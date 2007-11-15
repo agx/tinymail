@@ -5,8 +5,8 @@
  *
  * Copyright (C) 2001 Ximian, Inc. (www.ximian.com)
  *
- * This program is free software; you can redistribute it and/or 
- * modify it under the terms of version 2 of the GNU Lesser General Public 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU Lesser General Public
  * License as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -95,7 +95,7 @@ gboolean     camel_data_cache_is_partial (CamelDataCache *cache, const char *pat
 
 void         camel_data_cache_set_partial (CamelDataCache *cache, const char *path,
 					      const char *uid, gboolean partial);
-void         camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path, 
+void         camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path,
 					      const char *key);
 
 void camel_data_cache_set_flags (CamelDataCache *cdc, const char *path, CamelMessageInfoBase *mi);

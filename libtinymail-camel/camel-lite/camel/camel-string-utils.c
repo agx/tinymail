@@ -74,7 +74,7 @@ void camel_du (char *name, int *my_size)
 			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
 			if (isdir (p))
 				camel_du (p, my_size);
-			else 
+			else
 			{
 				struct stat st;
 				if (stat (p, &st) == 0)
@@ -99,7 +99,7 @@ static int ignorentd (char *name)
 	return 0;
 }
 
-void 
+void
 camel_rm (char *name)
 {
 	DIR *dir;
@@ -118,7 +118,7 @@ camel_rm (char *name)
 			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
 			if (isdir (p))
 				camel_rm (p);
-			else 
+			else
 				remove (p);
 			g_free (p);
 		}
@@ -140,7 +140,7 @@ camel_strcase_hash (gconstpointer v)
 {
 	const char *p = (char *) v;
 	guint h = 0, g;
-	
+
 	for ( ; *p != '\0'; p++) {
 		h = (h << 4) + g_ascii_toupper (*p);
 		if ((g = h & 0xf0000000)) {
@@ -148,7 +148,7 @@ camel_strcase_hash (gconstpointer v)
 			h = h ^ g;
 		}
 	}
-	
+
 	return h;
 }
 
@@ -163,8 +163,8 @@ void
 camel_string_list_free (GList *string_list)
 {
 	if (string_list == NULL)
-		return; 
-	
+		return;
+
 	g_list_foreach (string_list, free_string, NULL);
 	g_list_free (string_list);
 }
@@ -175,21 +175,21 @@ camel_strstrcase (const char *haystack, const char *needle)
 	/* find the needle in the haystack neglecting case */
 	const char *ptr;
 	guint len;
-	
+
 	g_return_val_if_fail (haystack != NULL, NULL);
 	g_return_val_if_fail (needle != NULL, NULL);
-	
+
 	len = strlen (needle);
 	if (len > strlen (haystack))
 		return NULL;
-	
+
 	if (len == 0)
 		return (char *) haystack;
-	
+
 	for (ptr = haystack; *(ptr + len - 1) != '\0'; ptr++)
 		if (!g_ascii_strncasecmp (ptr, needle, len))
 			return (char *) ptr;
-	
+
 	return NULL;
 }
 
@@ -198,23 +198,23 @@ const char *
 camel_strdown (char *str)
 {
 	register char *s = str;
-	
+
 	while (*s) {
 		if (*s >= 'A' && *s <= 'Z')
 			*s += 0x20;
 		s++;
 	}
-	
+
 	return str;
 }
 
 /**
  * camel_tolower:
- * @c: 
- * 
+ * @c:
+ *
  * ASCII to-lower function.
- * 
- * Return value: 
+ *
+ * Return value:
  **/
 char camel_tolower(char c)
 {
@@ -226,11 +226,11 @@ char camel_tolower(char c)
 
 /**
  * camel_toupper:
- * @c: 
- * 
+ * @c:
+ *
  * ASCII to-upper function.
- * 
- * Return value: 
+ *
+ * Return value:
  **/
 char camel_toupper(char c)
 {
@@ -247,7 +247,6 @@ static int cnt=0;
 /* working stuff for pstrings */
 static pthread_mutex_t pstring_lock = PTHREAD_MUTEX_INITIALIZER;
 static GHashTable *pstring_table = NULL;
-
 
 /**
  * camel_pstring_add:
@@ -267,20 +266,20 @@ camel_pstring_add (char *str, gboolean own)
 	void *pcount;
 	char *pstr;
 	int count;
-	
+
 	if (str == NULL)
 		return NULL;
-	
+
 	if (str[0] == '\0') {
 		if (own)
 			g_free (str);
 		return "";
 	}
-	
+
 	pthread_mutex_lock (&pstring_lock);
 	if (pstring_table == NULL)
 		pstring_table = g_hash_table_new (g_str_hash, g_str_equal);
-	
+
 	if (g_hash_table_lookup_extended (pstring_table, str, (void **) &pstr, &pcount)) {
 		count = GPOINTER_TO_INT (pcount) + 1;
 		g_hash_table_insert (pstring_table, pstr, GINT_TO_POINTER (count));
@@ -291,13 +290,13 @@ camel_pstring_add (char *str, gboolean own)
 
 #ifdef MEMDEBUG
 		cnt++;
-		printf ("%d\n", cnt); 
+		printf ("%d\n", cnt);
 #endif
 		g_hash_table_insert (pstring_table, pstr, GINT_TO_POINTER (1));
 	}
-	
+
 	pthread_mutex_unlock (&pstring_lock);
-	
+
 	return pstr;
 }
 
@@ -305,12 +304,12 @@ camel_pstring_add (char *str, gboolean own)
 /**
  * camel_pstring_strdup:
  * @s: String to copy.
- * 
+ *
  * Create a new pooled string entry for the string @s.  A pooled
  * string is a table where common strings are uniquified to the same
  * pointer value.  They are also refcounted, so freed when no longer
  * in use.  In a thread-safe manner.
- * 
+ *
  * The NULL and empty strings are special cased to constant values.
  *
  * Return value: A pointer to an equivalent string of @s.  Use
@@ -326,7 +325,7 @@ camel_pstring_strdup (const char *s)
 /**
  * camel_pstring_free:
  * @s: String to free.
- * 
+ *
  * De-ref a pooled string. If no more refs exist to this string, it will be deallocated.
  *
  * NULL and the empty string are special cased.

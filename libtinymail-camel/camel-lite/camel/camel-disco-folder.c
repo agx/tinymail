@@ -1,13 +1,13 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 /* camel-disco-folder.c: abstract class for a disconnectable folder */
 
-/* 
+/*
  * Authors: Dan Winship <danw@ximian.com>
  *
  * Copyright (C) 2001 Ximian, Inc.
  *
- * This program is free software; you can redistribute it and/or 
- * modify it under the terms of version 2 of the GNU Lesser General Public 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU Lesser General Public
  * License as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -102,11 +102,11 @@ cdf_sync_offline(CamelSession *session, CamelSessionThreadMsg *mm)
 	struct _cdf_sync_msg *m = (struct _cdf_sync_msg *)mm;
 	int i;
 
-	camel_operation_start(NULL, "Downloading new messages for offline mode");
+	camel_operation_start(NULL, _("Downloading new messages for offline mode"));
 
 	if (m->changes) {
 		for (i=0;i<m->changes->uid_added->len;i++) {
-			
+
 			camel_operation_progress(NULL, i, m->changes->uid_added->len);
 			camel_disco_folder_cache_message((CamelDiscoFolder *)m->folder,
 							 m->changes->uid_added->pdata[i],
@@ -464,7 +464,7 @@ disco_prepare_for_offline (CamelDiscoFolder *disco_folder,
 	GPtrArray *uids;
 	int i;
 
-	camel_operation_start(NULL, "Preparing folder '%s' for offline", folder->full_name);
+	camel_operation_start(NULL, _("Preparing folder '%s' for offline"), folder->full_name);
 
 	if (expression)
 		uids = camel_folder_search_by_expression (folder, expression, ex);
@@ -477,7 +477,6 @@ disco_prepare_for_offline (CamelDiscoFolder *disco_folder,
 	}
 
 	for (i = 0; i < uids->len; i++) {
-		
 		camel_disco_folder_cache_message (disco_folder, uids->pdata[i], ex);
 		camel_operation_progress(NULL, i, uids->len);
 		if (camel_exception_is_set (ex))
@@ -503,7 +502,7 @@ disco_prepare_for_offline (CamelDiscoFolder *disco_folder,
  * the bodies of all messages described by @expression (using the
  * same syntax as camel_folder_search_by_expression() ).
  **/
-void 
+void
 camel_disco_folder_prepare_for_offline (CamelDiscoFolder *disco_folder,
 					const char *expression,
 					CamelException *ex)

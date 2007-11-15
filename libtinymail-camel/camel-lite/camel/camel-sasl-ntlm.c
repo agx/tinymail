@@ -48,9 +48,9 @@ static void
 camel_sasl_ntlm_class_init (CamelSaslNTLMClass *camel_sasl_ntlm_class)
 {
 	CamelSaslClass *camel_sasl_class = CAMEL_SASL_CLASS (camel_sasl_ntlm_class);
-	
+
 	parent_class = CAMEL_SASL_CLASS (camel_type_get_global_classfuncs (camel_sasl_get_type ()));
-	
+
 	/* virtual method overload */
 	camel_sasl_class->challenge = ntlm_challenge;
 }
@@ -105,7 +105,7 @@ ntlm_challenge (CamelSasl *sasl, GByteArray *token, CamelException *ex)
 	ret = g_byte_array_new ();
 
 	if (!token || !token->len) {
-		g_byte_array_append (ret, (guchar *) NTLM_REQUEST,
+		g_byte_array_append (ret, (guint8 *) NTLM_REQUEST,
 				     sizeof (NTLM_REQUEST) - 1);
 		return ret;
 	}
@@ -142,8 +142,8 @@ ntlm_challenge (CamelSasl *sasl, GByteArray *token, CamelException *ex)
 }
 
 /* MD4 */
-static void md4sum                (const unsigned char *in, 
-				   int                  nbytes, 
+static void md4sum                (const unsigned char *in,
+				   int                  nbytes,
 				   unsigned char        digest[16]);
 
 /* DES */
@@ -195,7 +195,7 @@ ntlm_nt_hash (const char *password, char hash[21])
 		*p++ = '\0';
 	}
 
-	md4sum (buf, p - buf, ( unsigned char *) hash);
+	md4sum (buf, p - buf, (unsigned char *) hash);
 	memset (hash + 16, 0, 5);
 
 	g_free (buf);
@@ -208,7 +208,7 @@ ntlm_set_string (GByteArray *ba, int offset, const char *data, int len)
 	ba->data[offset + 1] = ba->data[offset + 3] = (len >> 8) & 0xFF;
 	ba->data[offset + 4] =  ba->len       & 0xFF;
 	ba->data[offset + 5] = (ba->len >> 8) & 0xFF;
-	g_byte_array_append (ba, (guchar *) data, len);
+	g_byte_array_append (ba, (guint8 *) data, len);
 }
 
 
@@ -258,7 +258,7 @@ ntlm_calc_response (const guchar key[21], const guchar plaintext[8],
 }
 
 
-/* 
+/*
  * MD4 encoder. (The one everyone else uses is not GPL-compatible;
  * this is a reimplementation from spec.) This doesn't need to be
  * efficient for our purposes, although it would be nice to fix
@@ -532,7 +532,7 @@ static void
 des (guint32 ks[16][2], unsigned char block[8])
 {
 	guint32 left, right, work;
-	
+
 	/* Read input block and place in left/right in big-endian order */
 	left = ((guint32)block[0] << 24)
 	 | ((guint32)block[1] << 16)
@@ -544,11 +544,11 @@ des (guint32 ks[16][2], unsigned char block[8])
 	 | (guint32)block[7];
 
 	/* Hoey's clever initial permutation algorithm, from Outerbridge
-	 * (see Schneier p 478)	
+	 * (see Schneier p 478)
 	 *
 	 * The convention here is the same as Outerbridge: rotate each
 	 * register left by 1 bit, i.e., so that "left" contains permuted
-	 * input bits 2, 3, 4, ... 1 and "right" contains 33, 34, 35, ... 32	
+	 * input bits 2, 3, 4, ... 1 and "right" contains 33, 34, 35, ... 32
 	 * (using origin-1 numbering as in the FIPS). This allows us to avoid
 	 * one of the two rotates that would otherwise be required in each of
 	 * the 16 rounds.

@@ -32,7 +32,7 @@
 #    ifdef TRANSDOM
 #        undef _
 #        define _(String) dgettext (TRANSDOM, String)
-#    else 
+#    else
 #        define _(String) gettext (String)
 #    endif
 #    ifdef gettext_noop

@@ -175,7 +175,7 @@ local_finalize(CamelObject * object)
 	g_free(local_folder->priv);
 }
 
-static int 
+static int
 local_get_local_size (CamelFolder *folder)
 {
 	CamelLocalFolder *local_folder = (CamelLocalFolder *) folder;
@@ -229,7 +229,7 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 	int len;
 	CamelURL *url;
 	CamelLocalStore *ls = (CamelLocalStore *)parent_store;
-	
+
 	folder = (CamelFolder *)lf;
 
 	name = g_path_get_basename(full_name);
@@ -285,9 +285,9 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 #if 0
 	/* if we have no/invalid index file, force it */
 	forceindex = camel_text_index_check(lf->index_path) == -1;
-#endif 
+#endif
 
-	/* TNY: Ignore indexing (for Tinymail) 
+	/* TNY: Ignore indexing (for Tinymail)
 	foceindex = FALSE; */
 
 #if 0
@@ -315,7 +315,7 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 
 
 	folder->summary = (CamelFolderSummary *)CLOCALF_CLASS(lf)->create_summary(lf, lf->summary_path, lf->folder_path, lf->index);
-	
+
 	/* camel_local_summary_load((CamelLocalSummary *)folder->summary, forceindex, NULL); */
 
 	/* We don't need to sync here ..., it can sync later on when it calls refresh info */
@@ -333,7 +333,7 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 	if ((flags & CAMEL_STORE_FOLDER_CREATE) != 0) {
 		url = camel_url_copy (((CamelService *) parent_store)->url);
 		camel_url_set_fragment (url, full_name);
-	
+
 		fi = camel_folder_info_new ();
 		fi->full_name = g_strdup (full_name);
 		fi->name = g_strdup (name);
@@ -347,7 +347,7 @@ camel_local_folder_construct(CamelLocalFolder *lf, CamelStore *parent_store, con
 		}
 
 		camel_url_free (url);
-	
+
 		camel_object_trigger_event(CAMEL_OBJECT (parent_store), "folder_created", fi);
 		camel_folder_info_free(fi);
 	}
@@ -422,7 +422,7 @@ local_getv(CamelObject *object, CamelException *ex, CamelArgGetV *args)
 									      ((CamelService *)folder->parent_store)->url->protocol);
 				else
 					/* a full path + protocol */
-					folder->description = g_strdup_printf(_("%s (%s)"), path, 
+					folder->description = g_strdup_printf(_("%s (%s)"), path,
 									      ((CamelService *)folder->parent_store)->url->protocol);
 			}
 			*arg->ca_str = folder->description;
@@ -506,7 +506,7 @@ local_refresh_info(CamelFolder *folder, CamelException *ex)
 	if (camel_local_summary_check((CamelLocalSummary *)folder->summary, lf->changes, ex) == -1)
 		return;
 
-	/* TNY TODO: Temporary fix (changeinfo's for local folders?! 
+	/* TNY TODO: Temporary fix (changeinfo's for local folders?!
 	if (camel_folder_change_info_changed(lf->changes)) {
 		camel_object_trigger_event((CamelObject *)folder, "folder_changed", lf->changes);
 		camel_folder_change_info_clear(lf->changes);
@@ -552,7 +552,7 @@ static void
 local_delete(CamelFolder *folder)
 {
 	CamelLocalFolder *lf = (CamelLocalFolder *)folder;
-	
+
 	if (lf->index)
 		camel_index_delete(lf->index);
 

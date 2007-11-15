@@ -27,9 +27,9 @@
 #include <camel/camel-stream.h>
 
 #ifdef DEBUG
-#define pop3_debug	g_print 
+#define pop3_debug	g_print
 #else
-#define pop3_debug(o,...)	
+#define pop3_debug(o,...)
 #endif
 
 

@@ -162,7 +162,7 @@ static int
 summary_header_load (CamelFolderSummary *s)
 {
 	CamelImapSummary *ims = CAMEL_IMAP_SUMMARY (s);
-	
+
 	if (camel_imap_summary_parent->summary_header_load (s) == -1)
 		return -1;
 
@@ -176,7 +176,7 @@ summary_header_load (CamelFolderSummary *s)
 
 	/* Version 1 */
 	ims->version = g_ntohl(get_unaligned_u32(s->filepos)); s->filepos += 4;
-	
+
 	if (ims->version == 2) {
 		/* Version 2: for compat with version 2 of the imap4 summary files */
 		int have_mlist;
@@ -184,7 +184,7 @@ summary_header_load (CamelFolderSummary *s)
 	}
 
 	ims->validity = g_ntohl(get_unaligned_u32(s->filepos)); s->filepos += 4;
-	
+
 	if (ims->version > CAMEL_IMAP_SUMMARY_VERSION) {
 		g_warning("Unkown summary version\n");
 		errno = EINVAL;
@@ -319,8 +319,7 @@ camel_imap_summary_add_offline (CamelFolderSummary *summary, const char *uid,
 #endif
 
 	mi->info.size = ((CamelMessageInfoBase *)info)->size;
-	if (mi->info.uid)
-		g_free (mi->info.uid);
+	g_free (mi->info.uid);
 	mi->info.uid = g_strdup (uid);
 
 	label_to_flags(mi);
@@ -335,9 +334,9 @@ camel_imap_summary_add_offline_uncached (CamelFolderSummary *summary, const char
 	CamelImapMessageInfo *mi;
 
 	mi = camel_message_info_clone(info);
-	if (mi->info.uid)
-		g_free (mi->info.uid);
+	g_free (mi->info.uid);
 	mi->info.uid = g_strdup(uid);
+
 	label_to_flags(mi);
 
 	camel_folder_summary_add (summary, (CamelMessageInfo *)mi);

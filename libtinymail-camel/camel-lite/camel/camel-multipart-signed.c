@@ -1,5 +1,5 @@
-/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- 
- * camel-multipart.c : Abstract class for a multipart 
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
+ * camel-multipart.c : Abstract class for a multipart
  *
  * Authors: Michael Zucchi <notzed@ximian.com>
  *
@@ -265,7 +265,7 @@ parse_content(CamelMultipartSigned *mps)
 	mps->start2 = -1;
 	mps->end2 = -1;
 
-g_static_rec_mutex_lock (&global_plock);
+	g_static_rec_mutex_lock (&global_plock);
 	while ((state = camel_mime_parser_step(cmp, &buf, &len)) != CAMEL_MIME_PARSER_STATE_MULTIPART_END) {
 		if (mps->start1 == -1) {
 			mps->start1 = camel_mime_parser_tell_start_headers(cmp);
@@ -284,11 +284,11 @@ g_static_rec_mutex_lock (&global_plock);
 		if (skip_content(cmp) == -1)
 			break;
 	}
-g_static_rec_mutex_unlock (&global_plock);
+	g_static_rec_mutex_unlock (&global_plock);
 
 	if (state == CAMEL_MIME_PARSER_STATE_MULTIPART_END) {
 		mps->end2 = camel_mime_parser_tell_start_boundary(cmp);
-		
+
 		camel_multipart_set_preface(mp, camel_mime_parser_preface(cmp));
 		camel_multipart_set_postface(mp, camel_mime_parser_postface(cmp));
 	}
@@ -379,7 +379,7 @@ signed_get_part(CamelMultipart *multipart, guint index)
 			camel_object_ref(stream);
 		} else {
 
-			if (mps->start1 == -1 || mps->end1 == -1) 
+			if (mps->start1 == -1 || mps->end1 == -1)
 			{
 				if (parse_content(mps) == -1) {
 					g_warning("Trying to get content on an invalid multipart/signed");
@@ -523,7 +523,7 @@ write_to_stream (CamelDataWrapper *data_wrapper, CamelStream *stream)
 	const char *boundary;
 	ssize_t total = 0;
 	ssize_t count;
-	
+
 	/* we have 3 basic cases:
 	   1. constructed, we write out the data wrapper stream we got
 	   2. signed content, we create and write out a new stream
@@ -562,7 +562,7 @@ write_to_stream (CamelDataWrapper *data_wrapper, CamelStream *stream)
 	if (count == -1)
 		return -1;
 	total += count;
-	
+
 	/* boundary */
 	count = camel_stream_printf(stream, "\n--%s\n", boundary);
 	if (count == -1)
@@ -589,7 +589,7 @@ write_to_stream (CamelDataWrapper *data_wrapper, CamelStream *stream)
 		total += count;
 	}
 
-	return total;	
+	return total;
 }
 
 
@@ -626,7 +626,7 @@ camel_multipart_signed_get_content_stream(CamelMultipartSigned *mps, CamelExcept
 		sub = camel_seekable_substream_new((CamelSeekableStream *)((CamelDataWrapper *)mps)->stream, mps->start1, mps->end1);
 		constream = (CamelStream *)camel_stream_filter_new_with_stream(sub);
 		camel_object_unref((CamelObject *)sub);
-		
+
 		/* Note: see rfc2015 or rfc3156, section 5 */
 		canon_filter = camel_mime_filter_canon_new (CAMEL_MIME_FILTER_CANON_CRLF);
 		camel_stream_filter_add((CamelStreamFilter *)constream, (CamelMimeFilter *)canon_filter);

@@ -127,13 +127,13 @@ set_vbuf(CamelStreamBuffer *sbf, char *buf, CamelStreamBufferMode mode, int size
 		g_free(sbf->buf);
 	}
 	if (buf) {
-		sbf->buf = (unsigned char*)buf;
+		sbf->buf = (unsigned char *) buf;
 		sbf->flags |= BUF_USER;
 	} else {
 		sbf->buf = g_malloc(size);
 		sbf->flags &= ~BUF_USER;
 	}
-	
+
 	sbf->ptr = sbf->buf;
 	sbf->end = sbf->buf;
 	sbf->size = size;
@@ -254,7 +254,7 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 					bptr += bytes_read;
 				}
 			} else {
-				bytes_read = camel_stream_read(sbf->stream, (char *)sbf->buf, sbf->size);
+				bytes_read = camel_stream_read(sbf->stream, (char *) sbf->buf, sbf->size);
 				if (bytes_read>0) {
 					size_t bytes_used = bytes_read > n ? n : bytes_read;
 					sbf->ptr = sbf->buf;
@@ -313,7 +313,7 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 
 	/* if we've filled the buffer, write it out, reset buffer */
 	if (left == todo) {
-		if (stream_write_all(sbf->stream, (const char *)sbf->buf, sbf->size) == -1)
+		if (stream_write_all(sbf->stream, (const char *) sbf->buf, sbf->size) == -1)
 			return -1;
 
 		sbf->ptr = sbf->buf;
@@ -340,10 +340,10 @@ stream_flush (CamelStream *stream)
 
 	if ((sbf->mode & CAMEL_STREAM_BUFFER_MODE) == CAMEL_STREAM_BUFFER_WRITE) {
 		size_t len = sbf->ptr - sbf->buf;
-		
-		if (camel_stream_write (sbf->stream, (const char *)sbf->buf, len) == -1)
+
+		if (camel_stream_write (sbf->stream, (const char *) sbf->buf, len) == -1)
 			return -1;
-		
+
 		sbf->ptr = sbf->buf;
 	} else {
 		/* nothing to do for read mode 'flush' */
@@ -392,8 +392,8 @@ camel_stream_buffer_gets(CamelStreamBuffer *sbf, char *buf, unsigned int max)
 	int bytes_read;
 
 	outptr = buf;
-	inptr = (char*)sbf->ptr;
-	inend = (char*)sbf->end;
+	inptr = (char *) sbf->ptr;
+	inend = (char *) sbf->end;
 	outend = buf+max-1;	/* room for NUL */
 
 	do {
@@ -402,14 +402,14 @@ camel_stream_buffer_gets(CamelStreamBuffer *sbf, char *buf, unsigned int max)
 			*outptr++ = c;
 			if (c == '\n') {
 				*outptr = 0;
-				sbf->ptr = (unsigned char*) inptr;
+				sbf->ptr = (unsigned char *) inptr;
 				return outptr-buf;
 			}
 		}
 		if (outptr == outend)
 			break;
 
-		bytes_read = camel_stream_read (sbf->stream, (char*)sbf->buf, sbf->size);
+		bytes_read = camel_stream_read (sbf->stream, (char *) sbf->buf, sbf->size);
 		if (bytes_read == -1) {
 			if (buf == outptr)
 				return -1;
@@ -418,11 +418,11 @@ camel_stream_buffer_gets(CamelStreamBuffer *sbf, char *buf, unsigned int max)
 		}
 		sbf->ptr = sbf->buf;
 		sbf->end = sbf->buf + bytes_read;
-		inptr = (char*)sbf->ptr;
-		inend = (char*)sbf->end;
+		inptr = (char *) sbf->ptr;
+		inend = (char *) sbf->end;
 	} while (bytes_read>0);
 
-	sbf->ptr = (unsigned char*)inptr;
+	sbf->ptr = (unsigned char *) inptr;
 	*outptr = 0;
 
 	return (int)(outptr - buf);
@@ -492,7 +492,7 @@ camel_stream_buffer_read_line (CamelStreamBuffer *sbf)
 	p = sbf->linebuf;
 
 	while (1) {
-		nread = camel_stream_buffer_gets (sbf, (char*)p, sbf->linesize - (p - sbf->linebuf));
+		nread = camel_stream_buffer_gets (sbf, (char *) p, sbf->linesize - (p - sbf->linebuf));
 		if (nread <=0) {
 			if (p > sbf->linebuf)
 				break;
@@ -514,5 +514,5 @@ camel_stream_buffer_read_line (CamelStreamBuffer *sbf)
 		p--;
 	p[0] = 0;
 
-	return g_strdup((gchar*)sbf->linebuf);
+	return g_strdup((char *) sbf->linebuf);
 }

@@ -68,7 +68,7 @@ CamelType
 camel_local_summary_get_type(void)
 {
 	static CamelType type = CAMEL_INVALID_TYPE;
-	
+
 	if (type == CAMEL_INVALID_TYPE) {
 		type = camel_type_register(camel_folder_summary_get_type(), "CamelLocalSummary",
 					   sizeof (CamelLocalSummary),
@@ -78,7 +78,7 @@ camel_local_summary_get_type(void)
 					   (CamelObjectInitFunc) camel_local_summary_init,
 					   (CamelObjectFinalizeFunc) camel_local_summary_finalise);
 	}
-	
+
 	return type;
 }
 
@@ -86,7 +86,7 @@ static void
 camel_local_summary_class_init(CamelLocalSummaryClass *klass)
 {
 	CamelFolderSummaryClass *sklass = (CamelFolderSummaryClass *) klass;
-	
+
 	camel_local_summary_parent = CAMEL_FOLDER_SUMMARY_CLASS(camel_type_get_global_classfuncs(camel_folder_summary_get_type()));
 
 	sklass->summary_header_load = summary_header_load;
@@ -290,7 +290,7 @@ camel_local_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changei
 		}
 
 		printf("\nMemory used by summary:\n\n");
-		printf("Total of %d messages\n", camel_folder_summary_count(s)); 
+		printf("Total of %d messages\n", camel_folder_summary_count(s));
 		printf("Total: %d bytes (ave %f)\n", stats.citotal + stats.mitotal,
 		       (double)(stats.citotal+stats.mitotal)/(double)camel_folder_summary_count(s));
 		printf("Message Info: %d (ave %f)\n", stats.mitotal, (double)stats.mitotal/(double)stats.micount);
@@ -315,17 +315,17 @@ camel_local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const Cam
 
 /**
  * camel_local_summary_write_headers:
- * @fd: 
- * @header: 
- * @xevline: 
+ * @fd:
+ * @header:
+ * @xevline:
  * @status:
  * @xstatus:
- * 
+ *
  * Write a bunch of headers to the file @fd.  IF xevline is non NULL, then
  * an X-Evolution header line is created at the end of all of the headers.
  * If @status is non NULL, then a Status header line is also written.
  * The headers written are termianted with a blank line.
- * 
+ *
  * Return value: -1 on error, otherwise the number of bytes written.
  **/
 int
@@ -418,7 +418,7 @@ local_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChangeIn
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				      _("Could not save summary: %s: %s"),
 				      cls->folder_path, g_strerror (errno));
-		
+
 		g_warning ("Could not save summary for %s: %s", cls->folder_path, strerror (errno));
 	}
 
@@ -435,7 +435,7 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 	char *xev;
 
 	d(printf("Adding message to summary\n"));
-	
+
 	mi = (CamelLocalMessageInfo *)camel_folder_summary_add_from_message((CamelFolderSummary *)cls, msg);
 	if (mi) {
 		d(printf("Added, uid = %s\n", mi->uid));
@@ -449,7 +449,7 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 				camel_message_info_set_user_flag((CamelMessageInfo *)mi, flag->name, TRUE);
 				flag = flag->next;
 			}
-			
+
 			while (tag) {
 				camel_message_info_set_user_tag((CamelMessageInfo *)mi, tag->name, tag->value);
 				tag = tag->next;
@@ -463,8 +463,9 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 		/* we need to calculate the size ourselves */
 		if (mi->info.size == 0) {
 			CamelStreamNull *sn = (CamelStreamNull *)camel_stream_null_new();
+
 			camel_data_wrapper_write_to_stream((CamelDataWrapper *)msg, (CamelStream *)sn);
-			mi->info.size = (sn->written);
+			mi->info.size = sn->written;
 			camel_object_unref((CamelObject *)sn);
 		}
 
@@ -511,7 +512,7 @@ local_summary_encode_x_evolution(CamelLocalSummary *cls, const CamelLocalMessage
 #ifdef NON_TINYMAIL_FEATURES
 	if (flag || tag) {
 		val = g_string_new ("");
-		
+
 		if (flag) {
 			while (flag) {
 				g_string_append (val, flag->name);
@@ -541,7 +542,7 @@ local_summary_encode_x_evolution(CamelLocalSummary *cls, const CamelLocalMessage
 
 	ret = out->str;
 	g_string_free (out, FALSE);
-	
+
 	return ret;
 }
 
@@ -571,7 +572,7 @@ local_summary_decode_x_evolution(CamelLocalSummary *cls, const char *xev, CamelL
 	if (mi == NULL)
 		return 0;
 
-	/* check for additional data */	
+	/* check for additional data */
 	header = strchr(xev, ';');
 	if (header) {
 		params = camel_header_param_list_decode(header+1);
@@ -623,8 +624,8 @@ summary_header_load(CamelFolderSummary *s)
 		return 0;
 
 	/* otherwise load the version number */
-	
-	cls->version = g_ntohl(get_unaligned_u32(s->filepos)); 
+
+	cls->version = g_ntohl(get_unaligned_u32(s->filepos));
 	s->filepos += 4;
 
 	return 0;

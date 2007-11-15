@@ -99,7 +99,6 @@ camel_seekable_substream_get_type (void)
 	return camel_seekable_substream_type;
 }
 
-
 /**
  * camel_seekable_substream_new:
  * @parent_stream: a #CamelSeekableStream object

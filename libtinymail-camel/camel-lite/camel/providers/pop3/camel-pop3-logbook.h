@@ -1,4 +1,4 @@
-/* 
+/*
  * Authors:
  *   Philip Van Hoof <pvanhoof@gnome.org>
  *

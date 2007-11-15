@@ -22,7 +22,6 @@
 #ifndef _CAMEL_FOLDER_SUMMARY_H
 #define _CAMEL_FOLDER_SUMMARY_H
 
-
 #include <stdio.h>
 #include <time.h>
 #include <camel/camel-mime-parser.h>
@@ -50,10 +49,10 @@ typedef struct _CamelFolderMetaSummary CamelFolderMetaSummary;
    describe the content structure of the message (if it has any) */
 struct _CamelMessageContentInfo {
 	struct _CamelMessageContentInfo *next;
-	
+
 	struct _CamelMessageContentInfo *childs;
 	struct _CamelMessageContentInfo *parent;
-	
+
 	CamelContentType *type;
 	char *id;
 	char *description;
@@ -151,8 +150,7 @@ struct _CamelMessageInfo {
 /* Otherwise they can do their own thing entirely */
 
 /*                                          on x86_32 */
-struct _CamelMessageInfoBase 
-{
+struct _CamelMessageInfoBase {
 	CamelFolderSummary *summary;       /* 4 bytes */
 	guint32 refcount;                  /* 4 bytes */
 	char *uid;                         /* 4 bytes */
@@ -178,7 +176,6 @@ struct _CamelMessageInfoBase
 typedef enum _CamelFolderSummaryFlags {
 	CAMEL_SUMMARY_DIRTY = 1<<0
 } CamelFolderSummaryFlags;
-
 
 struct _CamelFolderSummary {
 	CamelObject parent;

@@ -122,16 +122,16 @@ summary_header_load(CamelFolderSummary *s)
 		return -1;
 
 	/* Legacy version */
-	if (s->version == 0x100c) {		
+	if (s->version == 0x100c) {
 		ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &ims->uidvalidity, FALSE);
 		s->filepos = ptrchr;
 
 		return 0;
 	}
 
-	ims->version = g_ntohl(get_unaligned_u32(s->filepos)); 
+	ims->version = g_ntohl(get_unaligned_u32(s->filepos));
 	s->filepos += 4;
-	ims->uidvalidity = g_ntohl(get_unaligned_u32(s->filepos)); 
+	ims->uidvalidity = g_ntohl(get_unaligned_u32(s->filepos));
 	s->filepos += 4;
 
 	if (ims->version > CAMEL_IMAPP_SUMMARY_VERSION) {
@@ -141,7 +141,7 @@ summary_header_load(CamelFolderSummary *s)
 	}
 
 	return 0;
-}	
+}
 
 static int
 summary_header_save(CamelFolderSummary *s, FILE *out)
@@ -171,7 +171,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		iinfo =(CamelIMAPPMessageInfo *)info;
 
 		ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &iinfo->server_flags, FALSE);
-		s->filepos = ptrchr;		
+		s->filepos = ptrchr;
 	}
 
 	return info;

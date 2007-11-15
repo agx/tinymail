@@ -39,7 +39,7 @@ typedef struct _CamelFolderThreadNode {
 typedef struct _CamelFolderThread {
 	guint32 refcount  : 31;
 	guint32 subject   : 1;
-	
+
 	struct _CamelFolderThreadNode *tree;
 	struct _CamelFolderThreadNode *mem_chain;
 	CamelFolder *folder;

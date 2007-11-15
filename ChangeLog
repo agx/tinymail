@@ -1,3 +1,9 @@
+2007-11-15  Matthew Barnes  <mbarnes@redhat.com>
+
+	* Mark a bunch exception messages for translation.
+	* A few new argument guards here and there (e.g. g_return_if_fail).
+	* Tons of little whitespace and coding style fixes.
+
 2007-11-14  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Changed a hard reference into a weak reference, although I'm not

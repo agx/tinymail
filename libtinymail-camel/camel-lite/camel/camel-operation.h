@@ -35,7 +35,6 @@ typedef enum _camel_operation_status_t {
 	CAMEL_OPERATION_END = -2
 } camel_operation_status_t;
 
-
 /* main thread functions */
 CamelOperation *camel_operation_new(CamelOperationStatusFunc status, void *status_data);
 void camel_operation_mute(CamelOperation *cc);

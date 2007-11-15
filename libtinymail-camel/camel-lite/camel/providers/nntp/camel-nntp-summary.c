@@ -73,7 +73,7 @@ CamelType
 camel_nntp_summary_get_type(void)
 {
 	static CamelType type = CAMEL_INVALID_TYPE;
-	
+
 	if (type == CAMEL_INVALID_TYPE) {
 		type = camel_type_register(camel_folder_summary_get_type(), "CamelNNTPSummary",
 					   sizeof (CamelNNTPSummary),
@@ -83,7 +83,7 @@ camel_nntp_summary_get_type(void)
 					   (CamelObjectInitFunc) camel_nntp_summary_init,
 					   (CamelObjectFinalizeFunc) camel_nntp_summary_finalise);
 	}
-	
+
 	return type;
 }
 
@@ -91,7 +91,7 @@ static void
 camel_nntp_summary_class_init(CamelNNTPSummaryClass *klass)
 {
 	CamelFolderSummaryClass *sklass = (CamelFolderSummaryClass *) klass;
-	
+
 	camel_nntp_summary_parent = CAMEL_FOLDER_SUMMARY_CLASS(camel_type_get_global_classfuncs(camel_folder_summary_get_type()));
 
 	sklass->message_info_new_from_header  = message_info_new_from_header;
@@ -132,7 +132,7 @@ camel_nntp_summary_new(struct _CamelFolder *folder, const char *path)
 
 	camel_folder_summary_set_filename((CamelFolderSummary *)cns, path);
 	camel_folder_summary_set_build_content((CamelFolderSummary *)cns, FALSE);
-	
+
 	return cns;
 }
 
@@ -155,7 +155,7 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 		mi->uid = cns->priv->uid;
 		cns->priv->uid = NULL;
 	}
-	
+
 	return (CamelMessageInfo *)mi;
 }
 
@@ -177,7 +177,7 @@ summary_header_load(CamelFolderSummary *s)
 		return 0;
 	}
 
-	cns->version = g_ntohl(get_unaligned_u32(s->filepos)); 
+	cns->version = g_ntohl(get_unaligned_u32(s->filepos));
 	s->filepos += 4;
 
 	if (cns->version > CAMEL_NNTP_SUMMARY_VERSION) {
@@ -186,9 +186,9 @@ summary_header_load(CamelFolderSummary *s)
 		return -1;
 	}
 
-	cns->high = g_ntohl(get_unaligned_u32(s->filepos)); 
+	cns->high = g_ntohl(get_unaligned_u32(s->filepos));
 	s->filepos += 4;
-	cns->low = g_ntohl(get_unaligned_u32(s->filepos)); 
+	cns->low = g_ntohl(get_unaligned_u32(s->filepos));
 	s->filepos += 4;
 
 	return 0;
@@ -355,7 +355,7 @@ add_range_head(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high, 
 		n = strtoul(line, &line, 10);
 		if (n != i)
 			g_warning("retrieved message '%u' when i expected '%u'?\n", n, i);
-		
+
 		/* FIXME: use camel-mime-utils.c function for parsing msgid? */
 		if ((msgid = strchr(line, '<')) && (line = strchr(msgid+1, '>'))){
 			line[1] = 0;
@@ -474,7 +474,7 @@ camel_nntp_summary_check(CamelNNTPSummary *cns, CamelNNTPStore *store, char *lin
 					count--;
 					i--;
 				}
-				
+
 				camel_message_info_free(mi);
 			}
 		}
@@ -511,7 +511,7 @@ update:
 				camel_message_info_free(mi);
 			}
 		}
-		
+
 		if (si->info.unread != unread
 		    || si->info.total != count
 		    || si->first != f

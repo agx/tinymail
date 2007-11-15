@@ -7,8 +7,8 @@
  *
  * Copyright 1999, 2000 Ximian, Inc. (www.ximian.com)
  *
- * This program is free software; you can redistribute it and/or 
- * modify it under the terms of version 2 of the GNU Lesser General Public 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU Lesser General Public
  * License as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -35,8 +35,7 @@
 #define CAMEL_IS_FOLDER(o)    (CAMEL_CHECK_TYPE((o), CAMEL_FOLDER_TYPE))
 
 
-enum _CamelFolderReceiveType 
-{
+enum _CamelFolderReceiveType {
 	CAMEL_FOLDER_RECEIVE_FULL = 1<<0,
 	CAMEL_FOLDER_RECEIVE_PARTIAL = 1<<1,
 	CAMEL_FOLDER_RECEIVE_ANY_OR_FULL = 1<<2,
@@ -113,17 +112,17 @@ struct _CamelFolder {
 #define CAMEL_FOLDER_HAS_BEEN_DELETED       (1<<3)
 #define CAMEL_FOLDER_IS_TRASH               (1<<4)
 #define CAMEL_FOLDER_IS_JUNK                (1<<5)
-#define CAMEL_FOLDER_FILTER_JUNK            (1<<6)
+#define CAMEL_FOLDER_FILTER_JUNK	    (1<<6)
 #define CAMEL_FOLDER_IS_READONLY            (1<<7)
 #define CAMEL_FOLDER_HAS_PUSHEMAIL_CAPABILITY (1<<8)
 
 typedef struct {
 	CamelObjectClass parent_class;
 
-	/* Virtual methods */	
+	/* Virtual methods */
 	void   (*refresh_info) (CamelFolder *folder, CamelException *ex);
 
-	void   (*sync) (CamelFolder *folder, gboolean expunge, 
+	void   (*sync) (CamelFolder *folder, gboolean expunge,
 			CamelException *ex);
 
 	const char *  (*get_name)  (CamelFolder *folder);
@@ -131,18 +130,18 @@ typedef struct {
 
 	CamelStore *  (*get_parent_store) (CamelFolder *folder);
 
-	void (*expunge)  (CamelFolder *folder, 
+	void (*expunge)  (CamelFolder *folder,
 			  CamelException *ex);
 
 	int   (*get_message_count)   (CamelFolder *folder);
 	int   (*get_local_size)   (CamelFolder *folder);
 
-	void (*append_message)  (CamelFolder *folder, 
+	void (*append_message)  (CamelFolder *folder,
 				 CamelMimeMessage *message,
 				 const CamelMessageInfo *info,
 				 char **appended_uid,
 				 CamelException *ex);
-	
+
 	guint32 (*get_permanent_flags) (CamelFolder *folder);
 	guint32 (*get_message_flags)   (CamelFolder *folder,
 					const char *uid);
@@ -166,9 +165,9 @@ typedef struct {
 					  const char *name,
 					  const char *value);
 
-	CamelMimeMessage * (*get_message)  (CamelFolder *folder, 
+	CamelMimeMessage * (*get_message)  (CamelFolder *folder,
 					    const char *uid, CamelFolderReceiveType type,
-					    gint param, 
+					    gint param,
 					    CamelException *ex);
 
 	GPtrArray * (*get_uids)       (CamelFolder *folder);
@@ -196,10 +195,10 @@ typedef struct {
 				      GPtrArray **transferred_uids,
 				      gboolean delete_originals,
 				      CamelException *ex);
-	
+
 	void (*delete)           (CamelFolder *folder);
 	void (*rename)           (CamelFolder *folder, const char *newname);
-	
+
 	void     (*freeze)    (CamelFolder *folder);
 	void     (*thaw)      (CamelFolder *folder);
 	gboolean (*is_frozen) (CamelFolder *folder);
@@ -220,17 +219,17 @@ void               camel_folder_construct              (CamelFolder *folder,
 							const char *full_name,
 							const char *name);
 
-void               camel_folder_refresh_info           (CamelFolder *folder, 
+void               camel_folder_refresh_info           (CamelFolder *folder,
 							CamelException *ex);
-void               camel_folder_sync                   (CamelFolder *folder, 
-							gboolean expunge, 
+void               camel_folder_sync                   (CamelFolder *folder,
+							gboolean expunge,
 							CamelException *ex);
 
 CamelStore *       camel_folder_get_parent_store       (CamelFolder *folder);
 
 
 /* delete operations */
-void		   camel_folder_expunge                (CamelFolder *folder, 
+void		   camel_folder_expunge                (CamelFolder *folder,
 							CamelException *ex);
 
 
@@ -273,7 +272,7 @@ void		   camel_folder_set_message_user_tag  (CamelFolder *folder,
 
 
 /* message manipulation */
-void               camel_folder_append_message         (CamelFolder *folder, 
+void               camel_folder_append_message         (CamelFolder *folder,
 							CamelMimeMessage *message,
 							const CamelMessageInfo *info,
 							char **appended_uid,
@@ -297,7 +296,7 @@ void               camel_folder_free_summary          (CamelFolder *folder,
 						       GPtrArray *array);
 
 /* uid based access operations */
-CamelMimeMessage * camel_folder_get_message           (CamelFolder *folder, 
+CamelMimeMessage * camel_folder_get_message           (CamelFolder *folder,
 						       const char *uid, CamelFolderReceiveType type,
 						       gint param, CamelException *ex);
 #define camel_folder_delete_message(folder, uid) \

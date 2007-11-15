@@ -37,13 +37,13 @@ extern "C" {
 
 typedef struct _CamelStreamGZipClass CamelStreamGZipClass;
 
-enum 
+enum
 {
 	CAMEL_STREAM_GZIP_ZIP,
 	CAMEL_STREAM_GZIP_UNZIP
 };
 
-struct _CamelStreamGZip 
+struct _CamelStreamGZip
 {
 	CamelStream parent;
 

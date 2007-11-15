@@ -23,12 +23,14 @@
 #ifndef __CAMEL_IMAP4_SPECIALS_H__
 #define __CAMEL_IMAP4_SPECIALS_H__
 
+#include <glib.h>
+
 G_BEGIN_DECLS
 
 enum {
 	IS_ASPECIAL   = (1 << 0),
 	IS_CTRL       = (1 << 1),
-	IS_LWSP       = (1 << 2), 
+	IS_LWSP       = (1 << 2),
 	IS_QSPECIAL   = (1 << 3),
 	IS_SPACE      = (1 << 4),
 	IS_WILDCARD   = (1 << 5),

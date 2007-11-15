@@ -1,7 +1,7 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 /* camel-store.h : Abstract class for an email store */
 
-/* 
+/*
  *
  * Authors: Bertrand Guiheneuf <bertrand@helixcode.com>
  *          Michael Zucchi <NotZed@ximian.com>
@@ -9,8 +9,8 @@
  *
  * Copyright 1999, 2003 Ximian, Inc. (www.ximian.com)
  *
- * This program is free software; you can redistribute it and/or 
- * modify it under the terms of version 2 of the GNU Lesser General Public 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU Lesser General Public
  * License as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -121,7 +121,7 @@ typedef struct _CamelRenameInfo {
 struct _CamelStore {
 	CamelService parent_object;
 	struct _CamelStorePrivate *priv;
-	
+
 	CamelObjectBag *folders;
 
 	guint32 flags;
@@ -152,10 +152,10 @@ typedef struct {
 						     guint32 flags,
 						     CamelException *ex);
 
-	CamelFolder *   (*get_inbox)                (CamelStore *store, CamelException *ex);	
+	CamelFolder *   (*get_inbox)                (CamelStore *store, CamelException *ex);
 	CamelFolder *   (*get_trash)                (CamelStore *store, CamelException *ex);
 	CamelFolder *   (*get_junk)                 (CamelStore *store, CamelException *ex);
-	
+
 	CamelFolderInfo *(*create_folder)           (CamelStore *store,
 						     const char *parent_name,
 						     const char *folder_name,
@@ -167,16 +167,16 @@ typedef struct {
 						     const char *old_name,
 						     const char *new_name,
 						     CamelException *ex);
-	
+
 	void            (*sync)                     (CamelStore *store, int expunge, CamelException *ex);
-	
+
 	CamelFolderInfo *(*get_folder_info)         (CamelStore *store,
 						     const char *top,
 						     guint32 flags,
 						     CamelException *ex);
 	void            (*free_folder_info)         (CamelStore *store,
 						     CamelFolderInfo *fi);
-	
+
 	gboolean        (*folder_subscribed)        (CamelStore *store,
 						     const char *folder_name);
 	void            (*subscribe_folder)         (CamelStore *store,
@@ -187,9 +187,9 @@ typedef struct {
 						     CamelException *ex);
 	void            (*noop)                     (CamelStore *store,
 						     CamelException *ex);
-	void            (*get_folder_status)        (CamelStore *store, 
-						     const char *folder_name, 
-						     int *unseen, int *messages, 
+	void            (*get_folder_status)        (CamelStore *store,
+						     const char *folder_name,
+						     int *unseen, int *messages,
 						     int *uidnext);
 	void             (*delete_cache)            (CamelStore *store);
 
@@ -267,9 +267,9 @@ int              camel_store_folder_uri_equal         (CamelStore *store,
 						       const char *uri0,
 						       const char *uri1);
 
-void            camel_store_get_folder_status        (CamelStore *store, 
-						      const char *folder_name, 
-						      int *unseen, int *messages, 
+void            camel_store_get_folder_status        (CamelStore *store,
+						      const char *folder_name,
+						      int *unseen, int *messages,
 						      int *uidnext);
 
 void             camel_store_delete_cache            (CamelStore *store);

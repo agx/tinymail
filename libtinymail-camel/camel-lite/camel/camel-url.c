@@ -1,15 +1,15 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 /* camel-url.c : utility functions to parse URLs */
 
-/* 
+/*
  * Authors:
  *  Dan Winship <danw@ximian.com>
  *  Jeffrey Stedfast <fejj@ximian.com>
  *
  * Copyright 1999-2001 Ximian, Inc. (www.ximian.com)
  *
- * This program is free software; you can redistribute it and/or 
- * modify it under the terms of version 2 of the GNU Lesser General Public 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU Lesser General Public
  * License as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -62,6 +62,8 @@ camel_url_new_with_base (CamelURL *base, const char *url_string)
 	const char *start;
 	const char *end, *hash, *colon, *semi, *at, *slash, *question;
 	const char *p;
+
+	g_return_val_if_fail (url_string != NULL, NULL);
 
 	url = g_new0 (CamelURL, 1);
 	start = url_string;
@@ -207,9 +209,7 @@ camel_url_new_with_base (CamelURL *base, const char *url_string)
 		url->protocol = g_strdup (base->protocol);
 		url->user = g_strdup (base->user);
 		url->authmech = g_strdup (base->authmech);
-		if (base->passwd)
-			url->passwd = g_strdup (base->passwd);
-		else url->passwd = NULL;
+		url->passwd = g_strdup (base->passwd);
 		url->host = g_strdup (base->host);
 		url->port = base->port;
 
@@ -298,7 +298,11 @@ copy_param (GQuark key_id, gpointer data, gpointer user_data)
 CamelURL *
 camel_url_new (const char *url_string, CamelException *ex)
 {
-	CamelURL *url = camel_url_new_with_base (NULL, url_string);
+	CamelURL *url;
+
+	g_return_val_if_fail (url_string != NULL, NULL);
+
+	url = camel_url_new_with_base (NULL, url_string);
 
 	if (!url->protocol) {
 		camel_url_free (url);
@@ -324,21 +328,23 @@ camel_url_to_string (CamelURL *url, guint32 flags)
 {
 	GString *str;
 	char *return_result;
-	
+
+	g_return_val_if_fail (url != NULL, NULL);
+
 	/* IF YOU CHANGE ANYTHING IN THIS FUNCTION, RUN
 	 * tests/misc/url AFTERWARD.
 	 */
-	
+
 #ifdef G_OS_WIN32
 	if (url->protocol && !strcmp(url->protocol, "file"))
 		return g_filename_to_uri(url->path, url->host, NULL);
 #endif /* G_OS_WIN32 */
-	
+
 	str = g_string_sized_new (20);
-	
+
 	if (url->protocol)
 		g_string_append_printf (str, "%s:", url->protocol);
-	
+
 	if (url->host) {
 		g_string_append (str, "//");
 		if (url->user) {
@@ -359,7 +365,7 @@ camel_url_to_string (CamelURL *url, guint32 flags)
 		if (!url->path && (url->params || url->query || url->fragment))
 			g_string_append_c (str, '/');
 	}
-	
+
 	if (url->path)
 		append_url_encoded (str, url->path, ";?");
 	if (url->params && !(flags & CAMEL_URL_HIDE_PARAMS))
@@ -372,10 +378,10 @@ camel_url_to_string (CamelURL *url, guint32 flags)
 		g_string_append_c (str, '#');
 		append_url_encoded (str, url->fragment, NULL);
 	}
-	
+
 	return_result = str->str;
 	g_string_free (str, FALSE);
-	
+
 	return return_result;
 }
 
@@ -428,6 +434,8 @@ camel_url_free (CamelURL *url)
 void							\
 camel_url_set_##part (CamelURL *url, const char *part)	\
 {							\
+	g_return_if_fail (url != NULL);			\
+							\
 	g_free (url->part);				\
 	url->part = g_strdup (part);			\
 }
@@ -523,6 +531,8 @@ DEFINE_CAMEL_URL_SET (fragment)
 void
 camel_url_set_port (CamelURL *url, int port)
 {
+	g_return_if_fail (url != NULL);
+
 	url->port = port;
 }
 
@@ -538,6 +548,8 @@ camel_url_set_port (CamelURL *url, int port)
 void
 camel_url_set_param (CamelURL *url, const char *name, const char *value)
 {
+	g_return_if_fail (url != NULL);
+
 	if (value)
 		g_datalist_set_data_full (&url->params, name, g_strdup(value), g_free);
 	else
@@ -557,6 +569,8 @@ camel_url_set_param (CamelURL *url, const char *name, const char *value)
 const char *
 camel_url_get_param (CamelURL *url, const char *name)
 {
+	g_return_val_if_fail (url != NULL, NULL);
+
 	return g_datalist_get_data (&url->params, name);
 }
 
@@ -611,6 +625,8 @@ camel_url_encode (const char *part, const char *escape_extra)
 	GString *str;
 	char *encoded;
 
+	g_return_val_if_fail (part != NULL, NULL);
+
 	str = g_string_new (NULL);
 	append_url_encoded (str, part, escape_extra);
 	encoded = str->str;
@@ -631,6 +647,8 @@ void
 camel_url_decode (char *part)
 {
 	unsigned char *s, *d;
+
+	g_return_if_fail (part != NULL);
 
 #define XDIGIT(c) ((c) <= '9' ? (c) - '0' : ((c) & 0x4F) - 'A' + 10)
 
@@ -660,7 +678,7 @@ camel_url_hash (const void *v)
 	ADD_HASH (u->path);
 	ADD_HASH (u->query);
 	hash ^= u->port;
-	
+
 	return hash;
 }
 
@@ -673,7 +691,7 @@ check_equal (char *s1, char *s2)
 		else
 			return FALSE;
 	}
-	
+
 	if (s2 == NULL)
 		return FALSE;
 
@@ -708,12 +726,13 @@ camel_url_copy(const CamelURL *in)
 {
 	CamelURL *out;
 
+	g_return_val_if_fail (in != NULL, NULL);
+
 	out = g_malloc0(sizeof(*out));
 	out->protocol = g_strdup(in->protocol);
 	out->user = g_strdup(in->user);
 	out->authmech = g_strdup(in->authmech);
-	if (in->passwd)
-		out->passwd = g_strdup(in->passwd);
+	out->passwd = g_strdup(in->passwd);
 	out->host = g_strdup(in->host);
 	out->port = in->port;
 	out->path = g_strdup(in->path);

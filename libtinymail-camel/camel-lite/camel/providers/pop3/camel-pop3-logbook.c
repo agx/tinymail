@@ -1,4 +1,4 @@
-/* 
+/*
  * Authors:
  *   Philip Van Hoof <pvanhoof@gnome.org>
  *
@@ -53,7 +53,7 @@
 #include "camel-session.h"
 
 
-void 
+void
 camel_pop3_logbook_set_rootpath (CamelPOP3Logbook *book, const gchar *path)
 {
 	g_static_rec_mutex_lock (book->lock);
@@ -81,7 +81,7 @@ stripit (char *buffer)
 	return;
 }
 
-void 
+void
 camel_pop3_logbook_register (CamelPOP3Logbook *book, const gchar *uid)
 {
 	FILE *f = NULL;
@@ -89,7 +89,7 @@ camel_pop3_logbook_register (CamelPOP3Logbook *book, const gchar *uid)
 	g_static_rec_mutex_lock (book->lock);
 
 	if (book->registered) {
-		book->registered = g_list_prepend (book->registered, 
+		book->registered = g_list_prepend (book->registered,
 			g_strdup (uid));
 	}
 
@@ -106,7 +106,7 @@ camel_pop3_logbook_register (CamelPOP3Logbook *book, const gchar *uid)
 	return;
 }
 
-gboolean 
+gboolean
 camel_pop3_logbook_is_registered (CamelPOP3Logbook *book, const gchar *uid)
 {
 	gboolean truth = FALSE;
@@ -145,7 +145,7 @@ camel_pop3_logbook_is_registered (CamelPOP3Logbook *book, const gchar *uid)
 	return truth;
 }
 
-void 
+void
 camel_pop3_logbook_open (CamelPOP3Logbook *book)
 {
 	g_static_rec_mutex_lock (book->lock);
@@ -159,7 +159,7 @@ camel_pop3_logbook_open (CamelPOP3Logbook *book)
 				buffer = fgets (buffer, 1024, f);
 				stripit (buffer);
 				if (buffer) {
-					book->registered = g_list_prepend (book->registered, 
+					book->registered = g_list_prepend (book->registered,
 						g_strdup (buffer));
 					memset (buffer, 0, 1024);
 				}
@@ -171,7 +171,7 @@ camel_pop3_logbook_open (CamelPOP3Logbook *book)
 	g_static_rec_mutex_unlock (book->lock);
 }
 
-gboolean 
+gboolean
 camel_pop3_logbook_is_open (CamelPOP3Logbook *book, const gchar *uid)
 {
 	gboolean truth = FALSE;
@@ -189,7 +189,7 @@ foreach_free (gpointer data, gpointer user_data)
 	g_free (data);
 }
 
-void 
+void
 camel_pop3_logbook_close (CamelPOP3Logbook *book)
 {
 	g_static_rec_mutex_lock (book->lock);
@@ -206,7 +206,7 @@ camel_pop3_logbook_close (CamelPOP3Logbook *book)
 }
 
 
-static void 
+static void
 finalize (CamelObject *object)
 {
 	CamelPOP3Logbook *book = (CamelPOP3Logbook *) object;
@@ -238,7 +238,7 @@ camel_pop3_logbook_init (gpointer object, gpointer klass)
 }
 
 
-CamelPOP3Logbook* 
+CamelPOP3Logbook*
 camel_pop3_logbook_new (gpointer store_in)
 {
 	CamelPOP3Logbook *book = NULL;

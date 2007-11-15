@@ -4,8 +4,8 @@
  *
  * Authors: Michael Zucchi <notzed@ximian.com>
  *
- * This program is free software; you can redistribute it and/or 
- * modify it under the terms of version 2 of the GNU Lesser General Public 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU Lesser General Public
  * License as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -249,12 +249,12 @@ static int rem_dir (const gchar *tmp)
 
 	dir = opendir(tmp);
 	if (dir) {
-		while ( (d=readdir(dir)) ) 
+		while ( (d=readdir(dir)) )
 		{
 			struct stat st;
 
 			char *namea = d->d_name, *file;
-			
+
 			if (!strcmp(namea, ".") || !strcmp(namea, ".."))
 				continue;
 			file = g_strdup_printf("%s/%s", tmp, namea);
@@ -402,7 +402,7 @@ static guint scan_hash(const void *d)
 static gboolean scan_equal(const void *a, const void *b)
 {
 	const struct _scan_node *v1 = a, *v2 = b;
-	
+
 	return v1->inode == v2->inode && v1->dnode == v2->dnode;
 }
 
@@ -440,8 +440,6 @@ static CamelFolderInfo *scan_fi(CamelStore *store, guint32 flags, CamelURL *url,
 	      && stat(cur, &st) == 0 && S_ISDIR(st.st_mode)
 	      && stat(new, &st) == 0 && S_ISDIR(st.st_mode)))
 		fi->flags |= CAMEL_FOLDER_NOSELECT;
-
-	
 
 	g_free(new);
 	g_free(cur);

@@ -1,13 +1,13 @@
 /* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 /* camel-disco-diary.c: class for a disconnected operation log */
 
-/* 
+/*
  * Authors: Dan Winship <danw@ximian.com>
  *
  * Copyright (C) 2001 Ximian, Inc.
  *
- * This program is free software; you can redistribute it and/or 
- * modify it under the terms of version 2 of the GNU Lesser General Public 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU Lesser General Public
  * License as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
@@ -43,7 +43,7 @@
 #include "camel-session.h"
 #include "camel-store.h"
 
-#define d(x) 
+#define d(x)
 
 static void
 camel_disco_diary_class_init (CamelDiscoDiaryClass *camel_disco_diary_class)
@@ -293,7 +293,7 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 	g_return_if_fail (size != 0);
 	rewind (diary->file);
 
-	camel_operation_start (NULL, "Resynchronizing with server");
+	camel_operation_start (NULL, _("Resynchronizing with server"));
 	while (!camel_exception_is_set (ex)) {
 		camel_operation_progress (NULL, ftell (diary->file) , size);
 

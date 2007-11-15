@@ -2,6 +2,12 @@ Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog
 
+2007-11-15  Matthew Barnes  <mbarnes@redhat.com>
+
+	* Mark a bunch exception messages for translation.
+	* A few new argument guards here and there (e.g. g_return_if_fail).
+	* Tons of little whitespace and coding style fixes
+
 2007-11-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
         * Merged with upstream Camel revision 8186
