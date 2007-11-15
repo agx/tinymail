@@ -1129,6 +1129,7 @@ rfail:
 		pop3_store->engine->type = type;
 		pop3_store->engine->param = param;
 		had_attachment = FALSE;
+		fi->has_attachments = FALSE;
 
 		if (type & CAMEL_FOLDER_RECEIVE_FULL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_FULL) {
 
