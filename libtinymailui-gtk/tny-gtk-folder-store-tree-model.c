@@ -305,6 +305,9 @@ tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyCo
 {
 	TnyList *list = NULL;
 
+	if (!self || !TNY_IS_GTK_FOLDER_STORE_TREE_MODEL (self))
+		return;
+
 	/* This callback handler deals with connection status changes. In case
 	 * we got connected, we can expect that, at least sometimes, new folders
 	 * might have arrived. We'll need to scan for those, so we'll recursively
@@ -374,10 +377,10 @@ account_was_not_yet_ready_idle (gpointer user_data)
 
 	if (tny_account_is_ready (info->account))
 	{
-		g_signal_connect (info->account, "connection-status-changed",
+		info->self->signal1 = (gint) g_signal_connect (info->account, "connection-status-changed",
 			G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), info->self);
 
-		g_signal_connect (info->account, "changed",
+		info->self->signal1 = (gint) g_signal_connect (info->account, "changed",
 			G_CALLBACK (tny_gtk_folder_store_tree_model_on_changed), info->self);
 
 		tny_gtk_folder_store_tree_model_on_constatus_changed (info->account, 
@@ -497,6 +500,12 @@ tny_gtk_folder_store_tree_model_finalize (GObject *object)
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) object;
 	GList *copy = me->fol_obs;
 
+	if (me->signal1 != -1)
+		g_signal_handler_disconnect (me, me->signal1);
+
+	if (me->signal2 != -1)
+		g_signal_handler_disconnect (me, me->signal2);
+
 	while (copy) {
 		remove_folder_observer_weak (me, (TnyFolder *) copy->data, TRUE);
 		copy = g_list_next (copy);
@@ -556,6 +565,8 @@ tny_gtk_folder_store_tree_model_instance_init (GTypeInstance *instance, gpointer
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) instance;
 	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_UINT, G_TYPE_INT, G_TYPE_OBJECT };
 
+	me->signal1 = -1;
+	me->signal2 = -1;
 	me->fol_obs = NULL;
 	me->store_obs = NULL;
 	me->iterator_lock = g_mutex_new ();

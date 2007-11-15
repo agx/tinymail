@@ -61,6 +61,7 @@ struct _TnyGtkFolderStoreTreeModel
 	GMutex *iterator_lock;
 	TnyFolderStoreQuery *query;
 	gboolean first_needs_unref;
+	gint signal1, signal2;
 };
 
 struct _TnyGtkFolderStoreTreeModelClass
