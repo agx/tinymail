@@ -761,6 +761,13 @@ cmd_tocache(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 		if (n == -1)
 			break;
 
+		/* heuristics */
+		if (camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
+			fi->has_attachments = TRUE;
+
+		if (camel_strstrcase (buffer, "name=") != NULL && strchr (buffer, '.'))
+			fi->has_attachments = TRUE;
+
 		w += n;
 		if (w > fi->size)
 			w = fi->size;
@@ -812,6 +819,14 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	{
 		if (!buffer)
 			continue;
+
+		/* heuristics */
+		if (camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
+			fi->has_attachments = TRUE;
+
+		if (camel_strstrcase (buffer, "name=") != NULL && strchr (buffer, '.'))
+			fi->has_attachments = TRUE;
+
 
 		if (boundary == NULL)
 		{
@@ -916,6 +931,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
 	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 	gint retry = 0;
+	gboolean had_attachment = FALSE;
 
 	pop3_debug ("%s requested\n", uid);
 
@@ -1112,6 +1128,7 @@ rfail:
 
 		pop3_store->engine->type = type;
 		pop3_store->engine->param = param;
+		had_attachment = FALSE;
 
 		if (type & CAMEL_FOLDER_RECEIVE_FULL || type & CAMEL_FOLDER_RECEIVE_ANY_OR_FULL) {
 
@@ -1127,6 +1144,8 @@ rfail:
 			;
 		if (i == -1)
 			fi->err = errno;
+
+		had_attachment = fi->has_attachments;
 
 		/* getting error code? */
 		/*g_assert (pcr->state == CAMEL_POP3_COMMAND_DATA);*/
@@ -1197,9 +1216,14 @@ rfail:
 		if (mi->uid)
 			g_free (mi->uid);
 		mi->uid = g_strdup (uid);
+		if (had_attachment)
+			camel_message_info_set_flags((CamelMessageInfo *) mi, CAMEL_MESSAGE_ATTACHMENTS, CAMEL_MESSAGE_ATTACHMENTS);
 		camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
-	} if (mi)
+	} if (mi) {
+		if (had_attachment)
+			camel_message_info_set_flags((CamelMessageInfo *) mi, CAMEL_MESSAGE_ATTACHMENTS, CAMEL_MESSAGE_ATTACHMENTS);
 		camel_message_info_free (mi);
+	}
 
 done:
 	camel_object_unref((CamelObject *)stream);

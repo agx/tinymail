@@ -1,3 +1,8 @@
+2007-11-15  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Updating attachment flags after downloading of message
+	* Bugfix, bug detected by Milan Crha (alloc must be a alloc0)
+
 2007-11-15  Matthew Barnes  <mbarnes@redhat.com>
 
 	* Mark a bunch exception messages for translation.

@@ -45,6 +45,7 @@ typedef struct {
 	int err;
 	struct _CamelPOP3Command *cmd;
 	struct _CamelStream *stream;
+	gboolean has_attachments;
 } CamelPOP3FolderInfo;
 
 typedef struct {
