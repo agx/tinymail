@@ -50,6 +50,7 @@ typedef struct {
 	ConnectInfo *connect_slot;
 	/* When non-NULL, we are waiting for the success or failure signal. */
 	GMainLoop *loop;
+	gint signal1;
 } TnyMaemoConicDevicePriv;
 
 
@@ -578,7 +579,7 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	 * signal still does not seem to be emitted. */
 	g_object_set (priv->cnx, "automatic-connection-events", TRUE, NULL);
 
-	g_signal_connect (priv->cnx, "connection-event",
+	priv->signal1 = (gint) g_signal_connect (priv->cnx, "connection-event",
 			  G_CALLBACK(on_connection_event), self);
 
 	/* This will get us in connected state only if there is already a connection.
@@ -607,6 +608,8 @@ static void
 tny_maemo_conic_device_finalize (GObject *obj)
 {
 	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
+
+	g_signal_handler_disconnect (obj, priv->signal1);
 
 	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {
 		tny_maemo_conic_device_disconnect (TNY_MAEMO_CONIC_DEVICE(obj),priv->iap);

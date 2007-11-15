@@ -51,6 +51,7 @@ typedef struct _TnyMozEmbedHtmlMimePartViewPriv TnyMozEmbedHtmlMimePartViewPriv;
 struct _TnyMozEmbedHtmlMimePartViewPriv
 {
 	TnyMimePart *part;
+	gint signal1, signal2;
 };
 
 #define TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE(o) \
@@ -144,10 +145,10 @@ tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpoint
 	gtk_moz_embed_set_chrome_mask (GTK_MOZ_EMBED (self), 
 			GTK_MOZ_EMBED_FLAG_DEFAULTCHROME | GTK_MOZ_EMBED_FLAG_WINDOWRESIZEON);
 
-	g_signal_connect (G_OBJECT (self), "new_window",
+	priv->signal1 = (gint) g_signal_connect (G_OBJECT (self), "new_window",
 		G_CALLBACK (new_window_cb), self);
 
-	g_signal_connect (G_OBJECT (self), "open_uri",
+	priv->signal2 = (gint) g_signal_connect (G_OBJECT (self), "open_uri",
 		G_CALLBACK (open_uri_cb), self);
 
 	return;
@@ -158,6 +159,12 @@ tny_moz_embed_html_mime_part_view_finalize (GObject *object)
 {
 	TnyMozEmbedHtmlMimePartView *self = (TnyMozEmbedHtmlMimePartView *)object;	
 	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
+
+	if (priv->signal1 != -1)
+		g_signal_handler_disconnect (self, priv->signal1);
+
+	if (priv->signal2 != -1)
+		g_signal_handler_disconnect (self, priv->signal2);
 
 	if (G_LIKELY (priv->part))
 		g_object_unref (G_OBJECT (priv->part));

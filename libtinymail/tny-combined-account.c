@@ -451,7 +451,7 @@ tny_combined_account_finalize (GObject *object)
 {
 	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (object);
 
-	g_signal_handler_disconnect (G_OBJECT (priv->store_account),
+	g_signal_handler_disconnect (priv->store_account,
 			priv->subs_changed_signal);
 
 	g_object_unref (priv->store_account);
