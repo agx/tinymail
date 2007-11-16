@@ -34,7 +34,9 @@ guint tny_store_account_signals [TNY_STORE_ACCOUNT_LAST_SIGNAL];
  * tny_store_account_delete_cache:
  * @self: a #TnyStoreAccount object
  *
- * Delete the cache of a store account
+ * Delete the cache of a store account. After this operation becomes @self an
+ * unusable instance. You must finalise it as soon as possible (use g_object_unref
+ * and/or take it out of your models).
  **/
 void 
 tny_store_account_delete_cache (TnyStoreAccount *self)
