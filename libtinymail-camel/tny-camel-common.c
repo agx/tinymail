@@ -84,7 +84,8 @@ void
 _tny_session_stop_operation (TnySessionCamel *session)
 {
 	TnySessionCamel *in = (TnySessionCamel *) session;
-	in->priv->is_inuse = FALSE;
+	if (in)
+		in->priv->is_inuse = FALSE;
 }
 
 

@@ -281,6 +281,20 @@ thread_main (gpointer data)
 		sentbox = get_sentbox (self);
 		outbox = tny_send_queue_get_outbox (self);
 
+		if (!outbox || !sentbox) {
+			if (outbox)
+				g_object_unref (outbox);
+			if (sentbox)
+				g_object_unref (sentbox);
+			g_warning ("tny_send_queue_get_outbox and "
+				"tny_send_queue_get_sentbox are not allowed to "
+				"return NULL. This indicates a problem in the "
+				"software.");
+			priv->is_running = FALSE;
+			g_mutex_unlock (priv->todo_lock);
+			goto errorhandler;
+		}
+
 		tny_folder_get_headers (outbox, list, TRUE, &terror);
 
 		if (terror != NULL)

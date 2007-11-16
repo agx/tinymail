@@ -1,6 +1,7 @@
 2007-11-16  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* The cache deleter. A little bit of rework
+	* Hardening Tinymail a little bit
 
 2007-11-16  Jose Dapena Paz  <jdapena@igalia.com>
 
