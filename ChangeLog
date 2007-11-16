@@ -1,3 +1,12 @@
+2007-11-16  Matthew Barnes  <mbarnes@redhat.com>
+
+	* Merge from upstream to camel-lite (upstream revision 8219)
+	* Merged by Philip Van Hoof, bug found by Milan Crha
+
+	* camel-spool-store.c (free_folder_info):
+	Missed that CamelSpoolStore has its own free_folder_info()
+	implementation (why?).  Change it to use g_slice_free().
+
 2007-11-16  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* The cache deleter. A little bit of rework
