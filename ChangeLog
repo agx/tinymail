@@ -1,3 +1,9 @@
+2007-11-16  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/local/camel-maildir-folder.c:
+	Now rewrite folder gets the filename of the messages to rewrite from the
+	message info instead of using simply the message uid.
+
 2007-11-16  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix in TnyGtkFolderStoreTreeModel: the signals where not being

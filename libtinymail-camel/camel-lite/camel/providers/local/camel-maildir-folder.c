@@ -293,9 +293,18 @@ maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *m
 	char *name = NULL;
 	CamelStream *output_stream = NULL;
 	char *dest = NULL;
+	CamelMessageInfo *info;
+	CamelMaildirMessageInfo *mdi;
+
+	/* get the message summary info */
+	if ((info = camel_folder_summary_uid(folder->summary, uid)) == NULL) {
+		return;
+	}
+
+	mdi = (CamelMaildirMessageInfo *)info;
 
 	/* write it out to tmp, use the uid we got from the summary */
-	name = g_strdup_printf ("%s/tmp/%s", lf->folder_path, uid);
+	name = g_strdup_printf("%s/tmp/%s", lf->folder_path, camel_maildir_info_filename(mdi));
 	output_stream = camel_stream_fs_new_with_name (name, O_WRONLY|O_CREAT, 0600);
 	if (output_stream == NULL)
 		goto fail_write;
@@ -305,16 +314,18 @@ maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *m
 		goto fail_write;
 
 	/* now move from tmp to cur (bypass new, does it matter?) */
-	dest = g_strdup_printf("%s/cur/%s", lf->folder_path, uid);
+	dest = g_strdup_printf("%s/cur/%s", lf->folder_path, camel_maildir_info_filename(mdi));
 	if (rename (name, dest) == -1)
 		goto fail_write;
 
 	g_free (dest);
 	g_free (name);
-
+	camel_message_info_free(info);
+	
 	return;
 
  fail_write:
+	camel_message_info_free(info);
 	g_free (name);
 	g_free (dest);
 }
