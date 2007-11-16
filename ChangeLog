@@ -3,6 +3,7 @@
 	* Bugfix in TnyGtkFolderStoreTreeModel: the signals where not being
 	disconnected when the instance finalised.
 	* Disconnecting signals
+	* Cache deleter must also unreference the service instance
 
 2007-11-15  Sergio Villar Senin  <svillar@igalia.com>
 

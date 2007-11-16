@@ -183,9 +183,25 @@ tny_camel_store_account_delete_cache_default (TnyStoreAccount *self)
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelStore *store = CAMEL_STORE (apriv->service);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	priv->cant_reuse_iter = TRUE;
 	camel_store_delete_cache (store);
+
+	if (apriv->service && CAMEL_IS_SERVICE (apriv->service))
+	{
+		apriv->service->connecting = NULL;
+		apriv->service->disconnecting = NULL;
+		apriv->service->reconnecter = NULL;
+		apriv->service->reconnection = NULL;
+		camel_service_disconnect (CAMEL_SERVICE (apriv->service), FALSE, &ex);
+	}
+
+	if (apriv->session) {
+		_tny_session_camel_unregister_account (apriv->session, (TnyCamelAccount*) self);
+		camel_object_unref (apriv->session);
+	}
+	apriv->session = NULL;
 }
 
 static void
