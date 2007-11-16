@@ -185,6 +185,7 @@ tny_camel_store_account_delete_cache_default (TnyStoreAccount *self)
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
+	priv->deleted = TRUE;
 	priv->cant_reuse_iter = TRUE;
 	camel_store_delete_cache (store);
 
@@ -651,6 +652,7 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->deleted = FALSE;
 	priv->queue = _tny_camel_queue_new (self);
 	priv->msg_queue = _tny_camel_queue_new (self);
 	apriv->type = CAMEL_PROVIDER_STORE;

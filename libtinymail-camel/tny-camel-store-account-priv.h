@@ -37,6 +37,7 @@ struct _TnyCamelStoreAccountPriv
 	gboolean cant_reuse_iter;
 	GStaticRecMutex *factory_lock, *obs_lock;
 	TnyCamelQueue *queue, *msg_queue;
+	gboolean deleted;
 };
 
 #define TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE(o)	\

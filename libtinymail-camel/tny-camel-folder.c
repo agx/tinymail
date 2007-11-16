@@ -5476,6 +5476,7 @@ tny_camel_folder_finalize (GObject *object)
 	TnyCamelFolder *self = (TnyCamelFolder*) object;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+
 #ifdef DEBUG
 	g_print ("Finalizing TnyCamelFolder: %s\n", 
 		priv->folder_name?priv->folder_name:"(cleared)");
@@ -5485,8 +5486,23 @@ tny_camel_folder_finalize (GObject *object)
 		"are still alive: %d\n", priv->reason_to_live);
 #endif
 
-	if (priv->account)
+
+	if (priv->account) {
+		TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
+
+		/* If the account had its cache deleted with tny_store_account_delete_cache,
+		 * then we don't write the summary of its folders anymore during 
+		 * finalisation. We do this by setting the flag of the summary to
+		 * non-dirty. If the application developer continued using the 
+		 * account, this means he'll be losing data. But then again, we
+		 * warned for this in the API documentation of tny_store_account_delete_cache.
+		*
+		 * So this whould be his own fault! */
+
+		if (aspriv->deleted && priv->folder && priv->folder->summary)
+			priv->folder->summary->flags &= ~CAMEL_SUMMARY_DIRTY;
 		g_object_weak_unref (G_OBJECT (priv->account), notify_account_del, self);
+	}
 
 	if (priv->store)
 		camel_object_unref (priv->store);
