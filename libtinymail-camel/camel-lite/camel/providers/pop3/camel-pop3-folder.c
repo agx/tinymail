@@ -250,8 +250,11 @@ cmd_list(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	unsigned int len, id, size;
 	unsigned char *line;
 	CamelFolder *folder = data;
-	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
+	CamelPOP3Store *pop3_store = (CamelPOP3Store*) folder->parent_store;
 	CamelPOP3FolderInfo *fi;
+
+	if (!pop3_store)
+		return -1;
 
 	do {
 		ret = camel_pop3_stream_line(stream, &line, &len);
