@@ -188,10 +188,7 @@ tny_camel_store_account_delete_cache_default (TnyStoreAccount *self)
 
 	priv->deleted = TRUE;
 	priv->cant_reuse_iter = TRUE;
-	str = camel_store_delete_cache (store);
-
-	if (str)
-		g_free (str);
+	apriv->delete_this = camel_store_delete_cache (store);
 
 	return;
 }
@@ -689,11 +686,6 @@ tny_camel_store_account_finalize (GObject *object)
 {
 	TnyCamelStoreAccount *self = (TnyCamelStoreAccount *)object;
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	CamelStore *store = (CamelStore*) apriv->service;
-
-	if (priv->deleted && store)
-		apriv->delete_this = camel_store_delete_cache (store);
 
 	if (priv->sobs) {
 		GList *copy = priv->sobs;
