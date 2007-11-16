@@ -5486,6 +5486,9 @@ tny_camel_folder_finalize (GObject *object)
 		"are still alive: %d\n", priv->reason_to_live);
 #endif
 
+	if (priv->store)
+		camel_object_unref (priv->store);
+
 
 	if (priv->account) {
 		TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
@@ -5504,8 +5507,6 @@ tny_camel_folder_finalize (GObject *object)
 		g_object_weak_unref (G_OBJECT (priv->account), notify_account_del, self);
 	}
 
-	if (priv->store)
-		camel_object_unref (priv->store);
 
 	if (priv->parent)
 		g_object_weak_unref (G_OBJECT (priv->parent), notify_parent_del, self);
