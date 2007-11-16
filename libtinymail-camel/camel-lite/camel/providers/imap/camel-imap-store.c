@@ -186,12 +186,13 @@ camel_imap_recon (CamelImapStore *store, CamelException *mex)
 	service->reconnecting = FALSE;
 }
 
-static void
+static char*
 imap_delete_cache  (CamelStore *store)
 {
 	CamelImapStore *imap_store = (CamelImapStore *) store;
 	gchar *folder_dir = imap_store->storage_path;
 	camel_rm (folder_dir);
+	return g_strdup (folder_dir);
 }
 
 static void

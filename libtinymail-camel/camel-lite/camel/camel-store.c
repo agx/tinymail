@@ -76,7 +76,7 @@ static void subscribe_folder (CamelStore *store, const char *folder_name, CamelE
 static void unsubscribe_folder (CamelStore *store, const char *folder_name, CamelException *ex);
 
 static void noop (CamelStore *store, CamelException *ex);
-static void delete_cache (CamelStore *store);
+static char* delete_cache (CamelStore *store);
 
 static void construct (CamelService *service, CamelSession *session,
 		       CamelProvider *provider, CamelURL *url,
@@ -208,16 +208,16 @@ camel_store_get_local_size (CamelStore *store, const gchar *folder_name)
 	return CS_CLASS (store)->get_local_size (store, folder_name);
 }
 
-static void
+static char *
 delete_cache (CamelStore *store)
 {
-	return;
+	return g_strdup ("");
 }
 
-void
+char*
 camel_store_delete_cache (CamelStore *store)
 {
-	CS_CLASS (store)->delete_cache (store);
+	return CS_CLASS (store)->delete_cache (store);
 }
 
 void

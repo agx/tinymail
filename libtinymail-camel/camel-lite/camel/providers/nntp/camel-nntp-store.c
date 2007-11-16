@@ -78,12 +78,13 @@ static void nntp_construct (CamelService *service, CamelSession *session,
 		            CamelException *ex);
 
 
-static void
+static char *
 nntp_delete_cache  (CamelStore *store)
 {
 	CamelNNTPStore *nntp_store = (CamelNNTPStore *) store;
 	gchar *folder_dir = nntp_store->storage_path;
 	camel_rm (folder_dir);
+	return g_strdup (folder_dir);
 }
 
 static gboolean

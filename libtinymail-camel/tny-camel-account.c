@@ -1351,6 +1351,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccount *self = (TnyCamelAccount *)instance;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->delete_this = NULL;
 	priv->is_ready = FALSE;
 	priv->is_connecting = FALSE;
 	priv->in_auth = FALSE;
@@ -2028,7 +2029,6 @@ tny_camel_account_finalize (GObject *object)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
-
 	if (priv->service && CAMEL_IS_SERVICE (priv->service))
 	{
 		priv->service->connecting = NULL;
@@ -2090,6 +2090,12 @@ tny_camel_account_finalize (GObject *object)
 
 	if (G_LIKELY (priv->url_string))
 		g_free (priv->url_string);
+
+	if (priv->delete_this && strlen (priv->delete_this) > 0)
+		camel_rm (priv->delete_this);
+	if (priv->delete_this)
+		g_free (priv->delete_this);
+	priv->delete_this = NULL;
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 

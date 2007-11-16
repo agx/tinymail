@@ -107,12 +107,13 @@ pop3store_get_local_size (CamelStore *store, const gchar *folder_name)
 	return msize;
 }
 
-static void
+static char*
 pop3_delete_cache  (CamelStore *store)
 {
 	CamelPOP3Store *pop3_store = (CamelPOP3Store *) store;
 	gchar *folder_dir = pop3_store->storage_path;
 	camel_rm (folder_dir);
+	return g_strdup (folder_dir);
 }
 
 

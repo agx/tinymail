@@ -69,11 +69,12 @@ static char *local_get_meta_path(CamelLocalStore *lf, const char *full_name, con
 static CamelStoreClass *parent_class = NULL;
 
 
-static void
+static char *
 local_delete_cache  (CamelStore *store)
 {
 	CamelLocalStore *local_store = (CamelLocalStore *) store;
 	camel_rm (local_store->toplevel_dir);
+	return g_strdup (local_store->toplevel_dir);
 }
 
 static int
