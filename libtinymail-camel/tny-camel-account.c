@@ -1742,6 +1742,9 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, Tn
 	/* In case we  are a store account, this means that we need to throw the 
 	 * request to go online to the account's queue. */
 
+	if (session == NULL)
+		return;
+
 	if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
 		OnSetOnlineDoneInfo *i = g_slice_new0 (OnSetOnlineDoneInfo);
 		i->callback = callback;
