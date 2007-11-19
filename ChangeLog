@@ -2,6 +2,7 @@
 
 	* IMAP protocol bugfix during Lemonade interop, bug found while
 	testing with Arnt's IMAP server
+	* Implemented a image/* viewer
 
 2007-11-16  Matthew Barnes  <mbarnes@redhat.com>
 
