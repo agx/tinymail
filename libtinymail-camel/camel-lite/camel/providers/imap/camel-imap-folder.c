@@ -3170,7 +3170,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	seq = camel_folder_summary_count (folder->summary);
 
 	if (!camel_imap_command_start (store, folder, ex,
-		"UID SEARCH %d:%d ALL", seq + 1, seq + 1 + nextn))
+		"UID SEARCH %d:%d ALL", seq + 1, MAX (1, MIN (seq + 1 + nextn, exists))))
 		{ if (!camel_operation_cancel_check (NULL))
 			g_warning ("IMAP error getting UIDs (1)");
 		 camel_operation_end (NULL); return; }

@@ -1,3 +1,8 @@
+2007-11-19  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* IMAP protocol bugfix during Lemonade interop, bug found while
+	testing with Arnt's IMAP server
+
 2007-11-16  Matthew Barnes  <mbarnes@redhat.com>
 
 	* Merge from upstream to camel-lite (upstream revision 8219)
