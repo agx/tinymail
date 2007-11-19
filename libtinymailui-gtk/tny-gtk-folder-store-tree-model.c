@@ -380,7 +380,7 @@ account_was_not_yet_ready_idle (gpointer user_data)
 		info->self->signal1 = (gint) g_signal_connect (info->account, "connection-status-changed",
 			G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), info->self);
 
-		info->self->signal1 = (gint) g_signal_connect (info->account, "changed",
+		info->self->signal2 = (gint) g_signal_connect (info->account, "changed",
 			G_CALLBACK (tny_gtk_folder_store_tree_model_on_changed), info->self);
 
 		tny_gtk_folder_store_tree_model_on_constatus_changed (info->account, 
