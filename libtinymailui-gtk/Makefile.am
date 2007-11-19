@@ -15,6 +15,8 @@ libtinymailui_gtk_1_0_headers = \
 	tny-gtk-lockable.h \
 	tny-gtk-msg-window.h \
 	tny-gtk-text-mime-part-view.h \
+	tny-gtk-pixbuf-stream.h \
+	tny-gtk-image-mime-part-view.h \
 	tny-gtk-attachment-mime-part-view.h\
 	tny-gtk-header-list-model.h \
 	tny-gtk-account-list-model.h \
@@ -30,6 +32,8 @@ libtinymailui_gtk_1_0_la_SOURCES = \
 	tny-gtk-msg-view.c \
 	tny-gtk-lockable.c \
 	tny-gtk-text-mime-part-view.c \
+	tny-gtk-pixbuf-stream.c \
+	tny-gtk-image-mime-part-view.c \
 	tny-gtk-attachment-mime-part-view.c \
 	tny-gtk-msg-window.c \
 	tny-gtk-folder-store-tree-model.c \

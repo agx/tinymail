@@ -40,6 +40,7 @@
 #include <tny-gtk-attach-list-model.h>
 #include <tny-header-view.h>
 #include <tny-gtk-header-view.h>
+#include <tny-gtk-image-mime-part-view.h>
 #include <tny-gtk-text-mime-part-view.h>
 #include <tny-gtk-attachment-mime-part-view.h>
 #include <tny-mime-part-saver.h>
@@ -352,6 +353,10 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 		retval = tny_gtk_text_mime_part_view_new ();
 
 	/* Inline message RFC822 */
+	} else if (tny_mime_part_content_type_is (part, "image/*"))
+	{
+		retval = tny_gtk_image_mime_part_view_new ();
+
 	} else if (priv->display_rfc822 && (tny_mime_part_content_type_is (part, "message/rfc822")||
 		tny_mime_part_content_type_is (part, "multipart/*")))
 	{
