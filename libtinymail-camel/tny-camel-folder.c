@@ -351,7 +351,8 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 		summary = priv->folder->summary;
 
 		if (!change && info->uid_changed != NULL && info->uid_changed->len > 0) {
-			priv->cached_length = camel_folder_get_message_count (priv->folder);
+			/* Commented because it seems to be the source of weird hangs */
+			/* priv->cached_length = camel_folder_get_message_count (priv->folder); */
 			priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 			urcnted = TRUE;
 			change = tny_folder_change_new (TNY_FOLDER (self));
@@ -360,7 +361,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 		if (info->uid_added && info->uid_added->len > 0) 
 		{
 			if (!urcnted) {
-				priv->cached_length = camel_folder_get_message_count (priv->folder);
+				/* priv->cached_length = camel_folder_get_message_count (priv->folder); */
 				priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 				urcnted = TRUE;
 			}
@@ -394,7 +395,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 		if (info->uid_removed && info->uid_removed->len > 0) 
 		{
 			if (!urcnted) {
-				priv->cached_length = camel_folder_get_message_count (priv->folder);
+				/* priv->cached_length = camel_folder_get_message_count (priv->folder); */
 				priv->unread_length = camel_folder_get_unread_message_count (priv->folder);
 				urcnted = TRUE;
 			}
