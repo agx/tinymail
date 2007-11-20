@@ -15,6 +15,7 @@ lib_LTLIBRARIES = libtinymail-maemo-1.0.la
 libtinymail_maemo_1_0_headers = \
 	tny-maemo-account-store.h \
 	tny-maemo-device.h \
+	tny-maemo-device-priv.h \
 	tny-maemo-platform-factory.h \
 	tny-maemo-conic-device.h 	
 
