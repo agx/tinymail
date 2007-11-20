@@ -1757,7 +1757,7 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 			/* Disconnect */
 			camel_service_disconnect (service, FALSE, NULL);
 
-		} else
+		} else {
 			if (!have_second_capa && !imap_get_capability (service, ex))
 			{
 				errbuf = g_strdup_printf ("Unable to authenticate "
@@ -1789,7 +1789,7 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 					camel_imap_response_free_without_processing (store, response);
 				g_string_free (enable_line, TRUE);
 			}
-
+		}
 	}
 
 	return TRUE;
