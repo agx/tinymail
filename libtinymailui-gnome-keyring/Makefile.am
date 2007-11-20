@@ -1,3 +1,5 @@
+AM_CFLAGS = -fPIC -DPIC
+
 INCLUDES = -I. -I$(top_srcdir) \
 	$(TINYMAIL_CFLAGS) \
 	$(LIBTINYMAILUI_GTK_CFLAGS) \
