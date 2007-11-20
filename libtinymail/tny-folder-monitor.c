@@ -365,7 +365,7 @@ tny_folder_monitor_finalize (GObject *object)
 	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (object);
 
 	g_mutex_lock (priv->lock);
-	g_object_unref (G_OBJECT (priv->lists));
+	g_object_unref (priv->lists);
 	g_mutex_unlock (priv->lock);
 
 	g_mutex_free (priv->lock);

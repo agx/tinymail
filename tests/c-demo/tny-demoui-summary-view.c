@@ -176,7 +176,7 @@ clear_header_view (TnyDemouiSummaryViewPriv *priv)
 		if (priv->monitor)
 		{
 			tny_folder_monitor_stop (priv->monitor);
-			g_object_unref (G_OBJECT (priv->monitor));
+			g_object_unref (priv->monitor);
 		}
 		priv->monitor = NULL;
 	}
@@ -918,7 +918,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 			{
 				if (priv->monitor) {
 					tny_folder_monitor_stop (priv->monitor);
-					g_object_unref (G_OBJECT (priv->monitor));
+					g_object_unref (priv->monitor);
 				}
 				priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (folder));
 				tny_folder_monitor_add_list (priv->monitor, TNY_LIST (hmodel));
@@ -987,7 +987,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 		{
 			if (priv->monitor) {
 				tny_folder_monitor_stop (priv->monitor);
-				g_object_unref (G_OBJECT (priv->monitor));
+				g_object_unref (priv->monitor);
 			}
 			priv->monitor = TNY_FOLDER_MONITOR (tny_folder_monitor_new (merge));
 			tny_folder_monitor_add_list (priv->monitor, TNY_LIST (hmodel));
@@ -2046,7 +2046,8 @@ tny_demoui_summary_view_finalize (GObject *object)
 	if (priv->monitor)
 	{
 		tny_folder_monitor_stop (priv->monitor);
-		g_object_unref (G_OBJECT (priv->monitor));
+		g_object_unref (priv->monitor);
+		priv->monitor = NULL;
 	}
 	g_mutex_unlock (priv->monitor_lock);
 

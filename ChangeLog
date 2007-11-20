@@ -7,6 +7,9 @@
 2007-11-20  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix makes ENABLE not happen if login failed
+	* Completed the implementation of TnyMergeFolder, shortened its locks
+	and made it possible to provide a ui-locker. Also, locking the ui
+	context at the right times.
 
 2007-11-20  Steve Kowalik  <stevenk@ubuntu.com>
 

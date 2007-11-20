@@ -31,6 +31,7 @@
 #include <tny-msg-receive-strategy.h>
 #include <tny-folder-store.h>
 #include <tny-folder-stats.h>
+#include <tny-lockable.h>
 
 G_BEGIN_DECLS
 
@@ -57,6 +58,8 @@ struct _TnyMergeFolderClass
 GType tny_merge_folder_get_type (void);
 
 TnyFolder* tny_merge_folder_new (const gchar *folder_name);
+TnyFolder* tny_merge_folder_new_with_ui_locker (const gchar *folder_name, TnyLockable *ui_locker);
+void tny_merge_folder_set_ui_locker (TnyMergeFolder *self, TnyLockable *ui_locker);
 void tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder);
 void tny_merge_folder_remove_folder (TnyMergeFolder *self, TnyFolder *folder);
 void tny_merge_folder_set_folder_type (TnyMergeFolder *self, TnyFolderType folder_type);
