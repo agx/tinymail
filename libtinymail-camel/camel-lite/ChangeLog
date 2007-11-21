@@ -2,6 +2,11 @@ Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog
 
+2007-11-20  Matthew Barnes  <mbarnes@redhat.com>
+
+	* http://bugzilla.gnome.org/show_bug.cgi?id=474000#19
+	* Strengthens error handling
+
 2007-11-16  Matthew Barnes  <mbarnes@redhat.com>
 
 	* Merge from upstream to camel-lite (upstream revision 8219)
