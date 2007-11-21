@@ -767,8 +767,10 @@ cmd_tocache(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 		/* heuristics */
 		if (camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
 			fi->has_attachments = TRUE;
-
-		if (camel_strstrcase (buffer, "name=") != NULL && strchr (buffer, '.'))
+		else if (camel_strstrcase (buffer, "filename=") != NULL &&
+			 strchr (buffer, '.'))
+			fi->has_attachments = TRUE;
+		else if (camel_strstrcase (buffer, "Content-Type: message/rfc822") != NULL)
 			fi->has_attachments = TRUE;
 
 		w += n;
@@ -826,10 +828,11 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 		/* heuristics */
 		if (camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
 			fi->has_attachments = TRUE;
-
-		if (camel_strstrcase (buffer, "name=") != NULL && strchr (buffer, '.'))
+		else if (camel_strstrcase (buffer, "filename=") != NULL &&
+			 strchr (buffer, '.'))
 			fi->has_attachments = TRUE;
-
+		else if (camel_strstrcase (buffer, "Content-Type: message/rfc822") != NULL)
+			fi->has_attachments = TRUE;
 
 		if (boundary == NULL)
 		{
