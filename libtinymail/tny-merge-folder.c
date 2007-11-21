@@ -66,6 +66,11 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 	while (list)
 	{
 		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (list->data);
+
+		/* We don't need to hold the ui-lock here, because this is called
+		 * from the update function, which is guaranteed to happen in the
+		 * UI context already (the TnyFolder layer takes care of this) */
+
 		tny_folder_observer_update (observer, change);
 		list = g_list_next (list);
 	}
