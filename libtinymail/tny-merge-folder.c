@@ -66,9 +66,7 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 	while (list)
 	{
 		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (list->data);
-		tny_lockable_lock (priv->ui_locker);
 		tny_folder_observer_update (observer, change);
-		tny_lockable_unlock (priv->ui_locker);
 		list = g_list_next (list);
 	}
 
