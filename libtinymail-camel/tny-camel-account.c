@@ -1716,7 +1716,12 @@ on_set_online_done (TnySessionCamel *self, TnyCamelAccount *account, GError *err
 	info->condition = g_cond_new ();
 	info->had_callback = FALSE;
 
-	execute_callback (/* info->depth */ 10, G_PRIORITY_HIGH, 
+	/* If the connection was cancelled we can not execute this in
+	   an idle because we're currently in the main loop. If we try
+	   to execute it in an idle the following g_cond_wait will
+	   never succeed because the idle won't be executed never
+	   (we're in the main loop) */
+	execute_callback ((info->cancel) ? 0 : 10, G_PRIORITY_HIGH, 
 		on_set_online_done_idle_func, 
 		info, on_set_online_done_destroy_func);
 
