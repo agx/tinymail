@@ -101,12 +101,12 @@ execute_callback (gint depth,
 		  gpointer data, 
 		  GDestroyNotify destroy_func)
 {
-	if (depth > 0){
+	/* if (depth > 0){ */
 		g_idle_add_full (priority, idle_func, data, destroy_func);
-	} else {
+	/* } else {
 		idle_func (data);
 		destroy_func (data);
-	}
+	} */
 }
 
 
