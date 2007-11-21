@@ -4479,6 +4479,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	{
 		camel_imap_message_cache_set_partial (imap_folder->cache, uid, FALSE);
 
+		/* TNY TODO: This is pointless atm, since we can't handle section_text yet */
 		if (store->capabilities & IMAP_CAPABILITY_BINARY)
 		{
 			gchar line[MAX_LINE_LEN];
