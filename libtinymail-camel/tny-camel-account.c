@@ -96,8 +96,8 @@ _tny_camel_account_emit_changed (TnyCamelAccount *self)
 
 
 typedef struct {
+	TnyCamelQueueable parent;
 	TnyCamelAccount *self;
-	char somestuff[20];
 } ReconInfo;
 
 static gpointer
