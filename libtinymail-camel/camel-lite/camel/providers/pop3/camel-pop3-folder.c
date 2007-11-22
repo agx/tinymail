@@ -968,41 +968,47 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		return NULL;
 	}
 
-	/* if (pop3_folder->uids_uid)
+	if (pop3_store->is_refreshing && pop3_folder->uids_uid)
 		fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
-	else */
+	else 
 		fi = NULL;
 
-	if (fi == NULL) {
+
+	if (fi == NULL) 
+	{
 		CamelPOP3Command *pcl, *pcu = NULL;
 
-		g_static_rec_mutex_lock (pop3_store->eng_lock);
-
-		if (pop3_store->engine == NULL)
+		if (!pop3_store->is_refreshing) 
 		{
-			camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
-			if (camel_exception_is_set (ex)) {
-				g_static_rec_mutex_unlock (pop3_store->eng_lock);
-				goto rfail;
+
+			g_static_rec_mutex_lock (pop3_store->eng_lock);
+
+			if (pop3_store->engine == NULL)
+			{
+				camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
+				if (camel_exception_is_set (ex)) {
+					g_static_rec_mutex_unlock (pop3_store->eng_lock);
+					goto rfail;
+				}
 			}
+
+			destroy_lists (pop3_folder);
+			pop3_folder->uids = g_ptr_array_new ();
+			pop3_folder->uids_uid = g_hash_table_new(g_str_hash, g_str_equal);
+			/* only used during setup */
+			pop3_folder->uids_id = g_hash_table_new(NULL, NULL);
+			pop3_store->is_refreshing = TRUE;
+			pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
+			if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
+				pcu = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_uidl, folder, "UIDL\r\n");
+			while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0)
+				;
+			pop3_store->is_refreshing = FALSE;
+
+			fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
+
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		}
-
-		destroy_lists (pop3_folder);
-		pop3_folder->uids = g_ptr_array_new ();
-		pop3_folder->uids_uid = g_hash_table_new(g_str_hash, g_str_equal);
-		/* only used during setup */
-		pop3_folder->uids_id = g_hash_table_new(NULL, NULL);
-		pop3_store->is_refreshing = TRUE;
-		pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
-		if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
-			pcu = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_uidl, folder, "UIDL\r\n");
-		while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0)
-			;
-		pop3_store->is_refreshing = FALSE;
-
-		fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
-
-		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 rfail:
 		if (fi == NULL) {
