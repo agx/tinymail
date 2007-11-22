@@ -2199,6 +2199,8 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	info->msg = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, 
 			info->self, info->header, &info->err);
 
+	reset_local_size (priv);
+
 	info->cancelled = camel_operation_cancel_check (cancel);
 
 	camel_operation_unregister (cancel);
@@ -2375,6 +2377,8 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 
 	retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, header, err);
 
+	reset_local_size (priv);
+
 	if (retval)
 	{
 		change = tny_folder_change_new (self);
@@ -2445,7 +2449,9 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 		/* hdr will take care of the freeup */
 		_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), info);
 		retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, hdr, err);
-		g_object_unref (G_OBJECT (hdr));
+		g_object_unref (hdr);
+		reset_local_size (priv);
+
 	} else {
 		g_warning ("%s: malformed url string: %s", __FUNCTION__, url_string);
 		g_set_error (err, TNY_FOLDER_ERROR, 

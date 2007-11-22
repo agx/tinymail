@@ -4,6 +4,7 @@
 	* Fixed a bug if a message was not available and whe are offline with
 	POP accounts
 	* Removed unneeded removal of observers (they are weak referenced)
+	* Update local_size after getting messages
 
 2007-11-21  Philip Van Hoof  <pvanhoof@gnome.org>
 
