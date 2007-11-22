@@ -63,14 +63,14 @@ tny_camel_queue_finalize (GObject *object)
 
 /**
  * _tny_camel_queue_new
- * @account: the queue
+ * @account: the account
  *
  * Internal, non-public API documentation of Tinymail
  *
  * Make a new queue for @account.
  **/
 TnyCamelQueue*
-_tny_camel_queue_new (TnyCamelStoreAccount *account)
+_tny_camel_queue_new (TnyCamelAccount *account)
 {
 	TnyCamelQueue *self = g_object_new (TNY_TYPE_CAMEL_QUEUE, NULL);
 
@@ -84,12 +84,78 @@ typedef struct
 	GThreadFunc func;
 	GSourceFunc callback;
 	GDestroyNotify destroyer;
+	GSourceFunc cancel_callback;
+	GDestroyNotify cancel_destroyer;
 	gpointer data;
+	gsize data_size;
 	TnyCamelQueueItemFlags flags;
 	const gchar *name;
 	gboolean *cancel_field;
+	gboolean deleted;
 } QueueItem;
 
+static gboolean
+perform_callback (gpointer user_data)
+{
+	QueueItem *item = (QueueItem *) user_data;
+	gboolean retval = FALSE;
+
+	if (item->callback)
+		retval = item->callback (item->data);
+
+	return retval;
+}
+
+static void
+perform_destroyer (gpointer user_data)
+{
+	QueueItem *item = (QueueItem *) user_data;
+	TnyCamelQueueable *info = (TnyCamelQueueable * ) item->data;
+
+	if (item->destroyer)
+		item->destroyer (item->data);
+
+	if (info->condition) {
+		g_mutex_lock (info->mutex);
+		g_cond_broadcast (info->condition);
+		info->had_callback = TRUE;
+		g_mutex_unlock (info->mutex);
+	}
+
+	return;
+}
+
+
+static gboolean
+perform_cancel_callback (gpointer user_data)
+{
+	QueueItem *item = (QueueItem *) user_data;
+	gboolean retval = FALSE;
+
+	if (item->cancel_callback)
+		retval = item->cancel_callback (item->data);
+
+	return retval;
+}
+
+static void
+perform_cancel_destroyer (gpointer user_data)
+{
+	QueueItem *item = (QueueItem *) user_data;
+	TnyCamelQueueable *info = (TnyCamelQueueable * ) item->data;
+
+	if (item->cancel_destroyer)
+		item->cancel_destroyer (item->data);
+
+	if (info->condition) {
+		g_mutex_lock (info->mutex);
+		g_cond_broadcast (info->condition);
+		info->had_callback = TRUE;
+		g_mutex_unlock (info->mutex);
+	}
+
+	return;
+}
 
 static gpointer 
 thread_main_func (gpointer user_data)
@@ -100,6 +166,7 @@ thread_main_func (gpointer user_data)
 	{
 		GList *first = NULL;
 		QueueItem *item = NULL;
+		gboolean deleted = FALSE;
 
 		g_static_rec_mutex_lock (queue->lock);
 
@@ -112,15 +179,49 @@ thread_main_func (gpointer user_data)
 		first = g_list_first (queue->list);
 		if (first) {
 			item = first->data;
+			if (item)
+				deleted = item->deleted;
 			queue->current = item;
 		} else
 			queue->stopped = TRUE;
 		g_static_rec_mutex_unlock (queue->lock);
 
 		if (item) {
-			tny_debug ("TnyCamelQueue: %s is on the stage, now performing\n", item->name);
-			item->func (item->data);
-			tny_debug ("TnyCamelQueue: %s is off the stage, done performing\n", item->name);
+			TnyCamelQueueable *info = (TnyCamelQueueable * ) item->data;
+
+			if (!deleted) {
+				tny_debug ("TnyCamelQueue: %s is on the stage, now performing\n", item->name);
+				item->func (item->data);
+			}
+
+			info->mutex = g_mutex_new ();
+			info->condition = g_cond_new ();
+			info->had_callback = FALSE;
+
+			if (deleted) {
+
+				g_idle_add_full (G_PRIORITY_DEFAULT, 
+					perform_cancel_callback, item, 
+					perform_cancel_destroyer);
+			} else {
+
+				g_idle_add_full (G_PRIORITY_DEFAULT, 
+					perform_callback, item, 
+					perform_destroyer);
+			}
+			/* Wait on the queue for the mainloop callback to be finished */
+			g_mutex_lock (info->mutex);
+			if (!info->had_callback)
+				g_cond_wait (info->condition, info->mutex);
+			g_mutex_unlock (info->mutex);
+
+			g_mutex_free (info->mutex);
+			g_cond_free (info->condition);
+
+			g_slice_free1 (item->data_size, item->data);
+
+			if (!deleted)
+				tny_debug ("TnyCamelQueue: %s is off the stage, done performing\n", item->name);
 		}
 
 		g_static_rec_mutex_lock (queue->lock);
@@ -147,6 +248,7 @@ thread_main_func (gpointer user_data)
 	return NULL;
 }
 
+
 /**
  * _tny_camel_queue_remove_items
  * @queue: the queue
@@ -165,10 +267,10 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 
 	g_static_rec_mutex_lock (queue->lock);
 	copy = queue->list;
-
 	while (copy) 
 	{
 		QueueItem *item = copy->data;
+
 		if (queue->current != item)
 		{
 			if (item && (item->flags & flags)) 
@@ -178,19 +280,10 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 				if (item->cancel_field)
 					*item->cancel_field = TRUE;
 
-				if (item->callback)
-					g_idle_add_full (G_PRIORITY_HIGH, item->callback, 
-						item->data, item->destroyer);
-
-				rem = g_list_prepend (rem, copy);
-				g_slice_free (QueueItem, item);
+				item->deleted = TRUE;
 			}
 		}
 		copy = g_list_next (copy);
-	}
-	while (rem) {
-		queue->list = g_list_delete_link (queue->list, rem->data);
-		rem = g_list_next (rem);
 	}
 	g_static_rec_mutex_unlock (queue->lock);
 }
@@ -243,10 +336,13 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
  * _tny_camel_queue_launch_wflags
  * @queue: the queue
  * @func: the work function
- * @callback: for in case of a cancellation, can be NULL
- * @destroyer: for in case of a cancellation, can be NULL
+ * @callback: the callback for when finished
+ * @destroyer: the destroyer for the @callback
+ * @cancel_callback: for in case of a cancellation, can be NULL
+ * @cancel_destroyer: for in case of a cancellation, can be NULL
  * @cancel_field: a byref location of a gboolean that will be set to TRUE in case of a cancellation
  * @data: data that will be passed to @func, @callback and @destroyer
+ * @data_size: size of the @data pointer
  * @flags: flags of this item
  * @name: a name for this item for debugging (__FUNCTION__ will do)
  *
@@ -258,7 +354,7 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
  * A cancelled item's @cancel_field will also be set to TRUE.
  **/
 void 
-_tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, TnyCamelQueueItemFlags flags, const gchar *name)
+_tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, GSourceFunc cancel_callback, GDestroyNotify cancel_destroyer, gboolean *cancel_field, gpointer data, gsize data_size, TnyCamelQueueItemFlags flags, const gchar *name)
 {
 	QueueItem *item = g_slice_new (QueueItem);
 
@@ -268,10 +364,14 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 	item->func = func;
 	item->callback = callback;
 	item->destroyer = destroyer;
+	item->cancel_callback = cancel_callback;
+	item->cancel_destroyer = cancel_destroyer;
 	item->data = data;
+	item->data_size = data_size;
 	item->flags = flags;
 	item->name = name;
 	item->cancel_field = cancel_field;
+	item->deleted = FALSE;
 
 	g_static_rec_mutex_lock (queue->lock);
 
@@ -315,10 +415,13 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
  * _tny_camel_queue_launch
  * @queue: the queue
  * @func: the work function
- * @callback: for in case of a cancellation, can be NULL
- * @destroyer: for in case of a cancellation, can be NULL
+ * @callback: the callback for when finished
+ * @destroyer: the destroyer for the @callback
+ * @cancel_callback: for in case of a cancellation, can be NULL
+ * @cancel_destroyer: for in case of a cancellation, can be NULL
  * @cancel_field: a byref location of a gboolean that will be set to TRUE in case of a cancellation
  * @data: data that will be passed to @func, @callback and @destroyer
+ * @data_size: size of the @data pointer
  * @name: a name for this item for debugging (__FUNCTION__ will do)
  *
  * Internal, non-public API documentation of Tinymail
@@ -331,10 +434,10 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
  * The flags of the queue item will be TNY_CAMEL_QUEUE_NORMAL_ITEM.
  **/
 void 
-_tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, const gchar *name)
+_tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, GSourceFunc cancel_callback, GDestroyNotify cancel_destroyer, gboolean *cancel_field, gpointer data, gsize data_size, const gchar *name)
 {
-	_tny_camel_queue_launch_wflags (queue, func, callback, destroyer, 
-		cancel_field, data, TNY_CAMEL_QUEUE_NORMAL_ITEM, name);
+	_tny_camel_queue_launch_wflags (queue, func, callback, destroyer, cancel_callback, cancel_destroyer,
+		cancel_field, data, data_size, TNY_CAMEL_QUEUE_NORMAL_ITEM, name);
 	return;
 }
 

@@ -30,6 +30,8 @@
 
 #include <camel/camel-operation.h>
 
+#include "tny-camel-queue-priv.h"
+
 typedef struct _TnyCamelAccountPriv TnyCamelAccountPriv;
 typedef struct _RefreshStatusInfo RefreshStatusInfo;
 
@@ -72,6 +74,7 @@ struct _TnyCamelAccountPriv
 	TnyConnectionStatus status;
 	gboolean is_connecting, is_ready;
 	gchar *delete_this;
+	TnyCamelQueue *queue;
 };
 
 const CamelService* _tny_camel_account_get_service (TnyCamelAccount *self);

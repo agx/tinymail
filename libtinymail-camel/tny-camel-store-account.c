@@ -640,9 +640,9 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->queue = apriv->queue;
 	priv->deleted = FALSE;
-	priv->queue = _tny_camel_queue_new (self);
-	priv->msg_queue = _tny_camel_queue_new (self);
+	priv->msg_queue = _tny_camel_queue_new (TNY_CAMEL_ACCOUNT (self));
 	apriv->type = CAMEL_PROVIDER_STORE;
 	apriv->account_type = TNY_ACCOUNT_TYPE_STORE;
 	priv->managed_folders = NULL;
@@ -715,7 +715,6 @@ tny_camel_store_account_finalize (GObject *object)
 	g_free (priv->obs_lock);
 	priv->obs_lock = NULL;
 
-	g_object_unref (priv->queue);
 	g_object_unref (priv->msg_queue);
 
 	(*parent_class->finalize) (object);
@@ -1222,20 +1221,18 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 }
 
 
-typedef struct {
+typedef struct 
+{
+	TnyCamelQueueable parent;
+
 	GError *err;
 	TnyFolderStore *self;
 	TnyList *list;
 	TnyGetFoldersCallback callback;
 	TnyFolderStoreQuery *query;
 	gpointer user_data;
-	guint depth; 
 	TnySessionCamel *session;
 	gboolean cancelled;
-
-	GCond* condition;
-	gboolean had_callback;
-	GMutex *mutex;
 
 } GetFoldersInfo;
 
@@ -1252,11 +1249,6 @@ tny_camel_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 	if (info->err)
 		g_error_free (info->err);
 
-	g_mutex_lock (info->mutex);
-	g_cond_broadcast (info->condition);
-	info->had_callback = TRUE;
-	g_mutex_unlock (info->mutex);
-
 	return;
 }
 
@@ -1270,28 +1262,6 @@ tny_camel_store_account_get_folders_async_callback (gpointer thr_user_data)
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;
-}
-
-
-/**
- * When using a #GMainLoop this method will execute a callback using
- * g_idle_add_full.  Note that without a #GMainLoop, the callbacks
- * could happen in a worker thread (depends on who call it) at an
- * unknown moment in time (check your locking in this case).
- */
-static void
-execute_callback (gint depth, 
-		  gint priority,
-		  GSourceFunc idle_func,
-		  gpointer data, 
-		  GDestroyNotify destroy_func)
-{
-	/* if (depth > 0){ */
-		g_idle_add_full (priority, idle_func, data, destroy_func);
-	/* } else {
-		idle_func (data);
-		destroy_func (data);
-	} */
 }
 
 
@@ -1312,25 +1282,6 @@ tny_camel_store_account_get_folders_async_thread (gpointer thr_user_data)
 	if (info->query)
 		g_object_unref (G_OBJECT (info->query));
 
-	info->mutex = g_mutex_new ();
-	info->condition = g_cond_new ();
-	info->had_callback = FALSE;
-
-	execute_callback (info->depth, G_PRIORITY_DEFAULT, 
-		tny_camel_store_account_get_folders_async_callback, info, 
-		tny_camel_store_account_get_folders_async_destroyer);
-
-	/* Wait on the queue for the mainloop callback to be finished */
-	g_mutex_lock (info->mutex);
-	if (!info->had_callback)
-		g_cond_wait (info->condition, info->mutex);
-	g_mutex_unlock (info->mutex);
-
-	g_mutex_free (info->mutex);
-	g_cond_free (info->condition);
-
-	g_slice_free (GetFoldersInfo, info);
-
 	return NULL;
 }
 
@@ -1345,7 +1296,6 @@ tny_camel_store_account_get_folders_async_cancelled_destroyer (gpointer thr_user
 	g_object_unref (info->list);
 	if (info->err)
 		g_error_free (info->err);
-	g_slice_free (GetFoldersInfo, info);
 	return;
 }
 
@@ -1385,7 +1335,6 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 	info->callback = callback;
 	info->user_data = user_data;
 	info->query = query;
-	info->depth = g_main_depth ();
 
 	/* thread reference */
 	g_object_ref (info->self);
@@ -1395,10 +1344,13 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 
 	_tny_camel_queue_launch_wflags (priv->queue, 
 		tny_camel_store_account_get_folders_async_thread,
+		tny_camel_store_account_get_folders_async_callback,
+		tny_camel_store_account_get_folders_async_destroyer, 
 		tny_camel_store_account_get_folders_async_cancelled_callback,
 		tny_camel_store_account_get_folders_async_cancelled_destroyer, 
-		&info->cancelled, info, TNY_CAMEL_QUEUE_NORMAL_ITEM|
-			TNY_CAMEL_QUEUE_PRIORITY_ITEM, __FUNCTION__);
+		&info->cancelled, info, sizeof (GetFoldersInfo),
+		TNY_CAMEL_QUEUE_NORMAL_ITEM|TNY_CAMEL_QUEUE_PRIORITY_ITEM, 
+		__FUNCTION__);
 
 	return;
 }
@@ -1689,6 +1641,8 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 
 
 typedef struct {
+	TnyCamelQueueable parent;
+
 	TnySessionCamel *session;
 	TnyCamelStoreAccount *self;
 	gboolean online;
@@ -1788,7 +1742,7 @@ cancelled_conn_destroy (gpointer user_data)
 	GoingOnlineInfo *info = (GoingOnlineInfo *) user_data;
 	g_object_unref (info->self);
 	camel_object_unref (info->session);
-	g_slice_free (GoingOnlineInfo, info);
+
 	return;
 }
 
@@ -1819,9 +1773,10 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 
 	_tny_camel_queue_launch_wflags (priv->queue, 
 		tny_camel_store_account_queue_going_online_thread,
+		NULL, NULL, /* If not canceled, we'll cleanup in the thread */
 		cancelled_conn, cancelled_conn_destroy, NULL,
-		 info, TNY_CAMEL_QUEUE_RECONNECT_ITEM|
-			TNY_CAMEL_QUEUE_CANCELLABLE_ITEM,
+		 info, sizeof (GoingOnlineInfo),
+		TNY_CAMEL_QUEUE_RECONNECT_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM,
 		__FUNCTION__);
 
 	return;

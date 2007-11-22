@@ -35,13 +35,14 @@ G_BEGIN_DECLS
 #define TNY_CAMEL_QUEUE_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_QUEUE, TnyCamelQueueClass))
 
 typedef struct _TnyCamelQueue TnyCamelQueue;
+typedef struct _TnyCamelQueueable TnyCamelQueueable;
 typedef struct _TnyCamelQueueClass TnyCamelQueueClass;
 
 struct _TnyCamelQueue
 {
 	GObject parent;
 
-	TnyCamelStoreAccount *account;
+	TnyCamelAccount *account;
 	GList *list;
 	GThread *thread;
 	GStaticRecMutex *lock;
@@ -54,6 +55,12 @@ struct _TnyCamelQueueClass
 	GObjectClass parent;
 };
 
+struct _TnyCamelQueueable
+{
+	GCond* condition;
+	gboolean had_callback;
+	GMutex *mutex;
+};
 
 typedef enum {
 	TNY_CAMEL_QUEUE_NORMAL_ITEM = 1<<0,
@@ -66,9 +73,9 @@ typedef enum {
 
 GType tny_camel_queue_get_type (void);
 
-TnyCamelQueue* _tny_camel_queue_new (TnyCamelStoreAccount *account);
-void _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, TnyCamelQueueItemFlags flags, const gchar *name);
-void _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, gboolean *cancel_field, gpointer data, const gchar *name);
+TnyCamelQueue* _tny_camel_queue_new (TnyCamelAccount *account);
+void _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, GSourceFunc cancel_callback, GDestroyNotify cancel_destroyer, gboolean *cancel_field, gpointer data, gsize data_size, TnyCamelQueueItemFlags flags, const gchar *name);
+void _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, GSourceFunc cancel_callback, GDestroyNotify cancel_destroyer, gboolean *cancel_field, gpointer data, gsize data_size, const gchar *name);
 void _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 void _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 

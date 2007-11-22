@@ -124,7 +124,6 @@ reconnect_thread (gpointer user_data)
 	apriv->service->reconnecting = FALSE;
 
 	g_object_unref (info->self);
-	g_slice_free (ReconInfo, info);
 	return NULL;
 }
 
@@ -139,7 +138,6 @@ cancelled_refresh_destroy (gpointer user_data)
 {
 	ReconInfo *info = (ReconInfo *) user_data;
 	g_object_unref (info->self);
-	g_slice_free (ReconInfo, info);
 	return;
 }
 
@@ -229,8 +227,12 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 				TNY_CAMEL_QUEUE_RECONNECT_ITEM);
 
 			_tny_camel_queue_launch_wflags (aspriv->queue, 
-				reconnect_thread, cancelled_refresh, 
-				cancelled_refresh_destroy, NULL, info,
+				reconnect_thread, 
+				NULL, NULL,
+				cancelled_refresh, 
+				cancelled_refresh_destroy, 
+				NULL, 
+				info, sizeof (ReconInfo),
 				TNY_CAMEL_QUEUE_RECONNECT_ITEM,
 				__FUNCTION__);
 		}
@@ -1351,6 +1353,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccount *self = (TnyCamelAccount *)instance;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->queue = _tny_camel_queue_new (self);
 	priv->delete_this = NULL;
 	priv->is_ready = FALSE;
 	priv->is_connecting = FALSE;
@@ -1799,6 +1802,8 @@ tny_camel_account_is_ready (TnyAccount *self)
 
 typedef struct 
 {
+	TnyCamelQueueable parent;
+
 	TnyCamelAccount *self;
 	TnyCamelGetSupportedSecureAuthCallback callback;
 	TnyStatusCallback status_callback;
@@ -1808,10 +1813,6 @@ typedef struct
 	TnyIdleStopper* stopper;
 	GError *err;
 	TnySessionCamel *session;
-
-	GCond* condition;
-	gboolean had_callback;
-	GMutex *mutex;
 
 } GetSupportedAuthInfo;
 
@@ -1833,6 +1834,22 @@ on_supauth_idle_func (gpointer user_data)
 }
 
 
+static gboolean 
+on_supauth_cancelled_idle_func (gpointer user_data)
+{
+	GetSupportedAuthInfo *info = (GetSupportedAuthInfo *) user_data;
+
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, TRUE, info->result, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+
+	tny_idle_stopper_stop (info->stopper);
+
+	return FALSE; /* Don't call this again. */
+}
+
 static void 
 on_supauth_destroy_func (gpointer user_data)
 {
@@ -1849,19 +1866,18 @@ on_supauth_destroy_func (gpointer user_data)
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
 
-	if (info->condition) {
-		g_mutex_lock (info->mutex);
-		g_cond_broadcast (info->condition);
-		info->had_callback = TRUE;
-		g_mutex_unlock (info->mutex);
+	if (info->err) {
+		g_error_free (info->err);
+		info->err = NULL;
 	}
+
+	return;
 }
 
 static void 
 on_supauth_destroy_and_kill_func (gpointer user_data)
 {
 	on_supauth_destroy_func (user_data);
-	g_slice_free (GetSupportedAuthInfo, user_data);
 }
 
 /* Starts the operation in the thread: */
@@ -1917,30 +1933,6 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 	}
 
 	g_static_rec_mutex_unlock (priv->service_lock);
-
-	info->mutex = g_mutex_new ();
-	info->condition = g_cond_new ();
-	info->had_callback = FALSE;
-
-	execute_callback (10, G_PRIORITY_HIGH, 
-		on_supauth_idle_func, 
-		info, on_supauth_destroy_func);
-
-	/* Wait on the queue for the mainloop callback to be finished */
-	g_mutex_lock (info->mutex);
-	if (!info->had_callback)
-		g_cond_wait (info->condition, info->mutex);
-	g_mutex_unlock (info->mutex);
-
-	g_mutex_free (info->mutex);
-	g_cond_free (info->condition);
-
-	if (info->err) {
-		g_error_free (info->err);
-		info->err = NULL;
-	}
-
-	g_slice_free (GetSupportedAuthInfo, info);
 
 	tny_status_free(status);
 
@@ -2018,9 +2010,12 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 		TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 		_tny_camel_queue_launch (aspriv->queue, 
 			tny_camel_account_get_supported_secure_authentication_async_thread, 
-			on_supauth_idle_func, on_supauth_destroy_and_kill_func, 
-			&info->cancelled, info, __FUNCTION__);
+			on_supauth_idle_func, on_supauth_destroy_func, 
+			on_supauth_cancelled_idle_func, on_supauth_destroy_and_kill_func, 
+			&info->cancelled, info, sizeof (GetSupportedAuthInfo),
+			__FUNCTION__);
 	} else {
+		TnyCamelQueue *temp_queue = _tny_camel_queue_new (self);
 		g_thread_create (tny_camel_account_get_supported_secure_authentication_async_thread,
 			info, FALSE, NULL);
 	}
@@ -2103,6 +2098,8 @@ tny_camel_account_finalize (GObject *object)
 	priv->delete_this = NULL;
 
 	g_static_rec_mutex_unlock (priv->service_lock);
+
+	g_object_unref (priv->queue);
 
 	camel_exception_free (priv->ex);
 
