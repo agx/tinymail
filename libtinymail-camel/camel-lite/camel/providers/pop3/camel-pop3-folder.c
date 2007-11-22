@@ -962,6 +962,12 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		return message;
 	}
 
+	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE) {
+		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			     _("This message is not currently available"));
+		return NULL;
+	}
+
 	if (pop3_folder->uids_uid)
 		fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
 	else
