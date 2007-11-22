@@ -69,7 +69,7 @@ remove_folder_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolder *folder
 	if (TNY_IS_FOLDER (folder)) {
 		if (!final)
 			self->fol_obs = g_list_remove (self->fol_obs, folder);
-		tny_folder_remove_observer (folder, TNY_FOLDER_OBSERVER (self));
+		tny_folder_remove_observer (folder, (TnyFolderObserver *) self);
 	}
 }
 
@@ -79,7 +79,7 @@ remove_folder_store_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolderSt
 	if (TNY_IS_FOLDER_STORE (store)) {
 		if (!final)
 			self->store_obs = g_list_remove (self->store_obs, store);
-		tny_folder_store_remove_observer (store, TNY_FOLDER_STORE_OBSERVER (self));
+		tny_folder_store_remove_observer (store, (TnyFolderStoreObserver *) self);
 	}
 }
 
@@ -508,6 +508,8 @@ tny_gtk_folder_store_tree_model_finalize (GObject *object)
 		g_signal_handler_disconnect (me, me->signal2);
 */
 
+/* Experimentally removed this. With weak referencing this ain't needed ...
+
 	while (copy) {
 		remove_folder_observer_weak (me, (TnyFolder *) copy->data, TRUE);
 		copy = g_list_next (copy);
@@ -518,6 +520,7 @@ tny_gtk_folder_store_tree_model_finalize (GObject *object)
 		remove_folder_store_observer_weak (me, (TnyFolderStore *) copy->data, TRUE);
 		copy = g_list_next (copy);
 	}
+*/
 
 	if (me->fol_obs)
 		g_list_free (me->fol_obs);
