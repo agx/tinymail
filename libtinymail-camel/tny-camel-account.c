@@ -97,6 +97,7 @@ _tny_camel_account_emit_changed (TnyCamelAccount *self)
 
 typedef struct {
 	TnyCamelAccount *self;
+	char somestuff[20];
 } ReconInfo;
 
 static gpointer
@@ -123,8 +124,21 @@ reconnect_thread (gpointer user_data)
 	}
 	apriv->service->reconnecting = FALSE;
 
-	g_object_unref (info->self);
 	return NULL;
+}
+
+static gboolean 
+did_refresh (gpointer user_data)
+{
+	return FALSE;
+}
+
+static void 
+did_refresh_destroy (gpointer user_data)
+{
+	ReconInfo *info = (ReconInfo *) user_data;
+	g_object_unref (info->self);
+	return;
 }
 
 static gboolean 
@@ -228,7 +242,7 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 
 			_tny_camel_queue_launch_wflags (aspriv->queue, 
 				reconnect_thread, 
-				NULL, NULL,
+				did_refresh, did_refresh_destroy,
 				cancelled_refresh, 
 				cancelled_refresh_destroy, 
 				NULL, 
