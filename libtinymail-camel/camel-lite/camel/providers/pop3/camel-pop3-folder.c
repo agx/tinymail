@@ -968,9 +968,9 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		return NULL;
 	}
 
-	if (pop3_folder->uids_uid)
+	/* if (pop3_folder->uids_uid)
 		fi = g_hash_table_lookup(pop3_folder->uids_uid, uid);
-	else
+	else */
 		fi = NULL;
 
 	if (fi == NULL) {
@@ -978,9 +978,13 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 		g_static_rec_mutex_lock (pop3_store->eng_lock);
 
-		if (pop3_store->engine == NULL) {
-			g_static_rec_mutex_unlock (pop3_store->eng_lock);
-			goto rfail;
+		if (pop3_store->engine == NULL)
+		{
+			camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
+			if (camel_exception_is_set (ex)) {
+				g_static_rec_mutex_unlock (pop3_store->eng_lock);
+				goto rfail;
+			}
 		}
 
 		destroy_lists (pop3_folder);

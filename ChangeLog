@@ -5,6 +5,8 @@
 	POP accounts
 	* Removed unneeded removal of observers (they are weak referenced)
 	* Update local_size after getting messages
+	* Fix for when you remove something from GMail's webpage, and then
+	click on later E-mails (for POP accounts)
 
 2007-11-21  Philip Van Hoof  <pvanhoof@gnome.org>
 
