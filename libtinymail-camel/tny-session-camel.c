@@ -704,8 +704,9 @@ _tny_session_camel_register_account (TnySessionCamel *self, TnyCamelAccount *acc
 }
 
 static void
-on_account_connect_done (TnySessionCamel *self, TnyCamelAccount *account, GError *err, gpointer user_data)
+on_account_connect_done (TnyCamelAccount *account, gboolean canceled, GError *err, gpointer user_data)
 {
+	TnySessionCamel *self = (TnySessionCamel *) user_data;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
 
 	/* This one happens when a account is finished with connecting. On 
@@ -723,12 +724,14 @@ on_account_connect_done (TnySessionCamel *self, TnyCamelAccount *account, GError
 
 	apriv->is_ready = TRUE;
 
-	if (err) {
-		if (strcmp (err->message, "cancel")) {
-			tny_session_camel_do_an_error (self, TNY_ACCOUNT (account), 
-				TNY_ALERT_TYPE_ERROR, FALSE, err);
-		}
+	if (!canceled && err) {
+		tny_account_store_alert (
+			(TnyAccountStore*) self->priv->account_store, 
+			TNY_ACCOUNT (account), TNY_ALERT_TYPE_ERROR, FALSE, 
+			(const GError *) err);
 	}
+
+	camel_object_unref (self);
 
 	return;
 }
@@ -769,10 +772,12 @@ tny_session_queue_going_online_for_account (TnySessionCamel *self, TnyCamelAccou
 	 * go online to the account's queue. This is implemented in a protected
 	 * method in TnyCamelStoreAccount. Go take a look! */
 
-	if (TNY_IS_CAMEL_STORE_ACCOUNT (account)) 
+	if (TNY_IS_CAMEL_STORE_ACCOUNT (account)) {
+		camel_object_ref (self);
 		_tny_camel_store_account_queue_going_online (
 			TNY_CAMEL_STORE_ACCOUNT (account), self, online, 
-			on_account_connect_done, NULL);
+			on_account_connect_done, self);
+	}
 
 	/* Else, if it's a transport account, we don't have any transport 
 	 * account implementations that actually need to go online at this 

@@ -1643,11 +1643,14 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 typedef struct {
 	TnyCamelQueueable parent;
 
-	TnySessionCamel *session;
 	TnyCamelStoreAccount *self;
-	gboolean online;
-	go_online_callback_func done_func;
+	TnyCamelSetOnlineCallback callback;
 	gpointer user_data;
+	gboolean cancelled;
+	GError *err;
+	TnySessionCamel *session;
+	gboolean online;
+
 } GoingOnlineInfo;
 
 static gpointer 
@@ -1680,74 +1683,80 @@ tny_camel_store_account_queue_going_online_thread (gpointer thr_user_data)
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	_tny_camel_account_try_connect (TNY_CAMEL_ACCOUNT (info->self), 
-			FALSE, &err);
+			FALSE, &info->err);
 
-	if (err) {
-		info->done_func (info->session, TNY_CAMEL_ACCOUNT (info->self), err, info->user_data);
-		g_error_free (err);
-	} else {
-
-		/* This one actually sets the account to online. Although Rob 
-		 * is probably going to improve all this. Right *poke*? */
-
+	if (!info->err) {
 		_tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (info->self), 
-			info->online, &err);
-
-		if (err) {
-			info->done_func (info->session, 
-				TNY_CAMEL_ACCOUNT (info->self), err, info->user_data);
-			g_error_free (err);
-		} else
-			info->done_func (info->session, 
-				TNY_CAMEL_ACCOUNT (info->self), NULL, info->user_data);
-
+			info->online, &info->err);
 	}
 
 	apriv->is_connecting = FALSE;
 
-	/* Thread reference */
-	camel_object_unref (info->session);
-	g_object_unref (info->self);
-
 	return NULL;
 }
 
-/* This is that protected implementation that will request to go online, on the
- * queue of this account @self. Each TnyCamelStoreAccount has two queues: One 
- * queue is dedicated to getting messages. The other, the default queue, is
- * dedicated to any other operation. Including getting itself connected with an 
- * actual server (that can be both a POP or an IMAP server, depending on the 
- * url-string and/or proto setting of @self). */
 
 static gboolean 
-cancelled_conn (gpointer user_data)
+tny_camel_store_account_queue_going_online_callback (gpointer user_data)
 {
 	GoingOnlineInfo *info = (GoingOnlineInfo *) user_data;
-	GError *err = NULL;
 
-	g_set_error (&err, TNY_ACCOUNT_ERROR, TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL, 
-		"cancel");
-
-	info->done_func (info->session, 
-		TNY_CAMEL_ACCOUNT (info->self), err, info->user_data);
-	if (err)
-		g_error_free (err);
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback ((TnyCamelAccount *) info->self, FALSE, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
 
 	return FALSE;
 }
 
 static void 
-cancelled_conn_destroy (gpointer user_data)
+tny_camel_store_account_queue_going_online_destroy (gpointer user_data)
 {
 	GoingOnlineInfo *info = (GoingOnlineInfo *) user_data;
+
+	if (info->err)
+		g_error_free (info->err);
+
+	/* thread reference */
+	g_object_unref (info->self);
+	camel_object_unref (info->session);
+
+	return;
+}
+static gboolean 
+tny_camel_store_account_queue_going_online_cancelled_callback (gpointer user_data)
+{
+	GoingOnlineInfo *info = (GoingOnlineInfo *) user_data;
+
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback ((TnyCamelAccount *) info->self, TRUE, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+
+	return FALSE;
+}
+
+
+static void 
+tny_camel_store_account_queue_going_online_cancelled_destroy (gpointer user_data)
+{
+	GoingOnlineInfo *info = (GoingOnlineInfo *) user_data;
+
+	if (info->err)
+		g_error_free (info->err);
+
+	/* thread reference */
 	g_object_unref (info->self);
 	camel_object_unref (info->session);
 
 	return;
 }
 
+
 void
-_tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySessionCamel *session, gboolean online, go_online_callback_func done_func, gpointer user_data)
+_tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySessionCamel *session, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data)
 {
 	GoingOnlineInfo *info = NULL;
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
@@ -1757,25 +1766,27 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 
 	info->session = session;
 	info->self = self;
-	info->done_func = done_func;
+	info->callback = callback;
 	info->online = online;
 	info->user_data = user_data;
+	info->err = NULL;
 
 	/* thread reference */
 	g_object_ref (info->self);
 	camel_object_ref (info->session);
 
-
 	/* It's indeed a very typical queue operation */
-
 	_tny_camel_queue_cancel_remove_items (priv->queue,
 		TNY_CAMEL_QUEUE_RECONNECT_ITEM);
 
 	_tny_camel_queue_launch_wflags (priv->queue, 
 		tny_camel_store_account_queue_going_online_thread,
-		NULL, NULL, /* If not canceled, we'll cleanup in the thread */
-		cancelled_conn, cancelled_conn_destroy, NULL,
-		 info, sizeof (GoingOnlineInfo),
+		tny_camel_store_account_queue_going_online_callback,
+		tny_camel_store_account_queue_going_online_destroy,
+		tny_camel_store_account_queue_going_online_cancelled_callback,
+		tny_camel_store_account_queue_going_online_cancelled_destroy,
+		NULL,
+		info, sizeof (GoingOnlineInfo),
 		TNY_CAMEL_QUEUE_RECONNECT_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM,
 		__FUNCTION__);
 

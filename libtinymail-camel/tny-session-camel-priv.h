@@ -23,7 +23,6 @@ struct _TnySessionCamelPriv
 	GList *regged_queues;
 };
 
-typedef void (*go_online_callback_func) (TnySessionCamel *self, TnyCamelAccount *account, GError *err, gpointer user_data);
 void _tny_session_camel_register_account (TnySessionCamel *self, TnyCamelAccount *account);
 void _tny_session_camel_activate_account (TnySessionCamel *self, TnyCamelAccount *account);
 void _tny_session_camel_unregister_account (TnySessionCamel *self, TnyCamelAccount *account);

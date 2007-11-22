@@ -1664,56 +1664,6 @@ on_set_online_done_destroy_func (gpointer data)
 	return;
 }
 
-/**
- * When using a #GMainLoop this method will execute a callback using
- * g_idle_add_full.  Note that without a #GMainLoop, the callbacks
- * could happen in a worker thread (depends on who call it) at an
- * unknown moment in time (check your locking in this case).
- */
-static void
-execute_callback (gint depth, 
-		  gint priority,
-		  GSourceFunc idle_func,
-		  gpointer data, 
-		  GDestroyNotify destroy_func)
-{
-	/* if (depth > 0){ */
-		g_idle_add_full (priority, idle_func, data, destroy_func);
-	/* } else { 
-		idle_func (data);
-		destroy_func (data);
-	} */
-}
-
-typedef struct {
-	TnyCamelSetOnlineCallback callback;
-	gpointer user_data;
-} OnSetOnlineDoneInfo;
-
-static void 
-on_set_online_done (TnySessionCamel *self, TnyCamelAccount *account, GError *err, gpointer user_data)
-{
-	OnSetOnlineDoneInfo *i = (OnSetOnlineDoneInfo *) user_data;
-
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
-	TnySessionCamel *session = apriv->session;
-	gboolean cancel = FALSE;
-
-	if (err) {
-		if (!strcmp (err->message, "cancel"))
-			cancel = TRUE;
-	}
-
-	if (i->callback) {
-		tny_lockable_lock (session->priv->ui_lock);
-		i->callback (account, cancel, err, i->user_data);
-		tny_lockable_unlock (session->priv->ui_lock);
-	}
-
-	g_slice_free (OnSetOnlineDoneInfo, i);
-
-	return;
-}
 
 void 
 tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data)
@@ -1729,13 +1679,9 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, Tn
 
 	if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
 
-		OnSetOnlineDoneInfo *i = g_slice_new0 (OnSetOnlineDoneInfo);
-		i->callback = callback;
-		i->user_data = user_data;
-
 		_tny_camel_store_account_queue_going_online (
 			TNY_CAMEL_STORE_ACCOUNT (self), session, online, 
-			on_set_online_done, i);
+			callback, user_data);
 	}
 
 
@@ -1758,7 +1704,7 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, Tn
 		info->had_callback = FALSE;
 		info->account = TNY_CAMEL_ACCOUNT (g_object_ref (self));
 
-		execute_callback (/* info->depth */ 10, G_PRIORITY_HIGH, 
+		g_idle_add_full (G_PRIORITY_HIGH, 
 			on_set_online_done_idle_func, 
 			info, on_set_online_done_destroy_func);
 
