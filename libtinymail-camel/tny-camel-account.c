@@ -1693,51 +1693,24 @@ typedef struct {
 static void 
 on_set_online_done (TnySessionCamel *self, TnyCamelAccount *account, GError *err, gpointer user_data)
 {
-	OnSetOnlineInfo *info = g_slice_new (OnSetOnlineInfo);
 	OnSetOnlineDoneInfo *i = (OnSetOnlineDoneInfo *) user_data;
 
-	/* Thread reference */
-	info->account = TNY_CAMEL_ACCOUNT (g_object_ref (account));
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+	TnySessionCamel *session = apriv->session;
+	gboolean cancel = FALSE;
 
-	/* We must copy the err because this context will destroy it! */
-
-	info->cancel = FALSE;
 	if (err) {
 		if (!strcmp (err->message, "cancel"))
-			info->cancel = TRUE;
-		else
-			info->err = g_error_copy (err); 
-	} else
-		info->err = NULL;
+			cancel = TRUE;
+	}
 
-	info->callback = i->callback;
-	info->user_data = i->user_data;
+	if (i->callback) {
+		tny_lockable_lock (session->priv->ui_lock);
+		i->callback (account, cancel, err, i->user_data);
+		tny_lockable_unlock (session->priv->ui_lock);
+	}
 
 	g_slice_free (OnSetOnlineDoneInfo, i);
-
-	info->mutex = g_mutex_new ();
-	info->condition = g_cond_new ();
-	info->had_callback = FALSE;
-
-	/* If the connection was cancelled we can not execute this in
-	   an idle because we're currently in the main loop. If we try
-	   to execute it in an idle the following g_cond_wait will
-	   never succeed because the idle won't be executed never
-	   (we're in the main loop) */
-	execute_callback ((info->cancel) ? 0 : 10, G_PRIORITY_HIGH, 
-		on_set_online_done_idle_func, 
-		info, on_set_online_done_destroy_func);
-
-	/* Wait on the queue for the mainloop callback to be finished */
-	g_mutex_lock (info->mutex);
-	if (!info->had_callback)
-		g_cond_wait (info->condition, info->mutex);
-	g_mutex_unlock (info->mutex);
-
-	g_mutex_free (info->mutex);
-	g_cond_free (info->condition);
-
-	g_slice_free (OnSetOnlineInfo, info);
 
 	return;
 }
@@ -1755,9 +1728,11 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, Tn
 		return;
 
 	if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
+
 		OnSetOnlineDoneInfo *i = g_slice_new0 (OnSetOnlineDoneInfo);
 		i->callback = callback;
 		i->user_data = user_data;
+
 		_tny_camel_store_account_queue_going_online (
 			TNY_CAMEL_STORE_ACCOUNT (self), session, online, 
 			on_set_online_done, i);

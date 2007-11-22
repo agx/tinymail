@@ -7,6 +7,7 @@
 	* Update local_size after getting messages
 	* Fix for when you remove something from GMail's webpage, and then
 	click on later E-mails (for POP accounts)
+	* Fixed regression bug in the TnyCamelQueue refactoring
 
 2007-11-21  Philip Van Hoof  <pvanhoof@gnome.org>
 
