@@ -129,7 +129,7 @@ static void
 pop3_finalize (CamelObject *object)
 {
 	CamelPOP3Folder *pop3_folder = CAMEL_POP3_FOLDER (object);
-	camel_folder_summary_save (((CamelFolder *) pop3_folder)->summary);
+	camel_folder_summary_save (((CamelFolder *) pop3_folder)->summary, NULL);
 	destroy_lists (pop3_folder);
 
 }
