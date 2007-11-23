@@ -2,6 +2,16 @@ Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog
 
+2007-11-22  Milan Crha  <mcrha@redhat.com>
+
+	* Merged By Philip Van Hoof
+	* http://bugzilla.gnome.org/show_bug.cgi?id=376425
+
+	** Fix for bug #461979
+
+	* camel-url.c: (camel_url_new_with_base):
+	The base URL can be without a path, so do not crash, if that happened
+
 2007-11-20  Milan Crha  <mcrha@redhat.com>
 
 	* Merged by Philip Van Hoof
