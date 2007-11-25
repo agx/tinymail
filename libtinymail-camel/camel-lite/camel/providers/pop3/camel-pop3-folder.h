@@ -50,10 +50,6 @@ typedef struct {
 
 typedef struct {
 	CamelDiscoFolder parent_object;
-
-	GPtrArray *uids;
-	GHashTable *uids_uid;	/* messageinfo by uid */
-	GHashTable *uids_id;	/* messageinfo by id */
 } CamelPOP3Folder;
 
 typedef struct {

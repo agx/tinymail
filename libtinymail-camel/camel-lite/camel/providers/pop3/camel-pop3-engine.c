@@ -60,6 +60,7 @@ camel_pop3_engine_class_init (CamelPOP3EngineClass *camel_pop3_engine_class)
 static void
 camel_pop3_engine_init(CamelPOP3Engine *pe, CamelPOP3EngineClass *peclass)
 {
+	pe->login_delay = 300;
 	pe->lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (pe->lock);
 
@@ -208,6 +209,7 @@ static struct {
 	{ "UIDL", CAMEL_POP3_CAP_UIDL },
 	{ "PIPELINING", CAMEL_POP3_CAP_PIPE },
 	{ "STLS", CAMEL_POP3_CAP_STLS },  /* STARTTLS */
+	{ "LOGIN-DELAY", CAMEL_POP3_CAP_LOGIN_DELAY } 
 };
 
 static int
@@ -241,6 +243,17 @@ cmd_capa(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 						dd(printf("unsupported auth type '%s'\n", tok));
 					}
 					tok = next;
+				}
+			} if (camel_strstrcase ((char *) line, "LOGIN-DELAY")) {
+				char *delay;
+				pe->capa |= CAMEL_POP3_CAP_LOGIN_DELAY;
+				delay = strchr (line, ' ');
+				if (delay) {
+					delay++;
+					pe->login_delay = strtoul (delay, &delay, 10);
+
+					/* printf ("SET DELAY: %s (%d) OVERW 5\n", delay, pe->login_delay);
+					pe->login_delay = 5; */
 				}
 			} else {
 				for (i=0;i<sizeof(capa)/sizeof(capa[0]);i++) {

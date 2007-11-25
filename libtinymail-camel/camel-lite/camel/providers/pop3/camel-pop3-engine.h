@@ -67,7 +67,8 @@ enum {
 	CAMEL_POP3_CAP_SASL = 1<<2,
 	CAMEL_POP3_CAP_TOP  = 1<<3,
 	CAMEL_POP3_CAP_PIPE = 1<<4,
-	CAMEL_POP3_CAP_STLS = 1<<5
+	CAMEL_POP3_CAP_STLS = 1<<5,
+	CAMEL_POP3_CAP_LOGIN_DELAY = 1<<5
 };
 
 /* enable/disable flags for the engine itself */
@@ -117,6 +118,7 @@ struct _CamelPOP3Engine {
 	CamelPOP3Command *current; /* currently busy (downloading) response */
 	void *store; gboolean partial_happening;
 	gint type; gint param;
+	guint login_delay;
 
 	GStaticRecMutex *lock;
 };

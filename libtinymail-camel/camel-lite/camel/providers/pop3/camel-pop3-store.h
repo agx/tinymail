@@ -49,9 +49,14 @@ typedef struct {
 	guint delete_after;
 	gboolean immediate_delete_after;
 	gchar *storage_path, *base_url;
-	gboolean connected, is_refreshing;
+	gboolean connected, logged_in, is_refreshing;
 	GStaticRecMutex *eng_lock;
 	gpointer book;
+	guint login_delay;
+
+	GPtrArray *uids;
+	GHashTable *uids_uid;	/* messageinfo by uid */
+	GHashTable *uids_id;	/* messageinfo by id */
 
 } CamelPOP3Store;
 
@@ -71,6 +76,8 @@ char *camel_pop3_command_get_additional_data (CamelPOP3Store *store, int total, 
 
 /* Standard Camel function */
 CamelType camel_pop3_store_get_type (void);
+
+void camel_pop3_store_destroy_lists (CamelPOP3Store *pop3_store);
 
 G_END_DECLS
 

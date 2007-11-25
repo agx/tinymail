@@ -1,3 +1,10 @@
+2007-11-25  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Using the LOGIN-DELAY of a POP server
+	* If LOGIN-DELAY is not given, use 300 seconds as default timeout for
+	POP servers
+	* Reconnect after the timeout has expired
+
 2007-11-22  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Refactored TnyCamelQueue to make more sense
