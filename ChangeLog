@@ -1,3 +1,8 @@
+2007-11-26 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+	
+	* add a dummy conic device, so libtinymail-maemo does
+	  not require libconic anymore
+
 2007-11-25  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Using the LOGIN-DELAY of a POP server
