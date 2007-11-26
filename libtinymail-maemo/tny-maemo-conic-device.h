@@ -24,7 +24,21 @@
 #include <glib-object.h>
 
 #include <tny-device.h>
+
+/* this TnyMaemoConicDevice comes with three different implementations;
+ * one is chosen at configure time:
+ * 1) the real TnyMaemoConicDevice (tny-maemo-conic-device.c for use on real N800/N810)
+ * 2) a dummy  TnyMaemoConicDevice (tny-maemo-conic-dummy-device.c, for use in Scratchbox)
+ * 3) another dummy TnyMaemoConicDevice (tny-maemo-noconic-device.c. for use if
+ *    libconic is not available at all (such as in Ubuntu Embedded)
+ */
+
+#ifdef MAEMO_HAVE_CONIC
 #include <coniciap.h>
+#else
+typedef struct {
+} ConIcIap;
+#endif /*MAEMO_HAVE_CONIC*/
 
 G_BEGIN_DECLS
 
@@ -40,21 +54,19 @@ G_BEGIN_DECLS
 typedef struct _TnyMaemoConicDevice      TnyMaemoConicDevice;
 typedef struct _TnyMaemoConicDeviceClass TnyMaemoConicDeviceClass;
 
-struct _TnyMaemoConicDevice
-{
+struct _TnyMaemoConicDevice {
 	GObject parent;
 };
 
-struct _TnyMaemoConicDeviceClass 
-{
+struct _TnyMaemoConicDeviceClass {
 	GObjectClass parent;
 };
 
-typedef void (*TnyMaemoConicDeviceConnectCallback) (TnyMaemoConicDevice *self, const gchar* iap_id, gboolean canceled, GError *err, gpointer user_data);
+typedef void (*TnyMaemoConicDeviceConnectCallback) (TnyMaemoConicDevice *self, const gchar* iap_id,
+						    gboolean canceled, GError *err, gpointer user_data);
 
 
 GType tny_maemo_conic_device_get_type (void);
-
 TnyDevice* tny_maemo_conic_device_new (void);
 
 gboolean tny_maemo_conic_device_connect (TnyMaemoConicDevice *self, const gchar* iap_id, gboolean user_requested);

@@ -25,11 +25,22 @@ libtinymail_maemo_1_0_la_SOURCES =  \
 	tny-maemo-device.c \
 	tny-maemo-platform-factory.c
 
+
+#
+# if we have libconic and build for ARM: use tny-maemo-conic-device.c (the real one)
+# if we have libconic and build for x86 (scratchbox): use tny-maemo-conic-dummy-device.c
+# if we don't have libconic: use tny-maemo-noconic-device.c
+#
+if MAEMO_CONIC_HAVE_CONIC
 if MAEMO_CONIC_DEVICE_DUMMY
 libtinymail_maemo_1_0_la_SOURCES += tny-maemo-conic-dummy-device.c
 else
 libtinymail_maemo_1_0_la_SOURCES += tny-maemo-conic-device.c
 endif
+else
+libtinymail_maemo_1_0_la_SOURCES += tny-maemo-noconic-device.c
+endif
+
 
 libtinymail_maemo_1_0_la_LIBADD = \
 	$(LIBTINYMAIL_MAEMO_LIBS) \

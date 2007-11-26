@@ -425,7 +425,7 @@ AC_DEFUN([ARMEL_TARGET],
 
 dnl ### libtinymail-maemo, a platform library implementation for the maemo platform ##
 if test x$PLATFORMDIR = xlibtinymail-maemo; then
-	PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 libosso)
+	PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
 	if $PKG_CONFIG --exists conic; then
 		PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO_CONIC,conic,HAVE_CONIC=yes,HAVE_CONIC=no)
 		AC_MSG_RESULT(conic)
@@ -438,12 +438,15 @@ if test x$PLATFORMDIR = xlibtinymail-maemo; then
 			use_conic_device_dummy=1
  			AC_DEFINE_UNQUOTED(MAEMO_CONIC_DUMMY,1,["Whether to hack the TnyMaemoConicDevice to somewhat work in sbox"])
  		fi
+		AC_DEFINE_UNQUOTED(MAEMO_HAVE_CONIC,1,["whether libconic is available"])
 	fi
+
 	AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
 	AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
 fi
-
+			
 AM_CONDITIONAL(MAEMO_CONIC_DEVICE_DUMMY, test -n "$use_conic_device_dummy")
+AM_CONDITIONAL(MAEMO_CONIC_HAVE_CONIC, test "x$HAVE_CONIC" = "xyes")
 AM_CONDITIONAL(BUILD_MAEMO, test x$build_maemo = xtrue)
 
 dnl ### libtinymail-gpe, a platform library implementation for the GPE platform ##
