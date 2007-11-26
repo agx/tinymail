@@ -351,7 +351,10 @@ wait_for_login_delay (gpointer user_data)
 	guint login_delay = 300;
 
 	g_static_rec_mutex_lock (store->eng_lock);
-	login_delay = store->engine->login_delay;
+	if (!store->engine)
+		killed = TRUE;
+	else
+		login_delay = store->engine->login_delay;
 	g_static_rec_mutex_unlock (store->eng_lock);
 
 	while (!killed) {
