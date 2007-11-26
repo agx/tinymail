@@ -913,10 +913,9 @@ pop3_connect (CamelService *service, CamelException *ex)
 
 	store->engine->state = CAMEL_POP3_ENGINE_TRANSACTION;
 	camel_pop3_engine_reget_capabilities (store->engine);
+	g_static_rec_mutex_unlock (store->eng_lock);
 
 	g_thread_create (wait_for_login_delay, store, FALSE, NULL);
-
-	g_static_rec_mutex_unlock (store->eng_lock);
 
 	return TRUE;
 }
