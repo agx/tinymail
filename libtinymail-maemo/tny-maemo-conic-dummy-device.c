@@ -296,6 +296,7 @@ on_dummy_connection_check (gpointer user_data)
 	gchar *contents = NULL;
 	GError* error = NULL;
 	gboolean test = FALSE;
+	static gboolean first_time = TRUE;
 		
 	self = TNY_MAEMO_CONIC_DEVICE (user_data);
 
@@ -333,16 +334,16 @@ on_dummy_connection_check (gpointer user_data)
 		
 		if (strcmp (priv->iap, MAEMO_CONIC_DUMMY_IAP_ID_NONE) == 0) {
 			priv->is_online = FALSE;
-			g_debug ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to no connection.\n", __FUNCTION__);
 		} else {
 			priv->is_online = TRUE;
-			g_debug ("DEBUG: TnyMaemoConicDevice: %s:\n  Dummy connection changed to '%s\n", __FUNCTION__, priv->iap);
 		}
-		
-		g_debug ("DEBUG1: %s: emitting is_online=%d\n", __FUNCTION__, priv->is_online);
 
-		conic_emit_status (TNY_DEVICE (self), priv->is_online);
-
+		/* Do not need to emit it the first time because it's
+		   called from the instance init */
+		if (!first_time)		
+			conic_emit_status (TNY_DEVICE (self), priv->is_online);
+		else
+			first_time = FALSE;
 	}
 	
 	g_free (contents);
@@ -538,11 +539,13 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->iap = NULL;
 	priv->is_online = dnsmasq_has_resolv ();
 
+	/* Check if we're online right now */
+	on_dummy_connection_check (self);
+
 	/* Allow debuggers to fake a connection change by setting an environment 
 	 * variable, which we check ever 1 second. This should match one of the 
 	 * fake iap IDs that we created in tny_maemo_conic_device_get_iap_list().*/
-
-	priv->dummy_env_check_timeout = 
+	priv->dummy_env_check_timeout =
 		g_timeout_add (1000, on_dummy_connection_check, self);
 
 	return;

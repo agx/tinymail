@@ -2,6 +2,8 @@
 
 	* libtinymail-maemo/tny-maemo-conic-dummy-device.c
 	Fixed a g_signal_connect which was receiving an invalid user_data
+	The device now gets the connection status correctly when it's created
+	and no longer reports false connection status changes after 1 second
 
 2007-11-26 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 	
