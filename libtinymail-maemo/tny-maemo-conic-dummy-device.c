@@ -232,9 +232,9 @@ dummy_con_ic_connection_connect_by_id_async (TnyMaemoConicDevice *self,
 			GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL, 
 			"TnyMaemoConicDevice fake scratchbox implementation:\nThe application requested a connection. Make a fake connection?"));
 
-	g_signal_connect_swapped (dialog, "response",
-		G_CALLBACK (dummy_con_ic_connection_connect_by_id_async_cb),
-		dialog);
+	g_signal_connect (dialog, "response",
+			  G_CALLBACK (dummy_con_ic_connection_connect_by_id_async_cb),
+			  info);
 
 	gtk_widget_show (GTK_WIDGET (dialog));
 
