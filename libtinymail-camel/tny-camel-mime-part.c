@@ -211,13 +211,19 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 	CamelDataWrapper *containee;
 	CamelMultipart *body;
 	gint curl = 0, retval = 0;
+	TnyMimePart *actual_part = part;
 	CamelMimePart *cpart;
 
-	/* Yes, indeed (I don't yet support non TnyCamelMimePart mime part 
-	   instances, and I know I should. Feel free to implement the copying
-	   if you really need it) */
+	g_assert (TNY_IS_MIME_PART (part));
 
-	g_assert (TNY_IS_CAMEL_MIME_PART (part));
+	if (!TNY_IS_CAMEL_MIME_PART (part)) {
+		TnyStream *in_stream = tny_mime_part_get_stream (part);
+		actual_part = tny_camel_mime_part_new ();
+		tny_mime_part_construct_from_stream (actual_part, in_stream, 
+			tny_mime_part_get_content_type (part));
+		g_object_unref (in_stream);
+	} else 
+		g_object_ref (actual_part);
 
 	g_mutex_lock (priv->part_lock);
 
@@ -225,21 +231,22 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 	containee = camel_medium_get_content_object (medium);
 
 	/* Warp it into a multipart */
-	if (G_UNLIKELY (!containee) || G_LIKELY (!CAMEL_IS_MULTIPART (containee)))
+	if (!containee || !CAMEL_IS_MULTIPART (containee))
 	{
 		CamelContentType *type;
 		gchar *applied_type = NULL;
+
+		/* camel_medium_set_content_object does this ...
 		if (containee)
-			camel_object_unref (CAMEL_OBJECT (containee));
+			camel_object_unref (containee); */
 
 		curl = 0;
-		
 		type = camel_mime_part_get_content_type (priv->part);
-		if (!g_ascii_strcasecmp (type->type, "multipart")) {
+
+		if (!g_ascii_strcasecmp (type->type, "multipart"))
 			applied_type = g_strdup_printf ("%s/%s", type->type, type->subtype);
-		} else {
+		else
 			applied_type = g_strdup ("multipart/mixed");
-		}
 
 		body = camel_multipart_new ();
 		camel_data_wrapper_set_mime_type (CAMEL_DATA_WRAPPER (body),
@@ -250,32 +257,44 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 	} else
 		body = CAMEL_MULTIPART (containee);
 
-	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (part));
-	if (CAMEL_IS_MIME_MESSAGE (cpart)) {
+	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (actual_part));
+
+	if (cpart && CAMEL_IS_MIME_MESSAGE (cpart)) {
 		CamelMimePart *message_part = camel_mime_part_new ();
 		const gchar *subject;
 		gchar *description;
+		gboolean freedescup = FALSE;
 
 		subject = camel_mime_message_get_subject (CAMEL_MIME_MESSAGE (cpart));
-		if (subject)
-			description = g_strdup (subject);
-		else
-			description = _("Forwarded message");
+
+		if (subject) {
+			freedescup = TRUE;
+			description = g_strdup_printf ("Forwarded message: %s", subject);
+		} else
+			description = "Forwarded message";
+
+		camel_mime_part_set_description (message_part, description);
+
+		if (freedescup)
+			g_free (description);
 
 		camel_mime_part_set_disposition (message_part, "inline");
 		camel_medium_set_content_object (CAMEL_MEDIUM (message_part), 
 						 CAMEL_DATA_WRAPPER (cpart));
 		camel_mime_part_set_content_type (message_part, "message/rfc822");
 		camel_multipart_add_part (body, message_part);
-		camel_object_unref (CAMEL_OBJECT (message_part));
-	} else {
+		camel_object_unref (message_part);
+	} else if (cpart)
 		camel_multipart_add_part (body, cpart);
-	}
-	camel_object_unref (CAMEL_OBJECT (cpart));
+
+	if (cpart)
+		camel_object_unref (cpart);
 
 	retval = camel_multipart_get_number (body);
 
 	g_mutex_unlock (priv->part_lock);
+
+	g_object_unref (actual_part);
 
 	return retval;
 }
@@ -338,9 +357,7 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 	/* Content-Disposition is excellent for this, of course (but we might
 	 * not actually have this header, as not all E-mail clients add it) */
 
-
-	if (contdisp)
-	{
+	if (contdisp) {
 		if (camel_strstrcase (contdisp, "inline"))
 			return FALSE;
 		if (camel_strstrcase (contdisp, "attachment"))
@@ -350,15 +367,12 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 	/* Check the old fashioned way */
 	dw = camel_medium_get_content_object(medium);
 
-	if (dw)
-	{
-		return !(/*camel_content_type_is (dw->mime_type, "multipart", "*")
-			 ||*/ camel_content_type_is(dw->mime_type, "application", "x-pkcs7-mime")
+	if (dw) {
+		return !(camel_content_type_is(dw->mime_type, "application", "x-pkcs7-mime")
 			 || camel_content_type_is(dw->mime_type, "application", "pkcs7-mime")
 			 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-signed")
 			 || camel_content_type_is(dw->mime_type, "application", "x-inlinepgp-encrypted")
-			 || ( /* camel_content_type_is (dw->mime_type, "text", "*") text/x-patch 
-			     && */ camel_mime_part_get_filename(priv->part) == NULL));
+			 || (camel_mime_part_get_filename(priv->part) == NULL));
 	}
 
 	return FALSE;
@@ -384,36 +398,32 @@ tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *strea
 	cstream = tny_stream_camel_new (stream);
 
 	g_mutex_lock (priv->part_lock);
-
 	medium = CAMEL_MEDIUM (priv->part);
-	camel_object_ref (CAMEL_OBJECT (medium));
-
-	/* Once medium is referenced, we can continue without lock */
+	camel_object_ref (medium);
 	g_mutex_unlock (priv->part_lock);
 
 	wrapper = camel_medium_get_content_object (medium);
 
-	if (G_UNLIKELY (!wrapper))
-	{
+	if (!wrapper) {
 		g_error (_("Mime part does not yet have a source stream, use "
 			"tny_mime_part_construct_from_stream first"));
-		camel_object_unref (CAMEL_OBJECT (cstream));
+		camel_object_unref (cstream);
 		return;
 	}
-
-	camel_stream_reset (wrapper->stream);
-	camel_stream_write_to_stream (wrapper->stream, cstream);
 
 	/* This should work but doesn't . . .
 	camel_data_wrapper_write_to_stream (wrapper, cstream); */
 
-	camel_object_unref (CAMEL_OBJECT (cstream));
+	camel_stream_reset (wrapper->stream);
+	camel_stream_write_to_stream (wrapper->stream, cstream);
 
-	/* We are done, so unreference the reference above */
-	camel_object_unref (CAMEL_OBJECT (medium));
+	camel_object_unref (cstream);
+	camel_object_unref (medium);
 
 	return;
 }
+
+
 
 static void
 camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
@@ -430,42 +440,37 @@ camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 		g_ascii_strncasecmp(charset, "iso-8859-", 9) == 0) 
 	{
 		CamelStream *null;
-		
+
 		/* Since a few Windows mailers like to claim they sent
 		* out iso-8859-# encoded text when they really sent
 		* out windows-cp125#, do some simple sanity checking
 		* before we move on... */
-		
+
 		null = camel_stream_null_new();
 		filter_stream = camel_stream_filter_new_with_stream(null);
 		camel_object_unref(null);
-		
 		windows = (CamelMimeFilterWindows *)camel_mime_filter_windows_new(charset);
 		camel_stream_filter_add (filter_stream, (CamelMimeFilter *)windows);
-		
 		camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
 		camel_stream_flush ((CamelStream *)filter_stream);
 		camel_object_unref (filter_stream);
-		
 		charset = camel_mime_filter_windows_real_charset (windows);
-		
 	}
-	
+
 	filter_stream = camel_stream_filter_new_with_stream (stream);
-	
-	if ((filter = camel_mime_filter_charset_new_convert (charset, "UTF-8"))) 
-	{
+
+	if ((filter = camel_mime_filter_charset_new_convert (charset, "UTF-8"))) {
 		camel_stream_filter_add (filter_stream, (CamelMimeFilter *) filter);
 		camel_object_unref (filter);
 	}
-	
+
 	camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
 	camel_stream_flush ((CamelStream *)filter_stream);
 	camel_object_unref (filter_stream);
-	
+
 	if (windows)
 		camel_object_unref(windows);
-	
+
 	return;
 }
 
@@ -490,17 +495,13 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 	cstream = tny_stream_camel_new (stream);
 
 	g_mutex_lock (priv->part_lock);
-
 	medium = CAMEL_MEDIUM (priv->part);
 	camel_object_ref (CAMEL_OBJECT (medium));
-
-	/* Once medium is referenced, we can continue without lock */
 	g_mutex_unlock (priv->part_lock);
 
 	wrapper = camel_medium_get_content_object (medium);
 
-	if (G_UNLIKELY (!wrapper))
-	{
+	if (G_UNLIKELY (!wrapper)) {
 		g_error (_("Mime part does not yet have a source stream, use "
 			"tny_mime_part_construct_from_stream first"));
 		camel_object_unref (CAMEL_OBJECT (cstream));
@@ -512,8 +513,8 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 	else
 		camel_data_wrapper_decode_to_stream (wrapper, cstream);
 
-	camel_object_unref (CAMEL_OBJECT (cstream));
-	camel_object_unref (CAMEL_OBJECT (medium));
+	camel_object_unref (cstream);
+	camel_object_unref (medium);
 
 	return;
 }
@@ -544,21 +545,21 @@ tny_camel_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream 
 
 	wrapper = camel_medium_get_content_object (medium);
 
-	if (G_LIKELY (wrapper))
+	if (wrapper)
 		camel_object_unref (CAMEL_OBJECT (wrapper));
 
-	if (!g_ascii_strcasecmp (type, "message/rfc822")) {
+	if (!g_ascii_strcasecmp (type, "message/rfc822"))
 		wrapper = (CamelDataWrapper *) camel_mime_message_new ();
-	} else {
+	else 
 		wrapper = camel_data_wrapper_new ();
-	}
+
 	retval = camel_data_wrapper_construct_from_stream (wrapper, cstream);
 	camel_data_wrapper_set_mime_type (wrapper, type);
 
 	camel_medium_set_content_object(medium, wrapper);
 
-	camel_object_unref (CAMEL_OBJECT (cstream));
-	camel_object_unref (CAMEL_OBJECT (medium));
+	camel_object_unref (cstream);
+	camel_object_unref (medium);
 
 	return retval;
 }
@@ -580,32 +581,26 @@ tny_camel_mime_part_get_stream_default (TnyMimePart *self)
 
 	g_mutex_lock (priv->part_lock);
 	medium =  CAMEL_MEDIUM (priv->part);
-	camel_object_ref (CAMEL_OBJECT (medium));
+	camel_object_ref (medium);
 	g_mutex_unlock (priv->part_lock);
 
 	wrapper = camel_medium_get_content_object (medium);
 
-	if (G_UNLIKELY (!wrapper))
-	{
+	if (!wrapper) {
 		wrapper = camel_data_wrapper_new (); 
 		camel_medium_set_content_object (medium, wrapper);
 	} 
 
-	if (wrapper->stream)
-	{
+	if (wrapper->stream) {
 		camel_stream_reset (wrapper->stream);
 		camel_stream_write_to_stream (wrapper->stream, stream);
 	}
 
 	retval = TNY_STREAM (tny_camel_stream_new (stream));
-
-	/* Parenting: Loose own ref (the tnystreamcamel wrapper keeps one) */
-	camel_object_unref (CAMEL_OBJECT (stream));
-
+	camel_object_unref (stream);
 
 	tny_stream_reset (retval);
-
-	camel_object_unref (CAMEL_OBJECT (medium));
+	camel_object_unref (medium);
 
 	return retval;
 }
@@ -621,14 +616,11 @@ tny_camel_mime_part_get_content_type_default (TnyMimePart *self)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
-	if (G_LIKELY (!priv->cached_content_type))
-	{
+	if (!priv->cached_content_type) {
 		CamelContentType *type;
-
 		g_mutex_lock (priv->part_lock);
 		type = camel_mime_part_get_content_type (priv->part);
 		priv->cached_content_type = g_strdup_printf ("%s/%s", type->type, type->subtype);
-		/* Q: camel_content_type_unref (type); */
 		g_mutex_unlock (priv->part_lock);
 	}
 
@@ -645,9 +637,7 @@ static gboolean
 tny_camel_mime_part_is_purged_default (TnyMimePart *self)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
-	const gchar *disposition;
-
-	disposition = camel_mime_part_get_disposition (priv->part);
+	const gchar *disposition = camel_mime_part_get_disposition (priv->part);
 	return (disposition != NULL) && (!strcmp (disposition, "purged"));
 }
 
@@ -678,10 +668,8 @@ tny_camel_mime_part_content_type_is_default (TnyMimePart *self, const gchar *typ
 
 	/* pocus ! */
 
-	retval = camel_content_type_is (ctype, (const char*)str1, 
-			(const char*)str2);
-
-	/* TODO: Q: camel_content_type_unref (ctype); */
+	retval = camel_content_type_is (ctype, (const char *)str1, 
+			(const char *) str2);
 
 	g_free (dup);
 	g_free (str2);
@@ -697,14 +685,14 @@ _tny_camel_mime_part_set_part (TnyCamelMimePart *self, CamelMimePart *part)
 
 	g_mutex_lock (priv->part_lock);
 
-	if (G_UNLIKELY (priv->cached_content_type))
+	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
 
 	if (priv->part)
-		camel_object_unref (CAMEL_OBJECT (priv->part));
+		camel_object_unref (priv->part);
 
-	camel_object_ref (CAMEL_OBJECT (part));
+	camel_object_ref (part);
 	priv->part = part;
 
 	g_mutex_unlock (priv->part_lock);
@@ -729,7 +717,7 @@ tny_camel_mime_part_get_part (TnyCamelMimePart *self)
 	g_mutex_lock (priv->part_lock);
 	retval = priv->part;
 	if (retval)
-		camel_object_ref (CAMEL_OBJECT (retval));
+		camel_object_ref (retval);
 	g_mutex_unlock (priv->part_lock);
 
 	return retval;
@@ -881,12 +869,9 @@ static void
 tny_camel_mime_part_set_filename_default (TnyMimePart *self, const gchar *filename)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
-
 	g_mutex_lock (priv->part_lock);
-	if (filename) /* Q: Perhaps is this check not needed (and even invalid) */
-		camel_mime_part_set_filename (priv->part, filename);
+	camel_mime_part_set_filename (priv->part, filename);
 	g_mutex_unlock (priv->part_lock);
-
 	return;
 }
 
@@ -902,10 +887,10 @@ static void
 tny_camel_mime_part_set_purged_default (TnyMimePart *self)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
-
 	g_mutex_lock (priv->part_lock);
 	camel_mime_part_set_disposition (priv->part, "purged");
 	g_mutex_unlock (priv->part_lock);
+	return;
 }
 
 static void
@@ -923,13 +908,10 @@ tny_camel_mime_part_set_content_type_default (TnyMimePart *self, const gchar *co
 	g_assert (CAMEL_IS_MEDIUM (priv->part));
 
 	g_mutex_lock (priv->part_lock);
-
 	camel_mime_part_set_content_type (priv->part, content_type);
-
-	if (G_UNLIKELY (priv->cached_content_type))
+	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
-
 	g_mutex_unlock (priv->part_lock);
 
 	return;
@@ -940,16 +922,13 @@ tny_camel_mime_part_finalize (GObject *object)
 {
 	TnyCamelMimePart *self = (TnyCamelMimePart*) object;
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
-	
-	g_mutex_lock (priv->part_lock);
 
+	g_mutex_lock (priv->part_lock);
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
-
-	if (G_LIKELY (priv->part) && CAMEL_IS_OBJECT (priv->part))
+	if (priv->part && CAMEL_IS_OBJECT (priv->part))
 		camel_object_unref (CAMEL_OBJECT (priv->part));
-
 	g_mutex_unlock (priv->part_lock);
 
 	g_mutex_free (priv->part_lock);

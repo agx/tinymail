@@ -115,7 +115,9 @@ tny_moz_embed_msg_view_create_new_inline_viewer (TnyMsgView *self)
 static TnyMsgView*
 tny_moz_embed_msg_view_create_new_inline_viewer_default (TnyMsgView *self)
 {
-	return tny_moz_embed_msg_view_new ();
+	TnyMsgView *retval = tny_moz_embed_msg_view_new ();
+	tny_gtk_msg_view_set_parented (TNY_GTK_MSG_VIEW (retval), TRUE);
+	return retval;
 }
 
 

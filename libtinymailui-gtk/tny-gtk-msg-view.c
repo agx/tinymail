@@ -71,7 +71,7 @@ struct _TnyGtkMsgViewPriv
 	gboolean display_attachments;
 	gboolean display_rfc822;
 	gboolean first_attachment;
-	GtkBox *kid; gboolean in_expander;
+	GtkBox *kid; gboolean in_expander, parented;
 };
 
 typedef struct
@@ -297,10 +297,26 @@ tny_gtk_msg_view_create_new_inline_viewer (TnyMsgView *self)
 	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_new_inline_viewer_func (self);
 }
 
+/**
+ * tny_gtk_msg_view_set_parented:
+ * @self: a #TnyGtkMsgView instance
+ * @parented: parented or not
+ *
+ * Set @self as parented. Usually internally used.
+ **/
+void 
+tny_gtk_msg_view_set_parented (TnyGtkMsgView *self, gboolean parented)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	priv->parented = TRUE;
+	return;
+}
+
 static TnyMsgView*
 tny_gtk_msg_view_create_new_inline_viewer_default (TnyMsgView *self)
 {
 	TnyMsgView *retval = tny_gtk_msg_view_new ();
+	tny_gtk_msg_view_set_parented (TNY_GTK_MSG_VIEW (retval), TRUE);
 	return retval;
 }
 
@@ -309,6 +325,7 @@ tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 {
 	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_func (self, part);
 }
+
 
 /**
  * tny_gtk_msg_view_create_mime_part_view_for_default:
@@ -446,7 +463,8 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part, const gchar 
 				if (label == NULL || strlen (label) <= 0)
 					label = _("Email message attachment");
 				expander = gtk_expander_new (label);
-				gtk_expander_set_expanded (GTK_EXPANDER (expander), FALSE);
+				gtk_expander_set_expanded (GTK_EXPANDER (expander), 
+					tny_mime_part_content_type_is (part, "text/*"));
 				gtk_expander_set_spacing (GTK_EXPANDER (expander), 7);
 				gtk_container_add (GTK_CONTAINER (expander), GTK_WIDGET (mpview));
 				gtk_widget_show (GTK_WIDGET (expander));
@@ -705,6 +723,7 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->kid = GTK_BOX (gtk_vbox_new (FALSE, 0));
 	vbox = priv->kid;
 
+	priv->parented = FALSE;
 	priv->in_expander = FALSE;
 
 	/* Defaults */

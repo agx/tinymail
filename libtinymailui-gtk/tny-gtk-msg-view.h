@@ -79,6 +79,8 @@ gboolean tny_gtk_msg_view_get_display_rfc822 (TnyGtkMsgView *self);
 gboolean tny_gtk_msg_view_get_display_attachments (TnyGtkMsgView *self);
 gboolean tny_gtk_msg_view_get_display_plain (TnyGtkMsgView *self);
 
+void tny_gtk_msg_view_set_parented (TnyGtkMsgView *self, gboolean parented);
+
 G_END_DECLS
 
 #endif
