@@ -50,7 +50,6 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, l
 	GtkListStore *model = GTK_LIST_STORE (self);
 	GtkTreeIter iter;
 	TnyGtkAttachListModelPriv *priv = TNY_GTK_ATTACH_LIST_MODEL_GET_PRIVATE (self);
-
 	static GdkPixbuf *stock_file_pixbuf = NULL;
 	GdkPixbuf *pixbuf;
 	gchar *icon;
@@ -62,7 +61,7 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, l
 		if (!priv->theme || !GTK_IS_ICON_THEME (priv->theme))
 		{
 			priv->theme = gtk_icon_theme_get_default ();
-			g_object_ref (G_OBJECT (priv->theme));
+			g_object_ref (priv->theme);
 		}
 
 #ifdef GNOME
@@ -99,6 +98,17 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, l
 			pixbuf,
 			TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN, 
 			tny_mime_part_get_filename (part),
+			TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN,
+			part, -1);
+	} else {
+
+		func (model, &iter);
+
+		gtk_list_store_set (model, &iter,
+			TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN, 
+			tny_mime_part_get_description (part)?
+				tny_mime_part_get_description (part):
+				"Unknown attachment",
 			TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN,
 			part, -1);
 	}
