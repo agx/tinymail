@@ -111,7 +111,7 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  * tny_gtk_text_mime_part_view_finalize (TnyGtkTextMimePartView *self)
  * {
  *      if (priv->part))
- *          g_object_unref (G_OBJECT (priv->part));
+ *          g_object_unref (priv->part);
  * }
  * </programlisting></informalexample>
  **/

@@ -124,7 +124,9 @@ tny_gtk_image_mime_part_view_clear_default (TnyMimePartView *self)
 /**
  * tny_gtk_image_mime_part_view_new:
  *
- * Create a new #TnyMimePartView for Gtk+
+ * Create a new #TnyMimePartView for Gtk+. The returned value will inherit
+ * #GtkImage. It's recommended to use a #TnyGtkExpanderMimePartView to wrap this
+ * type.
  *
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/

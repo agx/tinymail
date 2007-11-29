@@ -43,6 +43,7 @@
 #include <tny-gtk-image-mime-part-view.h>
 #include <tny-gtk-text-mime-part-view.h>
 #include <tny-gtk-attachment-mime-part-view.h>
+#include <tny-gtk-expander-mime-part-view.h>
 #include <tny-mime-part-saver.h>
 
 #ifdef GNOME
@@ -372,8 +373,12 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 	/* Inline message RFC822 */
 	} else if (tny_mime_part_content_type_is (part, "image/*"))
 	{
-		retval = tny_gtk_image_mime_part_view_new ();
-
+		TnyMimePartView *image_view = tny_gtk_image_mime_part_view_new ();
+ 		const gchar *desc = tny_mime_part_get_description (part);
+ 		retval = tny_gtk_expander_mime_part_view_new (image_view);
+ 		if (!desc)
+ 			desc = _("Attached image");
+ 		gtk_expander_set_label (GTK_EXPANDER (retval), desc);
 	} else if (tny_mime_part_content_type_is (part, "multipart/*"))
 	{
 		retval = TNY_MIME_PART_VIEW (tny_msg_view_create_new_inline_viewer (self));

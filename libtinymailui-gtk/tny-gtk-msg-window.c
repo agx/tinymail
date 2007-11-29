@@ -211,14 +211,15 @@ tny_gtk_msg_window_mp_get_part_default (TnyMimePartView *self)
  * @self: a #TnyGtkMsgView instance
  * @view: a #TnyMsgView to decorate
  *
- * Set the @view to decorate with @self
+ * Set the @view to decorate with @self. The @view instance must inherit the 
+ * #GtkWidget type.
  **/
 void 
 tny_gtk_msg_window_set_view (TnyGtkMsgWindow *self, TnyMsgView *view)
 {
 	TnyGtkMsgWindowPriv *priv = TNY_GTK_MSG_WINDOW_GET_PRIVATE (self);
 
-	if (G_UNLIKELY (priv->msg_view))
+	if (priv->msg_view)
 		gtk_container_remove (GTK_CONTAINER (self), GTK_WIDGET (priv->msg_view));
 
 	priv->msg_view = view;
@@ -237,7 +238,9 @@ tny_gtk_msg_window_set_view (TnyGtkMsgWindow *self, TnyMsgView *view)
  * tny_gtk_msg_window_new:
  * @msgview: a #TnyMsgView to decorate
  *
- * Create a GtkWindow that implements #TnyMsgView by decorating @msgview.
+ * Create a GtkWindow that implements #TnyMsgView by decorating @msgview. The 
+ * @view instance must inherit the #GtkWidget type. The returned value will
+ * inherit #GtkWindow
  *
  * Return value: a new #TnyMsgWindow instance implemented for Gtk+
  **/

@@ -1,3 +1,12 @@
+2007-11-29  Philip Van Hoof  <pvanhoof@gnome.org>
+
+        * Backporting stable things from the devel/pvanhoof/bs branch to trunk
+	* Added TnyGtkExpanderMimePartView. This type is advised to be used
+	with for example TnyGtkImageMimePartView and other mime parts that are
+	known to be large (in a future branch (devel/pvanhoof/bs) will this
+	construction make sure that you don't download the part's content
+	until you expand the expander).
+
 2007-11-28  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Backporting stable things from the devel/pvanhoof/bs branch to trunk
