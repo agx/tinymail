@@ -1,3 +1,7 @@
+2007-11-30  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Bugfix for ticket #72
+
 2007-11-29  Philip Van Hoof  <pvanhoof@gnome.org>
 
         * Backporting stable things from the devel/pvanhoof/bs branch to trunk
