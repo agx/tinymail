@@ -4982,8 +4982,10 @@ tny_camel_folder_add_observer_default (TnyFolder *self, TnyFolderObserver *obser
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
 
 	g_static_rec_mutex_lock (priv->obs_lock);
-	priv->obs = g_list_prepend (priv->obs, observer);
-	g_object_weak_ref (G_OBJECT (observer), notify_observer_del, self);
+	if (!g_list_find (priv->obs, observer)) {
+		priv->obs = g_list_prepend (priv->obs, observer);
+		g_object_weak_ref (G_OBJECT (observer), notify_observer_del, self);
+	}
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	return;
@@ -5074,8 +5076,10 @@ tny_camel_folder_store_add_observer_default (TnyFolderStore *self, TnyFolderStor
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
 
 	g_static_rec_mutex_lock (priv->obs_lock);
-	priv->sobs = g_list_prepend (priv->sobs, observer);
-	g_object_weak_ref (G_OBJECT (observer), notify_store_observer_del, self);
+	if (!g_list_find (priv->sobs, observer)) {
+		priv->sobs = g_list_prepend (priv->sobs, observer);
+		g_object_weak_ref (G_OBJECT (observer), notify_store_observer_del, self);
+	}
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	return;

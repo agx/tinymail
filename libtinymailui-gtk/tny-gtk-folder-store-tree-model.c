@@ -996,25 +996,11 @@ tny_gtk_folder_store_tree_model_folder_obsr_update (TnyFolderObserver *self, Tny
 	return;
 }
 
-
-static void
-tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
+static void 
+delete_these_folders (GtkTreeModel *model, TnyList *list)
 {
-	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
-	GtkTreeModel *model = GTK_TREE_MODEL (self);
-	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
-
-	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS)
-		gtk_tree_model_foreach (model, creater, change);
-
-	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS)
-	{
-		TnyList *removed = tny_simple_list_new ();
 		TnyIterator *miter;
-
-		tny_folder_store_change_get_removed_folders (change, removed);
-		miter = tny_list_create_iterator (removed);
-
+		miter = tny_list_create_iterator (list);
 		while (!tny_iterator_is_done (miter))
 		{
 			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
@@ -1023,6 +1009,28 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 			tny_iterator_next (miter);
 		}
 		g_object_unref (miter);
+}
+
+static void
+tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)
+{
+	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
+	GtkTreeModel *model = GTK_TREE_MODEL (self);
+	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
+
+	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS) {
+		/* TnyList *created = tny_simple_list_new ();
+		 * tny_folder_store_change_get_created_folders (change, created);
+		 * delete_these_folders (model, created);
+		 * g_object_unref (created); */
+		gtk_tree_model_foreach (model, creater, change);
+	}
+
+	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS)
+	{
+		TnyList *removed = tny_simple_list_new ();
+		tny_folder_store_change_get_removed_folders (change, removed);
+		delete_these_folders (model, removed);
 		g_object_unref (removed);
 	}
 

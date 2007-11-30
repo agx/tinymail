@@ -1,6 +1,8 @@
 2007-11-30  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix for ticket #72
+	* Workaround for a known but unfound bug: don't register observers
+	twice.
 
 2007-11-29  Philip Van Hoof  <pvanhoof@gnome.org>
 

@@ -1370,8 +1370,10 @@ tny_camel_store_account_add_observer_default (TnyFolderStore *self, TnyFolderSto
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
 
 	g_static_rec_mutex_lock (priv->obs_lock);
-	priv->sobs = g_list_prepend (priv->sobs, observer);
-	g_object_weak_ref (G_OBJECT (observer), notify_store_observer_del, self);
+	if (!g_list_find (priv->sobs, observer)) {
+		priv->sobs = g_list_prepend (priv->sobs, observer);
+		g_object_weak_ref (G_OBJECT (observer), notify_store_observer_del, self);
+	}
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
 	return;

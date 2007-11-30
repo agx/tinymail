@@ -1255,8 +1255,10 @@ tny_merge_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->lock);
-	priv->obs = g_list_prepend (priv->obs, observer);
-	g_object_weak_ref (G_OBJECT (observer), notify_observer_del, self);
+	if (!g_list_find (priv->obs, observer)) {
+		priv->obs = g_list_prepend (priv->obs, observer);
+		g_object_weak_ref (G_OBJECT (observer), notify_observer_del, self);
+	}
 	g_static_rec_mutex_unlock (priv->lock);
 
 	return;
