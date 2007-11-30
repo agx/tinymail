@@ -4670,6 +4670,7 @@ Received: from nic.funet.fi
 					if (line[1] == '\r')
 						hadr = TRUE;
 					isnextdone = TRUE;
+					memset (line, 0, MAX_LINE_LEN);
 					continue;
 				}
 
@@ -4679,6 +4680,7 @@ Received: from nic.funet.fi
 					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
 					errmessage = g_strdup ("Read from service failed: Unexpected result from service");
 					err=TRUE;
+					memset (line, 0, MAX_LINE_LEN);
 					break;
 				} else if (linenum == 0)
 				{
@@ -4694,12 +4696,15 @@ Received: from nic.funet.fi
 					} else {
 						imap_debug ("Unsolicited in FETCH: %s\n", line);
 					}
+					memset (line, 0, MAX_LINE_LEN);
 					continue;
 				}
 
 				/* It's the last line (isnextdone will be ignored if that is the case) */
-			 	if (!strncmp (line, tag, taglen))
+			 	if (!strncmp (line, tag, taglen)) {
+					memset (line, 0, MAX_LINE_LEN);
 					break;
+				}
 
 				camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
 
@@ -4710,6 +4715,7 @@ Received: from nic.funet.fi
 						{
 							err = TRUE;
 							errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+							memset (line, 0, MAX_LINE_LEN);
 							break;
 						}
 					} else {
@@ -4717,6 +4723,7 @@ Received: from nic.funet.fi
 						{
 							err = TRUE;
 							errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+							memset (line, 0, MAX_LINE_LEN);
 							break;
 						}
 					}
@@ -4730,6 +4737,7 @@ Received: from nic.funet.fi
 				{
 					err = TRUE;
 					errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+					memset (line, 0, MAX_LINE_LEN);
 					break;
 				}
 				linenum++;
@@ -4809,7 +4817,7 @@ Received: from nic.funet.fi
 
 				/* It might be the line before the last line */
 				if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
-					{ isnextdone = TRUE; continue; }
+					{ isnextdone = TRUE; memset (line, 0, MAX_LINE_LEN); continue; }
 
 				/* It's the first line */
 				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
@@ -4817,6 +4825,7 @@ Received: from nic.funet.fi
 					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
 					errmessage = g_strdup ("Read from service failed: Unexpected result from FETCH");
 					err=TRUE;
+					memset (line, 0, MAX_LINE_LEN);
 					break;
 				}
 				else if (linenum == 0)
@@ -4833,6 +4842,7 @@ Received: from nic.funet.fi
 					} else {
 						imap_debug ("Unsolicited in FETCH: %s\n", line);
 					}
+					memset (line, 0, MAX_LINE_LEN);
 					continue;
 				}
 
@@ -4846,21 +4856,25 @@ Received: from nic.funet.fi
 						{
 							err = TRUE;
 							errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+							memset (line, 0, MAX_LINE_LEN);
 							break;
 						}
 						if (camel_stream_write (stream, boundary, boundary_len) != boundary_len)
 						{
 							err = TRUE;
 							errmessage = g_strdup_printf ("Write to cache failed failed: %s", g_strerror (errno));
+							memset (line, 0, MAX_LINE_LEN);
 							break;
 						}
 						if (camel_stream_write (stream, "\n", 1) != 1)
 						{
 							err = TRUE;
 							errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+							memset (line, 0, MAX_LINE_LEN);
 							break;
 						}
 					}
+					memset (line, 0, MAX_LINE_LEN);
 					break;
 				}
 
@@ -4904,6 +4918,7 @@ Received: from nic.funet.fi
 					{
 						err = TRUE;
 						errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+						memset (line, 0, MAX_LINE_LEN);
 						break;
 					}
 					isnextdone = FALSE;
@@ -4914,6 +4929,7 @@ Received: from nic.funet.fi
 				{
 					err = TRUE;
 					errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+					memset (line, 0, MAX_LINE_LEN);
 					break;
 				}
 
