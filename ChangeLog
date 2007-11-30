@@ -3,6 +3,8 @@
 	* Bugfix for ticket #72
 	* Workaround for a known but unfound bug: don't register observers
 	twice.
+	* Tryout bugfix for an invalid memory access (I think the problem was
+	incorrect locking while a list was being destroyed)
 
 2007-11-29  Philip Van Hoof  <pvanhoof@gnome.org>
 

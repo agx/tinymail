@@ -303,6 +303,8 @@ kill_lists (CamelPOP3Store *pop3_store)
 void
 camel_pop3_store_destroy_lists (CamelPOP3Store *pop3_store)
 {
+	g_static_rec_mutex_lock (pop3_store->uidl_lock);
+
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
 	if (pop3_store->uids != NULL)
@@ -319,12 +321,14 @@ camel_pop3_store_destroy_lists (CamelPOP3Store *pop3_store)
 					g_free(fi[0]->uid);
 					g_free(fi[0]);
 					g_static_rec_mutex_unlock (pop3_store->eng_lock);
+					g_static_rec_mutex_unlock (pop3_store->uidl_lock);
 					return;
 				}
 
 				while (camel_pop3_engine_iterate(pop3_store->engine, fi[0]->cmd) > 0)
 					;
 				camel_pop3_engine_command_free(pop3_store->engine, fi[0]->cmd);
+				fi[0]->cmd = NULL;
 			}
 
 			g_free(fi[0]->uid);
@@ -340,6 +344,7 @@ camel_pop3_store_destroy_lists (CamelPOP3Store *pop3_store)
 	}
 
 	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+	g_static_rec_mutex_unlock (pop3_store->uidl_lock);
 
 }
 
@@ -954,6 +959,9 @@ finalize (CamelObject *object)
 	g_free (pop3_store->eng_lock);
 	pop3_store->eng_lock = NULL;
 
+	g_free (pop3_store->uidl_lock);
+	pop3_store->uidl_lock = NULL;
+
 	kill_lists (pop3_store);
 
 	camel_object_unref (pop3_store->book);
@@ -1136,6 +1144,8 @@ camel_pop3_store_init (gpointer object, gpointer klass)
 	store->book = camel_pop3_logbook_new (store);
 	store->eng_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (store->eng_lock);
+	store->uidl_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (store->uidl_lock);
 
 	return;
 }

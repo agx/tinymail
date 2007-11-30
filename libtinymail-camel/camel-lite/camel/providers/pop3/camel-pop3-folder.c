@@ -906,6 +906,8 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		return NULL;
 	}
 
+	g_static_rec_mutex_lock (pop3_store->uidl_lock);
+
 	if (pop3_store->uids_uid)
 		fi = g_hash_table_lookup(pop3_store->uids_uid, uid);
 	else 
@@ -969,6 +971,7 @@ rfail:
 			  "configured to automatically delete E-mails from the POP server." ,
 			  uid);
 
+			g_static_rec_mutex_unlock (pop3_store->uidl_lock);
 			return NULL;
 		}
 	}
@@ -982,6 +985,7 @@ rfail:
 		  "Message with UID %s is not currently available and not online",
 		  uid);
 
+		g_static_rec_mutex_unlock (pop3_store->uidl_lock);
 		return NULL;
 	}
 
@@ -994,6 +998,7 @@ rfail:
 		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
 		if (camel_exception_is_set (ex)) {
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			g_static_rec_mutex_unlock (pop3_store->uidl_lock);
 			return NULL;
 		}
 	}
@@ -1196,6 +1201,8 @@ fail:
     retry++;
   }
 
+	g_static_rec_mutex_unlock (pop3_store->uidl_lock);
+
 	return message;
 }
 
@@ -1231,6 +1238,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 			return NULL;
 		}
 	}
+
 
 	fi = g_hash_table_lookup(pop3_store->uids_uid, uid);
 
@@ -1392,6 +1400,7 @@ done:
 	camel_object_unref((CamelObject *)stream);
 fail:
 	camel_operation_end(NULL);
+
 
 	return message;
 }
