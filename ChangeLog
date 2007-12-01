@@ -5,6 +5,7 @@
 	twice.
 	* Tryout bugfix for an invalid memory access (I think the problem was
 	incorrect locking while a list was being destroyed)
+	* Fixed tny_camel_account_set_online
 
 2007-11-29  Philip Van Hoof  <pvanhoof@gnome.org>
 

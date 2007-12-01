@@ -1692,7 +1692,8 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, Tn
 		return;
 
 	if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
-
+		if (online)
+			camel_session_set_online ((CamelSession *) session, TRUE); 
 		_tny_camel_store_account_queue_going_online (
 			TNY_CAMEL_STORE_ACCOUNT (self), session, online, 
 			callback, user_data);
