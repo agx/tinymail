@@ -107,7 +107,7 @@ tny_msg_get_url_string (TnyMsg *self)
 #ifdef DBC /* ensure */
 	if (retval) {
 		g_assert (strlen (retval) > 0);
-		g_assert (strstr (retval, "://") != NULL);
+		/*g_assert (strstr (retval, "://") != NULL);*/
 	}
 #endif
 
