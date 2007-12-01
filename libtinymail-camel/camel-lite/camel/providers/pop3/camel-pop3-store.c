@@ -554,6 +554,9 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	char *serv;
 	const char *port;
 
+	if (!service->url)
+		return FALSE;
+
 	if ((ssl_mode = camel_url_get_param (service->url, "use_ssl"))) {
 		for (i = 0; ssl_options[i].value; i++)
 			if (!strcmp (ssl_options[i].value, ssl_mode))
@@ -578,6 +581,8 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	memset (&hints, 0, sizeof (hints));
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_family = PF_UNSPEC;
+	if (!service->url)
+		return FALSE;
 	ai = camel_getaddrinfo(service->url->host, serv, &hints, ex);
 	if (ai == NULL && port != NULL && camel_exception_get_id(ex) != CAMEL_EXCEPTION_USER_CANCEL) {
 		camel_exception_clear (ex);
@@ -836,6 +841,13 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 	return status;
 }
 
+static void 
+camel_pop3_store_prepare (CamelStore *store)
+{
+	camel_object_ref (store);
+	g_thread_create (wait_for_login_delay, store, FALSE, NULL);
+}
+
 static gboolean
 pop3_connect (CamelService *service, CamelException *ex)
 {
@@ -886,7 +898,7 @@ pop3_connect (CamelService *service, CamelException *ex)
 	store->engine->state = CAMEL_POP3_ENGINE_TRANSACTION;
 	camel_pop3_engine_reget_capabilities (store->engine);
 
-	g_thread_create (wait_for_login_delay, store, FALSE, NULL);
+	camel_pop3_store_prepare ((CamelStore *) store);
 
 	return TRUE;
 }
