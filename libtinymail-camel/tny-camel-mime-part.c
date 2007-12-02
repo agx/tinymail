@@ -259,6 +259,9 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 
 	cpart = tny_camel_mime_part_get_part (TNY_CAMEL_MIME_PART (actual_part));
 
+	/* Generate a content-id */
+	camel_mime_part_set_content_id (cpart, NULL);
+
 	if (cpart && CAMEL_IS_MIME_MESSAGE (cpart)) {
 		CamelMimePart *message_part = camel_mime_part_new ();
 		const gchar *subject;
