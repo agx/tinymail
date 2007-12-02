@@ -216,29 +216,28 @@ recreate_part (TnyMimePart *orig)
 /*
 	TnyList *header_pairs = tny_simple_list_new ();
 */
-	if (TNY_IS_MSG (orig) || tny_mime_part_content_type_is (orig, "message/rfc822")) {
+	if (TNY_IS_MSG (orig)) {
 		TnyHeader *hdr = NULL;
-		if (TNY_IS_MSG (orig))
-			hdr = tny_msg_get_header (TNY_MSG (orig));
+		TnyHeader *dest_header;
+
+		hdr = tny_msg_get_header (TNY_MSG (orig));
 		retval = TNY_MIME_PART (tny_camel_msg_new ());
-		if (hdr) {
-			TnyHeader *dest_header = tny_msg_get_header (TNY_MSG (retval));
-			if (tny_header_get_bcc (hdr))
-				tny_header_set_bcc (dest_header, tny_header_get_bcc (hdr));
-			if (tny_header_get_cc (hdr))
-				tny_header_set_cc (dest_header, tny_header_get_cc (hdr));
-			if (tny_header_get_from (hdr))
-				tny_header_set_from (dest_header, tny_header_get_from (hdr));
-			if (tny_header_get_replyto (hdr))
-				tny_header_set_replyto (dest_header, tny_header_get_replyto (hdr));
-			if (tny_header_get_subject (hdr))
-				tny_header_set_subject (dest_header, tny_header_get_subject (hdr));
-			if (tny_header_get_to (hdr))
-				tny_header_set_to (dest_header, tny_header_get_to (hdr));
-			tny_header_set_priority (dest_header, tny_header_get_priority (hdr));
-			g_object_unref (hdr);
-			g_object_unref (dest_header);
-		}
+ 		dest_header = tny_msg_get_header (TNY_MSG (retval));
+		if (tny_header_get_bcc (hdr))
+			tny_header_set_bcc (dest_header, tny_header_get_bcc (hdr));
+		if (tny_header_get_cc (hdr))
+			tny_header_set_cc (dest_header, tny_header_get_cc (hdr));
+		if (tny_header_get_from (hdr))
+			tny_header_set_from (dest_header, tny_header_get_from (hdr));
+		if (tny_header_get_replyto (hdr))
+			tny_header_set_replyto (dest_header, tny_header_get_replyto (hdr));
+		if (tny_header_get_subject (hdr))
+			tny_header_set_subject (dest_header, tny_header_get_subject (hdr));
+		if (tny_header_get_to (hdr))
+			tny_header_set_to (dest_header, tny_header_get_to (hdr));
+		/* tny_header_set_priority (dest_header, tny_header_get_priority (hdr)); */
+		g_object_unref (hdr);
+		g_object_unref (dest_header);
 		piece = tny_camel_mime_part_new ();
 		piece_needs_unref = TRUE;
 		type = NULL;
