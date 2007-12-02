@@ -633,7 +633,7 @@ write_to_stream (CamelDataWrapper *data_wrapper, CamelStream *stream)
 	/* force mandatory headers ... */
 	if (mm->from == NULL) {
 		/* FIXME: should we just abort?  Should we make one up? */
-		g_warning ("No from set for message");
+		/* g_warning ("No from set for message"); */
 		camel_medium_set_header ((CamelMedium *)mm, "From", "");
 	}
 	if (!camel_medium_get_header ((CamelMedium *)mm, "Date"))

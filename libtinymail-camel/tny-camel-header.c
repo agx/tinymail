@@ -137,7 +137,6 @@ tny_camel_header_get_cc (TnyHeader *self)
 static const gchar*
 tny_camel_header_get_bcc (TnyHeader *self)
 {
-	g_warning ("tny_header_get_bcc: This is a summary header instance. It has no bcc.\n");
 	return NULL;
 }
 

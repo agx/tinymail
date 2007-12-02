@@ -222,11 +222,24 @@ recreate_part (TnyMimePart *orig)
 			hdr = tny_msg_get_header (TNY_MSG (orig));
 		retval = TNY_MIME_PART (tny_camel_msg_new ());
 		if (hdr) {
-			_tny_camel_msg_set_header (TNY_CAMEL_MSG (retval), hdr);
+			TnyHeader *dest_header = tny_msg_get_header (TNY_MSG (retval));
+			if (tny_header_get_bcc (hdr))
+				tny_header_set_bcc (dest_header, tny_header_get_bcc (hdr));
+			if (tny_header_get_cc (hdr))
+				tny_header_set_cc (dest_header, tny_header_get_cc (hdr));
+			if (tny_header_get_from (hdr))
+				tny_header_set_from (dest_header, tny_header_get_from (hdr));
+			if (tny_header_get_replyto (hdr))
+				tny_header_set_replyto (dest_header, tny_header_get_replyto (hdr));
+			if (tny_header_get_subject (hdr))
+				tny_header_set_subject (dest_header, tny_header_get_subject (hdr));
+			if (tny_header_get_to (hdr))
+				tny_header_set_to (dest_header, tny_header_get_to (hdr));
+			tny_header_set_priority (dest_header, tny_header_get_priority (hdr));
 			g_object_unref (hdr);
+			g_object_unref (dest_header);
 		}
 		piece = tny_camel_mime_part_new ();
-		tny_mime_part_add_part (retval, piece);
 		piece_needs_unref = TRUE;
 		type = NULL;
 	} else {
@@ -280,8 +293,10 @@ recreate_part (TnyMimePart *orig)
 	g_object_unref (iter);
 	g_object_unref (list);
 
-	if (piece_needs_unref)
+	if (piece_needs_unref) {
+		tny_mime_part_add_part (retval, piece);
 		g_object_unref (piece);
+	}
 
 	return retval;
 }
@@ -630,7 +645,7 @@ tny_camel_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream 
 	if (wrapper)
 		camel_object_unref (CAMEL_OBJECT (wrapper));
 
-	if (!g_ascii_strcasecmp (type, "message/rfc822"))
+	if (type && !g_ascii_strcasecmp (type, "message/rfc822"))
 		wrapper = (CamelDataWrapper *) camel_mime_message_new ();
 	else 
 		wrapper = camel_data_wrapper_new ();
