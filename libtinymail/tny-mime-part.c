@@ -593,8 +593,6 @@ tny_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream, const
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (TNY_IS_STREAM (stream));
-	g_assert (type);
-	g_assert (strlen (type) > 0);
 	g_assert (TNY_MIME_PART_GET_IFACE (self)->construct_from_stream_func != NULL);
 #endif
 
