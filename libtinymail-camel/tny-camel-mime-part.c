@@ -211,19 +211,34 @@ recreate_part (TnyMimePart *orig)
 	TnyList *list = tny_simple_list_new ();
 	TnyIterator *iter;
 	TnyStream *in_stream = tny_mime_part_get_stream (orig);
+/*
 	TnyList *header_pairs = tny_simple_list_new ();
-
+*/
 	if (TNY_IS_MSG (orig)) {
 		TnyHeader *hdr = tny_msg_get_header (TNY_MSG (orig));
 		retval = TNY_MIME_PART (tny_camel_msg_new ());
 		_tny_camel_msg_set_header (TNY_CAMEL_MSG (retval), hdr);
 		g_object_unref (hdr);
-	} else
+
+	} else {
 		retval = tny_camel_mime_part_new ();
+	}
 
 	tny_mime_part_construct_from_stream (retval, in_stream, 
 		tny_mime_part_get_content_type (orig));
 
+	if (tny_mime_part_get_description (orig))
+		tny_mime_part_set_description (retval, tny_mime_part_get_description (orig));
+
+	tny_mime_part_set_content_id (retval, tny_mime_part_get_content_id (orig));
+
+	if (tny_mime_part_get_content_location (orig))
+		tny_mime_part_set_content_location (retval, tny_mime_part_get_content_location (orig));
+
+	if (tny_mime_part_is_attachment (orig))
+		tny_mime_part_set_filename (retval, tny_mime_part_get_filename (orig));
+
+/*
 	tny_mime_part_get_header_pairs (orig, header_pairs);
 	iter = tny_list_create_iterator (header_pairs);
 	while (!tny_iterator_is_done (iter)) {
@@ -236,16 +251,8 @@ recreate_part (TnyMimePart *orig)
 	}
 	g_object_unref (iter);
 	g_object_unref (header_pairs);
+*/
 
-	if (tny_mime_part_is_attachment (orig))
-		tny_mime_part_set_filename (retval, tny_mime_part_get_filename (orig));
-	if (tny_mime_part_get_content_location (orig))
-		tny_mime_part_set_content_location (retval, tny_mime_part_get_content_location (orig));
-	tny_mime_part_set_content_id (retval, tny_mime_part_get_content_id (orig));
-	if (tny_mime_part_get_content_type (orig))
-		tny_mime_part_set_content_type (retval, tny_mime_part_get_content_type (orig));
-	if (tny_mime_part_get_description (orig))
-		tny_mime_part_set_description (retval, tny_mime_part_get_description (orig));
 
 	g_object_unref (in_stream);
 
