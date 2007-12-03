@@ -22,6 +22,11 @@
 #include "mozilla-preferences.h"
 
 #include <stdlib.h>
+
+#ifdef XPCOM_GLUE
+#include <gtkmozembed_glue.cpp>
+#endif
+
 #ifdef HAVE_MOZILLA_1_9
 #include <gtkmozembed_common.h>
 #else
@@ -110,11 +115,49 @@ _mozilla_preference_init ()
     const gchar *prgname;
     gchar *profile_path;
     gchar *useragent;
+
+#ifdef XPCOM_GLUE
+    nsresult rv;
+    static const GREVersionRange greVersion = {
+      "1.9a", PR_TRUE,
+      "2", PR_TRUE
+    };
+    char xpcomLocation[4096];
+    rv = GRE_GetGREPathWithProperties(&greVersion, 1, nsnull, 0, xpcomLocation, 4096);
+    if (NS_FAILED (rv))
+    {
+      g_warning ("Could not determine locale!\n");
+      return;
+    }
+
+    // Startup the XPCOM Glue that links us up with XPCOM.
+    rv = XPCOMGlueStartup(xpcomLocation);
+    if (NS_FAILED (rv))
+    {
+      g_warning ("Could not determine locale!\n");
+      return;
+    }
+
+    rv = GTKEmbedGlueStartup();
+    if (NS_FAILED (rv))
+    {
+      g_warning ("Could not determine locale!\n");
+      return;
+    }
+
+    char *lastSlash = strrchr(xpcomLocation, '/');
+    if (lastSlash)
+      *lastSlash = '\0';
+
+    gtk_moz_embed_set_path(xpcomLocation);
+
+#else // XPCOM_GLUE
 #ifdef HAVE_MOZILLA_1_9
     gtk_moz_embed_set_path (MOZILLA_HOME);
 #else
     gtk_moz_embed_set_comp_path (MOZILLA_HOME);
-#endif
+#endif // HAVE_MOZILLA_1_9
+#endif // XPCOM_GLUE
 
     home_path = getenv ("HOME");
     if (!home_path)

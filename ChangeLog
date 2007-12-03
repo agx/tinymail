@@ -1,3 +1,9 @@
+2007-12-03  Loïc Minier  <lool@dooz.org>
+
+	* m4/moz.m4 (AC_TNY_MOZ_CHECK):
+	Add configure flags to force pkg-config modules for xpcom,
+	gtkmozembed, nss, and nspr.
+
 2007-12-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Merge from devel/pvanhoof/bs branch
