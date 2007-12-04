@@ -2,6 +2,11 @@ Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog
 
+2007-12-04  Milan Crha  <mcrha@redhat.com>
+
+	* Merged By Philip Van Hoof
+	* http://bugzilla.gnome.org/show_bug.cgi?id=324008
+
 2007-11-22  Milan Crha  <mcrha@redhat.com>
 
 	* Merged By Philip Van Hoof
