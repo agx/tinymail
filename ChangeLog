@@ -1,3 +1,9 @@
+2007-12-04  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-send-queue.c:
+	Mark all sent messages as seen just before moving them
+	to sentbox.
+
 2007-12-03  Loïc Minier  <lool@dooz.org>
 
 	* m4/moz.m4 (AC_TNY_MOZ_CHECK):

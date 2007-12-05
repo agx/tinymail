@@ -422,6 +422,7 @@ thread_main (gpointer data)
 				{
 					GError *newerr = NULL;
 					priv->cur_i = i;
+					tny_header_set_flag (header, TNY_HEADER_FLAG_SEEN);
 					tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, &newerr);
 					if (newerr != NULL) 
 					{
