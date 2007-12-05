@@ -438,7 +438,8 @@ if test x$PLATFORMDIR = xlibtinymail-maemo; then
 			use_conic_device_dummy=1
  			AC_DEFINE_UNQUOTED(MAEMO_CONIC_DUMMY,1,["Whether to hack the TnyMaemoConicDevice to somewhat work in sbox"])
  		fi
-		AC_DEFINE_UNQUOTED(MAEMO_HAVE_CONIC,1,["whether libconic is available"])
+	else
+		AC_DEFINE_UNQUOTED(LIBTINYMAIL_MAEMO_WITHOUT_CONIC,1,["whether the dummy libconic should be built"])
 	fi
 
 	AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)

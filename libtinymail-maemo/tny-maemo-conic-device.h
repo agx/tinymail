@@ -33,12 +33,12 @@
  *    libconic is not available at all (such as in Ubuntu Embedded)
  */
 
-#ifdef MAEMO_HAVE_CONIC
-#include <coniciap.h>
-#else
+#ifdef LIBTINYMAIL_MAEMO_WITHOUT_CONIC
 typedef struct {
 } ConIcIap;
-#endif /*MAEMO_HAVE_CONIC*/
+#else
+#include <coniciap.h>
+#endif /*LIBTINYMAIL_MAEMO_WITHOUT_CONIC*/
 
 G_BEGIN_DECLS
 
