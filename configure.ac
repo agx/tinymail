@@ -171,6 +171,18 @@ AC_HELP_STRING([--enable-demoui],
 esac],[build_demoui=$build_demoui])
 AM_CONDITIONAL(BUILD_DEMOUI, test x$build_demoui = xtrue)
 
+dnl ### Enable IMAP part-fetch feature ##
+AC_ARG_ENABLE(imap-part-fetch,
+AC_HELP_STRING([--enable-imap-part-fetch],
+  [Build using imap part fetch]),
+[case "${enableval}" in
+  yes)
+        build_imapp=true
+  ;;
+  no)  build_imapp=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-part-fetch) ;;
+esac],[build_imapp=$build_imapp])
+AM_CONDITIONAL(BUILD_IMAPP, test x$build_imapp = xtrue)
 
 dnl ### Enable gnome features ##
 AC_ARG_ENABLE(gnome,

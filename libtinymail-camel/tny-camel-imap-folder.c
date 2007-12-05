@@ -92,12 +92,15 @@ tny_camel_imap_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (instance);
 
-/* Disabled until after the first release 
+#ifdef IMAP_PART_FETCH
+
+	/* By default disabled until after the first release */
+
 	if (priv->receive_strat)
 		g_object_unref (priv->receive_strat);
 
 	priv->receive_strat = tny_camel_bs_msg_receive_strategy_new ();
-*/
+#endif
 
 	return;
 }

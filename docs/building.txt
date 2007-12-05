@@ -219,4 +219,8 @@ Read this documentation:
 http://tinymail.org/trac/tinymail/wiki/RecentGdbN800
 
 
+Experimental features
+---------------------
+On demand fetching parts, in stead of always fetching the entire message:
+Use the --enable-imap-part-fetch ./configure option to enable this feature
 

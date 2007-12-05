@@ -5,6 +5,10 @@ INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS)  	\
 	-I$(top_srcdir)/libtinymail		\
 	-I$(top_srcdir)/libtinymail-camel/camel-lite 
 
+if BUILD_IMAPP
+INCLUDES += -DIMAP_PART_FETCH
+endif
+
 lib_LTLIBRARIES = libtinymail-camel-1.0.la 
 
 libtinymail_camel_1_0_headers =	\

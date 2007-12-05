@@ -2,6 +2,8 @@
 
 	* Merged all of devel/pvanhoof/bs branch back
 	* Disabled the bodystruct mime part and fetching for now
+	* Made the bodystructure stuff optional. The configure magic is
+	--enable-imap-part-fetch
 
 2007-12-04  Jose Dapena Paz  <jdapena@igalia.com>
 
