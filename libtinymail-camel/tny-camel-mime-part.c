@@ -196,6 +196,68 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 	return;
 }
 
+typedef struct {
+	GObject *self, *stream;
+	TnyMimePartCallback callback;
+	gpointer user_data;
+	GError *err;
+} DecodeAsyncInfo;
+
+
+static void
+decode_async_destroyer (gpointer user_data)
+{
+	DecodeAsyncInfo *info = (DecodeAsyncInfo *) user_data;
+	/* thread reference */
+	g_object_unref (info->self);
+	g_object_unref (info->stream);
+	if (info->err)
+		g_error_free (info->err);
+	g_slice_free (DecodeAsyncInfo, info);
+	return;
+}
+
+static gboolean
+decode_async_callback (gpointer user_data)
+{
+	DecodeAsyncInfo *info = (DecodeAsyncInfo *) user_data;
+	if (info->callback) { 
+		/* TODO: tny_lockable_lock (priv->ui_locker); */
+		info->callback (TNY_MIME_PART (info->self), TNY_STREAM (info->stream), 
+			FALSE, info->err, info->user_data);
+		/* TODO: tny_lockable_unlock (priv->ui_locker); */
+	}
+	return FALSE;
+}
+
+/* This one is just to fulfil the API requirements */
+
+static void
+tny_camel_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TNY_CAMEL_MIME_PART_GET_CLASS (self)->decode_to_stream_async_func (self, stream, callback, status_callback, user_data);
+	return;
+}
+
+static void
+tny_camel_mime_part_decode_to_stream_async_default (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	DecodeAsyncInfo *info = g_slice_new0 (DecodeAsyncInfo);
+
+	tny_mime_part_decode_to_stream (self, stream);
+
+	info->self = g_object_ref (self);
+	info->stream = g_object_ref (stream);
+	info->callback = callback;
+	info->user_data = user_data;
+	info->err = NULL;
+
+	g_idle_add_full (G_PRIORITY_HIGH, 
+				decode_async_callback, 
+				info, decode_async_destroyer);
+
+	return;
+}
 
 
 static gint
@@ -1104,7 +1166,7 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->del_part_func = tny_camel_mime_part_del_part;
 	klass->get_header_pairs_func = tny_camel_mime_part_get_header_pairs;
 	klass->set_header_pair_func = tny_camel_mime_part_set_header_pair;
-
+	klass->decode_to_stream_async_func = tny_camel_mime_part_decode_to_stream_async;
 	return;
 }
 
@@ -1140,6 +1202,7 @@ tny_camel_mime_part_class_init (TnyCamelMimePartClass *class)
 	class->del_part_func = tny_camel_mime_part_del_part_default;
 	class->get_header_pairs_func = tny_camel_mime_part_get_header_pairs_default;
 	class->set_header_pair_func = tny_camel_mime_part_set_header_pair_default;
+	class->decode_to_stream_async_func = tny_camel_mime_part_decode_to_stream_async_default;
 
 	object_class->finalize = tny_camel_mime_part_finalize;
 

@@ -733,6 +733,7 @@ static struct {
 	{ "QRESYNC",         	IMAP_CAPABILITY_QRESYNC },
 	{ "ENABLE",         	IMAP_CAPABILITY_ENABLE },
 	{ "ESEARCH",         	IMAP_CAPABILITY_ESEARCH },
+	{ "CONVERT",         	IMAP_CAPABILITY_CONVERT },
 
 	{ NULL, 0 }
 };

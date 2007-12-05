@@ -50,6 +50,8 @@ typedef struct _TnyGtkTextMimePartViewPriv TnyGtkTextMimePartViewPriv;
 struct _TnyGtkTextMimePartViewPriv
 {
 	TnyMimePart *part;
+	TnyStatusCallback status_callback;
+	gpointer status_user_data;
 };
 
 #define TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE(o) \
@@ -83,11 +85,10 @@ tny_gtk_text_mime_part_view_set_part_default (TnyMimePartView *self, TnyMimePart
 
 	g_assert (TNY_IS_MIME_PART (part));
 
-	if (G_LIKELY (priv->part))
-		g_object_unref (G_OBJECT (priv->part));
+	if (priv->part)
+		g_object_unref (priv->part);
 
-	if (part)
-	{
+	if (part) {
 		GtkTextBuffer *buffer;
 		TnyStream *dest;
 
@@ -98,12 +99,11 @@ tny_gtk_text_mime_part_view_set_part_default (TnyMimePartView *self, TnyMimePart
 		dest = tny_gtk_text_buffer_stream_new (buffer);
 
 		tny_stream_reset (dest);
-		tny_mime_part_decode_to_stream (part, dest);
-		tny_stream_reset (dest);
+		tny_mime_part_decode_to_stream_async (part, dest, NULL, 
+			priv->status_callback, priv->status_user_data);
+		g_object_unref (dest);
 
-		g_object_unref (G_OBJECT (dest));
-
-		priv->part = g_object_ref (G_OBJECT (part));
+		priv->part = g_object_ref (part);
 	}
 
 	return;
@@ -129,15 +129,21 @@ tny_gtk_text_mime_part_view_clear_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_text_mime_part_view_new:
+ * @status_callback: a #TnyStatusCallback for when status information happens
+ * @status_user_data: user data for @status_callback
  *
  * Create a new #TnyMimePartView for Gtk+
  *
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*
-tny_gtk_text_mime_part_view_new (void)
+tny_gtk_text_mime_part_view_new (TnyStatusCallback status_callback, gpointer status_user_data)
 {
 	TnyGtkTextMimePartView *self = g_object_new (TNY_TYPE_GTK_TEXT_MIME_PART_VIEW, NULL);
+	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
+
+	priv->status_callback = status_callback;
+	priv->status_user_data = status_user_data;
 
 	return TNY_MIME_PART_VIEW (self);
 }
@@ -149,6 +155,9 @@ tny_gtk_text_mime_part_view_instance_init (GTypeInstance *instance, gpointer g_c
 	TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIVATE (self);
 
 	priv->part = NULL;
+	priv->status_callback = NULL;
+	priv->status_user_data = NULL;
+
 	gtk_text_view_set_editable (GTK_TEXT_VIEW (self), FALSE);
 
 	return;

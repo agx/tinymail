@@ -38,6 +38,10 @@
  * 
  * Set a header pair (name: value) or delete a header (use NULL as value).
  *
+ * Note that not all TnyMimePart instances are writable. Only when creating
+ * a new message will the instance be guaranteed to be writable. This is a
+ * writing operation.
+ *
  * Example:
  * <informalexample><programlisting>
  * TnyMsg *message = ...
@@ -147,8 +151,11 @@ tny_mime_part_get_parts (TnyMimePart *self, TnyList *list)
  * 
  * Add a mime-part to @self.
  *
- * Return value: The id of the added mime-part
+ * Note that not all TnyMimePart instances are writable. Only when creating
+ * a new message will the instance be guaranteed to be writable. This is a
+ * writing operation.
  *
+ * Return value: The id of the added mime-part
  **/
 gint
 tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part)
@@ -170,6 +177,9 @@ tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part)
  * 
  * Delete a mime-part from @self
  *
+ * Note that not all TnyMimePart instances are writable. Only when creating
+ * a new message will the instance be guaranteed to be writable. This is a
+ * writing operation.
  **/
 void
 tny_mime_part_del_part (TnyMimePart *self, TnyMimePart *part)
@@ -235,6 +245,9 @@ tny_mime_part_is_attachment (TnyMimePart *self)
  * 
  * Set the content location of @self.
  *
+ * Note that not all TnyMimePart instances are writable. Only when creating
+ * a new message will the instance be guaranteed to be writable. This is a
+ * writing operation.
  **/
 void
 tny_mime_part_set_content_location (TnyMimePart *self, const gchar *content_location)
@@ -256,6 +269,9 @@ tny_mime_part_set_content_location (TnyMimePart *self, const gchar *content_loca
  * 
  * Set the description of @self.
  *
+ * Note that not all TnyMimePart instances are writable. Only when creating
+ * a new message will the instance be guaranteed to be writable. This is a
+ * writing operation.
  **/
 void
 tny_mime_part_set_description (TnyMimePart *self, const gchar *description)
@@ -277,6 +293,9 @@ tny_mime_part_set_description (TnyMimePart *self, const gchar *description)
  * 
  * Set the content id of @self.
  *
+ * Note that not all TnyMimePart instances are writable. Only when creating
+ * a new message will the instance be guaranteed to be writable. This is a
+ * writing operation.
  **/
 void
 tny_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
@@ -297,6 +316,18 @@ tny_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
  * 
  * Set the message as purged in cache
  *
+ * This is not a writing operation. Although it might change the content of a
+ * message for a user who's not connected with the server where @self originates
+ * from.
+ *
+ * Using the tny_msg_rewrite_cache API on a message instance will rewrite its 
+ * purged mime parts with an empty body (saving storage space). The storage 
+ * space is recovered after using tny_msg_rewrite_cache. Only setting a mime 
+ * part to purged might not remove it.
+ *
+ * There is no guarantee about what happens with a purged mime part internally 
+ * (it might get destroyed or become unuseful more early than the call to
+ * tny_msg_rewrite_cache).
  **/
 void
 tny_mime_part_set_purged (TnyMimePart *self)
@@ -317,6 +348,9 @@ tny_mime_part_set_purged (TnyMimePart *self)
  * 
  * Set the filename of @self.
  *
+ * Note that not all TnyMimePart instances are writable. Only when creating
+ * a new message will the instance be guaranteed to be writable. This is a
+ * writing operation.
  **/
 void
 tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
@@ -338,6 +372,9 @@ tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
  * 
  * Set the content type of @self. Formatted as "type/subtype"
  *
+ * Note that not all TnyMimePart instances are writable. Only when creating
+ * a new message will the instance be guaranteed to be writable. This is a
+ * writing operation.
  **/
 void
 tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype)
@@ -361,7 +398,6 @@ tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype)
  * returned value should not be freed.
  *
  * Return value: the filename of a mime part as a read-only string
- *
  **/
 const gchar*
 tny_mime_part_get_filename (TnyMimePart *self)
@@ -389,7 +425,6 @@ tny_mime_part_get_filename (TnyMimePart *self)
  * Get the content-id of @self. The returned value should not be freed.
  *
  * Return value: the content-id of a mime part as a read-only string
- *
  **/
 const gchar*
 tny_mime_part_get_content_id (TnyMimePart *self)
@@ -417,7 +452,6 @@ tny_mime_part_get_content_id (TnyMimePart *self)
  * Get if this attachment has been purged from cache.
  *
  * Return value: a #gboolean
- *
  **/
 gboolean
 tny_mime_part_is_purged (TnyMimePart *self)
@@ -468,7 +502,6 @@ tny_mime_part_get_description (TnyMimePart *self)
  * Get the content location of @self. The returned value should not be freed.
  *
  * Return value: the content-location of a mime part as a read-only string
- *
  **/
 const gchar*
 tny_mime_part_get_content_location (TnyMimePart *self)
@@ -496,11 +529,23 @@ tny_mime_part_get_content_location (TnyMimePart *self)
  * 
  * Efficiently write the content of @self to a stream. This will not read the 
  * data of the part in a memory buffer. In stead it will read the part data while
- * already writing it to the stream efficiently.
+ * already writing it to the stream efficiently. Although there is no guarantee
+ * about the memory usage either (just that it's the most efficient way).
  *
  * You probably want to utilise the tny_mime_part_decode_to_stream
  * method in stead of this one. This method will not attempt to decode the
  * mime part. Mime parts are usually encoded in E-mails.
+ *
+ * When the mime part was received in BINARY mode from an IMAP server, then this
+ * API has mostly the same effect as the tny_mime_part_decode_to_stream: You 
+ * will get a non-encoded version of the data. A small difference will be that
+ * the tny_mime_part_decode_to_stream will decode certain special characters in
+ * TEXT/* mime parts (character set encoding) to UTF-8.
+ *
+ * However. A larger difference happens with binary mime parts that where not
+ * retrieved using BINARY. For those this API will give you the encoded data
+ * as is. This means that you will get a stream spitting out for example BASE64
+ * data.
  * 
  * Example:
  * <informalexample><programlisting>
@@ -536,7 +581,23 @@ tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
  * 
  * Efficiently decode @self to a stream. This will not read the data of the
  * part in a memory buffer. In stead it will read the part data while already
- * writing it to the stream efficiently.
+ * writing it to the stream efficiently. Although there is no guarantee
+ * about the memory usage either (just that it's the most efficient way).
+ *
+ * You will always get the decoded version of the data of @self. When your part
+ * get received in BINARY from an IMAP server, then nothing will really happen
+ * with your data (it will be streamed to you the way it got received). If we
+ * received using BODY and the data is encoded in a known encoding (BASE65,
+ * QUOTED-PRINTED, UUENCODED), the data will be decoded before delivered. TEXT/*
+ * mime parts will also enjoy character set decoding.
+ *
+ * In short will this API prepare the cookie and deliver it to your stream. It's
+ * most likely the one that you want to use. If you are planning to nevertheless
+ * use the tny_mime_part_write_to_stream API, then please know and understand
+ * what you are doing.
+ *
+ * It's possible that this API receives information from the service. If you 
+ * don't want to block on this, use tny_mime_part_decode_to_stream_async.
  *
  * Example:
  * <informalexample><programlisting>
@@ -564,6 +625,33 @@ tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
 	TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_func (self, stream);
 	return;
 }
+
+/**
+ * tny_mime_part_decode_to_stream_async:
+ * @self: a #TnyMimePart object
+ * @stream: a #TnyMsgStream stream
+ * @callback: a #TnyMimePartCallback callback
+ * @status_callback: a #TnyStatusCallback callback
+ * @user_data: user data for @callback
+ *
+ * This method does the same as tny_mime_part_decode_to_stream. It just does 
+ * everything asynchronous and calls you back when finished.
+ */
+void
+tny_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (stream);
+	g_assert (TNY_IS_STREAM (stream));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_async_func != NULL);
+#endif
+
+	TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_async_func (self, stream, callback, status_callback, user_data);
+	return;
+}
+
+
 /**
  * tny_mime_part_construct_from_stream:
  * @self: a #TnyMimePart object

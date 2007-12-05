@@ -1,3 +1,8 @@
+2007-12-05  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Merged all of devel/pvanhoof/bs branch back
+	* Disabled the bodystruct mime part and fetching for now
+
 2007-12-04  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-send-queue.c:
@@ -47,6 +52,38 @@
 	
 	* add a dummy conic device, so libtinymail-maemo does
 	  not require libconic anymore
+
+2007-12-02  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Merging with trunk
+
+2007-12-02  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed tny_mime_part_add of TnyCamelMimePart to fully cope with alien
+	mime parts
+
+2007-11-30  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Merging with trunk
+
+2007-11-29  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed mime part purging
+	* Fixed status information notifying
+	* Added TnyGtkExpanderMimePartView
+
+2007-11-28  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Several fixes. in the bodystructure parsing
+	* Several fixes in the mime part handling
+	* Changed the API of mime part viewers to have a status
+	callback.
+
+	* This was a major API change in libtinymail and libtinymailui
+
+2007-11-27  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Branchpoint bodystructure work
 
 2007-11-25  Philip Van Hoof  <pvanhoof@gnome.org>
 

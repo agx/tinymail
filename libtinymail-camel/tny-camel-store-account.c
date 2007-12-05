@@ -1296,6 +1296,7 @@ tny_camel_store_account_get_folders_async_cancelled_destroyer (gpointer thr_user
 	g_object_unref (info->list);
 	if (info->err)
 		g_error_free (info->err);
+
 	return;
 }
 

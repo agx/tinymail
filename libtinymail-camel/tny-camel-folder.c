@@ -906,6 +906,9 @@ tny_camel_folder_add_msg_async_cancelled_destroyer (gpointer thr_user_data)
 	if (info->err)
 		g_error_free (info->err);
 
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
 	return;
 }
 
@@ -1520,6 +1523,9 @@ tny_camel_folder_sync_async_cancelled_destroyer (gpointer thr_user_data)
 	if (info->err)
 		g_error_free (info->err);
 
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
 	return;
 }
 
@@ -1726,6 +1732,10 @@ tny_camel_folder_refresh_async_cancelled_destroyer (gpointer thr_user_data)
 	g_object_unref (info->self);
 	if (info->err)
 		g_error_free (info->err);
+
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
 	return;
 }
 
@@ -1953,6 +1963,7 @@ tny_camel_folder_get_headers_async_cancelled_destroyer (gpointer thr_user_data)
 		g_error_free (info->err);
 	g_object_unref (info->self);
 	g_object_unref (info->headers);
+
 	return;
 }
 
@@ -2196,6 +2207,8 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	camel_operation_register (cancel);
 	camel_operation_start (cancel, (char *) "Getting message");
 
+	info->cancelled = FALSE;
+
 	info->msg = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, 
 			info->self, info->header, &info->err);
 
@@ -2212,9 +2225,7 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	 * restore this lock (B) */
 	/* g_static_rec_mutex_unlock (priv->folder_lock);  */
 
-	info->cancelled = FALSE;
-	if (info->err != NULL)
-	{
+	if (info->err != NULL) {
 		if (camel_strstrcase (info->err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
 		if (info->msg && G_IS_OBJECT (info->msg))
@@ -2241,6 +2252,9 @@ tny_camel_folder_get_msg_async_cancelled_destroyer (gpointer thr_user_data)
 
 	if (info->err)
 		g_error_free (info->err);
+
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
 
 	return;
 }
@@ -3271,6 +3285,9 @@ tny_camel_folder_copy_async_cancelled_destroyer (gpointer thr_user_data)
 	g_object_unref (info->self);
 	g_object_unref (info->into);
 
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
 	return;
 }
 
@@ -3855,6 +3872,9 @@ tny_camel_folder_transfer_msgs_async_cancelled_destroyer (gpointer thr_user_data
 
 	if (info->err)
 		g_error_free (info->err);
+
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
 
 	return;
 }

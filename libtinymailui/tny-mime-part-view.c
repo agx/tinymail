@@ -82,7 +82,18 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  * @self: A #TnyMimePartView instance
  * @mime_part: A #TnyMimePart instace
  *
- * Set mime part which @self should display.
+ * Set mime part which @self should display. Note that if possible, try to wait
+ * as long as possible to call this API. As soon as this API is used, and the
+ * part's data is not available locally, will the part's data be requested from
+ * the service.
+ *
+ * If you can delay the need for calling this API, for example by offering the
+ * user a feature to make it visible ather than making the part always visible,
+ * then this is a smart thing to do to save bandwidth consumption in your final
+ * application.
+ *
+ * For example #GtkExpander and setting it when the child widget gets realized
+ * in case you are using libtinymailui-gtk.
  * 
  * Implementors: this method should cause the view @self to show the mime part
  * @mime_part to the user. 
@@ -92,8 +103,7 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  * static void 
  * tny_gtk_text_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
  * {
- *      if (part)
- *      {
+ *      if (part) {
  *           GtkTextBuffer *buffer;
  *           TnyStream *dest;
  *           buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
@@ -103,7 +113,7 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  *           tny_stream_reset (dest);
  *           tny_mime_part_decode_to_stream (part, dest);
  *           tny_stream_reset (dest);
- *           g_object_unref (G_OBJECT (dest));
+ *           g_object_unref (dest);
  *           priv->part = TNY_MIME_PART (g_object_ref (part));
  *      }
  * }

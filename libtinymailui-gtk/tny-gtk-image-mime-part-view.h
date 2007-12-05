@@ -58,7 +58,7 @@ struct _TnyGtkImageMimePartViewClass
 };
 
 GType tny_gtk_image_mime_part_view_get_type (void);
-TnyMimePartView* tny_gtk_image_mime_part_view_new (void);
+TnyMimePartView* tny_gtk_image_mime_part_view_new (TnyStatusCallback status_callback, gpointer status_user_data);
 
 G_END_DECLS
 

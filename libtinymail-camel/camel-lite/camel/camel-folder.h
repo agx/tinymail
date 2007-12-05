@@ -39,10 +39,19 @@ enum _CamelFolderReceiveType {
 	CAMEL_FOLDER_RECEIVE_FULL = 1<<0,
 	CAMEL_FOLDER_RECEIVE_PARTIAL = 1<<1,
 	CAMEL_FOLDER_RECEIVE_ANY_OR_FULL = 1<<2,
-	CAMEL_FOLDER_RECEIVE_ANY_OR_PARTIAL = 1<<3
+	CAMEL_FOLDER_RECEIVE_ANY_OR_PARTIAL = 1<<3,
+	CAMEL_FOLDER_RECEIVE_PART_SPEC = 1<<4
+};
+
+enum _CamelFolderPartState {
+	CAMEL_FOLDER_PART_STATE_CACHED_BINARY,
+	CAMEL_FOLDER_PART_STATE_CACHED_ENCODED,
+	CAMEL_FOLDER_PART_STATE_CACHED_CONVERTED,
+	CAMEL_FOLDER_PART_STATE_NOT_CACHED
 };
 
 typedef enum _CamelFolderReceiveType CamelFolderReceiveType;
+typedef enum _CamelFolderPartState CamelFolderPartState;
 
 G_BEGIN_DECLS
 
@@ -207,6 +216,11 @@ typedef struct {
 	void (*delete_attachments) (CamelFolder *folder, const char *uid);
 	void (*rewrite_cache) (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
+	char* (*get_cache_filename) (CamelFolder *folder, const char *uid, const char *spec, CamelFolderPartState *state);
+	char* (*fetch) (CamelFolder *folder, const char *uid, const char *spec, gboolean *binary, CamelException *ex);
+	char* (*fetch_structure) (CamelFolder *folder, const char *uid, CamelException *ex);
+	char* (*convert) (CamelFolder *folder, const char *uid, const char *spec, const char *convert_to, CamelException *ex);
+
 } CamelFolderClass;
 
 /* Standard Camel function */
@@ -365,6 +379,11 @@ int camel_folder_get_local_size   (CamelFolder *folder);
 
 void camel_folder_delete_attachments (CamelFolder *folder, const char *uid);
 void camel_folder_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
+
+char* camel_folder_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *binary, CamelException *ex);
+char* camel_folder_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex);
+char* camel_folder_get_cache_filename (CamelFolder *folder, const char *uid, const char *spec, CamelFolderPartState *state);
+char* camel_folder_convert (CamelFolder *folder, const char *uid, const char *spec, const char *convert_to, CamelException *ex);
 
 G_END_DECLS
 

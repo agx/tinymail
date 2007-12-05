@@ -186,6 +186,8 @@ camel_imap_message_cache_new (const char *path, CamelFolderSummary *summary,
 		p = strchr (dname, '.');
 		if (p)
 			uid = g_strndup (dname, p - dname);
+		else if (p = strchr (dname, '_'))
+			uid = g_strndup (dname, p - dname);
 		else
 			uid = g_strdup (dname);
 
@@ -193,8 +195,8 @@ camel_imap_message_cache_new (const char *path, CamelFolderSummary *summary,
 		if (info) {
 			camel_message_info_free(info);
 			cache_put (cache, uid, dname, NULL);
-		} else
-			g_ptr_array_add (deletes, g_strdup_printf ("%s/%s", cache->path, dname));
+		} else 
+			g_ptr_array_add (deletes, g_strdup_printf ("%s/%s", cache->path, dname)); 
 		g_free (uid);
 	}
 	g_dir_close (dir);

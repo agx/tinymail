@@ -46,14 +46,24 @@
 
 static GObjectClass *parent_class = NULL;
 
+typedef struct _TnyGtkMimePartSaveStrategyPriv TnyGtkMimePartSaveStrategyPriv;
+
+struct _TnyGtkMimePartSaveStrategyPriv
+{
+	TnyStatusCallback status_callback;
+	gpointer status_user_data;
+};
+
 #define TNY_GTK_MIME_PART_SAVE_STRATEGY_GET_PRIVATE(o) \
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_GTK_MIME_PART_SAVE_STRATEGY, TnyGtkMimePartSaveStrategyPriv))
 
 
 #ifdef GNOME
+
 static gboolean
-gtk_save_to_file (const gchar *uri, TnyMimePart *part)
+gtk_save_to_file (const gchar *uri, TnyMimePart *part, TnyMimePartSaveStrategy *self)
 {
+	TnyGtkMimePartSaveStrategyPriv *priv = TNY_GTK_MIME_PART_SAVE_STRATEGY_GET_PRIVATE (self);
 	GnomeVFSResult result;
 	GnomeVFSHandle *handle;
 	TnyStream *stream = NULL;
@@ -65,23 +75,25 @@ gtk_save_to_file (const gchar *uri, TnyMimePart *part)
 		return FALSE;
 
 	stream = tny_vfs_stream_new (handle);
-	tny_mime_part_decode_to_stream (part, stream);
-    
+	tny_mime_part_decode_to_stream_async (part, stream, NULL, 
+		priv->status_callback, priv->status_user_data);
+
 	/* This also closes the handle */    
-	g_object_unref (G_OBJECT (stream));
+	g_object_unref (stream);
 
 	return TRUE;
 }
 #else
 static gboolean
-gtk_save_to_file (const gchar *local_filename, TnyMimePart *part)
+gtk_save_to_file (const gchar *local_filename, TnyMimePart *part, TnyMimePartSaveStrategy *self)
 {
 	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 	if (fd != -1)
 	{
 		TnyStream *stream = tny_fs_stream_new (fd);
-		tny_mime_part_decode_to_stream (part, TNY_STREAM (stream));
+		tny_mime_part_decode_to_stream_async (part, stream, NULL, 
+			priv->status_callback, priv->status_user_data);
 
 		/* This also closes the file descriptor */
 		g_object_unref (G_OBJECT (stream));
@@ -140,7 +152,7 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
 #endif
 		if (uri)
 		{
-			if (!gtk_save_to_file (uri, part))
+			if (!gtk_save_to_file (uri, part, self))
 			{
 				GtkWidget *errd;
 
@@ -168,6 +180,8 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
 
 /**
  * tny_gtk_mime_part_save_strategy_new:
+ * @status_callback: a #TnyStatusCallback for when status information happens
+ * @status_user_data: user data for @status_callback
  *
  * Create a new #TnyMimePartSaveStrategy instance implemented for Gtk+. It will
  * use the GtkFileChooserDialog type and if available support for GnomeVFS.
@@ -175,9 +189,13 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
  * Return value: a new #TnyMimePartSaveStrategy instance implemented for Gtk+
  **/
 TnyMimePartSaveStrategy*
-tny_gtk_mime_part_save_strategy_new (void)
+tny_gtk_mime_part_save_strategy_new (TnyStatusCallback status_callback, gpointer status_user_data)
 {
 	TnyGtkMimePartSaveStrategy *self = g_object_new (TNY_TYPE_GTK_MIME_PART_SAVE_STRATEGY, NULL);
+	TnyGtkMimePartSaveStrategyPriv *priv= TNY_GTK_MIME_PART_SAVE_STRATEGY_GET_PRIVATE (self);
+
+	priv->status_callback = status_callback;
+	priv->status_user_data = status_user_data;
 
 	return TNY_MIME_PART_SAVE_STRATEGY (self);
 }
@@ -185,6 +203,11 @@ tny_gtk_mime_part_save_strategy_new (void)
 static void
 tny_gtk_mime_part_save_strategy_instance_init (GTypeInstance *instance, gpointer g_class)
 {
+	TnyGtkMimePartSaveStrategyPriv *priv = TNY_GTK_MIME_PART_SAVE_STRATEGY_GET_PRIVATE (instance);
+
+	priv->status_callback = NULL;
+	priv->status_user_data = NULL;
+
 	return;
 }
 
@@ -217,6 +240,8 @@ tny_gtk_mime_part_save_strategy_class_init (TnyGtkMimePartSaveStrategyClass *cla
 	class->perform_save_func = tny_gtk_mime_part_save_strategy_perform_save_default;
 
 	object_class->finalize = tny_gtk_mime_part_save_strategy_finalize;
+
+	g_type_class_add_private (object_class, sizeof (TnyGtkMimePartSaveStrategyPriv));
 
 	return;
 }

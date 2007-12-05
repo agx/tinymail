@@ -1,7 +1,7 @@
-#ifndef TNY_CAMEL_MIME_PART_H
-#define TNY_CAMEL_MIME_PART_H
+#ifndef TNY_CAMEL_BS_MIME_PART_H
+#define TNY_CAMEL_BS_MIME_PART_H
 
-/* libtinymail-camel - The Tiny Mail base library for Camel
+/* libtinymail-camel_bs - The Tiny Mail base library for CamelBs
  * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -23,28 +23,26 @@
 #include <glib.h>
 #include <tny-mime-part.h>
 
-#include <camel/camel-mime-part.h>
-
 #include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#define TNY_TYPE_CAMEL_MIME_PART             (tny_camel_mime_part_get_type ())
-#define TNY_CAMEL_MIME_PART(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_CAMEL_MIME_PART, TnyCamelMimePart))
-#define TNY_CAMEL_MIME_PART_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_CAMEL_MIME_PART, TnyCamelMimePartClass))
-#define TNY_IS_CAMEL_MIME_PART(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_CAMEL_MIME_PART))
-#define TNY_IS_CAMEL_MIME_PART_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_MIME_PART))
-#define TNY_CAMEL_MIME_PART_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_MIME_PART, TnyCamelMimePartClass))
+#define TNY_TYPE_CAMEL_BS_MIME_PART             (tny_camel_bs_mime_part_get_type ())
+#define TNY_CAMEL_BS_MIME_PART(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_CAMEL_BS_MIME_PART, TnyCamelBsMimePart))
+#define TNY_CAMEL_BS_MIME_PART_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_CAMEL_BS_MIME_PART, TnyCamelBsMimePartClass))
+#define TNY_IS_CAMEL_BS_MIME_PART(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_CAMEL_BS_MIME_PART))
+#define TNY_IS_CAMEL_BS_MIME_PART_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_BS_MIME_PART))
+#define TNY_CAMEL_BS_MIME_PART_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_BS_MIME_PART, TnyCamelBsMimePartClass))
 
-typedef struct _TnyCamelMimePart TnyCamelMimePart;
-typedef struct _TnyCamelMimePartClass TnyCamelMimePartClass;
+typedef struct _TnyCamelBsMimePart TnyCamelBsMimePart;
+typedef struct _TnyCamelBsMimePartClass TnyCamelBsMimePartClass;
 
-struct _TnyCamelMimePart 
+struct _TnyCamelBsMimePart 
 {
 	GObject parent;
 };
 
-struct _TnyCamelMimePartClass 
+struct _TnyCamelBsMimePartClass 
 {
 	GObjectClass parent;
 
@@ -73,16 +71,11 @@ struct _TnyCamelMimePartClass
 	void (*get_header_pairs_func) (TnyMimePart *self, TnyList *list);
 	void (*set_header_pair_func) (TnyMimePart *self, const gchar *name, const gchar *value);
 	void (*decode_to_stream_async_func) (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
-
 };
 
 
-GType tny_camel_mime_part_get_type (void);
+GType tny_camel_bs_mime_part_get_type (void);
 
-TnyMimePart* tny_camel_mime_part_new_with_part (CamelMimePart *part);
-TnyMimePart* tny_camel_mime_part_new (void);
-
-CamelMimePart* tny_camel_mime_part_get_part (TnyCamelMimePart *self);
 
 G_END_DECLS
 

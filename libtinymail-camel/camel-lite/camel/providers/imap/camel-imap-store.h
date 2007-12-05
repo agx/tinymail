@@ -122,6 +122,7 @@ typedef enum {
 #define IMAP_CAPABILITY_QRESYNC			(1 << 15)
 #define IMAP_CAPABILITY_ENABLE			(1 << 16)
 #define IMAP_CAPABILITY_ESEARCH			(1 << 17)
+#define IMAP_CAPABILITY_CONVERT			(1 << 18)
 
 #define IMAP_PARAM_OVERRIDE_NAMESPACE		(1 << 0)
 #define IMAP_PARAM_CHECK_ALL			(1 << 1)

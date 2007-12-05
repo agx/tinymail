@@ -73,6 +73,8 @@ struct _TnyGtkMsgViewPriv
 	gboolean display_rfc822;
 	gboolean first_attachment;
 	GtkBox *kid; gboolean in_expander, parented;
+	TnyStatusCallback status_callback;
+	gpointer status_user_data;
 };
 
 typedef struct
@@ -313,11 +315,49 @@ tny_gtk_msg_view_set_parented (TnyGtkMsgView *self, gboolean parented)
 	return;
 }
 
+/**
+ * tny_gtk_msg_view_set_status_callback:
+ * @status_callback: a #TnyStatusCallback 
+ * @stats_user_data: user data for @status_callback
+ *
+ * Set the status callback info. This callback can be NULL and will be called
+ * when status information happens. You can for example set a progress bar's
+ * position here (for for example when downloading of a message takes place).
+ **/
+void 
+tny_gtk_msg_view_set_status_callback (TnyGtkMsgView *self, TnyStatusCallback status_callback, gpointer status_user_data)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	priv->status_callback = status_callback;
+	priv->status_user_data = status_user_data;
+	return;
+}
+
+/**
+ * tny_gtk_msg_view_set_status_callback:
+ * @status_callback: byref a #TnyStatusCallback 
+ * @stats_user_data: byref user data for @status_callback
+ *
+ * Get the status callback info. Usually internally used.
+ **/
+void 
+tny_gtk_msg_view_get_status_callback (TnyGtkMsgView *self, TnyStatusCallback *status_callback, gpointer *status_user_data)
+{
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+	*status_callback = priv->status_callback;
+	*status_user_data = priv->status_user_data;
+}
+
 static TnyMsgView*
 tny_gtk_msg_view_create_new_inline_viewer_default (TnyMsgView *self)
 {
 	TnyMsgView *retval = tny_gtk_msg_view_new ();
+	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
+
 	tny_gtk_msg_view_set_parented (TNY_GTK_MSG_VIEW (retval), TRUE);
+	tny_gtk_msg_view_set_status_callback (TNY_GTK_MSG_VIEW (retval), 
+		priv->status_callback, priv->status_user_data);
+
 	return retval;
 }
 
@@ -362,23 +402,23 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 	/* PLAIN mime part */
 	if (priv->display_plain && tny_mime_part_content_type_is (part, "text/plain"))
 	{
-		retval = tny_gtk_text_mime_part_view_new ();
+		retval = tny_gtk_text_mime_part_view_new (priv->status_callback, priv->status_user_data);
 
 	/* HTML mime part (shows HTML source code) (should be overridden in case there's
 	   support for a HTML TnyMsgView (like the TnyMozEmbedMsgView) */
 	} else if (priv->display_html && tny_mime_part_content_type_is (part, "text/html"))
 	{
-		retval = tny_gtk_text_mime_part_view_new ();
+		retval = tny_gtk_text_mime_part_view_new (priv->status_callback, priv->status_user_data);
 
 	/* Inline message RFC822 */
 	} else if (tny_mime_part_content_type_is (part, "image/*"))
 	{
-		TnyMimePartView *image_view = tny_gtk_image_mime_part_view_new ();
- 		const gchar *desc = tny_mime_part_get_description (part);
- 		retval = tny_gtk_expander_mime_part_view_new (image_view);
- 		if (!desc)
- 			desc = _("Attached image");
- 		gtk_expander_set_label (GTK_EXPANDER (retval), desc);
+		TnyMimePartView *image_view = tny_gtk_image_mime_part_view_new (priv->status_callback, priv->status_user_data);
+		const gchar *desc = tny_mime_part_get_description (part);
+		retval = tny_gtk_expander_mime_part_view_new (image_view);
+		if (!desc)
+			desc = _("Attached image");
+		gtk_expander_set_label (GTK_EXPANDER (retval), desc);
 	} else if (tny_mime_part_content_type_is (part, "multipart/*"))
 	{
 		retval = TNY_MIME_PART_VIEW (tny_msg_view_create_new_inline_viewer (self));

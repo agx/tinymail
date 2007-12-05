@@ -43,6 +43,7 @@ stay as an abstract TnyStoreAccount type. */
 #include "tny-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
 
+#include <tny-camel-bs-msg-receive-strategy.h>
 
 #include "tny-camel-account-priv.h"
 #include "tny-camel-store-account-priv.h"
@@ -89,6 +90,15 @@ tny_camel_imap_folder_class_init (TnyCamelIMAPFolderClass *class)
 static void
 tny_camel_imap_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 {
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (instance);
+
+/* Disabled until after the first release 
+	if (priv->receive_strat)
+		g_object_unref (priv->receive_strat);
+
+	priv->receive_strat = tny_camel_bs_msg_receive_strategy_new ();
+*/
+
 	return;
 }
 

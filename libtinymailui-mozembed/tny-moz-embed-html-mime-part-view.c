@@ -52,6 +52,8 @@ struct _TnyMozEmbedHtmlMimePartViewPriv
 {
 	TnyMimePart *part;
 	gint signal1, signal2;
+	TnyStatusCallback status_callback;
+	gpointer status_user_data;
 };
 
 #define TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE(o) \
@@ -80,20 +82,18 @@ tny_moz_embed_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *
 {
 	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
 
-	if (G_LIKELY (priv->part))
-		g_object_unref (G_OBJECT (priv->part));
+	if (priv->part)
+		g_object_unref (priv->part);
 
-	if (part)
-	{
+	if (part) {
 		TnyStream *dest;
-
 		dest = tny_moz_embed_stream_new (GTK_MOZ_EMBED (self));
 		tny_stream_reset (dest);
-		tny_mime_part_decode_to_stream (part, dest);
-		g_object_unref (G_OBJECT (dest));
+		tny_mime_part_decode_to_stream_async (part, dest, NULL, 
+			priv->status_callback, priv->status_user_data);
+		g_object_unref (dest);
 
-		g_object_ref (G_OBJECT (part));
-		priv->part = part;
+		priv->part = TNY_MIME_PART (g_object_ref (part));
 	}
 
 	return;
@@ -110,15 +110,21 @@ tny_moz_embed_html_mime_part_view_clear (TnyMimePartView *self)
 
 /**
  * tny_moz_embed_html_mime_part_view_new:
+ * @status_callback: a #TnyStatusCallback for when status information happens
+ * @status_user_data: user data for @status_callback
  *
  * Create a #TnyMimePartView that can display HTML mime parts
  *
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*
-tny_moz_embed_html_mime_part_view_new (void)
+tny_moz_embed_html_mime_part_view_new (TnyStatusCallback status_callback, gpointer status_user_data)
 {
 	TnyMozEmbedHtmlMimePartView *self = g_object_new (TNY_TYPE_MOZ_EMBED_HTML_MIME_PART_VIEW, NULL);
+	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
+
+	priv->status_callback = status_callback;
+	priv->status_user_data = status_user_data;
 
 	return TNY_MIME_PART_VIEW (self);
 }
@@ -141,7 +147,10 @@ tny_moz_embed_html_mime_part_view_instance_init (GTypeInstance *instance, gpoint
 	TnyMozEmbedHtmlMimePartView *self  = (TnyMozEmbedHtmlMimePartView*) instance;
 	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
 
+	priv->status_callback = NULL;
+	priv->status_user_data = NULL;
 	priv->part = NULL;
+
 	gtk_moz_embed_set_chrome_mask (GTK_MOZ_EMBED (self), 
 			GTK_MOZ_EMBED_FLAG_DEFAULTCHROME | GTK_MOZ_EMBED_FLAG_WINDOWRESIZEON);
 
@@ -160,14 +169,19 @@ tny_moz_embed_html_mime_part_view_finalize (GObject *object)
 	TnyMozEmbedHtmlMimePartView *self = (TnyMozEmbedHtmlMimePartView *)object;	
 	TnyMozEmbedHtmlMimePartViewPriv *priv = TNY_MOZ_EMBED_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
 
+/*	It looks like GtkMozEmbed already disconnects these?
+
 	if (priv->signal1 != -1)
 		g_signal_handler_disconnect (self, priv->signal1);
 
 	if (priv->signal2 != -1)
 		g_signal_handler_disconnect (self, priv->signal2);
 
-	if (G_LIKELY (priv->part))
-		g_object_unref (G_OBJECT (priv->part));
+	Fine for me ...
+*/
+
+	if (priv->part)
+		g_object_unref (priv->part);
 
 	(*parent_class->finalize) (object);
 

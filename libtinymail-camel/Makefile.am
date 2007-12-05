@@ -1,4 +1,4 @@
-SUBDIRS = camel-lite .
+SUBDIRS = camel-lite bs .
 
 INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS)  	\
 	-I. -I$(top_srcdir)			\
@@ -30,7 +30,10 @@ libtinymail_camel_1_0_headers =	\
 	tny-camel-shared.h \
 	tny-camel-send-queue.h \
 	tny-camel-mem-stream.h \
-	tny-session-camel.h
+	tny-session-camel.h \
+	tny-camel-bs-msg.h \
+	tny-camel-bs-mime-part.h \
+	tny-camel-bs-msg-receive-strategy.h
 
 libtinymail_camel_priv_headers = \
 	tny-camel-pop-store-account-priv.h \
@@ -48,7 +51,10 @@ libtinymail_camel_priv_headers = \
 	tny-camel-send-queue-priv.h \
 	tny-camel-folder-priv.h \
 	tny-camel-stream-priv.h \
-	tny-camel-queue-priv.h
+	tny-camel-queue-priv.h \
+	tny-camel-bs-msg-priv.h \
+	tny-camel-bs-mime-part-priv.h \
+	tny-camel-bs-msg-header-priv.h
 
 libtinymail_camel_1_0_la_SOURCES = \
 	$(libtinymail_camel_priv_headers) \
@@ -78,13 +84,18 @@ libtinymail_camel_1_0_la_SOURCES = \
 	tny-camel-send-queue.c \
 	tny-camel-mem-stream.c \
 	tny-session-camel.c \
-	tny-camel-queue.c			
+	tny-camel-queue.c \
+	tny-camel-bs-msg.c \
+	tny-camel-bs-mime-part.c \
+	tny-camel-bs-msg-receive-strategy.c \
+	tny-camel-bs-msg-header.c
 
 libtinymail_camel_1_0_la_LIBADD = \
 	$(LIBTINYMAIL_CAMEL_LIBS) \
 	$(top_builddir)/libtinymail-camel/camel-lite/camel/libcamel-lite-1.2.la \
 	$(top_builddir)/libtinymail-camel/camel-lite/camel/libcamel-lite-provider-1.2.la \
-	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
+	$(top_builddir)/libtinymail-camel/bs/libbodystruct.a 
 
 libtinymail_camel_1_0_la_LDFLAGS = -export-dynamic -version-info \
 	$(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)

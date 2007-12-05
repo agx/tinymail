@@ -43,6 +43,7 @@
 #include "camel-session.h"
 #include "camel-store.h"
 #include "camel-vtrash-folder.h"
+#include "camel-multipart.h"
 
 #define d(x)
 #define w(x)
@@ -117,6 +118,61 @@ static gboolean        folder_changed        (CamelObject *object,
 
 static int get_local_size (CamelFolder *folder);
 
+
+static char *
+fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
+{
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, "No support for BODYSTRUCTURE");
+	return NULL;
+}
+
+char *
+camel_folder_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
+{
+	return CF_CLASS (folder)->fetch_structure (folder, uid, ex);
+}
+
+static char *
+get_cache_filename (CamelFolder *folder, const char *uid, const char *spec, CamelFolderPartState *state)
+{
+	*state = CAMEL_FOLDER_PART_STATE_NOT_CACHED;
+	return NULL;
+}
+
+char *
+camel_folder_get_cache_filename (CamelFolder *folder, const char *uid, const char *spec, CamelFolderPartState *state)
+{
+	return CF_CLASS (folder)->get_cache_filename (folder, uid, spec, state);
+}
+
+static char * 
+fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *binary, CamelException *ex)
+{
+	if (binary)
+		*binary = TRUE;
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, "No support for BODYSTRUCTURE");
+	return g_strdup ("/dev/null");
+}
+
+static char * 
+convert (CamelFolder *folder, const char *uid, const char *spec, const char *cto, CamelException *ex)
+{
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, "No support for CONVERT");
+	return g_strdup ("/dev/null");
+}
+
+char* 
+camel_folder_convert (CamelFolder *folder, const char *uid, const char *spec, const char *convert_to, CamelException *ex)
+{
+	return CF_CLASS (folder)->convert (folder, uid, spec, convert_to, ex);
+}
+
+char * 
+camel_folder_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *binary, CamelException *ex)
+{
+	return CF_CLASS (folder)->fetch (folder, uid, spec, binary, ex);
+}
+
 static void
 delete_attachments (CamelFolder *folder, const char *uid)
 {
@@ -150,6 +206,10 @@ camel_folder_class_init (CamelFolderClass *camel_folder_class)
 	parent_class = camel_type_get_global_classfuncs (camel_object_get_type ());
 
 	/* virtual method definition */
+	camel_folder_class->convert = convert;
+	camel_folder_class->get_cache_filename = get_cache_filename;
+	camel_folder_class->fetch_structure = fetch_structure;
+	camel_folder_class->fetch = fetch;
 	camel_folder_class->get_local_size = get_local_size;
 	camel_folder_class->set_push_email = folder_set_push_email;
 	camel_folder_class->sync = folder_sync;

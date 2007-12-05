@@ -1,0 +1,4 @@
+Makefile.in
+libbodystruct.a
+.deps
+Makefile

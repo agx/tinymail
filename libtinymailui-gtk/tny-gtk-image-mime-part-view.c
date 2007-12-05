@@ -50,6 +50,8 @@ typedef struct _TnyGtkImageMimePartViewPriv TnyGtkImageMimePartViewPriv;
 struct _TnyGtkImageMimePartViewPriv
 {
 	TnyMimePart *part;
+	TnyStatusCallback status_callback;
+	gpointer status_user_data;
 };
 
 #define TNY_GTK_IMAGE_MIME_PART_VIEW_GET_PRIVATE(o) \
@@ -77,31 +79,42 @@ tny_gtk_image_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
 }
 
 static void 
+on_mime_part_decoded (TnyMimePart *part, TnyStream *dest, gboolean canceled, GError *err, gpointer user_data)
+{
+	TnyMimePartView *self = (TnyMimePartView *) user_data;
+	GdkPixbuf *pixbuf;
+	tny_stream_reset (dest);
+	pixbuf = tny_gtk_pixbuf_stream_get_pixbuf (TNY_GTK_PIXBUF_STREAM (dest));
+	gtk_image_set_from_pixbuf (GTK_IMAGE (self), pixbuf);
+	g_object_unref (self);
+}
+
+static void 
+on_status (GObject *part, TnyStatus *status, gpointer user_data)
+{
+	TnyMimePartView *self = (TnyMimePartView *) user_data;
+	TnyGtkImageMimePartViewPriv *priv = TNY_GTK_IMAGE_MIME_PART_VIEW_GET_PRIVATE (self);
+	if (priv->status_callback)
+		priv->status_callback ((GObject *) self, status, priv->status_user_data);
+	return;
+}
+
+static void 
 tny_gtk_image_mime_part_view_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 {
 	TnyGtkImageMimePartViewPriv *priv = TNY_GTK_IMAGE_MIME_PART_VIEW_GET_PRIVATE (self);
 
 	g_assert (TNY_IS_MIME_PART (part));
 
-	if (G_LIKELY (priv->part))
+	if (priv->part)
 		g_object_unref (priv->part);
 
-	if (part)
-	{
-		TnyStream *dest;
-		GdkPixbuf *pixbuf;
-
-		dest = tny_gtk_pixbuf_stream_new (tny_mime_part_get_content_type (part));
-
+	if (part) {
+		TnyStream *dest = tny_gtk_pixbuf_stream_new (tny_mime_part_get_content_type (part));
 		tny_stream_reset (dest);
-		tny_mime_part_decode_to_stream (part, dest);
-		tny_stream_reset (dest);
-
-		pixbuf = tny_gtk_pixbuf_stream_get_pixbuf (TNY_GTK_PIXBUF_STREAM (dest));
-		gtk_image_set_from_pixbuf (GTK_IMAGE (self), pixbuf);
-
+		tny_mime_part_decode_to_stream_async (part, dest, on_mime_part_decoded, 
+				on_status, g_object_ref (self));
 		g_object_unref (dest);
-
 		priv->part = g_object_ref (part);
 	}
 
@@ -123,6 +136,8 @@ tny_gtk_image_mime_part_view_clear_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_image_mime_part_view_new:
+ * @status_callback: a #TnyStatusCallback for when status information happens
+ * @status_user_data: user data for @status_callback
  *
  * Create a new #TnyMimePartView for Gtk+. The returned value will inherit
  * #GtkImage. It's recommended to use a #TnyGtkExpanderMimePartView to wrap this
@@ -131,9 +146,13 @@ tny_gtk_image_mime_part_view_clear_default (TnyMimePartView *self)
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*
-tny_gtk_image_mime_part_view_new (void)
+tny_gtk_image_mime_part_view_new (TnyStatusCallback status_callback, gpointer status_user_data)
 {
 	TnyGtkImageMimePartView *self = g_object_new (TNY_TYPE_GTK_IMAGE_MIME_PART_VIEW, NULL);
+	TnyGtkImageMimePartViewPriv *priv = TNY_GTK_IMAGE_MIME_PART_VIEW_GET_PRIVATE (self);
+
+	priv->status_callback = status_callback;
+	priv->status_user_data = status_user_data;
 
 	return TNY_MIME_PART_VIEW (self);
 }
@@ -144,6 +163,8 @@ tny_gtk_image_mime_part_view_instance_init (GTypeInstance *instance, gpointer g_
 	TnyGtkImageMimePartView *self = (TnyGtkImageMimePartView *)instance;
 	TnyGtkImageMimePartViewPriv *priv = TNY_GTK_IMAGE_MIME_PART_VIEW_GET_PRIVATE (self);
 
+	priv->status_callback = NULL;
+	priv->status_user_data = NULL;
 
 	return;
 }
@@ -154,8 +175,8 @@ tny_gtk_image_mime_part_view_finalize (GObject *object)
 	TnyGtkImageMimePartView *self = (TnyGtkImageMimePartView *)object;
 	TnyGtkImageMimePartViewPriv *priv = TNY_GTK_IMAGE_MIME_PART_VIEW_GET_PRIVATE (self);
 
-	if (G_LIKELY (priv->part))
-		g_object_unref (G_OBJECT (priv->part));
+	if (priv->part)
+		g_object_unref (priv->part);
 
 	(*parent_class->finalize) (object);
 

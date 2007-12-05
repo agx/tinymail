@@ -29,6 +29,8 @@
 #include <tny-iterator.h>
 #include <tny-platform-factory.h>
 
+#include <tny-gtk-msg-view.h>
+
 #if PLATFORM==1
 #include <tny-gnome-platform-factory.h>
 #include <tny-gnome-account-store.h>
@@ -68,6 +70,7 @@
 #include <tny-merge-folder.h>
 
 #include <tny-camel-send-queue.h>
+
 
 #define GO_ONLINE_TXT _("Go online")
 #define GO_OFFLINE_TXT _("Go offline")
@@ -116,7 +119,7 @@ cleanup_statusbar (gpointer data)
 {
 	TnyDemouiSummaryViewPriv *priv = data;
 
-	gtk_widget_hide (GTK_WIDGET (priv->progress));
+	//gtk_widget_hide (GTK_WIDGET (priv->progress));
 	gtk_statusbar_pop (GTK_STATUSBAR (priv->status), priv->status_id);
 
 	return FALSE;
@@ -1067,6 +1070,9 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			{
 				OnGetMsgInfo *info = g_slice_new (OnGetMsgInfo);
 				info->msg_view = TNY_MSG_VIEW (tny_gtk_msg_window_new (tny_platform_factory_new_msg_view (platfact)));
+
+				tny_gtk_msg_view_set_status_callback (TNY_GTK_MSG_VIEW (info->msg_view), status_update, self);
+
 				g_object_ref (info->msg_view);
 				gtk_widget_show (GTK_WIDGET (info->msg_view));
 				info->self = TNY_DEMOUI_SUMMARY_VIEW (g_object_ref (self));
@@ -1855,8 +1861,10 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 	vpaned1 = gtk_vpaned_new ();
 	gtk_widget_show (vpaned1);
-	
+
 	priv->msg_view = tny_platform_factory_new_msg_view (platfact);
+
+	tny_gtk_msg_view_set_status_callback (TNY_GTK_MSG_VIEW (priv->msg_view), status_update, self);
 
 	gtk_widget_show (GTK_WIDGET (priv->msg_view));
 

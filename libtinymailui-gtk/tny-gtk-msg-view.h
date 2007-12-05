@@ -79,6 +79,10 @@ gboolean tny_gtk_msg_view_get_display_rfc822 (TnyGtkMsgView *self);
 gboolean tny_gtk_msg_view_get_display_attachments (TnyGtkMsgView *self);
 gboolean tny_gtk_msg_view_get_display_plain (TnyGtkMsgView *self);
 
+
+void tny_gtk_msg_view_set_status_callback (TnyGtkMsgView *self, TnyStatusCallback status_callback, gpointer status_user_data);
+void tny_gtk_msg_view_get_status_callback (TnyGtkMsgView *self, TnyStatusCallback *status_callback, gpointer *status_user_data);
+
 void tny_gtk_msg_view_set_parented (TnyGtkMsgView *self, gboolean parented);
 
 G_END_DECLS

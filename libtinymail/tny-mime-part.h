@@ -67,6 +67,7 @@ struct _TnyMimePartIface
 	gint (*add_part_func) (TnyMimePart *self, TnyMimePart *part);
 	void (*get_header_pairs_func) (TnyMimePart *self, TnyList *list);
 	void (*set_header_pair_func) (TnyMimePart *self, const gchar *name, const gchar *value);
+	void (*decode_to_stream_async_func) (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 };
 
 GType tny_mime_part_get_type (void);
@@ -94,6 +95,7 @@ gint tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part);
 void tny_mime_part_del_part (TnyMimePart *self, TnyMimePart *part);
 void tny_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list);
 void tny_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value);
+void tny_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 
 G_END_DECLS
 

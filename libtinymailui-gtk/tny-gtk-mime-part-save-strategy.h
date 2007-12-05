@@ -53,7 +53,7 @@ struct _TnyGtkMimePartSaveStrategyClass
 };
 
 GType tny_gtk_mime_part_save_strategy_get_type (void);
-TnyMimePartSaveStrategy* tny_gtk_mime_part_save_strategy_new (void);
+TnyMimePartSaveStrategy* tny_gtk_mime_part_save_strategy_new (TnyStatusCallback status_callback, gpointer status_user_data);
 
 G_END_DECLS
 

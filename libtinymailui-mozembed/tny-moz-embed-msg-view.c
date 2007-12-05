@@ -74,15 +74,17 @@ tny_moz_embed_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyM
 	g_assert (TNY_IS_MIME_PART (part));
 
 	/* HTML mime part (shows HTML using GtkMozEmbed) */
-	if (tny_mime_part_content_type_is (part, "text/html"))
-	{
-		GtkWidget *widget = (GtkWidget *) self;
+	if (tny_mime_part_content_type_is (part, "text/html")) {
+		TnyStatusCallback status_callback;
+		gpointer status_user_data;
 
-		retval = tny_moz_embed_html_mime_part_view_new ();
+		tny_gtk_msg_view_get_status_callback (TNY_GTK_MSG_VIEW (self), &status_callback, &status_user_data);
+
+		GtkWidget *widget = (GtkWidget *) self;
+		retval = tny_moz_embed_html_mime_part_view_new (status_callback, status_user_data);
 
 		gtk_widget_set_usize (GTK_WIDGET (retval), 
 			widget->allocation.width>11?widget->allocation.width-10:1, 2500);
-
 	} else
 		retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for_func (self, part);
 
@@ -116,7 +118,13 @@ static TnyMsgView*
 tny_moz_embed_msg_view_create_new_inline_viewer_default (TnyMsgView *self)
 {
 	TnyMsgView *retval = tny_moz_embed_msg_view_new ();
+	TnyStatusCallback status_callback;
+	gpointer status_user_data;
+
 	tny_gtk_msg_view_set_parented (TNY_GTK_MSG_VIEW (retval), TRUE);
+	tny_gtk_msg_view_get_status_callback (TNY_GTK_MSG_VIEW (self), &status_callback, &status_user_data);
+	tny_gtk_msg_view_set_status_callback (TNY_GTK_MSG_VIEW (retval), status_callback, status_user_data);
+
 	return retval;
 }
 

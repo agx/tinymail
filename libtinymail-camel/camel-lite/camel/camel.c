@@ -58,9 +58,9 @@ camel_shutdown (void)
 	/* For some reason we get into trouble on Win32 if we call these.
 	 * But they shouldn't be necessary as the process is exiting anywy?
 	 */
-	NSS_Shutdown ();
+	/* NSS_Shutdown ();
 
-	PR_Cleanup ();
+	PR_Cleanup (); */
 #endif /* HAVE_NSS */
 
 	certdb = camel_certdb_get_default ();
