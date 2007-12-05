@@ -87,6 +87,7 @@ gtk_save_to_file (const gchar *uri, TnyMimePart *part, TnyMimePartSaveStrategy *
 static gboolean
 gtk_save_to_file (const gchar *local_filename, TnyMimePart *part, TnyMimePartSaveStrategy *self)
 {
+	TnyGtkMimePartSaveStrategyPriv *priv = TNY_GTK_MIME_PART_SAVE_STRATEGY_GET_PRIVATE (self);
 	int fd = open (local_filename, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 	if (fd != -1)
@@ -96,7 +97,7 @@ gtk_save_to_file (const gchar *local_filename, TnyMimePart *part, TnyMimePartSav
 			priv->status_callback, priv->status_user_data);
 
 		/* This also closes the file descriptor */
-		g_object_unref (G_OBJECT (stream));
+		g_object_unref (stream);
 		return TRUE;
 	}
 
