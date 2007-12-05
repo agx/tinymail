@@ -57,11 +57,11 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* "whether the dummy libconic should be built" */
+#undef LIBTINYMAIL_MAEMO_WITHOUT_CONIC
+
 /* "Whether to hack the TnyMaemoConicDevice to somewhat work in sbox" */
 #undef MAEMO_CONIC_DUMMY
-
-/* "whether libconic is available" */
-#undef MAEMO_HAVE_CONIC
 
 /* Detected mozilla engine version for mozembed */
 #undef MOZEMBED_MOZILLA_VERSION
