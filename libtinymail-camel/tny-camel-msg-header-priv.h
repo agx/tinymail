@@ -48,7 +48,8 @@ struct _TnyCamelMsgHeader
 	GObject parent;
 	TnyFolder *folder;
 	CamelMimeMessage *msg;
-	gchar *mime_from, *old_uid;
+	gchar *old_uid;
+	gchar *from, *to, *cc, *subject, *bcc, *reply_to;
 	gboolean has_received;
 	time_t received;
 	gboolean partial;

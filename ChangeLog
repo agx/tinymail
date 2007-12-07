@@ -1,6 +1,7 @@
 2007-12-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed the BODY fetcher to cope with unsolicited responses
+	* Fixed decoding of message headers in TnyMsg type
 
 2007-12-05  Philip Van Hoof  <pvanhoof@gnome.org>
 

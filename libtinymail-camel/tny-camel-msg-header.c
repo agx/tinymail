@@ -32,6 +32,8 @@
 #include "tny-camel-folder-priv.h"
 #include "tny-camel-msg-header-priv.h"
 
+#include <libedataserver/e-iconv.h>
+
 #include <tny-camel-shared.h>
 
 #include <camel/camel-folder.h>
@@ -42,18 +44,42 @@
 static GObjectClass *parent_class = NULL;
 
 
+static char*
+decode_it (CamelMimeMessage *msg, const char *str)
+{
+	struct _camel_header_raw *h = ((CamelMimePart *)msg)->headers;
+	const char *content, *charset;
+	CamelContentType *ct = NULL;
+
+	if ((content = camel_header_raw_find(&h, "Content-Type", NULL))
+	     && (ct = camel_content_type_decode(content))
+	     && (charset = camel_content_type_param(ct, "charset"))
+	     && (g_ascii_strcasecmp(charset, "us-ascii") == 0))
+		charset = NULL;
+
+	charset = charset ? e_iconv_charset_name (charset) : NULL;
+
+	while (isspace ((unsigned) *str))
+		str++;
+
+	return camel_header_decode_string (str, charset);
+}
+
 static const gchar*
 tny_camel_msg_header_get_replyto (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
-	const gchar *retval = NULL;
+	gchar *enc;
 
-	CamelInternetAddress *addr = (CamelInternetAddress*)
-		camel_mime_message_get_reply_to (me->msg);
-	if (addr)
-		retval = camel_address_format (CAMEL_ADDRESS (addr));
+	if (!me->reply_to) {
+		CamelAddress *addr = (CamelAddress *) camel_mime_message_get_reply_to (me->msg);
+		if (addr) {
+			enc = camel_address_format (addr);
+			me->reply_to = decode_it (me->msg, enc);
+		}
+	}
 
-	return retval;
+	return (const gchar *) me->reply_to;
 }
 
 
@@ -162,28 +188,33 @@ static const gchar*
 tny_camel_msg_header_get_cc (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
-	const gchar *retval = NULL;
+	const gchar *enc;
 
-	retval = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "cc");
+	if (!me->cc) {
+		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "cc");
+		me->cc = decode_it (me->msg, enc);
+	}
 
-	return retval;
+	return (const gchar *) me->bcc;
 }
 
 static const gchar*
 tny_camel_msg_header_get_bcc (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
-	const gchar *retval = NULL;
+	const gchar *enc;
 
-	retval = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "bcc");
+	if (!me->bcc) {
+		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "bcc");
+		me->bcc = decode_it (me->msg, enc);
+	}
 
-	return retval;
+	return (const gchar *) me->bcc;
 }
 
 static TnyHeaderFlags
 tny_camel_msg_header_get_flags (TnyHeader *self)
 {
-  
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 	const gchar *priority_string = NULL;
 	const gchar *attachments_string = NULL;
@@ -339,31 +370,31 @@ static const gchar*
 tny_camel_msg_header_get_from (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
-	const gchar *retval = NULL;
+	gchar *enc;
 
-	if (G_LIKELY (!me->mime_from))
-	{
-		CamelInternetAddress *addr = (CamelInternetAddress*)
-			camel_mime_message_get_from (me->msg);
-		if (addr)
-			me->mime_from = camel_address_format (CAMEL_ADDRESS (addr));
-		else me->mime_from = NULL;
+	if (!me->from) {
+		CamelAddress *addr = (CamelAddress *) camel_mime_message_get_from (me->msg);
+		if (addr) {
+			enc = camel_address_format (addr);
+			me->from = decode_it (me->msg, enc);
+		}
 	}
 
-	retval = (const gchar*)me->mime_from;
-
-	return retval;
+	return (const gchar *) me->from;
 }
 
 static const gchar*
 tny_camel_msg_header_get_subject (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
-	const gchar *retval = NULL;
+	const gchar *enc;
 
-	retval = camel_mime_message_get_subject (me->msg);
+	if (!me->subject) {
+		enc = camel_mime_message_get_subject (me->msg);
+		me->subject = decode_it (me->msg, enc);
+	}
 
-	return retval;
+	return (const gchar *) me->subject;
 }
 
 
@@ -371,11 +402,15 @@ static const gchar*
 tny_camel_msg_header_get_to (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
-	const gchar *retval = NULL;
+	const gchar *enc;
 
-	retval = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "to");
+	if (!me->to) {
+		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "to");
+		me->to = decode_it (me->msg, enc);
+	}
 
-	return retval;
+	return (const gchar *) me->to;
+
 }
 
 static const gchar*
@@ -433,6 +468,19 @@ tny_camel_msg_header_finalize (GObject *object)
 {
 	TnyCamelMsgHeader *me = (TnyCamelMsgHeader *) object;
 
+	if (me->bcc)
+		g_free (me->bcc);
+	if (me->cc)
+		g_free (me->cc);
+	if (me->from)
+		g_free (me->from);
+	if (me->to)
+		g_free (me->to);
+	if (me->subject)
+		g_free (me->subject);
+	if (me->reply_to)
+		g_free (me->reply_to);
+
 	if (me->old_uid)
 		g_free (me->old_uid);
 
@@ -476,6 +524,12 @@ _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder, time_t rece
 	self->has_received = FALSE;
 	self->partial = FALSE;
 	self->decorated = NULL;
+	self->to = NULL;
+	self->from = NULL;
+	self->cc = NULL;
+	self->bcc = NULL;
+	self->subject = NULL;
+	self->reply_to = NULL;
 
 	return (TnyHeader*) self;
 }
