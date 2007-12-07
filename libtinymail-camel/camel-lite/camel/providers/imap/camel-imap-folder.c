@@ -5426,17 +5426,11 @@ berrorhander:
 				goto errorhander;
 		} else
 		{
-			gboolean err=FALSE;
-			gchar line [MAX_LINE_LEN];
-			guint linenum = 0;
-			CamelStreamBuffer *server_stream;
-			gchar *tag;
-			guint taglen;
-			gboolean isnextdone = FALSE, hadr = FALSE;
-			guint tread = 0, exread = 0;
-
-			nread = 0;
-
+			CamelImapResponse *response;
+			gboolean err = FALSE, done=FALSE;
+			char *body;
+			int body_len = 0;
+			int i;
 /*
 a01 UID FETCH 1:10 BODY.PEEK[0]
 * Bla bla
@@ -5446,130 +5440,60 @@ Received: from nic.funet.fi
 
 			/* Stops idle */
 			if (store->server_level < IMAP_LEVEL_IMAP4REV1 && !*section_text)
-				camel_imap_command_start (store, folder, ex,
+				response = camel_imap_command (store, folder, ex,
 					"UID FETCH %s RFC822.PEEK", uid);
 			else
-				camel_imap_command_start (store, folder, ex,
+				response = camel_imap_command (store, folder, ex,
 					"UID FETCH %s BODY.PEEK[%s]", uid, section_text);
 
-			tag = g_strdup_printf ("%c%.5u", store->tag_prefix, store->command-1);
-			taglen = strlen (tag);
-
-			server_stream = (CamelStreamBuffer*) store->istream;
-
-			if (!server_stream) {
+			if (!response)
 				err = TRUE;
+
+			for (i = 0; i < response->untagged->len; i++) {
+				char *line = response->untagged->pdata[i];
+
+				do {
+					line++;
+
+					if (!g_ascii_strncasecmp (line, "BODY[", 5) ||
+					!g_ascii_strncasecmp (line, "RFC822 ", 7)) {
+						if (*line == 'B' || *line == 'b') {
+							char *p;
+							line += 5;
+							p = strchr (line, ']');
+							if (!p || *(p + 1) != ' ') {
+								ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
+								err = TRUE;
+								break;
+							}
+							line = p + 2;
+						} else
+							line += 7;
+
+						body = imap_parse_nstring ((const char **) &line, &body_len);
+						if (body) {
+							done = TRUE;
+							break;
+						}
+					}
+
+				} while (!done && line && *line != ')');
+			}
+			camel_imap_response_free (store, response);
+
+			if (body)
+				camel_stream_write (stream, body, body_len);
+			else {
 				ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-				errmessage = g_strdup ("Read from service failed: Service unavailable");
-			} else
-				store->command++;
-
-			if (server_stream)
-			  while ((nread = camel_stream_buffer_gets (server_stream, line, MAX_LINE_LEN) > 0))
-			  {
-				gint llen = 0;
-
-				/* It might be the line before the last line
-				 * TNY TODO: why no check for (linenum != 0) then ? */
-
-				if (line[0] == ')' && (line[1] == '\n' || (line[1] == '\r' && line[2] == '\n')))
-				{
-					if (line[1] == '\r')
-						hadr = TRUE;
-					isnextdone = TRUE;
-					memset (line, 0, MAX_LINE_LEN);
-					continue;
-				}
-
-				/* It's the first line (or an unsolicited one) */
-				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
-				{
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-					errmessage = g_strdup ("Read from service failed: Unexpected result from service");
-					err=TRUE;
-					memset (line, 0, MAX_LINE_LEN);
-					break;
-				} else if (linenum == 0)
-				{
-					char *pos, *ppos;
-					pos = strchr (line, '{');
-					if (pos) {
-						ppos = strchr (pos, '}');
-						if (ppos) {
-							*ppos = '\0';
-							exread = strtol (pos + 1, NULL, 10);
-						}
-						linenum++;
-					} else {
-						imap_debug ("Unsolicited in FETCH: %s\n", line);
-					}
-					memset (line, 0, MAX_LINE_LEN);
-					continue;
-				}
-
-				/* It's the last line (isnextdone will be ignored if that is the case) */
-			 	if (!strncmp (line, tag, taglen)) {
-					memset (line, 0, MAX_LINE_LEN);
-					break;
-				}
-
-				camel_seekable_stream_seek (CAMEL_SEEKABLE_STREAM (stream), 0, CAMEL_STREAM_END);
-
-				if (isnextdone)
-				{
-					if (hadr) {
-						if (camel_stream_write (stream, ")\n", 2) != 2)
-						{
-							err = TRUE;
-							errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
-							memset (line, 0, MAX_LINE_LEN);
-							break;
-						}
-					} else {
-						if (camel_stream_write (stream, ")\r\n", 3) != 3)
-						{
-							err = TRUE;
-							errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
-							memset (line, 0, MAX_LINE_LEN);
-							break;
-						}
-					}
-
-					hadr = FALSE;
-					isnextdone = FALSE;
-				}
-
-				llen = strlen (line);
-				if (camel_stream_write (stream, line, llen) != llen)
-				{
-					err = TRUE;
-					errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
-					memset (line, 0, MAX_LINE_LEN);
-					break;
-				}
-				linenum++;
-				tread += llen;
-
-				camel_operation_progress (NULL, tread, exread);
-
-				memset (line, 0, MAX_LINE_LEN);
-			  }
+				err = TRUE;
+			}
 
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
-			if (nread <= 0) {
-				err = TRUE;
-				ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-				errmessage = g_strdup_printf ("Read from service failed: %s", g_strerror (errno));
-			}
-
-			if (tag)
-				g_free (tag);
+			camel_stream_reset (stream);
 
 			if (err)
 				goto errorhander;
-
-			camel_stream_reset (stream);
 
 		} /* NON-BINARY */
 
@@ -5794,11 +5718,13 @@ errorhander:
 		camel_object_unref (stream);
 	camel_imap_message_cache_remove (imap_folder->cache, uid);
 
-	if (!errmessage)
-		camel_exception_setv (ex, ex_id, "Could not find message body in response.");
-	else {
-		camel_exception_setv (ex, ex_id, errmessage);
-		g_free (errmessage);
+	if (ex && !camel_exception_is_set (ex)) {
+		if (!errmessage)
+			camel_exception_setv (ex, ex_id, "Could not find message body in response.");
+		else {
+			camel_exception_setv (ex, ex_id, errmessage);
+			g_free (errmessage);
+		}
 	}
 
 	handle_freeup (store, nread, ex);

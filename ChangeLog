@@ -1,3 +1,7 @@
+2007-12-07  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* Fixed the BODY fetcher to cope with unsolicited responses
+
 2007-12-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Merged all of devel/pvanhoof/bs branch back
