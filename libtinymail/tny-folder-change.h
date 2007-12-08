@@ -67,6 +67,8 @@ struct _TnyFolderChangeClass
 };
 
 GType  tny_folder_change_get_type (void);
+GType tny_folder_change_changed_get_type (void);
+
 TnyFolderChange* tny_folder_change_new (TnyFolder *folder);
 
 const gchar* tny_folder_change_get_rename (TnyFolderChange *self, const gchar **oldname);

@@ -62,6 +62,8 @@ struct _TnyFolderStoreChangeClass
 };
 
 GType  tny_folder_store_change_get_type (void);
+GType tny_folder_store_change_changed_get_type (void);
+
 TnyFolderStoreChange* tny_folder_store_change_new (TnyFolderStore *folderstore);
 
 void tny_folder_store_change_add_created_folder (TnyFolderStoreChange *self, TnyFolder *folder);
