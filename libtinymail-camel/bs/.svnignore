@@ -1,4 +1,5 @@
 Makefile.in
 libbodystruct.a
 .deps
+.libs
 Makefile
