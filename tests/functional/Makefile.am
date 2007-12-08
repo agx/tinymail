@@ -24,7 +24,7 @@ anything_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la
 
 msg_sender_SOURCES = msg-sender.c
 msg_sender_LDADD = \
@@ -33,7 +33,7 @@ msg_sender_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la
 
 folder_lister_SOURCES = folder-lister.c 
 folder_lister_LDADD = \
@@ -42,7 +42,7 @@ folder_lister_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la
 
 folder_lister_async_SOURCES = folder-lister-async.c
 folder_lister_async_LDADD = \
@@ -51,7 +51,7 @@ folder_lister_async_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la
 
 msg_transfer_SOURCES = msg-transfer.c
 msg_transfer_LDADD = \
@@ -60,7 +60,7 @@ msg_transfer_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la
 
 folder_transfer_SOURCES = folder-transfer.c
 folder_transfer_LDADD = \
@@ -69,7 +69,7 @@ folder_transfer_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la
 
 account_refresh_SOURCES = account-refresh.c
 account_refresh_LDADD = \
@@ -78,7 +78,7 @@ account_refresh_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la
 
 folder_remove_SOURCES = folder-remove.c
 folder_remove_LDADD = \
@@ -87,4 +87,4 @@ folder_remove_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la

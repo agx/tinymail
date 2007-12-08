@@ -99,7 +99,7 @@ libtinymail_camel_1_0_la_LIBADD = \
 	$(top_builddir)/libtinymail-camel/camel-lite/camel/libcamel-lite-1.2.la \
 	$(top_builddir)/libtinymail-camel/camel-lite/camel/libcamel-lite-provider-1.2.la \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
-	$(top_builddir)/libtinymail-camel/bs/libbodystruct.a 
+	$(top_builddir)/libtinymail-camel/bs/libbodystruct.la 
 
 libtinymail_camel_1_0_la_LDFLAGS = -export-dynamic -version-info \
 	$(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)

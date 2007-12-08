@@ -26,5 +26,5 @@ memory_test_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la \
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la
 
