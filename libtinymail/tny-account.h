@@ -116,6 +116,8 @@ struct _TnyAccountIface
 
 GType tny_account_get_type (void);
 GType tny_account_type_get_type (void);
+GType tny_connection_status_get_type (void);
+GType tny_account_signal_type_get_type (void);
 
 TnyConnectionStatus tny_account_get_connection_status (TnyAccount *self);
 void tny_account_set_id (TnyAccount *self, const gchar *id);

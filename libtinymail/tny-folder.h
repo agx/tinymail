@@ -134,6 +134,8 @@ struct _TnyFolderIface
 
 GType tny_folder_get_type (void);
 GType tny_folder_type_get_type (void);
+GType tny_folder_caps_get_type (void);
+GType tny_folder_signal_get_type (void);
 
 TnyMsgRemoveStrategy* tny_folder_get_msg_remove_strategy (TnyFolder *self);
 void tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st);
