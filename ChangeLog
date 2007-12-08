@@ -1,5 +1,9 @@
 2007-12-08  Jürg Billeter  <j@bitron.ch>
 
+	* libtinymail/tny.h, libtinymailui/tnyui.h: remove internal files
+
+2007-12-08  Jürg Billeter  <j@bitron.ch>
+
 	* ChangeLog: use UTF-8 for all entries
 
 2007-12-07  Philip Van Hoof  <pvanhoof@gnome.org>

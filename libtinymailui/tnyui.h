@@ -2,10 +2,7 @@
 #define _TNYUI_H
 
 #include <tny-account-store-view.h>
-#include <tny-header-view.c>
 #include <tny-header-view.h>
-#include <tny-header-view.lo>
-#include <tny-header-view.o>
 #include <tny-mime-part-saver.h>
 #include <tny-mime-part-save-strategy.h>
 #include <tny-mime-part-view.h>
