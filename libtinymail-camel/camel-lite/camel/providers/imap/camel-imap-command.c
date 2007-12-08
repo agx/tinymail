@@ -268,7 +268,7 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 
 	if (store->ostream == NULL || ((CamelObject *)store->ostream)->ref_count <= 0)
 	{
-		if (store->has_login && !camel_service_connect ((CamelService*)store, ex))
+		if (store->has_login && (store->not_recon || !camel_service_connect ((CamelService*)store, ex)))
 		{
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 				     _("You must be working online to "
