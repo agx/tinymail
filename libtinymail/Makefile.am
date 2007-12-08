@@ -15,7 +15,7 @@ private_headers = tny-common-priv.h
 
 libtinymail_1_0_headers = \
 	tny-signals-marshal.h \
-	tny-shared.h \
+	tny-shared.h tny.h \
 	tny-error.h \
 	tny-status.h \
 	tny-list.h \

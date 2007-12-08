@@ -5,6 +5,7 @@ INCLUDES = \
 lib_LTLIBRARIES = libtinymailui-1.0.la
 
 libtinymailui_1_0_headers = \
+	tnyui.h \
 	tny-summary-view.h \
 	tny-msg-view.h \
 	tny-mime-part-save-strategy.h \
