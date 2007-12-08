@@ -1,5 +1,9 @@
 2007-12-08  Jürg Billeter  <j@bitron.ch>
 
+	* bindings/vala/README: Add some information about the Vala bindings
+
+2007-12-08  Jürg Billeter  <j@bitron.ch>
+
 	* bindings/Makefile.am:
 	* bindings/vala/:
 	* configure.ac:
