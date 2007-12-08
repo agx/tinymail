@@ -1635,6 +1635,7 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 	char *errbuf = NULL;
 	gboolean authenticated = FALSE, have_second_capa = FALSE;
 	const char *auth_domain;
+	int mtry;
 
 	/* Bugfix for #432234 */
 	if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED)
@@ -1674,7 +1675,9 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 		}
 	}
 
-	while (!authenticated) {
+	mtry = 0;
+	while (!authenticated && mtry < 3) {
+		mtry++;
 		if (errbuf) {
 			/* We need to un-cache the password before prompting again */
 			camel_session_forget_password (session, service, auth_domain, "password", ex);
