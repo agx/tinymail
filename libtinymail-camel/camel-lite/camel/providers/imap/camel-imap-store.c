@@ -172,6 +172,11 @@ camel_imap_recon (CamelImapStore *store, CamelException *mex)
 		if (service->reconnecter)
 			service->reconnecter (service, FALSE, service->data);
 
+		/* Pipeline? :) (well, whatever we send, we'll close our
+		  socket soon anyway)*/
+
+		camel_stream_write (store->ostream, "LOGOUT", 6);
+
 		camel_service_disconnect_r (service, FALSE, NULL);
 		camel_service_connect_r (service, mex);
 
