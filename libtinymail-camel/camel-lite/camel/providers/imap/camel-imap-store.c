@@ -161,29 +161,35 @@ imapstore_get_local_size (CamelStore *store, const gchar *folder_name)
 void
 camel_imap_recon (CamelImapStore *store, CamelException *mex)
 {
-	CamelService *service = CAMEL_SERVICE (store);
+	if (store->not_recon) {
+		camel_exception_set (mex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			"Can't reconnect");
+		return;
+	} else {
+		CamelService *service = CAMEL_SERVICE (store);
 
-	service->reconnecting = TRUE;
-	if (service->reconnecter)
-		service->reconnecter (service, FALSE, service->data);
+		service->reconnecting = TRUE;
+		if (service->reconnecter)
+			service->reconnecter (service, FALSE, service->data);
 
-	camel_service_disconnect_r (service, FALSE, NULL);
-	camel_service_connect_r (service, mex);
-
-	if (mex && camel_exception_is_set (mex))
-	{
-		camel_exception_clear (mex);
-		sleep (1);
+		camel_service_disconnect_r (service, FALSE, NULL);
 		camel_service_connect_r (service, mex);
-	}
-	if (service->reconnection) {
-		if (!camel_exception_is_set (mex))
-			service->reconnection (service, TRUE, service->data);
-		else
-			service->reconnection (service, FALSE, service->data);
-	}
 
-	service->reconnecting = FALSE;
+		if (mex && camel_exception_is_set (mex))
+		{
+			camel_exception_clear (mex);
+			sleep (1);
+			camel_service_connect_r (service, mex);
+		}
+		if (service->reconnection) {
+			if (!camel_exception_is_set (mex))
+				service->reconnection (service, TRUE, service->data);
+			else
+				service->reconnection (service, FALSE, service->data);
+		}
+
+		service->reconnecting = FALSE;
+	}
 }
 
 static char*
@@ -1826,6 +1832,7 @@ imap_connect_online (CamelService *service, CamelException *ex)
 
 	store->going_online = TRUE;
 	store->got_online = FALSE;
+	store->not_recon = TRUE;
 
 	camel_operation_uncancel (NULL);
 
@@ -1842,6 +1849,8 @@ imap_connect_online (CamelService *service, CamelException *ex)
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		/* camel_service_disconnect (service, TRUE, NULL); */
 		store->going_online = FALSE;
+
+		store->not_recon = FALSE;
 		return FALSE;
 	}
 
@@ -1982,6 +1991,8 @@ done:
 
 	store->going_online = FALSE;
 	store->got_online = !camel_exception_is_set (ex);
+
+	store->not_recon = FALSE;
 
 	return store->got_online;
 }
