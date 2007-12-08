@@ -134,6 +134,13 @@ CamelProvider *     camel_service_get_provider       (CamelService *service);
 GList *             camel_service_query_auth_types   (CamelService *service,
 						      CamelException *ex);
 
+
+gboolean            camel_service_connect_r           (CamelService *service,
+						      CamelException *ex);
+gboolean            camel_service_disconnect_r        (CamelService *service,
+						      gboolean clean,
+						      CamelException *ex);
+
 /* Standard Camel function */
 CamelType camel_service_get_type (void);
 

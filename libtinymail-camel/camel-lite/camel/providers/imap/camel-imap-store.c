@@ -167,14 +167,14 @@ camel_imap_recon (CamelImapStore *store, CamelException *mex)
 	if (service->reconnecter)
 		service->reconnecter (service, FALSE, service->data);
 
-	camel_service_disconnect (service, FALSE, NULL);
-	camel_service_connect (service, mex);
+	camel_service_disconnect_r (service, FALSE, NULL);
+	camel_service_connect_r (service, mex);
 
 	if (mex && camel_exception_is_set (mex))
 	{
 		camel_exception_clear (mex);
 		sleep (1);
-		camel_service_connect (service, mex);
+		camel_service_connect_r (service, mex);
 	}
 	if (service->reconnection) {
 		if (!camel_exception_is_set (mex))
@@ -1625,6 +1625,8 @@ try_auth (CamelImapStore *store, const char *mech, CamelException *ex)
 	return FALSE;
 }
 
+#define CSERV_CLASS(so) CAMEL_SERVICE_CLASS (CAMEL_OBJECT_GET_CLASS(so))
+
 static gboolean
 imap_auth_loop (CamelService *service, CamelException *ex)
 {
@@ -1756,10 +1758,15 @@ imap_auth_loop (CamelService *service, CamelException *ex)
 			errbuf = g_strdup_printf (_("Unable to authenticate "
 				"to IMAP server.\n%s\n\n"),
 				camel_exception_get_description (ex));
-			camel_exception_clear (ex);
 
-			/* Disconnect */
-			camel_service_disconnect (service, FALSE, NULL);
+			/* Disconnect (no checks) */
+			CSERV_CLASS (service)->disconnect (service, TRUE, NULL);
+
+			/* Too many connection attempts? */
+			if (strstr (camel_exception_get_description (ex), "many"))
+				sleep (1);
+
+			camel_exception_clear (ex);
 
 		} else {
 			if (!have_second_capa && !imap_get_capability (service, ex))

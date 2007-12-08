@@ -402,6 +402,60 @@ camel_service_connect (CamelService *service, CamelException *ex)
 	return ret;
 }
 
+
+gboolean
+camel_service_connect_r (CamelService *service, CamelException *ex)
+{
+	gboolean ret = FALSE;
+	gboolean unreg = FALSE;
+
+	g_return_val_if_fail (CAMEL_IS_SERVICE (service), FALSE);
+	g_return_val_if_fail (service->session != NULL, FALSE);
+	g_return_val_if_fail (service->url != NULL, FALSE);
+
+	//CAMEL_SERVICE_REC_LOCK (service, connect_lock);
+
+	if (service->status == CAMEL_SERVICE_CONNECTED) {
+		//CAMEL_SERVICE_REC_UNLOCK (service, connect_lock);
+		return TRUE;
+	}
+
+	/* Register a separate operation for connecting, so that
+	 * the offline code can cancel it.
+	 */
+	//CAMEL_SERVICE_LOCK (service, connect_op_lock);
+	service->connect_op = camel_operation_registered ();
+	if (!service->connect_op) {
+		service->connect_op = camel_operation_new (NULL, NULL);
+		camel_operation_register (service->connect_op);
+		unreg = TRUE;
+	}
+	//CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
+
+	service->status = CAMEL_SERVICE_CONNECTING;
+	ret = CSERV_CLASS (service)->connect (service, ex);
+	service->status = ret ? CAMEL_SERVICE_CONNECTED : CAMEL_SERVICE_DISCONNECTED;
+
+	//CAMEL_SERVICE_LOCK (service, connect_op_lock);
+	if (service->connect_op) {
+		if (unreg)
+			camel_operation_unregister (service->connect_op);
+
+		camel_operation_unref (service->connect_op);
+		service->connect_op = NULL;
+	}
+
+	if (service->disconnecting)
+		service->connecting (service, ret, service->data);
+
+	//CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
+
+	//CAMEL_SERVICE_REC_UNLOCK (service, connect_lock);
+
+	return ret;
+}
+
+
 static gboolean
 service_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 {
@@ -465,6 +519,50 @@ camel_service_disconnect (CamelService *service, gboolean clean,
 	}
 
 	CAMEL_SERVICE_REC_UNLOCK (service, connect_lock);
+
+		service->status = CAMEL_SERVICE_DISCONNECTED;
+	return res;
+}
+
+gboolean
+camel_service_disconnect_r (CamelService *service, gboolean clean,
+			  CamelException *ex)
+{
+	gboolean res = TRUE;
+	int unreg = FALSE;
+
+	//CAMEL_SERVICE_REC_LOCK (service, connect_lock);
+
+	if (service->status != CAMEL_SERVICE_DISCONNECTED
+	    && service->status != CAMEL_SERVICE_DISCONNECTING) {
+		//CAMEL_SERVICE_LOCK (service, connect_op_lock);
+		service->connect_op = camel_operation_registered ();
+		if (!service->connect_op) {
+			service->connect_op = camel_operation_new (NULL, NULL);
+			camel_operation_register (service->connect_op);
+			unreg = TRUE;
+		}
+		//CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
+
+		service->status = CAMEL_SERVICE_DISCONNECTING;
+		res = CSERV_CLASS (service)->disconnect (service, clean, ex);
+		service->status = CAMEL_SERVICE_DISCONNECTED;
+
+		//CAMEL_SERVICE_LOCK (service, connect_op_lock);
+		if (unreg)
+			camel_operation_unregister (service->connect_op);
+
+		if (service->connect_op)
+			camel_operation_unref (service->connect_op);
+		service->connect_op = NULL;
+
+		if (service->disconnecting)
+			service->disconnecting (service, clean, service->data);
+
+		//CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
+	}
+
+	//CAMEL_SERVICE_REC_UNLOCK (service, connect_lock);
 
 		service->status = CAMEL_SERVICE_DISCONNECTED;
 	return res;
