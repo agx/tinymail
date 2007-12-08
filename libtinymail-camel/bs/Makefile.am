@@ -3,7 +3,7 @@ INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS)          \
 	-I$(top_srcdir)/libtinymail             \
 	-I$(top_srcdir)/libtinymail-camel/camel-lite
 
-noinst_LIBRARIES = libbodystruct.a
+noinst_LTLIBRARIES = libbodystruct.la
 
-libbodystruct_a_SOURCES = bodystruct.c bodystruct.h envelope.h
+libbodystruct_la_SOURCES = bodystruct.c bodystruct.h envelope.h
 

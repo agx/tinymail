@@ -18,8 +18,8 @@ if BUILD_MOZEMBED
 INCLUDES += -DMOZEMBED
 endif
 
-noinst_LIBRARIES = libtestsshared.a
-libtestsshared_a_SOURCES = account-store.c account-store.h \
+noinst_LTLIBRARIES = libtestsshared.la
+libtestsshared_la_SOURCES = account-store.c account-store.h \
 	platfact.c platfact.h device.c device.h device-priv.h
 
 #libtestsshared_a_LDFLAGS = $(LIBTINYMAIL_LIBS) \
