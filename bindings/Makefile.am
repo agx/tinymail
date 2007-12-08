@@ -1,3 +1,7 @@
 if BUILD_PYTINYMAIL
 SUBDIRS = python
 endif
+
+if BUILD_VALA_BINDINGS
+SUBDIRS = vala
+endif

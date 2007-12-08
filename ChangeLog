@@ -1,5 +1,17 @@
 2007-12-08  Jürg Billeter  <j@bitron.ch>
 
+	* bindings/Makefile.am:
+	* bindings/vala/:
+	* configure.ac:
+	* tests/Makefile.am:
+	* tests/vala-demo/Makefile.am:
+	* tests/vala-demo/tinymail-vala-test.vala:
+
+	Add experimental Vala bindings and test application, disabled by
+	default.
+
+2007-12-08  Jürg Billeter  <j@bitron.ch>
+
 	* libtinymail/tny.h, libtinymailui/tnyui.h: remove internal files
 
 2007-12-08  Jürg Billeter  <j@bitron.ch>

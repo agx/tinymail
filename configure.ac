@@ -53,6 +53,9 @@ AM_PROG_CC_STDC
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
 
+AC_PATH_PROG(VALAC, valac, valac)
+AC_SUBST(VALAC)
+
 dnl ### default values (will get overwritten)
 build_queues=false
 build_asyncworker=false
@@ -302,6 +305,17 @@ AC_HELP_STRING([--enable-python-bindings],
 esac],[build_pytinymail=false])
 AM_CONDITIONAL(BUILD_PYTINYMAIL, test x$build_pytinymail = xtrue)
 
+dnl ### Enable the Vala language bindings ##
+AC_ARG_ENABLE(vala-bindings,
+AC_HELP_STRING([--enable-vala-bindings],
+  [Build vala bindings (no, yes)]),
+[case "${enableval}" in
+  yes) build_vala_bindings=true ;;
+  no)  build_vala_bindings=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-vala-bindings) ;;
+esac],[build_vala_bindings=false])
+AM_CONDITIONAL(BUILD_VALA_BINDINGS, test x$build_vala_bindings = xtrue)
+
 
 dnl ### doxygen
 AC_ARG_ENABLE(doxygen,
@@ -520,6 +534,7 @@ bindings/Makefile
 bindings/python/Makefile
 bindings/python/gendefs/Makefile
 bindings/python/tinymail.pth
+bindings/vala/Makefile
 libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile
@@ -559,6 +574,7 @@ tests/shared/Makefile
 tests/python-demo/Makefile
 tests/memory/Makefile
 tests/functional/Makefile
+tests/vala-demo/Makefile
 m4/Makefile
 ])
 

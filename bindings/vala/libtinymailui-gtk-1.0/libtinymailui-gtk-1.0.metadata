@@ -1,0 +1,4 @@
+Tny cheader_filename="tnyui.h"
+TnyGtkFolderStoreTreeModel cheader_filename="tny-gtk-folder-store-tree-model.h"
+TnyGtkHeaderListModel cheader_filename="tny-gtk-header-list-model.h"
+TnyGtkMsgView cheader_filename="tny-gtk-msg-view.h"
