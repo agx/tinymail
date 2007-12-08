@@ -1,3 +1,7 @@
+2007-12-08  J√ºrg Billeter  <j@bitron.ch>
+
+	* ChangeLog: use UTF-8 for all entries
+
 2007-12-07  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed the BODY fetcher to cope with unsolicited responses
@@ -16,7 +20,7 @@
 	Mark all sent messages as seen just before moving them
 	to sentbox.
 
-2007-12-03  LoÔc Minier  <lool@dooz.org>
+2007-12-03  Lo√Øc Minier  <lool@dooz.org>
 
 	* m4/moz.m4 (AC_TNY_MOZ_CHECK):
 	Add configure flags to force pkg-config modules for xpcom,
@@ -572,7 +576,7 @@
 	* bindings/python/Makefile.am: Added a generated file to 
 	the CLEANFILES to fix release problems.
 
-2007-09-18  Sergio Villar SenÌn  <svillar@igalia.com>
+2007-09-18  Sergio Villar Sen√≠n  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c: fixed an issue when
 	transferring folders, the CamelFolderInfo of the parent of the folder
@@ -1222,7 +1226,7 @@
 	* Don't set subject to 'No Subject' if it's empty
 	(camel-mime-message.c)
 
-2007-07-09  Javier Fern·ndez GarcÌa-Boente <jfernandez@igalia.com>
+2007-07-09  Javier Fern√°ndez Garc√≠a-Boente <jfernandez@igalia.com>
 	* Implements and emits msg-sending and msg-sent signals
 	when a message is just being sent and when is fully sent. 
         * Add a notification about EXPUNGED header change in 
@@ -1321,7 +1325,7 @@
 	mor types of filesystems
 	* Added the user to IMAP cache-dir locations
 
-2007-07-09  Javier Fern·ndez GarcÌa-Boente <jfernandez@igalia.com>
+2007-07-09  Javier Fern√°ndez Garc√≠a-Boente <jfernandez@igalia.com>
 
 	* Change way to manage priority flags (2 bits) 
         on maildir folders. Now, HIGH_PRIORITY flag
