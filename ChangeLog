@@ -1,3 +1,7 @@
+2007-12-09 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+
+	* optimization :) for NULL strings in decode_it 
+
 2007-12-08  Jürg Billeter  <j@bitron.ch>
 
 	* bindings/vala/README: Add some information about the Vala bindings

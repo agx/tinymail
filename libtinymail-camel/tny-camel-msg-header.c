@@ -51,6 +51,9 @@ decode_it (CamelMimeMessage *msg, const char *str)
 	const char *content, *charset;
 	CamelContentType *ct = NULL;
 
+	if (!str)
+		return NULL;
+	
 	if ((content = camel_header_raw_find(&h, "Content-Type", NULL))
 	     && (ct = camel_content_type_decode(content))
 	     && (charset = camel_content_type_param(ct, "charset"))
