@@ -183,8 +183,6 @@ tny_camel_store_account_delete_cache_default (TnyStoreAccount *self)
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	CamelStore *store = CAMEL_STORE (apriv->service);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
-	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-	char *str;
 
 	priv->deleted = TRUE;
 	priv->cant_reuse_iter = TRUE;
@@ -1042,7 +1040,118 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	return folder;
 }
 
+typedef struct 
+{
+	TnyCamelQueueable parent;
 
+	GError *err;
+	TnyFolderStore *self;
+	gchar *name;
+	TnyFolder *new_folder;
+	TnyCreateFolderCallback callback;
+	gpointer user_data;
+	TnySessionCamel *session;
+	gboolean cancelled;
+
+} CreateFolderInfo;
+
+static gpointer 
+tny_camel_store_account_create_folder_async_thread (gpointer thr_user_data)
+{
+	CreateFolderInfo *info = (CreateFolderInfo*) thr_user_data;
+
+	info->new_folder = tny_camel_store_account_create_folder (info->self, 
+								  (const gchar *) info->name, 
+								  &info->err);
+
+	info->cancelled = FALSE;
+	if (info->err != NULL) {
+		if (camel_strstrcase (info->err->message, "cancel") != NULL)
+			info->cancelled = TRUE;
+	}
+
+	return NULL;
+}
+
+static gboolean
+tny_camel_store_account_create_folder_async_callback (gpointer thr_user_data)
+{
+	CreateFolderInfo *info = thr_user_data;
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, info->cancelled, info->new_folder, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+	return FALSE;
+}
+
+static gboolean
+tny_camel_store_account_create_folder_async_cancelled_callback (gpointer thr_user_data)
+{
+	CreateFolderInfo *info = thr_user_data;
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, TRUE, info->new_folder, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+	return FALSE;
+}
+
+static void
+tny_camel_store_account_create_folder_async_destroyer (gpointer thr_user_data)
+{
+	CreateFolderInfo *info = (CreateFolderInfo *) thr_user_data;
+
+	/* thread reference */
+	g_object_unref (info->self);
+	g_free (info->name);
+
+	if (info->err)
+		g_error_free (info->err);
+
+	_tny_session_stop_operation (info->session);
+
+	return;
+}
+
+static void
+tny_camel_store_account_create_folder_async (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	return TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->create_folder_async_func (self, name, callback, status_callback, user_data);
+}
+
+static void
+tny_camel_store_account_create_folder_async_default (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	CreateFolderInfo *info;
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	/* Idle info for the callbacks */
+	info = g_slice_new (CreateFolderInfo);
+	info->session = apriv->session;
+	info->self = self;
+	info->name = g_strdup (name);
+	info->callback = callback;
+	info->user_data = user_data;
+	info->new_folder = NULL;
+	info->err = NULL;
+
+	/* thread reference */
+	g_object_ref (info->self);
+
+	_tny_camel_queue_launch (priv->queue, 
+		tny_camel_store_account_create_folder_async_thread, 
+		tny_camel_store_account_create_folder_async_callback,
+		tny_camel_store_account_create_folder_async_destroyer, 
+		tny_camel_store_account_create_folder_async_cancelled_callback,
+		tny_camel_store_account_create_folder_async_destroyer, 
+		&info->cancelled, 
+		info, sizeof (CreateFolderInfo),
+		__FUNCTION__);
+
+	return;
+}
 
 
 static void
@@ -1661,7 +1770,6 @@ tny_camel_store_account_queue_going_online_thread (gpointer thr_user_data)
 {
 	GoingOnlineInfo *info = (GoingOnlineInfo*) thr_user_data;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (info->self);
-	GError *err = NULL;
 
 	/* So this happens in the queue thread. There's only one such thread
 	 * for each TnyCamelStoreAccount active at any given moment in time. 
@@ -1803,6 +1911,7 @@ tny_folder_store_init (gpointer g, gpointer iface_data)
 
 	klass->remove_folder_func = tny_camel_store_account_remove_folder;
 	klass->create_folder_func = tny_camel_store_account_create_folder;
+	klass->create_folder_async_func = tny_camel_store_account_create_folder_async;
 	klass->get_folders_func = tny_camel_store_account_get_folders;
 	klass->get_folders_async_func = tny_camel_store_account_get_folders_async;
 	klass->add_observer_func = tny_camel_store_account_add_observer;
@@ -1841,6 +1950,7 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 	class->get_folders_async_func = tny_camel_store_account_get_folders_async_default;
 	class->get_folders_func = tny_camel_store_account_get_folders_default;
 	class->create_folder_func = tny_camel_store_account_create_folder_default;
+	class->create_folder_async_func = tny_camel_store_account_create_folder_async_default;
 	class->remove_folder_func = tny_camel_store_account_remove_folder_default;
 	class->add_observer_func = tny_camel_store_account_add_observer_default;
 	class->remove_observer_func = tny_camel_store_account_remove_observer_default;
