@@ -52,7 +52,7 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
-	GList *list;
+	GList *list, *list_iter;
 
 	g_static_rec_mutex_lock (priv->lock);
 	if (!priv->obs) {
@@ -60,19 +60,20 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 		return;
 	}
 	list = g_list_copy (priv->obs);
+	list_iter = list;
 	g_static_rec_mutex_unlock (priv->lock);
 
 
-	while (list)
+	while (list_iter)
 	{
-		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (list->data);
+		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (list_iter->data);
 
 		/* We don't need to hold the ui-lock here, because this is called
 		 * from the update function, which is guaranteed to happen in the
 		 * UI context already (the TnyFolder layer takes care of this) */
 
 		tny_folder_observer_update (observer, change);
-		list = g_list_next (list);
+		list_iter = g_list_next (list_iter);
 	}
 
 	g_list_free (list);

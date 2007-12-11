@@ -87,7 +87,7 @@ static void
 notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange *change)
 {
 	TnyCamelAccountPriv *apriv = NULL;
-	GList *list = NULL;
+	GList *list = NULL, *list_iter;
 
 	GStaticRecMutex *obs_lock;
 	GList *sobs;
@@ -114,16 +114,18 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 		return;
 	}
 	list = g_list_copy (sobs);
+	list_iter = list;
 	g_static_rec_mutex_unlock (obs_lock);
 
-	while (list)
+	while (list_iter)
 	{
-		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (list->data);
+		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (list_iter->data);
 		tny_lockable_lock (apriv->session->priv->ui_lock);
 		tny_folder_store_observer_update (observer, change);
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
-		list = g_list_next (list);
+		list_iter = g_list_next (list_iter);
 	}
+
 	g_list_free (list);
 
 	return;

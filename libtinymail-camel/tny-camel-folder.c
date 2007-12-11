@@ -123,7 +123,7 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
-	GList *list;
+	GList *list, *list_iter;
 
 	g_static_rec_mutex_lock (priv->obs_lock);
 	if (!priv->sobs) {
@@ -131,15 +131,16 @@ notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange 
 		return;
 	}
 	list = g_list_copy (priv->sobs);
+	list_iter = list;
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	while (list)
+	while (list_iter)
 	{
-		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (list->data);
+		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (list_iter->data);
 		tny_lockable_lock (apriv->session->priv->ui_lock);
 		tny_folder_store_observer_update (observer, change);
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
-		list = g_list_next (list);
+		list_iter = g_list_next (list_iter);
 	}
 
 	g_list_free (list);
@@ -195,6 +196,7 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
 		list_iter = g_list_next (list_iter);
 	}
+
 	g_list_free (list);
 
 	return;
@@ -229,7 +231,7 @@ notify_folder_store_observers_about_for_store_acc (TnyFolderStore *self, TnyFold
 {
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	GList *list = NULL;
+	GList *list = NULL, *list_iter;
 
 	g_static_rec_mutex_lock (priv->obs_lock);
 	if (!priv->sobs) {
@@ -237,16 +239,18 @@ notify_folder_store_observers_about_for_store_acc (TnyFolderStore *self, TnyFold
 		return;
 	}
 	list = g_list_copy (priv->sobs);
+	list_iter = list;
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	while (list)
+	while (list_iter)
 	{
-		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (list->data);
+		TnyFolderStoreObserver *observer = TNY_FOLDER_STORE_OBSERVER (list_iter->data);
 		tny_lockable_lock (apriv->session->priv->ui_lock);
 		tny_folder_store_observer_update (observer, change);
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
-		list = g_list_next (list);
+		list_iter = g_list_next (list_iter);
 	}
+
 	g_list_free (list);
 
 	return;
