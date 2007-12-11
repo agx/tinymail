@@ -1,3 +1,13 @@
+2007-12-11  Sergio Villar Senin  <svillar@gmail.com>
+
+	* libtinymail-camel/tny-camel-folder.c:
+	Fixed an small leak when notifying folder observers	
+	* libtinymail/tny-folder.[ch]
+	libtinymail/tny-shared.h
+	libtinymail-camel/tny-camel-folder.[ch]:
+	Added a new function tny_folder_store_create_folder_async that creates
+	folders asynchronously
+
 2007-12-09 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 
 	* optimization :) for NULL strings in decode_it 

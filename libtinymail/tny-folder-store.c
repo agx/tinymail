@@ -191,6 +191,25 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError 
 	return retval;
 }
 
+void 
+tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER_STORE (self));
+	g_assert (name);
+	g_assert (strlen (name) > 0);
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_async_func != NULL);
+#endif
+
+	TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_async_func (self, name, callback, status_callback, user_data);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return;
+}
+
+
 /**
  * tny_folder_store_get_folders:
  * @self: a #TnyFolderStore object

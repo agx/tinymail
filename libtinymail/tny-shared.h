@@ -98,6 +98,7 @@ typedef struct _TnyCombinedAccountClass TnyCombinedAccountClass;
 typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccount *self);
 typedef void (*TnyFolderCallback) (TnyFolder *self, gboolean canceled, GError *err, gpointer user_data);
+typedef void (*TnyCreateFolderCallback) (TnyFolderStore *self, gboolean canceled, TnyFolder *new_folder, GError *err, gpointer user_data);
 typedef void (*TnyMimePartCallback) (TnyMimePart *self, TnyStream *stream, gboolean canceled, GError *err, gpointer user_data);
 typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean canceled, TnyList *headers, GError *err, gpointer user_data);
 typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean canceled, TnyMsg *msg, GError *err, gpointer user_data);

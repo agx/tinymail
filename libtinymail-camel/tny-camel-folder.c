@@ -176,7 +176,7 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 	TnyIterator *iter;
-	GList *list;
+	GList *list, *list_iter;
 
 	g_static_rec_mutex_lock (priv->obs_lock);
 	if (!priv->obs) {
@@ -184,15 +184,16 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 		return;
 	}
 	list = g_list_copy (priv->obs);
+	list_iter = list;
 	g_static_rec_mutex_unlock (priv->obs_lock);
 
-	while (list)
+	while (list_iter)
 	{
-		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (list->data);
+		TnyFolderObserver *observer = TNY_FOLDER_OBSERVER (list_iter->data);
 		tny_lockable_lock (apriv->session->priv->ui_lock);
 		tny_folder_observer_update (observer, change);
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
-		list = g_list_next (list);
+		list_iter = g_list_next (list_iter);
 	}
 	g_list_free (list);
 
@@ -4483,6 +4484,121 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	return folder;
 }
 
+typedef struct 
+{
+	TnyCamelQueueable parent;
+
+	GError *err;
+	TnyFolderStore *self;
+	gchar *name;
+	TnyFolder *new_folder;
+	TnyCreateFolderCallback callback;
+	gpointer user_data;
+	TnySessionCamel *session;
+	gboolean cancelled;
+
+} CreateFolderInfo;
+
+static gpointer 
+tny_camel_folder_create_folder_async_thread (gpointer thr_user_data)
+{
+	CreateFolderInfo *info = (CreateFolderInfo*) thr_user_data;
+
+	info->new_folder = tny_camel_folder_create_folder (TNY_FOLDER_STORE (info->self), 
+							   (const gchar *) info->name, 
+							   &info->err);
+
+	info->cancelled = FALSE;
+	if (info->err != NULL) {
+		if (camel_strstrcase (info->err->message, "cancel") != NULL)
+			info->cancelled = TRUE;
+	}
+
+	return NULL;
+}
+
+static gboolean
+tny_camel_folder_create_folder_async_callback (gpointer thr_user_data)
+{
+	CreateFolderInfo *info = thr_user_data;
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, info->cancelled, info->new_folder, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+	return FALSE;
+}
+
+static gboolean
+tny_camel_folder_create_folder_async_cancelled_callback (gpointer thr_user_data)
+{
+	CreateFolderInfo *info = thr_user_data;
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, TRUE, info->new_folder, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+	return FALSE;
+}
+
+static void
+tny_camel_folder_create_folder_async_destroyer (gpointer thr_user_data)
+{
+	CreateFolderInfo *info = (CreateFolderInfo *) thr_user_data;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
+
+	/* thread reference */
+	_tny_camel_folder_unreason (priv);
+	g_object_unref (info->self);
+	g_free (info->name);
+
+	if (info->err)
+		g_error_free (info->err);
+
+	_tny_session_stop_operation (info->session);
+
+	return;
+}
+
+static void
+tny_camel_folder_create_folder_async (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->create_folder_async_func (self, name, callback, status_callback, user_data);
+}
+
+static void
+tny_camel_folder_create_folder_async_default (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	CreateFolderInfo *info;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	/* Idle info for the callbacks */
+	info = g_slice_new (CreateFolderInfo);
+	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	info->self = self;
+	info->name = g_strdup (name);
+	info->callback = callback;
+	info->user_data = user_data;
+	info->new_folder = NULL;
+	info->err = NULL;
+
+	/* thread reference */
+	_tny_camel_folder_reason (priv);
+	g_object_ref (info->self);
+
+	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		tny_camel_folder_create_folder_async_thread, 
+		tny_camel_folder_create_folder_async_callback,
+		tny_camel_folder_create_folder_async_destroyer, 
+		tny_camel_folder_create_folder_async_cancelled_callback,
+		tny_camel_folder_create_folder_async_destroyer, 
+		&info->cancelled, 
+		info, sizeof (CreateFolderInfo),
+		__FUNCTION__);
+
+	return;
+}
+
 /* Sets a TnyFolderStore as the parent of a TnyCamelFolder. Note that
  * this code could cause a cross-reference situation, if the parent
  * was used to create the child. */
@@ -5382,6 +5498,7 @@ tny_folder_store_init (gpointer g, gpointer iface_data)
 
 	klass->remove_folder_func = tny_camel_folder_remove_folder;
 	klass->create_folder_func = tny_camel_folder_create_folder;
+	klass->create_folder_async_func = tny_camel_folder_create_folder_async;
 	klass->get_folders_func = tny_camel_folder_get_folders;
 	klass->get_folders_async_func = tny_camel_folder_get_folders_async;
 	klass->add_observer_func = tny_camel_folder_store_add_observer;
@@ -5439,6 +5556,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
 	class->get_folders_func = tny_camel_folder_get_folders_default;
 	class->create_folder_func = tny_camel_folder_create_folder_default;
+	class->create_folder_async_func = tny_camel_folder_create_folder_async_default;
 	class->remove_folder_func = tny_camel_folder_remove_folder_default;
 	class->add_store_observer_func = tny_camel_folder_store_add_observer_default;
 	class->remove_store_observer_func = tny_camel_folder_store_remove_observer_default;
