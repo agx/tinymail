@@ -94,28 +94,23 @@ static gssize
 tny_gtk_text_buffer_stream_read_default (TnyStream *self, char *buffer, gsize n)
 {
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
-	GtkTextIter dest, end;
+	GtkTextIter chunk_end;
 	gchar *buf;
-	gint cur_offset, end_offset, rlength;
-	gtk_text_buffer_get_end_iter (priv->buffer, &end);
+	const gchar *valid_end;
+	gint cur_offset;
 
 	cur_offset = gtk_text_iter_get_offset (&(priv->cur));    
-	end_offset = gtk_text_iter_get_offset (&end);
 
-	if (cur_offset + (gint)n > end_offset)
-		rlength = end_offset - cur_offset;
-	else rlength = (gint)n;
+	gtk_text_buffer_get_iter_at_offset(priv->buffer, &chunk_end, (gint)n + cur_offset);
 
-	gtk_text_buffer_get_start_iter (priv->buffer, &dest);
-	gtk_text_iter_set_offset (&dest, rlength);
-
-
-	buf = gtk_text_buffer_get_text (priv->buffer, &(priv->cur), &dest, TRUE);
-	strncpy (buffer, buf, rlength);
+	buf = gtk_text_buffer_get_text (priv->buffer, &(priv->cur), &chunk_end, TRUE);
+	strncpy (buffer, buf, n);
 	g_free (buf);
-	gtk_text_iter_set_offset (&(priv->cur), cur_offset + rlength);
 
-	return (gssize) rlength;
+	g_utf8_validate(buffer, n, &valid_end);
+	gtk_text_iter_set_offset (&(priv->cur), cur_offset + g_utf8_strlen(buffer, valid_end - buffer));
+
+	return (gssize) (valid_end - buffer);
 }
 
 static gssize

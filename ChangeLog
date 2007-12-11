@@ -1,3 +1,8 @@
+2007-12-11  Milko Krachounov <milko@3mhz.net>
+
+	* Committed by Philip Van Hoof
+	* Bugfix in TnyGtkTextBufferStream
+
 2007-12-11  Sergio Villar Senin  <svillar@gmail.com>
 
 	* libtinymail-camel/tny-camel-folder.c:
@@ -9,7 +14,7 @@
 	Added a new function tny_folder_store_create_folder_async that creates
 	folders asynchronously
 
-2007-12-09 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+2007-12-09  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 
 	* optimization :) for NULL strings in decode_it 
 
