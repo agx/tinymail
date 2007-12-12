@@ -93,7 +93,7 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 
 			nheader = _tny_camel_msg_header_new (CAMEL_MIME_MESSAGE (camel_message), folder,
 				tny_header_get_date_received (header));
-			_tny_camel_msg_header_set_decorated (TNY_CAMEL_MSG_HEADER (nheader), header);
+			_tny_camel_msg_header_set_decorated (TNY_CAMEL_MSG_HEADER (nheader), header, FALSE);
 			message = tny_camel_msg_new ();
 			_tny_camel_msg_set_received (TNY_CAMEL_MSG (message), 
 				tny_header_get_date_received (header));

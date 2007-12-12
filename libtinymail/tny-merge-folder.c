@@ -51,7 +51,6 @@ static void
 notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
-	TnyIterator *iter;
 	GList *list, *list_iter;
 
 	g_static_rec_mutex_lock (priv->lock);
@@ -1015,7 +1014,6 @@ tny_merge_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, Tny
 static void
 tny_merge_folder_transfer_msgs (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
 {
-	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
 
 	iter = tny_list_create_iterator (header_list);
@@ -1100,8 +1098,6 @@ static gpointer
 transfer_msgs_async_thread (gpointer thr_user_data)
 {
 	TransferMsgsInfo *info = thr_user_data;
-	TnyFolder *self = info->self;
-	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 
 	tny_merge_folder_transfer_msgs (info->self, info->header_list, info->folder_dst, info->delete_originals, &info->err);
 

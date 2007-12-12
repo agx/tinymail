@@ -176,7 +176,6 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
-	TnyIterator *iter;
 	GList *list, *list_iter;
 
 	g_static_rec_mutex_lock (priv->obs_lock);
@@ -209,6 +208,7 @@ notify_folder_observers_about_idle (gpointer user_data)
 	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) user_data;
 	notify_folder_observers_about (TNY_FOLDER (info->self), 
 		TNY_FOLDER_CHANGE (info->change));
+
 	return FALSE;
 }
 
@@ -2465,17 +2465,27 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 	
 	if (uid && uid[0] != '/' && strlen (uid) > 0)
 	{
-		info = camel_message_info_new_uid (NULL, uid);
-		hdr = _tny_camel_header_new ();
-
-		/* This adds a reason to live to self */
-		_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
-			TNY_CAMEL_FOLDER (self), priv);
-		/* hdr will take care of the freeup */
-		_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), info);
-		retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, hdr, err);
-		g_object_unref (hdr);
-		reset_local_size (priv);
+		TnyHeader *nhdr;
+		info = camel_folder_get_message_info (priv->folder, uid);
+		if (info == NULL) {
+			g_set_error (err, TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_GET_MSG,
+				     "Message uid not found in folder");
+			retval = NULL;
+		} else {
+			hdr = _tny_camel_header_new ();
+			_tny_camel_header_set_folder ((TnyCamelHeader *) hdr, (TnyCamelFolder *) self, priv);
+			_tny_camel_header_set_camel_message_info ((TnyCamelHeader *) hdr, info, FALSE);
+			
+			retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, hdr, err);
+			if (retval) {
+				nhdr = tny_msg_get_header (retval);
+				/* This trick is for forcing owning a TnyCamelHeader reference */
+				_tny_camel_msg_header_set_decorated (nhdr, hdr, TRUE);
+				g_object_unref (nhdr);
+			}
+			g_object_unref (hdr);
+			reset_local_size (priv);
+		}
 
 	} else {
 		g_warning ("%s: malformed url string: %s", __FUNCTION__, url_string);
@@ -4416,7 +4426,6 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	TnyFolder *folder; CamelFolderInfo *info;
 	TnyFolderStoreChange *change;
 	CamelException subex = CAMEL_EXCEPTION_INITIALISER;
-	TnyCamelFolderPriv *rpriv = NULL;
 	gboolean was_new = FALSE;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
@@ -5291,6 +5300,8 @@ tny_camel_folder_get_url_string_default (TnyFolder *self)
 		if (apriv->service)
 		{
 			char *urls = camel_service_get_url (apriv->service);
+			if (!priv->folder)
+				load_folder_no_lock (priv);
 			const char *foln = camel_folder_get_full_name (priv->folder);
 			retval = g_strdup_printf ("%s/%s", urls, foln);
 			g_free (urls);

@@ -1,3 +1,19 @@
+2007-12-12  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c: load camel folder before
+	getting the url string of it.
+	* libtinymail-camel/tny-camel-msg-header.c: now the decorated header
+	can be added with g_object_ref or a weak reference.
+	* libtinymail-camel/tny-camel-folder.c: now the TnyCamelHeader we
+	use to retrieve the message in find_msg is constructed from summary. 
+	This is created in a way it's persistent, and then, we can access
+	properly to the summary flags. We also eturn null and set error if
+	message is not in summary.
+	* libtinymail-camel/tny-camel-full-msg-receive-strategy.c
+	libtinymail-camel/tny-camel-partial-msg-receive-strategy.c:
+	use the new TnyCamelMsgHeader decorator api.
+	* Fixed minor build issues.
+
 2007-12-12  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Experimental appending in stead of rewriting the summary.mmap

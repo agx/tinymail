@@ -54,6 +54,7 @@ struct _TnyCamelMsgHeader
 	time_t received;
 	gboolean partial;
 	TnyHeader *decorated;
+	gboolean decorated_has_ref;
 };
 
 struct _TnyCamelMsgHeaderClass 
@@ -64,7 +65,7 @@ struct _TnyCamelMsgHeaderClass
 GType tny_camel_msg_header_get_type (void);
 TnyHeader* _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder, time_t received);
 
-void _tny_camel_msg_header_set_decorated (TnyCamelMsgHeader *header, TnyHeader *decorated);
+void _tny_camel_msg_header_set_decorated (TnyCamelMsgHeader *header, TnyHeader *decorated, gboolean add_reference);
 
 G_END_DECLS
 

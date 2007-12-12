@@ -464,6 +464,7 @@ notify_decorated_del (gpointer user_data, GObject *decorated)
 {
 	TnyCamelMsgHeader *me = (TnyCamelMsgHeader *) user_data;
 	me->decorated = NULL;
+	me->decorated_has_ref = FALSE;
 }
 
 static void
@@ -488,7 +489,10 @@ tny_camel_msg_header_finalize (GObject *object)
 		g_free (me->old_uid);
 
 	if (me->decorated) {
-		g_object_weak_unref (G_OBJECT (me->decorated), notify_decorated_del, me);
+		if (me->decorated_has_ref)
+			g_object_unref (me->decorated);
+		else
+			g_object_weak_unref (G_OBJECT (me->decorated), notify_decorated_del, me);
 		me->decorated = NULL;
 	}
 
@@ -527,6 +531,7 @@ _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder, time_t rece
 	self->has_received = FALSE;
 	self->partial = FALSE;
 	self->decorated = NULL;
+	self->decorated_has_ref = FALSE;
 	self->to = NULL;
 	self->from = NULL;
 	self->cc = NULL;
@@ -540,14 +545,22 @@ _tny_camel_msg_header_new (CamelMimeMessage *msg, TnyFolder *folder, time_t rece
 
 void 
 _tny_camel_msg_header_set_decorated (TnyCamelMsgHeader *header, 
-				     TnyHeader *decorated)
+				     TnyHeader *decorated,
+				     gboolean add_reference)
 {
 	g_assert (TNY_IS_HEADER (decorated));
 	if (header->decorated) {
-		g_object_weak_unref (G_OBJECT (decorated), notify_decorated_del, header);
+		if (header->decorated_has_ref)
+			g_object_unref (header->decorated);
+		else
+			g_object_weak_unref (G_OBJECT (header->decorated), notify_decorated_del, header);
 	}
+	header->decorated_has_ref = add_reference;
 
-	g_object_weak_ref (G_OBJECT (decorated), notify_decorated_del, header);
+	if (add_reference)
+		g_object_ref (decorated);
+	else
+		g_object_weak_ref (G_OBJECT (decorated), notify_decorated_del, header);
 
 	header->decorated = decorated;
 
