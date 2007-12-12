@@ -233,7 +233,8 @@ camel_folder_summary_init (CamelFolderSummary *s)
 	p = _PRIVATE(s) = g_slice_alloc0 (sizeof (*p));
 
 	p->filter_charset = g_hash_table_new (camel_strcase_hash, camel_strcase_equal);
-	s->dump_lock = g_mutex_new ();
+	s->dump_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (s->dump_lock);
 	s->message_info_size = sizeof(CamelMessageInfoBase);
 	s->content_info_size = sizeof(CamelMessageContentInfo);
 	s->set_extra_flags_func = do_nothing;
@@ -334,7 +335,7 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	p = _PRIVATE(obj);
 
-	g_mutex_lock (s->dump_lock);
+	g_static_rec_mutex_lock (s->dump_lock);
 
 	g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
 	g_ptr_array_foreach (s->expunged, foreach_msginfo, (gpointer)s->message_info_size);
@@ -345,8 +346,9 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	camel_folder_summary_unload_mmap (s);
 
-	g_mutex_unlock (s->dump_lock);
-	g_mutex_free (s->dump_lock);
+	g_static_rec_mutex_unlock (s->dump_lock);
+	/**/
+	g_free (s->dump_lock);
 
 	g_hash_table_foreach(p->filter_charset, free_o_name, NULL);
 	g_hash_table_destroy(p->filter_charset);
@@ -744,14 +746,18 @@ camel_folder_summary_load(CamelFolderSummary *s)
 	if ( ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_load(s) == -1)
 		goto error;
 
+
 	if (s->messages && s->messages->len > s->saved_count)
 	{
 		int r, curlen = s->messages->len;
 		for (r = curlen - 1; r >= s->saved_count - 1; r--)
 		{
 			CamelMessageInfo *ri = g_ptr_array_index (s->messages, r);
-			if (ri)
+			if (ri) {
+				((CamelMessageInfoBase *)ri)->flags |= CAMEL_MESSAGE_EXPUNGED;
+printf ("Removes %s\n", ri->uid);
 				camel_folder_summary_remove (s, ri);
+			}
 		}
 	}
 
@@ -851,6 +857,155 @@ perform_content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentI
  *
  * Returns %0 on success or %-1 on fail
  **/
+
+#define APPEND_WRITE
+
+#ifdef APPEND_WRITE
+int
+camel_folder_summary_save(CamelFolderSummary *s, CamelException *ex)
+{
+	FILE *out;
+	int i;
+	guint32 count = 0;
+	CamelMessageInfo *mi;
+	char *path;
+	gboolean herr = FALSE;
+	gboolean hadhash, create_header = FALSE;;
+
+	g_static_rec_mutex_lock (s->dump_lock);
+
+	hadhash = (s->uidhash != NULL);
+
+	g_assert(s->message_info_size >= sizeof(CamelMessageInfoBase));
+
+	if (s->summary_path == NULL || (s->flags & CAMEL_SUMMARY_DIRTY) == 0) {
+		g_static_rec_mutex_unlock (s->dump_lock);
+		return 0;
+	}
+
+	path = alloca(strlen(s->summary_path)+4);
+	sprintf(path, "%s", s->summary_path);
+
+	/* We are going to append to a RO mapped file in WRONLY APPEND.
+	 * That's a bit tricky, but fun :) (and we know that we are doing it) */
+
+	if (!g_file_test (path, G_FILE_TEST_EXISTS))
+		create_header = TRUE;
+
+	out = fopen(path, "a");
+	if (out == NULL) {
+		perror ("S");
+		i = errno;
+		g_unlink(path);
+		errno = i;
+ 		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+			"Error storing the summary");
+		g_static_rec_mutex_unlock (s->dump_lock);
+		return -1;
+	}
+
+	io(printf("saving header\n"));
+
+	CAMEL_SUMMARY_LOCK(s, io_lock);
+
+	if (create_header) {
+		if (((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_save(s, out) == -1)
+			goto haerror;
+	}
+
+	/* now write out each message ... */
+	/* we check ferorr when done for i/o errors */
+
+	count = s->messages->len;
+
+	for (i = 0; i < count; i++) {
+		mi = s->messages->pdata[i];
+
+		/* Only the new ones must be written (those have that funny 
+		 * internal flag set) */
+
+		if (!create_header && ((CamelMessageInfoBase *)mi)->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE) {
+
+			if (((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS (s)))->message_info_save (s, out, mi) == -1) {
+				herr = TRUE;
+				goto haerror;
+			}
+
+			if (s->build_content) {
+				if (perform_content_info_save (s, out, ((CamelMessageInfoBase *)mi)->content) == -1) {
+					herr = TRUE;
+					goto haerror;
+				}
+			}
+		}
+	}
+
+	if (fflush (out) != 0 || fsync (fileno (out)) == -1)
+		herr = TRUE;
+
+haerror:
+
+	if (s->build_content)
+		for (i = 0; i < count; i++) {
+			mi = s->messages->pdata[i];
+			if (((CamelMessageInfoBase *)mi)->content != NULL)
+				camel_folder_summary_content_info_free (s, ((CamelMessageInfoBase *)mi)->content);
+			((CamelMessageInfoBase *)mi)->content = NULL;
+		}
+
+	CAMEL_SUMMARY_UNLOCK(s, io_lock);
+
+	if (herr)
+		goto exception;
+
+	fclose (out);
+	s->in_reload = TRUE;
+
+	if (!hadhash)
+		camel_folder_summary_prepare_hash (s);
+
+	g_static_rec_mutex_lock (&global_lock);
+	g_static_mutex_lock (&global_lock2);
+
+	/* Remap the appended file :). Moeha! */
+	camel_folder_summary_unload_mmap (s);
+
+	out = fopen(path, "r+");
+	if (out) {
+		((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_save(s, out);
+		fclose (out);
+	}
+
+	camel_folder_summary_load (s);
+
+	g_static_mutex_unlock (&global_lock2);
+	g_static_rec_mutex_unlock (&global_lock);
+
+	if (!hadhash)
+		camel_folder_summary_kill_hash (s);
+
+	s->in_reload = FALSE;
+
+	s->flags &= ~CAMEL_SUMMARY_DIRTY;
+	g_static_rec_mutex_unlock (s->dump_lock);
+
+	return 0;
+
+exception:
+
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		"Error storing the summary");
+	i = errno;
+	fclose (out);
+	g_unlink (path);
+	errno = i;
+	g_static_rec_mutex_unlock (s->dump_lock);
+
+	return -1;
+}
+
+#else
+
 int
 camel_folder_summary_save(CamelFolderSummary *s, CamelException *ex)
 {
@@ -862,14 +1017,14 @@ camel_folder_summary_save(CamelFolderSummary *s, CamelException *ex)
 	gboolean herr = FALSE;
 	gboolean hadhash;
 
-	g_mutex_lock (s->dump_lock);
+	g_static_rec_mutex_lock (s->dump_lock);
 
 	hadhash = (s->uidhash != NULL);
 
 	g_assert(s->message_info_size >= sizeof(CamelMessageInfoBase));
 
 	if (s->summary_path == NULL || (s->flags & CAMEL_SUMMARY_DIRTY) == 0) {
-		g_mutex_unlock (s->dump_lock);
+		g_static_rec_mutex_unlock (s->dump_lock);
 		return 0;
 	}
 
@@ -878,13 +1033,13 @@ camel_folder_summary_save(CamelFolderSummary *s, CamelException *ex)
 	fd = g_open(path, O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0600);
 
 	if (fd == -1) {
-	  g_mutex_unlock (s->dump_lock);
+	  g_static_rec_mutex_unlock (s->dump_lock);
 	  camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
 		"Error storing the summary");
 	  return -1;
 	}
 
-	out = fdopen(fd, "wb");
+	out = fdopen(fd, "ab");
 	if (out == NULL) {
 		i = errno;
 		g_unlink(path);
@@ -892,7 +1047,7 @@ camel_folder_summary_save(CamelFolderSummary *s, CamelException *ex)
 		errno = i;
  		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
 			"Error storing the summary");
-		g_mutex_unlock (s->dump_lock);
+		g_static_rec_mutex_unlock (s->dump_lock);
 		return -1;
 	}
 
@@ -953,8 +1108,9 @@ haerror:
 
 	camel_folder_summary_unload_mmap (s);
 
+
 #ifdef G_OS_WIN32
-	g_unlink(s->summary_path);
+	g_unlink(s->summary_path); 
 #endif
 
 	if (g_rename(path, s->summary_path) == -1) {
@@ -965,7 +1121,7 @@ haerror:
 			"Error storing the summary");
 		g_static_mutex_unlock (&global_lock2);
 		g_static_rec_mutex_unlock (&global_lock);
-		g_mutex_unlock (s->dump_lock);
+		g_static_rec_mutex_unlock (s->dump_lock);
 		return -1;
 	}
 
@@ -980,7 +1136,7 @@ haerror:
 	s->in_reload = FALSE;
 
 	s->flags &= ~CAMEL_SUMMARY_DIRTY;
-	g_mutex_unlock (s->dump_lock);
+	g_static_rec_mutex_unlock (s->dump_lock);
 
 	return 0;
 
@@ -992,11 +1148,12 @@ exception:
 	fclose (out);
 	g_unlink (path);
 	errno = i;
-	g_mutex_unlock (s->dump_lock);
+	g_static_rec_mutex_unlock (s->dump_lock);
 
 	return -1;
 }
 
+#endif
 
 /**
  * camel_folder_summary_header_load:
@@ -1087,15 +1244,15 @@ void
 camel_folder_summary_add(CamelFolderSummary *s, CamelMessageInfo *info)
 {
 
-	g_mutex_lock (s->dump_lock);
+	g_static_rec_mutex_lock (s->dump_lock);
 
 	if (info == NULL) {
-		g_mutex_unlock (s->dump_lock);
+		g_static_rec_mutex_unlock (s->dump_lock);
 		return;
 	}
 
 	if (summary_assign_uid(s, info) == 0) {
-		g_mutex_unlock (s->dump_lock);
+		g_static_rec_mutex_unlock (s->dump_lock);
 		return;
 	}
 
@@ -1119,7 +1276,7 @@ camel_folder_summary_add(CamelFolderSummary *s, CamelMessageInfo *info)
 
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 
-	g_mutex_unlock (s->dump_lock);
+	g_static_rec_mutex_unlock (s->dump_lock);
 }
 
 static void
@@ -1413,7 +1570,7 @@ camel_folder_summary_clear(CamelFolderSummary *s)
 void
 camel_folder_summary_remove(CamelFolderSummary *s, CamelMessageInfo *info)
 {
-	g_mutex_lock (s->dump_lock);
+	g_static_rec_mutex_lock (s->dump_lock);
 
 	if (((CamelMessageInfoBase*)info)->flags & CAMEL_MESSAGE_EXPUNGED)
 	{
@@ -1441,7 +1598,7 @@ camel_folder_summary_remove(CamelFolderSummary *s, CamelMessageInfo *info)
 		camel_message_info_free(info);
 	}
 
-	g_mutex_unlock (s->dump_lock);
+	g_static_rec_mutex_unlock (s->dump_lock);
 }
 
 
@@ -1515,7 +1672,7 @@ camel_folder_summary_remove_range(CamelFolderSummary *s, int start, int end)
 	if (end < start)
 		return;
 
-	g_mutex_lock (s->dump_lock);
+	g_static_rec_mutex_lock (s->dump_lock);
 	CAMEL_SUMMARY_LOCK(s, summary_lock);
 	if (start < s->messages->len) {
 		CamelMessageInfo **infos;
@@ -1537,7 +1694,7 @@ camel_folder_summary_remove_range(CamelFolderSummary *s, int start, int end)
 		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 	}
 
-	g_mutex_unlock (s->dump_lock);
+	g_static_rec_mutex_unlock (s->dump_lock);
 }
 
 /* should be sorted, for binary search */
@@ -2105,6 +2262,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	if (!s->in_reload)
 	{
+
 		/* We are not reloading, so searching for recoverable
 		 * CamelMessageInfo struct instances is avoidable */
 		mi = (CamelMessageInfoBase *) camel_message_info_new (s);
@@ -2129,6 +2287,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 			*must_add = FALSE;
 
 			g_static_rec_mutex_lock (&global_lock);
+
 			if (mi->uid)
 				g_free (mi->uid);
 			mi->uid = g_strdup (theuid);

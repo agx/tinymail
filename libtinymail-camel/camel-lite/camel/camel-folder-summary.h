@@ -207,7 +207,8 @@ struct _CamelFolderSummary {
 
 	GMappedFile *file;
 	unsigned char *filepos;
-	GMutex *dump_lock, *hash_lock;
+	GMutex *hash_lock;
+	GStaticRecMutex *dump_lock;
 	gboolean in_reload;
 	gint idx;
 
