@@ -1072,6 +1072,9 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 	/* Notify about unread count */
 	_tny_camel_folder_check_unread_count (TNY_CAMEL_FOLDER (self));
 
+	/* Reset local size info */
+	reset_local_size (priv);
+
 	/* Notify header has been removed */
 	change = tny_folder_change_new (self);
 	tny_folder_change_add_expunged_header (change, header);
@@ -1140,6 +1143,9 @@ tny_camel_folder_remove_msgs_default (TnyFolder *self, TnyList *headers, GError 
 
 	/* Notify about unread count */
 	_tny_camel_folder_check_unread_count (TNY_CAMEL_FOLDER (self));
+
+	/* Reset local size info */
+	reset_local_size (priv);
 
 	/* Notify header has been removed */
 	notify_folder_observers_about_in_idle (self, change);
@@ -3857,6 +3863,10 @@ tny_camel_folder_transfer_msgs_async_thread (gpointer thr_user_data)
 		/* Check cancelation and stop operation */
 		info->cancelled = camel_operation_cancel_check (apriv->cancel);
 		_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv_src->account));
+
+		/* Reset local size info */
+		reset_local_size (priv_src);
+		reset_local_size (priv_dst);
 
 		/* Get data */
 		info->from_all = camel_folder_get_message_count (priv_src->folder);

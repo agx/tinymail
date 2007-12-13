@@ -1,3 +1,14 @@
+2007-12-13  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-msg-header.c
+	(tny_camel_msg_header_get_cc): the get_cc method was returning the bcc
+	instead of the cc
+	* libtinymail-camel/tny-camel-folder.c
+	(tny_camel_folder_remove_msg_default)
+	(tny_camel_folder_remove_msgs_default)
+	(tny_camel_folder_transfer_msgs_async_thread): update the local size properly when
+	removing or transferring messages
+
 2007-12-12  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c: load camel folder before

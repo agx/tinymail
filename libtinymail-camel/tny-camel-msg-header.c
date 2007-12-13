@@ -198,7 +198,7 @@ tny_camel_msg_header_get_cc (TnyHeader *self)
 		me->cc = decode_it (me->msg, enc);
 	}
 
-	return (const gchar *) me->bcc;
+	return (const gchar *) me->cc;
 }
 
 static const gchar*
