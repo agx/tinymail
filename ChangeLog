@@ -1,3 +1,8 @@
+2007-12-13  Alberto Garcia Gonzalez  <agarcia@igalia.com>
+
+	* libtinymail-camel/tny-camel-mime-part.c
+	(tny_camel_mime_part_new): Fixed a memory leak	
+
 2007-12-13  Felipe Erias Morandeira  <femorandeira@igalia.com>
 
 	* Commited by Sergio Villar Senin
