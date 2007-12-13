@@ -1064,8 +1064,11 @@ header_decode_text (const char *in, size_t inlen, int ctext, const char *default
 				chunk = start;
 
 			if ((default_charset == NULL || !append_8bit (out, chunk, inptr-chunk, default_charset))
-			    && (locale_charset == NULL || !append_8bit(out, chunk, inptr-chunk, locale_charset)))
+			    && (locale_charset == NULL || !append_8bit(out, chunk, inptr-chunk, locale_charset))) {
+
+			
 				append_latin1(out, chunk, inptr-chunk);
+			}
 		}
 
 		chunk = NULL;

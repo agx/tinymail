@@ -72,14 +72,11 @@ static const gchar*
 tny_camel_msg_header_get_replyto (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
-	gchar *enc;
+	const gchar *enc;
 
 	if (!me->reply_to) {
-		CamelAddress *addr = (CamelAddress *) camel_mime_message_get_reply_to (me->msg);
-		if (addr) {
-			enc = camel_address_format (addr);
-			me->reply_to = decode_it (me->msg, enc);
-		}
+		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "reply-to");
+		me->reply_to = decode_it (me->msg, enc);
 	}
 
 	return (const gchar *) me->reply_to;
@@ -373,14 +370,11 @@ static const gchar*
 tny_camel_msg_header_get_from (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
-	gchar *enc;
+	const gchar *enc;
 
 	if (!me->from) {
-		CamelAddress *addr = (CamelAddress *) camel_mime_message_get_from (me->msg);
-		if (addr) {
-			enc = camel_address_format (addr);
-			me->from = decode_it (me->msg, enc);
-		}
+		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "from");
+		me->from = decode_it (me->msg, enc);
 	}
 
 	return (const gchar *) me->from;
