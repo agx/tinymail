@@ -858,7 +858,10 @@ perform_content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentI
  * Returns %0 on success or %-1 on fail
  **/
 
-#define APPEND_WRITE
+#ifdef APPEND_WRITE
+#undef APPEND_WRITE
+#endif
+
 
 #ifdef APPEND_WRITE
 int
