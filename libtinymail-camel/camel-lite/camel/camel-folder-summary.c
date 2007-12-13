@@ -1152,10 +1152,10 @@ camel_folder_summary_save (CamelFolderSummary *s, CamelException *ex)
 {
 	int retval;
 
-	if (s->had_expunges)
+	//if (s->had_expunges)
 		retval = camel_folder_summary_save_rewrite (s, ex);
-	else
-		retval = camel_folder_summary_save_append (s, ex);
+	//else
+	//	retval = camel_folder_summary_save_append (s, ex);
 
 	s->had_expunges = FALSE;
 
