@@ -1114,6 +1114,7 @@ tny_camel_mime_part_new (void)
 
 	_tny_camel_mime_part_set_part (self, cpart);
 
+	camel_object_unref(cpart);
 	return TNY_MIME_PART (self);
 }
 
