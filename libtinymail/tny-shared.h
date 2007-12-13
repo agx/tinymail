@@ -31,6 +31,12 @@
 
 G_BEGIN_DECLS
 
+/* GTK+ uses G_PRIORITY_HIGH_IDLE + 10 for resizing operations,
+ * and G_PRIORITY_HIGH_IDLE + 20 for redrawing operations;
+ * this makes sure that status callbacks happen after redraws, so we don't
+ * get a lot of notifications but very little visual feedback */
+#define TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS G_PRIORITY_HIGH_IDLE + 30
+
 typedef struct _TnyStatus TnyStatus;
 typedef struct _TnyAccountStore TnyAccountStore;
 typedef struct _TnyAccountStoreIface TnyAccountStoreIface;

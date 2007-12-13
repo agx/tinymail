@@ -849,7 +849,7 @@ tny_camel_folder_add_msg_async_status (struct _CamelOperation *op, const char *w
 		TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_XFER_MSGS, what, sofar, 
 		oftotal, oinfo->stopper, oinfo->session->priv->ui_lock, oinfo->user_data);
 
-	g_idle_add_full (G_PRIORITY_HIGH,
+	g_idle_add_full (TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS,
 		tny_progress_info_idle_func, info,
 		tny_progress_info_destroy);
 
@@ -1463,7 +1463,7 @@ tny_camel_folder_sync_async_status (struct _CamelOperation *op, const char *what
 		TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_SYNC, what, sofar, 
 		oftotal, oinfo->stopper, oinfo->session->priv->ui_lock, oinfo->user_data);
 
-	g_idle_add_full (G_PRIORITY_HIGH,
+	g_idle_add_full (TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS,
 		tny_progress_info_idle_func, info,
 		tny_progress_info_destroy);
 
@@ -1668,7 +1668,7 @@ tny_camel_folder_refresh_async_status (struct _CamelOperation *op, const char *w
 		oftotal, oinfo->stopper, oinfo->session->priv->ui_lock, 
 		oinfo->user_data);
 
-	g_idle_add_full (G_PRIORITY_HIGH,
+	g_idle_add_full (TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS,
 		tny_progress_info_idle_func, info,
 		tny_progress_info_destroy);
 
@@ -2193,7 +2193,7 @@ tny_camel_folder_get_msg_async_status (struct _CamelOperation *op, const char *w
 		TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_GET_MSG, what, sofar, 
 		oftotal, oinfo->stopper, oinfo->session->priv->ui_lock, oinfo->user_data);
 
-	g_idle_add_full (G_PRIORITY_HIGH, 
+	g_idle_add_full (TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS, 
 			  tny_progress_info_idle_func, info, 
 			  tny_progress_info_destroy);
 
@@ -3235,7 +3235,7 @@ tny_camel_folder_copy_async_status (struct _CamelOperation *op, const char *what
 		TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_COPY_FOLDER, what, sofar, 
 		oftotal, oinfo->stopper, oinfo->session->priv->ui_lock, oinfo->user_data);
 
-	g_idle_add_full (G_PRIORITY_HIGH,
+	g_idle_add_full (TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS,
 			  tny_progress_info_idle_func, info, 
 			  tny_progress_info_destroy);
 
@@ -3821,7 +3821,7 @@ tny_camel_folder_transfer_msgs_async_status (struct _CamelOperation *op, const c
 		TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_XFER_MSGS, what, sofar, 
 		oftotal, oinfo->stopper, oinfo->session->priv->ui_lock, oinfo->user_data);
 
-	g_idle_add_full (G_PRIORITY_HIGH,
+	g_idle_add_full (TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS,
 			  tny_progress_info_idle_func, info, 
 			  tny_progress_info_destroy);
 
