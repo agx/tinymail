@@ -75,6 +75,7 @@ struct _TnyCamelAccountPriv
 	gboolean is_connecting, is_ready;
 	gchar *delete_this;
 	TnyCamelQueue *queue;
+	TnyConnectionStrategy *con_strat;
 };
 
 const CamelService* _tny_camel_account_get_service (TnyCamelAccount *self);

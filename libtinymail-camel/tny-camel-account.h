@@ -88,7 +88,6 @@ struct _TnyCamelAccountClass
 	void (*start_operation_func) (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data);
 	void (*stop_operation_func) (TnyAccount *self, gboolean *canceled);
 
-
 	void (*add_option_func) (TnyCamelAccount *self, const gchar *option);
 	void (*set_online_func) (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data);
 

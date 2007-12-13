@@ -32,6 +32,59 @@ guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
 
 
 /**
+ * tny_account_get_connection_strategy:
+ * @self: a #TnyAccount object
+ *
+ * Get the connection strategy for @self. You must unreference the returned 
+ * value when you are finished with used it.
+ *
+ * Return value: connection strategy
+ **/
+TnyConnectionStrategy* 
+tny_account_get_connection_strategy (TnyAccount *self)
+{
+	TnyConnectionStrategy *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_connection_strategy_func != NULL);
+#endif
+
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_connection_strategy_func (self);
+
+#ifdef DBC /* ensure*/
+	g_assert (TNY_IS_CONNECTION_STRATEGY (retval));
+#endif
+
+	return retval;
+}
+
+/**
+ * tny_account_set_connection_strategy:
+ * @self: a #TnyAccount object
+ * @strategy: the #TnyConnectionStrategy
+ *
+ * Set the connection strategy for @self.
+ **/
+void 
+tny_account_set_connection_strategy (TnyAccount *self, TnyConnectionStrategy *strategy)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_ACCOUNT (self));
+	g_assert (TNY_IS_CONNECTION_STRATEGY (strategy));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_connection_strategy_func != NULL);
+#endif
+
+	TNY_ACCOUNT_GET_IFACE (self)->set_connection_strategy_func (self, strategy);
+
+#ifdef DBC /* ensure*/
+#endif
+
+	return;
+}
+
+
+/**
  * tny_account_is_ready:
  * @self: a #TnyAccount object
  *

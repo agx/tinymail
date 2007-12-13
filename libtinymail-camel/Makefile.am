@@ -37,7 +37,8 @@ libtinymail_camel_1_0_headers =	\
 	tny-session-camel.h \
 	tny-camel-bs-msg.h \
 	tny-camel-bs-mime-part.h \
-	tny-camel-bs-msg-receive-strategy.h
+	tny-camel-bs-msg-receive-strategy.h \
+	tny-camel-default-connection-strategy.h
 
 libtinymail_camel_priv_headers = \
 	tny-camel-pop-store-account-priv.h \
@@ -92,7 +93,8 @@ libtinymail_camel_1_0_la_SOURCES = \
 	tny-camel-bs-msg.c \
 	tny-camel-bs-mime-part.c \
 	tny-camel-bs-msg-receive-strategy.c \
-	tny-camel-bs-msg-header.c
+	tny-camel-bs-msg-header.c \
+	tny-camel-default-connection-strategy.c
 
 libtinymail_camel_1_0_la_LIBADD = \
 	$(LIBTINYMAIL_CAMEL_LIBS) \

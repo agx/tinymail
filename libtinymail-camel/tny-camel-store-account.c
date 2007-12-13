@@ -202,6 +202,52 @@ tny_camel_store_account_do_emit (TnyCamelStoreAccount *self)
 				connection_status_idle_destroy);
 }
 
+static gboolean
+constrat_notify_connect (gpointer user_data)
+{
+	TnyAccount *self = (TnyAccount *) user_data;
+	TnyConnectionStrategy *strategy = tny_account_get_connection_strategy (self);
+
+	tny_connection_strategy_on_connect (strategy, self);
+
+	g_object_unref (strategy);
+
+	return FALSE;
+}
+
+
+static gboolean
+constrat_notify_broken (gpointer user_data)
+{
+	TnyAccount *self = (TnyAccount *) user_data;
+	TnyConnectionStrategy *strategy = tny_account_get_connection_strategy (self);
+
+	tny_connection_strategy_on_connection_broken (strategy, self);
+
+	g_object_unref (strategy);
+
+	return FALSE;
+}
+
+
+static gboolean
+constrat_notify_disconnect (gpointer user_data)
+{
+	TnyAccount *self = (TnyAccount *) user_data;
+	TnyConnectionStrategy *strategy = tny_account_get_connection_strategy (self);
+
+	tny_connection_strategy_on_disconnect (strategy, self);
+
+	g_object_unref (strategy);
+
+	return FALSE;
+}
+
+static void 
+constrat_notify_destroy (gpointer user_data)
+{
+	g_object_unref (user_data);
+}
 
 static void 
 disconnection (CamelService *service, gboolean suc, TnyAccount *self)
@@ -221,6 +267,12 @@ disconnection (CamelService *service, gboolean suc, TnyAccount *self)
 		if (apriv->status != TNY_CONNECTION_STATUS_DISCONNECTED)
 			emit = TRUE;
 		apriv->status = TNY_CONNECTION_STATUS_DISCONNECTED;
+
+
+		g_idle_add_full (G_PRIORITY_HIGH, 
+				constrat_notify_disconnect, 
+				g_object_ref (self), 
+				constrat_notify_destroy);
 
 		if (emit)
 			tny_camel_store_account_do_emit (TNY_CAMEL_STORE_ACCOUNT (self));
@@ -336,8 +388,25 @@ connection (CamelService *service, gboolean suc, TnyAccount *self)
 
 	}
 
-	if (emit)
+	if (emit) {
 		tny_camel_store_account_do_emit (TNY_CAMEL_STORE_ACCOUNT (self));
+
+		if (apriv->status == TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN)
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				constrat_notify_broken, 
+				g_object_ref (self), 
+				constrat_notify_destroy);
+		else if (apriv->status == TNY_CONNECTION_STATUS_CONNECTED)
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				constrat_notify_connect, 
+				g_object_ref (self), 
+				constrat_notify_destroy);
+		else if (apriv->status == TNY_CONNECTION_STATUS_DISCONNECTED)
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				constrat_notify_disconnect, 
+				g_object_ref (self), 
+				constrat_notify_destroy);
+	}
 
 }
 

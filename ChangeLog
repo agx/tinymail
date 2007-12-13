@@ -1,3 +1,9 @@
+2007-12-13  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added the TnyConnectionStrategy type for coping with connectivity
+	changes (for example sheduling a reconnect or asking the user what to
+	do about the event of a lost connection)
+
 2007-12-13  Alberto Garcia Gonzalez  <agarcia@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c
