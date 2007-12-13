@@ -390,36 +390,37 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 
-	if (apriv->session && apriv->url_string)
-	{
+	if (apriv->session && apriv->url_string) {
+
 	  if (camel_exception_is_set (apriv->ex))
 		camel_exception_clear (apriv->ex);
 
-	  if (!apriv->service && reservice)
-	  {
-		if (apriv->service && CAMEL_IS_SERVICE (apriv->service))
-		{
-			camel_object_unref (CAMEL_OBJECT (apriv->service));
-			apriv->service = NULL;
-		} 
+	  if (!apriv->service && reservice) {
 
-		apriv->service = camel_session_get_service
+		CamelService *new_service;
+
+		new_service = camel_session_get_service
 			((CamelSession*) apriv->session, apriv->url_string, 
 			apriv->type, apriv->ex);
 
-		if (apriv->service && !camel_exception_is_set (apriv->ex)) 
+		if (apriv->service && CAMEL_IS_SERVICE (apriv->service) && 
+		  new_service && !camel_exception_is_set (apriv->ex)) 
 		{
+			camel_object_unref (apriv->service);
+			apriv->service = NULL;
+		} 
+
+		if (new_service && !camel_exception_is_set (apriv->ex)) {
+			apriv->service = new_service;
 			apriv->service->data = self;
 			apriv->service->connecting = (con_op) connection;
 			apriv->service->disconnecting = (con_op) disconnection;
 			apriv->service->reconnecter = (con_op) reconnecting;
 			apriv->service->reconnection = (con_op) reconnection;
-	
 
-		} else if (camel_exception_is_set (apriv->ex) && apriv->service)
-		{
-			g_warning ("Must cleanup service pointer\n");
-			apriv->service = NULL;
+		} else if (camel_exception_is_set (apriv->ex) && new_service) {
+			if (CAMEL_IS_OBJECT (new_service))
+				camel_object_unref (new_service);
 		}
 	  }
 	} else {
@@ -1764,6 +1765,7 @@ typedef struct {
 	GError *err;
 	TnySessionCamel *session;
 	gboolean online;
+	CamelObject *service;
 
 } GoingOnlineInfo;
 
@@ -1832,6 +1834,8 @@ tny_camel_store_account_queue_going_online_destroy (gpointer user_data)
 		g_error_free (info->err);
 
 	/* thread reference */
+
+	camel_object_unref (info->service);
 	g_object_unref (info->self);
 	camel_object_unref (info->session);
 
@@ -1861,6 +1865,7 @@ tny_camel_store_account_queue_going_online_cancelled_destroy (gpointer user_data
 		g_error_free (info->err);
 
 	/* thread reference */
+	camel_object_unref (info->service);
 	g_object_unref (info->self);
 	camel_object_unref (info->session);
 
@@ -1873,6 +1878,7 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 {
 	GoingOnlineInfo *info = NULL;
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	/* Idle info for the callbacks */
 	info = g_slice_new0 (GoingOnlineInfo);
@@ -1883,10 +1889,12 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 	info->online = online;
 	info->user_data = user_data;
 	info->err = NULL;
+	info->service = (CamelObject *) apriv->service;
 
 	/* thread reference */
 	g_object_ref (info->self);
 	camel_object_ref (info->session);
+	camel_object_ref (info->service);
 
 	/* It's indeed a very typical queue operation */
 	_tny_camel_queue_cancel_remove_items (priv->queue,

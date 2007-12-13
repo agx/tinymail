@@ -1487,6 +1487,8 @@ _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **
 		return;
 	}
 
+	camel_object_ref (priv->service);
+
 	if (CAMEL_IS_DISCO_STORE (priv->service)) {
 		if (online) {
 			camel_disco_store_set_status (CAMEL_DISCO_STORE (priv->service),
@@ -1596,6 +1598,8 @@ done:
 			_tny_camel_account_get_tny_error_code_for_camel_exception_id (&ex),
 			camel_exception_get_description (&ex));
 	}
+
+	camel_object_unref (priv->service);
 
 	return;
 }
