@@ -249,6 +249,31 @@ constrat_notify_destroy (gpointer user_data)
 	g_object_unref (user_data);
 }
 
+
+static void
+let_connection_strat_know (TnyAccount *self)
+{
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	if (apriv->status == TNY_CONNECTION_STATUS_CONNECTED_BROKEN)
+		g_idle_add_full (G_PRIORITY_HIGH, 
+			constrat_notify_broken, 
+			g_object_ref (self), 
+			constrat_notify_destroy);
+	else if (apriv->status == TNY_CONNECTION_STATUS_CONNECTED)
+		g_idle_add_full (G_PRIORITY_HIGH, 
+			constrat_notify_connect, 
+			g_object_ref (self), 
+			constrat_notify_destroy);
+	else if (apriv->status == TNY_CONNECTION_STATUS_DISCONNECTED)
+		g_idle_add_full (G_PRIORITY_HIGH, 
+			constrat_notify_disconnect, 
+			g_object_ref (self), 
+			constrat_notify_destroy);
+
+	return;
+}
+
 static void 
 disconnection (CamelService *service, gboolean suc, TnyAccount *self)
 {
@@ -294,7 +319,9 @@ connection (CamelService *service, gboolean suc, TnyAccount *self)
 {
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
-	gboolean emit = FALSE;
+	gboolean emit = apriv->retry_connect;
+
+	apriv->retry_connect = FALSE;
 
 	priv->cant_reuse_iter = TRUE;
 
@@ -390,24 +417,8 @@ connection (CamelService *service, gboolean suc, TnyAccount *self)
 
 	if (emit) {
 		tny_camel_store_account_do_emit (TNY_CAMEL_STORE_ACCOUNT (self));
-
-		if (apriv->status == TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN)
-			g_idle_add_full (G_PRIORITY_HIGH, 
-				constrat_notify_broken, 
-				g_object_ref (self), 
-				constrat_notify_destroy);
-		else if (apriv->status == TNY_CONNECTION_STATUS_CONNECTED)
-			g_idle_add_full (G_PRIORITY_HIGH, 
-				constrat_notify_connect, 
-				g_object_ref (self), 
-				constrat_notify_destroy);
-		else if (apriv->status == TNY_CONNECTION_STATUS_DISCONNECTED)
-			g_idle_add_full (G_PRIORITY_HIGH, 
-				constrat_notify_disconnect, 
-				g_object_ref (self), 
-				constrat_notify_destroy);
+		let_connection_strat_know (self);
 	}
-
 }
 
 void 

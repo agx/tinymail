@@ -47,6 +47,7 @@
 #include <tny-folder-store-observer.h>
 #include <tny-simple-list.h>
 #include <tny-merge-folder.h>
+#include <tny-connection-strategy.h>
 
 
 #define TINYMAIL_ENABLE_PRIVATE_API
@@ -445,7 +446,7 @@ unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 			while (((CamelObject*)priv->folder)->ref_count >= 1)
 				camel_object_unref (CAMEL_OBJECT (priv->folder));
 		} else
-			g_critical ("Corrupted CamelFolder instance at (I can't recover from this state, therefore I will leak)\n");
+			g_critical ("Corrupted CamelFolder instance at (I can't camel_recover from this state, therefore I will leak)\n");
 	}
 
 	if (G_LIKELY (priv->folder) && CAMEL_IS_FOLDER (priv->folder))
@@ -1639,6 +1640,7 @@ tny_camel_folder_refresh_async_callback (gpointer thr_user_data)
 	TnyFolder *self = info->self;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyFolderChange *change = tny_folder_change_new (self);
+	TnyConnectionStrategy *constrat;
 
 	tny_folder_change_set_new_all_count (change, priv->cached_length);
 	tny_folder_change_set_new_unread_count (change, priv->unread_length);
@@ -1650,6 +1652,10 @@ tny_camel_folder_refresh_async_callback (gpointer thr_user_data)
 		info->callback (info->self, info->cancelled, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
+
+	constrat = tny_account_get_connection_strategy (priv->account);
+	tny_connection_strategy_set_current (constrat, priv->account, self);
+	g_object_unref (constrat);
 
 	tny_idle_stopper_stop (info->stopper);
 
@@ -1770,7 +1776,7 @@ tny_camel_folder_refresh_async_cancelled_callback (gpointer thr_user_data)
  *
  * It's actually very simple: just store all the interesting info in a struct 
  * launch a thread and keep that struct-instance around. In the callbacks,
- * which you stored as function pointers, recover that info and pass it to the
+ * which you stored as function pointers, camel_recover that info and pass it to the
  * user of the _async method.
  *
  * Important is to add and remove references. You don't want the reference to
@@ -1830,6 +1836,7 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	guint oldlen, oldurlen;
 	TnyFolderChange *change = NULL;
+	TnyConnectionStrategy *constrat;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
 			priv->account, err, TNY_FOLDER_ERROR, 
@@ -1873,6 +1880,10 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	tny_folder_change_set_new_unread_count (change, priv->unread_length);
 	notify_folder_observers_about_in_idle (self, change);
 	g_object_unref (change);
+
+	constrat = tny_account_get_connection_strategy (priv->account);
+	tny_connection_strategy_set_current (constrat, priv->account, self);
+	g_object_unref (constrat);
 
 	return;
 }

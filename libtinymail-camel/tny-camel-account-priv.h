@@ -72,7 +72,7 @@ struct _TnyCamelAccountPriv
 	RefreshStatusInfo *csyncop;
 	GList *chooks;
 	TnyConnectionStatus status;
-	gboolean is_connecting, is_ready;
+	gboolean is_connecting, is_ready, retry_connect;
 	gchar *delete_this;
 	TnyCamelQueue *queue;
 	TnyConnectionStrategy *con_strat;

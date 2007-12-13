@@ -3,6 +3,8 @@
 	* Added the TnyConnectionStrategy type for coping with connectivity
 	changes (for example sheduling a reconnect or asking the user what to
 	do about the event of a lost connection)
+	* Added two connection strategies. One that retries every five seconds
+	to reconnect, and recovers the state (the selected folder)
 
 2007-12-13  Alberto Garcia Gonzalez  <agarcia@igalia.com>
 
@@ -2233,7 +2235,7 @@
 
 2007-05-26  Philip Van Hoof  <pvanhoof@gnome.org>
 
-	* Experimental connection recovery for IMAP
+	* Experimental connection camel_recovery for IMAP
 	* Letting IDLE/PushE-mail support code cope with connection failures
 
 2007-05-25  Philip Van Hoof  <pvanhoof@gnome.org>

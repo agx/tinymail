@@ -322,7 +322,7 @@ tny_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
  *
  * Using the tny_msg_rewrite_cache API on a message instance will rewrite its 
  * purged mime parts with an empty body (saving storage space). The storage 
- * space is recovered after using tny_msg_rewrite_cache. Only setting a mime 
+ * space is camel_recovered after using tny_msg_rewrite_cache. Only setting a mime 
  * part to purged might not remove it.
  *
  * There is no guarantee about what happens with a purged mime part internally 

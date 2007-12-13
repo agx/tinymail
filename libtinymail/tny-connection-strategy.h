@@ -44,6 +44,8 @@ struct _TnyConnectionStrategyIface
 	void (*on_connect_func) (TnyConnectionStrategy *self, TnyAccount *account);
 	void (*on_connection_broken_func) (TnyConnectionStrategy *self, TnyAccount *account);
 	void (*on_disconnect_func) (TnyConnectionStrategy *self, TnyAccount *account);
+	void (*set_current_func) (TnyConnectionStrategy *self, TnyAccount *account, TnyFolder *folder);
+
 };
 
 GType tny_connection_strategy_get_type (void);
@@ -51,6 +53,7 @@ GType tny_connection_strategy_get_type (void);
 void tny_connection_strategy_on_connect (TnyConnectionStrategy *self, TnyAccount *account);
 void tny_connection_strategy_on_disconnect (TnyConnectionStrategy *self, TnyAccount *account);
 void tny_connection_strategy_on_connection_broken (TnyConnectionStrategy *self, TnyAccount *account);
+void tny_connection_strategy_set_current (TnyConnectionStrategy *self, TnyAccount *account, TnyFolder *folder);
 
 G_END_DECLS
 

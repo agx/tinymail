@@ -192,7 +192,7 @@ ai_to_herr (int error)
 		return errno;
 		break;
 	default:
-		return NO_RECOVERY;
+		return NO_CAMEL_RECOVERY;
 		break;
 	}
 }

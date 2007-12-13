@@ -1369,6 +1369,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccount *self = (TnyCamelAccount *)instance;
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
+	priv->retry_connect = FALSE;
 	priv->con_strat = tny_camel_default_connection_strategy_new ();
 	priv->queue = _tny_camel_queue_new (self);
 	priv->delete_this = NULL;
@@ -1699,6 +1700,7 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, Tn
 		return;
 
 	if (TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
+		priv->retry_connect = TRUE;
 		if (online)
 			camel_session_set_online ((CamelSession *) session, TRUE); 
 		_tny_camel_store_account_queue_going_online (

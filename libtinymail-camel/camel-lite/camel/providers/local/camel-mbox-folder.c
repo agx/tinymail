@@ -403,7 +403,7 @@ retry:
 
 		camel_exception_setv(ex, CAMEL_EXCEPTION_FOLDER_INVALID,
 				     _("Cannot get message: %s from folder %s\n  %s"), uid, lf->folder_path,
-				     _("The folder appears to be irrecoverably corrupted."));
+				     _("The folder appears to be ircamel_recoverably corrupted."));
 		goto fail;
 	}
 

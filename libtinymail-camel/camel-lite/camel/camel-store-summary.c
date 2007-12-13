@@ -940,7 +940,7 @@ store_info_load(CamelStoreSummary *s, FILE *in)
 	camel_file_util_decode_uint32(in, &info->total);
 
 	/* Ok, brown paper bag bug - prior to version 2 of the file, flags are
-	   stored using the bit number, not the bit. Try to recover as best we can */
+	   stored using the bit number, not the bit. Try to camel_recover as best we can */
 	if (s->version < CAMEL_STORE_SUMMARY_VERSION_2) {
 		guint32 flags = 0;
 

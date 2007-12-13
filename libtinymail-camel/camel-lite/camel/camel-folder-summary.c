@@ -2273,7 +2273,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	if (!s->in_reload)
 	{
 
-		/* We are not reloading, so searching for recoverable
+		/* We are not reloading, so searching for camel_recoverable
 		 * CamelMessageInfo struct instances is avoidable */
 		mi = (CamelMessageInfoBase *) camel_message_info_new (s);
 		*must_add = TRUE;

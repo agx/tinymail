@@ -9,6 +9,12 @@
 static GObjectClass *parent_class = NULL;
 
 static void
+tny_camel_default_connection_strategy_set_current (TnyConnectionStrategy *self, TnyAccount *account, TnyFolder *folder)
+{
+	return;
+}
+
+static void
 tny_camel_default_connection_strategy_on_connect (TnyConnectionStrategy *self, TnyAccount *account)
 {
 	return;
@@ -43,6 +49,7 @@ tny_connection_strategy_init (TnyConnectionStrategyIface *klass)
 	klass->on_connect_func = tny_camel_default_connection_strategy_on_connect;
 	klass->on_connection_broken_func = tny_camel_default_connection_strategy_on_connection_broken;
 	klass->on_disconnect_func = tny_camel_default_connection_strategy_on_disconnect;
+	klass->set_current_func = tny_camel_default_connection_strategy_set_current;
 }
 
 static void

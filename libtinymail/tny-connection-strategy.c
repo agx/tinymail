@@ -19,8 +19,35 @@
 
 #include <config.h>
 #include <tny-account.h>
+#include <tny-folder.h>
 #include <tny-connection-strategy.h>
 #include <tny-list.h>
+
+
+/**
+ * tny_connection_strategy_set_current:
+ * @self: A #TnyConnectionStrategy instance
+ * @account: the current #TnyAccount instance
+ * @folder: the current #TnyFolder instance
+ *
+ * Used to set the current situation (in case @self wants to restore this 
+ * situation in case of a connection event).
+ **/
+void 
+tny_connection_strategy_set_current (TnyConnectionStrategy *self, TnyAccount *account, TnyFolder *folder)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_CONNECTION_STRATEGY (self));
+	g_assert (TNY_IS_ACCOUNT (account));
+	g_assert (TNY_IS_FOLDER (folder));
+
+	g_assert (TNY_CONNECTION_STRATEGY_GET_IFACE (self)->set_current_func != NULL);
+#endif
+
+	TNY_CONNECTION_STRATEGY_GET_IFACE (self)->set_current_func (self, account, folder);
+
+	return;
+}
 
 /**
  * tny_connection_strategy_on_connect:

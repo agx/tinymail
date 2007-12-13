@@ -835,18 +835,18 @@ camel_imap_store_restore_stream_buffer (CamelImapStore *store)
 	{
 		if (store->ostream && CAMEL_IS_STREAM (store->ostream))
 		{
-			/* This is a recoverable situation. It's strange though */
+			/* This is a camel_recoverable situation. It's strange though */
 			store->istream = camel_stream_buffer_new (store->ostream, CAMEL_STREAM_BUFFER_READ);
 		} else {
 			CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 			camel_operation_uncancel (NULL);
 			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, &ex);
 			camel_exception_clear (&ex);
-			g_warning ("Something terrible happened with your connection.\nTrying to recover. (%s)\n",
+			g_warning ("Something terrible happened with your connection.\nTrying to camel_recover. (%s)\n",
 				g_strerror (errno));
 			camel_service_connect (CAMEL_SERVICE (store), &ex);
 			if (camel_exception_is_set (&ex))
-				g_warning ("Connection recovery failed: %s",
+				g_warning ("Connection camel_recovery failed: %s",
 					camel_exception_get_description (&ex));
 			return FALSE;
 		}

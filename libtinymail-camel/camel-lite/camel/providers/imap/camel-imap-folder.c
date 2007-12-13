@@ -11,7 +11,7 @@
  * the mmap CamelFolderSummary instance to sync headers to disk.
  *
  * It has support for CONDSTORE, BINARY and IMAP IDLE. This implementation will
- * write received information to disk as soon as possible, and will try recover
+ * write received information to disk as soon as possible, and will try camel_recover
  * the state using this information as much as possible.
  *
  * Copyright (C) 2000, 2001 Ximian, Inc.

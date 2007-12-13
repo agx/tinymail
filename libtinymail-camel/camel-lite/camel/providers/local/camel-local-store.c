@@ -434,7 +434,7 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 
 	return;
 
-	/* The (f)utility of this recovery effort is quesitonable */
+	/* The (f)utility of this camel_recovery effort is quesitonable */
 
 	xrename(new, old, path, ".cmeta", TRUE, ex);
 	xrename(new, old, path, ".ev-summary.mmap", TRUE, ex);
