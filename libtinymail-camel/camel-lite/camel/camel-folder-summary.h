@@ -209,7 +209,7 @@ struct _CamelFolderSummary {
 	unsigned char *filepos;
 	GMutex *hash_lock;
 	GStaticRecMutex *dump_lock;
-	gboolean in_reload;
+	gboolean in_reload, had_expunges;
 	gint idx;
 
 	void (*set_extra_flags_func) (CamelFolder *folder, CamelMessageInfoBase *mi);

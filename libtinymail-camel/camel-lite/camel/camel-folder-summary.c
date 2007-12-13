@@ -231,7 +231,7 @@ camel_folder_summary_init (CamelFolderSummary *s)
 	struct _CamelFolderSummaryPrivate *p;
 
 	p = _PRIVATE(s) = g_slice_alloc0 (sizeof (*p));
-
+	s->had_expunges = FALSE;
 	p->filter_charset = g_hash_table_new (camel_strcase_hash, camel_strcase_equal);
 	s->dump_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (s->dump_lock);
@@ -857,15 +857,8 @@ perform_content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentI
  *
  * Returns %0 on success or %-1 on fail
  **/
-
-#ifdef APPEND_WRITE
-#undef APPEND_WRITE
-#endif
-
-
-#ifdef APPEND_WRITE
-int
-camel_folder_summary_save(CamelFolderSummary *s, CamelException *ex)
+static int
+camel_folder_summary_save_append (CamelFolderSummary *s, CamelException *ex)
 {
 	FILE *out;
 	int i;
@@ -1007,10 +1000,8 @@ exception:
 	return -1;
 }
 
-#else
-
-int
-camel_folder_summary_save(CamelFolderSummary *s, CamelException *ex)
+static int
+camel_folder_summary_save_rewrite (CamelFolderSummary *s, CamelException *ex)
 {
 	FILE *out;
 	int fd, i;
@@ -1156,7 +1147,20 @@ exception:
 	return -1;
 }
 
-#endif
+int
+camel_folder_summary_save (CamelFolderSummary *s, CamelException *ex)
+{
+	int retval;
+
+	if (s->had_expunges)
+		retval = camel_folder_summary_save_rewrite (s, ex);
+	else
+		retval = camel_folder_summary_save_append (s, ex);
+
+	s->had_expunges = FALSE;
+
+	return retval;
+}
 
 /**
  * camel_folder_summary_header_load:
@@ -1589,6 +1593,7 @@ camel_folder_summary_remove(CamelFolderSummary *s, CamelMessageInfo *info)
 		mi->to = "Expunged";
 		mi->from = "Expunged";
 		mi->cc = "Expunged";
+		s->had_expunges = TRUE;
 		s->flags |= CAMEL_SUMMARY_DIRTY;
 		g_static_rec_mutex_unlock (&global_lock);
 
@@ -1596,6 +1601,7 @@ camel_folder_summary_remove(CamelFolderSummary *s, CamelMessageInfo *info)
 	} else {
 		CAMEL_SUMMARY_LOCK(s, summary_lock);
 		g_ptr_array_remove(s->messages, info);
+		s->had_expunges = TRUE;
 		s->flags |= CAMEL_SUMMARY_DIRTY;
 		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 		camel_message_info_free(info);
@@ -1650,6 +1656,7 @@ camel_folder_summary_remove_index(CamelFolderSummary *s, int index)
 	if (index < s->messages->len) {
 		CamelMessageInfo *info = s->messages->pdata[index];
 
+		s->had_expunges = TRUE;
 		g_ptr_array_remove_index(s->messages, index);
 		s->flags |= CAMEL_SUMMARY_DIRTY;
 
