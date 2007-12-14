@@ -276,6 +276,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	int i, hcnt = 0, lcnt = 0;
 	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 	CamelFolderChangeInfo *changes = NULL;
+	GList *deleted = NULL;
+	gint max;
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
@@ -411,17 +413,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 	}
 
-	if (changes && camel_folder_change_info_changed (changes)) {
-		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
-		camel_folder_change_info_free (changes);
-		changes = NULL;
-	}
 
-	camel_pop3_logbook_close (pop3_store->book);
-
-	camel_folder_summary_save (folder->summary, ex);
-
-	camel_folder_summary_kill_hash (folder->summary);
+	
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 
@@ -448,6 +441,64 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 			}
 		}
 	}
+
+	max = camel_folder_summary_count (folder->summary);
+	for (i = 0; i < max; i++) {
+		CamelMessageInfoBase *info;
+		gboolean found = FALSE;
+		gint t=0;
+
+		info = (CamelMessageInfoBase*) camel_folder_summary_index (folder->summary, i);
+		if (!info)
+			continue;
+		for (t=0; t < pop3_store->uids->len; t++)
+		{
+			CamelPOP3FolderInfo *fi2 = pop3_store->uids->pdata[t];
+			if (fi2 && fi2->uid && !strcmp (fi2->uid, info->uid)) {
+				found = TRUE;
+				break;
+			}
+		}
+
+		if (!found) {
+			/* Removed remotely (only if not cached locally) */
+			if (!camel_data_cache_exists (pop3_store->cache, "cache", info->uid, NULL)) {
+
+				camel_message_info_ref (info);
+				deleted = g_list_prepend (deleted, info);
+			}
+		}
+
+
+		camel_message_info_free((CamelMessageInfo *)info);
+	}
+
+	while (deleted)
+	{
+		CamelMessageInfo *info = deleted->data;
+
+		if (!changes)
+			changes = camel_folder_change_info_new ();
+		camel_folder_change_info_remove_uid (changes, info->uid);
+		((CamelMessageInfoBase*)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
+		camel_folder_summary_remove (folder->summary, info);
+		camel_message_info_free(info);
+		deleted = g_list_next (deleted);
+	}
+
+	if (deleted)
+		g_list_free (deleted);
+
+	if (changes && camel_folder_change_info_changed (changes)) {
+		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+		camel_folder_change_info_free (changes);
+		changes = NULL;
+	}
+
+
+	camel_pop3_logbook_close (pop3_store->book);
+	camel_folder_summary_save (folder->summary, ex);
+	camel_folder_summary_kill_hash (folder->summary);
 
 	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
@@ -558,7 +609,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 			if (!found) {
 				/* Removed remotely (only if not cached locally) */
-				if (camel_data_cache_exists (pop3_store->cache, "cache", info->uid, NULL)) {
+				if (!camel_data_cache_exists (pop3_store->cache, "cache", info->uid, NULL)) {
 					camel_message_info_ref (info);
 					deleted = g_list_prepend (deleted, info);
 				}

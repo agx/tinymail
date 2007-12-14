@@ -1,3 +1,9 @@
+2007-12-14  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Bugfix in the POP support: when an item is not available remotely
+	anymore, nor have we cached it locally, we remove it from the summary
+	list locally.
+
 2007-12-13  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Added the TnyConnectionPolicy type for coping with connectivity
