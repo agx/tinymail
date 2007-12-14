@@ -318,7 +318,8 @@ camel_stream_buffer_read_opp (CamelStream *stream, char *buffer, size_t n, int l
 			}
 
 			total += bytes_read;
-			camel_operation_progress (NULL, total, len);
+			if (total < len)
+				camel_operation_progress (NULL, total, len);
 
 		} else {
 			memcpy(bptr, sbf->ptr, n);
