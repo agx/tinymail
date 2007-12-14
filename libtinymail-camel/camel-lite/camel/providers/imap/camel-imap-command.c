@@ -58,6 +58,8 @@ static CamelImapResponse *imap_read_response (CamelImapStore *store,
 					      CamelException *ex);
 static char *imap_read_untagged (CamelImapStore *store, char *line,
 				 CamelException *ex);
+static char *imap_read_untagged_opp (CamelImapStore *store, char *line,
+				 CamelException *ex, int len);
 static char *imap_command_strdup_vprintf (CamelImapStore *store,
 					  const char *fmt, va_list ap);
 static char *imap_command_strdup_printf (CamelImapStore *store,
@@ -471,10 +473,17 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 {
 	CamelImapResponseType type;
 	char *respbuf;
+	int len;
 
 	if (camel_imap_store_readline (store, &respbuf, ex) < 0) {
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		return CAMEL_IMAP_RESPONSE_ERROR;
+	}
+
+	char *ptr = strchr (respbuf, '{');
+	if (ptr) {
+		ptr++;
+		len = strtoul (ptr, NULL, 10);
 	}
 
 	imap_debug ("(.., ..) <- %s\n", respbuf);
@@ -496,7 +505,12 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 
 		/* Read the rest of the response. */
 		type = CAMEL_IMAP_RESPONSE_UNTAGGED;
-		respbuf = imap_read_untagged (store, respbuf, ex);
+
+		if (len != -1)
+			respbuf = imap_read_untagged_opp (store, respbuf, ex, len);
+		else
+			respbuf = imap_read_untagged (store, respbuf, ex);
+
 		if (!respbuf)
 			type = CAMEL_IMAP_RESPONSE_ERROR;
 		else if (!g_ascii_strncasecmp (respbuf, "* OK [ALERT]", 12)
@@ -603,6 +617,7 @@ imap_read_response (CamelImapStore *store, CamelException *ex)
 	CamelImapResponse *response;
 	CamelImapResponseType type;
 	char *respbuf, *p;
+	int len = -1, sofar = 0;
 
 	/* Get another lock so that when we reach the tagged
 	 * response and camel_imap_command_response unlocks,
@@ -664,6 +679,170 @@ imap_read_response (CamelImapStore *store, CamelException *ex)
  * return the complete response, which may include an arbitrary number
  * of literals.
  */
+static char *
+imap_read_untagged_opp (CamelImapStore *store, char *line, CamelException *ex, int len)
+{
+	int fulllen, ldigits, nread, n, i, sexp = 0;
+	unsigned int length;
+	GPtrArray *data;
+	GString *str;
+	char *end, *p, *s, *d;
+
+	p = strrchr (line, '{');
+	if (!p)
+		return line;
+
+	data = g_ptr_array_new ();
+	fulllen = 0;
+
+	while (1) {
+		str = g_string_new (line);
+		g_free (line);
+		fulllen += str->len;
+		g_ptr_array_add (data, str);
+
+		if (!(p = strrchr (str->str, '{')) || p[1] == '-')
+			break;
+
+		/* HACK ALERT: We scan the non-literal part of the string, looking for possible s expression braces.
+		   This assumes we're getting s-expressions, which we should be.
+		   This is so if we get a blank line after a literal, in an s-expression, we can keep going, since
+		   we do no other parsing at this level.
+		   TODO: handle quoted strings? */
+		for (s=str->str; s<p; s++) {
+			if (*s == '(')
+				sexp++;
+			else if (*s == ')')
+				sexp--;
+		}
+
+		length = strtoul (p + 1, &end, 10);
+		if (*end != '}' || *(end + 1) || end == p + 1 || length >= UINT_MAX - 2)
+			break;
+		ldigits = end - (p + 1);
+
+		/* Read the literal */
+		str = g_string_sized_new (length + 2);
+		str->str[0] = '\n';
+		nread = 0;
+
+		do {
+			if ((n = camel_stream_buffer_read_opp (store->istream, str->str + nread + 1, length - nread, len)) == -1) {
+
+				if (errno == EINTR)
+				{
+					CamelException mex = CAMEL_EXCEPTION_INITIALISER;
+					camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
+							     _("Operation cancelled"));
+					camel_imap_recon (store, &mex);
+					imap_debug ("Recon in untagged: %s\n", camel_exception_get_description (&mex));
+				} else {
+					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+							     g_strerror (errno));
+					camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+				}
+				g_string_free (str, TRUE);
+				goto lose;
+			}
+
+			nread += n;
+		} while (n > 0 && nread < length);
+
+		if (nread < length) {
+			if (errno == EINTR) {
+				CamelException mex = CAMEL_EXCEPTION_INITIALISER;
+				camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
+						     _("Operation cancelled"));
+				camel_imap_recon (store, &mex);
+				imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
+			} else {
+				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+					     _("Server response ended too soon."));
+				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+			}
+			g_string_free (str, TRUE);
+			goto lose;
+		}
+		str->str[length + 1] = '\0';
+
+		if (camel_debug("imap")) {
+			printf("Literal: -->");
+			fwrite(str->str+1, 1, length, stdout);
+			printf("<--\n");
+		}
+
+		/* Fix up the literal, turning CRLFs into LF. Also, if
+		 * we find any embedded NULs, strip them. This is
+		 * dubious, but:
+		 *   - The IMAP grammar says you can't have NULs here
+		 *     anyway, so this will not affect our behavior
+		 *     against any completely correct server.
+		 *   - WU-imapd 12.264 (at least) will cheerily pass
+		 *     NULs along if they are embedded in the message
+		 */
+
+		s = d = str->str + 1;
+		end = str->str + 1 + length;
+		while (s < end) {
+			while (s < end && *s == '\0') {
+				s++;
+				length--;
+			}
+			if (*s == '\r' && *(s + 1) == '\n') {
+				s++;
+				length--;
+			}
+			*d++ = *s++;
+		}
+		*d = '\0';
+		str->len = length + 1;
+
+		/* p points to the "{" in the line that starts the
+		 * literal. The length of the CR-less response must be
+		 * less than or equal to the length of the response
+		 * with CRs, therefore overwriting the old value with
+		 * the new value cannot cause an overrun. However, we
+		 * don't want it to be shorter either, because then the
+		 * GString's length would be off...
+		 */
+		sprintf (p, "{%0*u}", ldigits, length);
+
+		fulllen += str->len;
+		g_ptr_array_add (data, str);
+
+		/* Read the next line. */
+		do {
+			if (camel_imap_store_readline (store, &line, ex) < 0)
+				goto lose;
+
+			/* MAJOR HACK ALERT, gropuwise sometimes sends an extra blank line after literals, check that here
+			   But only do it if we're inside an sexpression */
+			if (line[0] == 0 && sexp > 0)
+				g_warning("Server sent empty line after a literal, assuming in error");
+		} while (line[0] == 0 && sexp > 0);
+	}
+
+	/* Now reassemble the data. */
+	p = line = g_malloc (fulllen + 1);
+	for (i = 0; i < data->len; i++) {
+		str = data->pdata[i];
+		memcpy (p, str->str, str->len);
+		p += str->len;
+		g_string_free (str, TRUE);
+	}
+	*p = '\0';
+	g_ptr_array_free (data, TRUE);
+	return line;
+
+ lose:
+	for (i = 0; i < data->len; i++)
+		g_string_free (data->pdata[i], TRUE);
+	g_ptr_array_free (data, TRUE);
+	return NULL;
+}
+
+
+
 static char *
 imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 {
@@ -824,7 +1003,6 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 	g_ptr_array_free (data, TRUE);
 	return NULL;
 }
-
 
 /**
  * camel_imap_response_free:

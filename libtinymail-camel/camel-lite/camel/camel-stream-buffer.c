@@ -276,6 +276,61 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 	return (ssize_t)(bptr - buffer);
 }
 
+
+ssize_t
+camel_stream_buffer_read_opp (CamelStream *stream, char *buffer, size_t n, int len)
+{
+	CamelStreamBuffer *sbf = CAMEL_STREAM_BUFFER (stream);
+	ssize_t bytes_read = 1;
+	ssize_t bytes_left;
+	char *bptr = buffer;
+	int total = 0;
+
+	g_return_val_if_fail( (sbf->mode & CAMEL_STREAM_BUFFER_MODE) == CAMEL_STREAM_BUFFER_READ, 0);
+
+	while (n && bytes_read > 0) {
+		bytes_left = sbf->end - sbf->ptr;
+		if (bytes_left < n) {
+			if (bytes_left > 0) {
+				memcpy(bptr, sbf->ptr, bytes_left);
+				n -= bytes_left;
+				bptr += bytes_left;
+				sbf->ptr += bytes_left;
+			}
+			/* if we are reading a lot, then read directly to the destination buffer */
+			if (n >= sbf->size/3) {
+				bytes_read = camel_stream_read(sbf->stream, bptr, n);
+				if (bytes_read>0) {
+					n -= bytes_read;
+					bptr += bytes_read;
+				}
+			} else {
+				bytes_read = camel_stream_read(sbf->stream, (char *) sbf->buf, sbf->size);
+				if (bytes_read>0) {
+					size_t bytes_used = bytes_read > n ? n : bytes_read;
+					sbf->ptr = sbf->buf;
+					sbf->end = sbf->buf+bytes_read;
+					memcpy(bptr, sbf->ptr, bytes_used);
+					sbf->ptr += bytes_used;
+					bptr += bytes_used;
+					n -= bytes_used;
+				}
+			}
+
+			total += bytes_read;
+			camel_operation_progress (NULL, total, len);
+
+		} else {
+			memcpy(bptr, sbf->ptr, n);
+			sbf->ptr += n;
+			bptr += n;
+			n = 0;
+		}
+	}
+
+	return (ssize_t)(bptr - buffer);
+}
+
 /* only returns the number passed in, or -1 on an error */
 static ssize_t
 stream_write_all(CamelStream *stream, const char *buffer, size_t n)

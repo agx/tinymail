@@ -4023,9 +4023,10 @@ ssize_t
 camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *ex)
 {
 	CamelStreamBuffer *stream;
-	char linebuf[1024] = {0};
+	char linebuf[100] = {0};
 	GByteArray *ba;
 	ssize_t nread;
+	int len = -1, sofar = 0;
 
 	g_return_val_if_fail (CAMEL_IS_IMAP_STORE (store), -1);
 	g_return_val_if_fail (dest, -1);
@@ -4048,6 +4049,7 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 		g_byte_array_append (ba, (const guint8 *) linebuf, nread);
 		if (linebuf[nread - 1] == '\n')
 			break;
+		memset (linebuf, 0, sizeof(linebuf));
 	}
 
 	if (nread <= 0) {

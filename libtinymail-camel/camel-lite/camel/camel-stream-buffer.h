@@ -96,6 +96,7 @@ int camel_stream_buffer_gets (CamelStreamBuffer *sbf, char *buf, unsigned int ma
 char *camel_stream_buffer_read_line (CamelStreamBuffer *sbf);
 int camel_tcp_stream_buffer_gets_nb (CamelStreamBuffer *sbf, char *buf, unsigned int max);
 
+ssize_t camel_stream_buffer_read_opp (CamelStream *stream, char *buffer, size_t n, int len);
 
 G_END_DECLS
 

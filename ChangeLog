@@ -3,6 +3,7 @@
 	* Bugfix in the POP support: when an item is not available remotely
 	anymore, nor have we cached it locally, we remove it from the summary
 	list locally.
+	* Detailed progress info for BODY fetches
 
 2007-12-13  Philip Van Hoof <pvanhoof@gnome.org>
 
