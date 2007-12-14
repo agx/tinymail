@@ -50,6 +50,9 @@ struct _TnyCamelRecoverConnectionStrategyClass
 GType tny_camel_recover_connection_strategy_get_type (void);
 TnyConnectionStrategy* tny_camel_recover_connection_strategy_new (void);
 
+void tny_camel_recover_connection_strategy_set_reconnect_delay (TnyConnectionStrategy *self, gint milliseconds);
+void tny_camel_recover_connection_strategy_set_recover_active_folder (TnyConnectionStrategy *self, gboolean setting);
+
 G_END_DECLS
 
 #endif

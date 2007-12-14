@@ -17,7 +17,8 @@ typedef struct _TnyCamelRecoverConnectionStrategyPriv TnyCamelRecoverConnectionS
 struct _TnyCamelRecoverConnectionStrategyPriv
 {
 	TnyFolder *folder;
-	gboolean recover;
+	gboolean recover, recov_folder;
+	gint recon_delay;
 };
 
 #define TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE(o) \
@@ -29,7 +30,7 @@ tny_camel_recover_connection_strategy_on_connect (TnyConnectionStrategy *self, T
 {
 	TnyCamelRecoverConnectionStrategyPriv *priv = TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE (self);
 
-	if (priv->folder && priv->recover)
+	if (priv->folder && priv->recover && priv->recov_folder)
 		tny_folder_refresh_async (priv->folder, NULL, NULL, NULL);
 
 	priv->recover = FALSE;
@@ -52,14 +53,49 @@ reconnect_destroy (gpointer user_data)
 	g_object_unref (user_data);
 }
 
+/**
+ * tny_camel_recover_connection_strategy_set_recover_active_folder:
+ * @self: a #TnyConnectionstrategy instance
+ * @setting: whether to recover the active folder
+ * 
+ * Sets whether to recover the active folder. Recovering the active folder means
+ * that the folder will be refreshed once the account is back online, and if
+ * the folder supports IDLE (in case of IMAP), its IDLE state is turned on.
+ * Default value is TRUE.
+ **/
+void 
+tny_camel_recover_connection_strategy_set_recover_active_folder (TnyConnectionStrategy *self, gboolean setting)
+{
+	TnyCamelRecoverConnectionStrategyPriv *priv = TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE (self);
+	priv->recov_folder = setting;
+}
+
+
+/**
+ * tny_camel_recover_connection_strategy_set_reconnect_delay:
+ * @self: a #TnyConnectionstrategy instance
+ * @milliseconds: delay before a reconnect attempt happens, use -1 to disable
+ * 
+ * Sets the amount of milliseconds before a reconnect attempt takes place. Use
+ * -1 to disable reconnecting. Default value is 5000 milliseconds.
+ **/
+void 
+tny_camel_recover_connection_strategy_set_reconnect_delay (TnyConnectionStrategy *self, gint milliseconds)
+{
+	TnyCamelRecoverConnectionStrategyPriv *priv = TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE (self);
+	priv->recon_delay = milliseconds;
+}
+
 static void
 tny_camel_recover_connection_strategy_on_connection_broken (TnyConnectionStrategy *self, TnyAccount *account)
 {
 	TnyCamelRecoverConnectionStrategyPriv *priv = TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE (self);
 
-	priv->recover = TRUE;
-	g_timeout_add_full (G_PRIORITY_HIGH, 5000, reconnect_it, 
-		g_object_ref (account), reconnect_destroy);
+	if (priv->recon_delay > 0) {
+		priv->recover = TRUE;
+		g_timeout_add_full (G_PRIORITY_HIGH, priv->recon_delay, reconnect_it, 
+			g_object_ref (account), reconnect_destroy);
+	}
 
 }
 
@@ -102,6 +138,8 @@ tny_camel_recover_connection_strategy_instance_init (GTypeInstance *instance, gp
 	TnyCamelRecoverConnectionStrategyPriv *priv = TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE (instance);
 	priv->folder = NULL;
 	priv->recover = FALSE;
+	priv->recon_delay = 5000;
+	priv->recov_folder = TRUE;
 }
 
 static void
