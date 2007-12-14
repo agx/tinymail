@@ -617,7 +617,6 @@ imap_read_response (CamelImapStore *store, CamelException *ex)
 	CamelImapResponse *response;
 	CamelImapResponseType type;
 	char *respbuf, *p;
-	int len = -1, sofar = 0;
 
 	/* Get another lock so that when we reach the tagged
 	 * response and camel_imap_command_response unlocks,
