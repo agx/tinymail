@@ -55,7 +55,7 @@ reconnect_destroy (gpointer user_data)
 
 /**
  * tny_camel_recover_connection_strategy_set_recover_active_folder:
- * @self: a #TnyConnectionstrategy instance
+ * @self: a #TnyCamelRecoverConnectionStrategy instance
  * @setting: whether to recover the active folder
  * 
  * Sets whether to recover the active folder. Recovering the active folder means
@@ -64,7 +64,7 @@ reconnect_destroy (gpointer user_data)
  * Default value is TRUE.
  **/
 void 
-tny_camel_recover_connection_strategy_set_recover_active_folder (TnyConnectionStrategy *self, gboolean setting)
+tny_camel_recover_connection_strategy_set_recover_active_folder (TnyCamelRecoverConnectionStrategy *self, gboolean setting)
 {
 	TnyCamelRecoverConnectionStrategyPriv *priv = TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE (self);
 	priv->recov_folder = setting;
@@ -73,14 +73,14 @@ tny_camel_recover_connection_strategy_set_recover_active_folder (TnyConnectionSt
 
 /**
  * tny_camel_recover_connection_strategy_set_reconnect_delay:
- * @self: a #TnyConnectionstrategy instance
+ * @self: a #TnyCamelRecoverConnectionStrategy instance
  * @milliseconds: delay before a reconnect attempt happens, use -1 to disable
  * 
  * Sets the amount of milliseconds before a reconnect attempt takes place. Use
  * -1 to disable reconnecting. Default value is 5000 milliseconds.
  **/
 void 
-tny_camel_recover_connection_strategy_set_reconnect_delay (TnyConnectionStrategy *self, gint milliseconds)
+tny_camel_recover_connection_strategy_set_reconnect_delay (TnyCamelRecoverConnectionStrategy *self, gint milliseconds)
 {
 	TnyCamelRecoverConnectionStrategyPriv *priv = TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE (self);
 	priv->recon_delay = milliseconds;
