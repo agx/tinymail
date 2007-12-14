@@ -35,6 +35,6 @@
 #include <tny-store-account.h>
 #include <tny-stream.h>
 #include <tny-transport-account.h>
-#include <tny-connection-strategy.h>
+#include <tny-connection-policy.h>
 
 #endif

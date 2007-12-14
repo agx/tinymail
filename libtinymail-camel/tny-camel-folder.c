@@ -47,7 +47,7 @@
 #include <tny-folder-store-observer.h>
 #include <tny-simple-list.h>
 #include <tny-merge-folder.h>
-#include <tny-connection-strategy.h>
+#include <tny-connection-policy.h>
 
 
 #define TINYMAIL_ENABLE_PRIVATE_API
@@ -1640,7 +1640,7 @@ tny_camel_folder_refresh_async_callback (gpointer thr_user_data)
 	TnyFolder *self = info->self;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyFolderChange *change = tny_folder_change_new (self);
-	TnyConnectionStrategy *constrat;
+	TnyConnectionPolicy *constrat;
 
 	tny_folder_change_set_new_all_count (change, priv->cached_length);
 	tny_folder_change_set_new_unread_count (change, priv->unread_length);
@@ -1653,8 +1653,8 @@ tny_camel_folder_refresh_async_callback (gpointer thr_user_data)
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 
-	constrat = tny_account_get_connection_strategy (priv->account);
-	tny_connection_strategy_set_current (constrat, priv->account, self);
+	constrat = tny_account_get_connection_policy (priv->account);
+	tny_connection_policy_set_current (constrat, priv->account, self);
 	g_object_unref (constrat);
 
 	tny_idle_stopper_stop (info->stopper);
@@ -1836,7 +1836,7 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	guint oldlen, oldurlen;
 	TnyFolderChange *change = NULL;
-	TnyConnectionStrategy *constrat;
+	TnyConnectionPolicy *constrat;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
 			priv->account, err, TNY_FOLDER_ERROR, 
@@ -1881,8 +1881,8 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	notify_folder_observers_about_in_idle (self, change);
 	g_object_unref (change);
 
-	constrat = tny_account_get_connection_strategy (priv->account);
-	tny_connection_strategy_set_current (constrat, priv->account, self);
+	constrat = tny_account_get_connection_policy (priv->account);
+	tny_connection_policy_set_current (constrat, priv->account, self);
 	g_object_unref (constrat);
 
 	return;

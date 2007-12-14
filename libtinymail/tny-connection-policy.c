@@ -20,13 +20,13 @@
 #include <config.h>
 #include <tny-account.h>
 #include <tny-folder.h>
-#include <tny-connection-strategy.h>
+#include <tny-connection-policy.h>
 #include <tny-list.h>
 
 
 /**
- * tny_connection_strategy_set_current:
- * @self: A #TnyConnectionStrategy instance
+ * tny_connection_policy_set_current:
+ * @self: A #TnyConnectionPolicy instance
  * @account: the current #TnyAccount instance
  * @folder: the current #TnyFolder instance
  *
@@ -34,90 +34,90 @@
  * situation in case of a connection event).
  **/
 void 
-tny_connection_strategy_set_current (TnyConnectionStrategy *self, TnyAccount *account, TnyFolder *folder)
+tny_connection_policy_set_current (TnyConnectionPolicy *self, TnyAccount *account, TnyFolder *folder)
 {
 #ifdef DBC /* require */
-	g_assert (TNY_IS_CONNECTION_STRATEGY (self));
+	g_assert (TNY_IS_CONNECTION_POLICY (self));
 	g_assert (TNY_IS_ACCOUNT (account));
 	g_assert (TNY_IS_FOLDER (folder));
 
-	g_assert (TNY_CONNECTION_STRATEGY_GET_IFACE (self)->set_current_func != NULL);
+	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->set_current_func != NULL);
 #endif
 
-	TNY_CONNECTION_STRATEGY_GET_IFACE (self)->set_current_func (self, account, folder);
+	TNY_CONNECTION_POLICY_GET_IFACE (self)->set_current_func (self, account, folder);
 
 	return;
 }
 
 /**
- * tny_connection_strategy_on_connect:
- * @self: A #TnyConnectionStrategy instance
+ * tny_connection_policy_on_connect:
+ * @self: A #TnyConnectionPolicy instance
  * @account: a #TnyAccount instance
  *
  * Happens when @account got connected.
  **/
 void 
-tny_connection_strategy_on_connect (TnyConnectionStrategy *self, TnyAccount *account)
+tny_connection_policy_on_connect (TnyConnectionPolicy *self, TnyAccount *account)
 {
 #ifdef DBC /* require */
-	g_assert (TNY_IS_CONNECTION_STRATEGY (self));
+	g_assert (TNY_IS_CONNECTION_POLICY (self));
 	g_assert (TNY_IS_ACCOUNT (account));
 
-	g_assert (TNY_CONNECTION_STRATEGY_GET_IFACE (self)->on_connect_func != NULL);
+	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connect_func != NULL);
 #endif
 
-	TNY_CONNECTION_STRATEGY_GET_IFACE (self)->on_connect_func (self, account);
+	TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connect_func (self, account);
 
 	return;
 }
 
 /**
- * tny_connection_strategy_on_disconnect:
- * @self: A #TnyConnectionStrategy instance
+ * tny_connection_policy_on_disconnect:
+ * @self: A #TnyConnectionPolicy instance
  * @account: a #TnyAccount instance
  *
  * Happens when @account got disconnected.
  **/
 void 
-tny_connection_strategy_on_disconnect (TnyConnectionStrategy *self, TnyAccount *account)
+tny_connection_policy_on_disconnect (TnyConnectionPolicy *self, TnyAccount *account)
 {
 #ifdef DBC /* require */
-	g_assert (TNY_IS_CONNECTION_STRATEGY (self));
+	g_assert (TNY_IS_CONNECTION_POLICY (self));
 	g_assert (TNY_IS_ACCOUNT (account));
 
-	g_assert (TNY_CONNECTION_STRATEGY_GET_IFACE (self)->on_disconnect_func != NULL);
+	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->on_disconnect_func != NULL);
 #endif
 
-	TNY_CONNECTION_STRATEGY_GET_IFACE (self)->on_disconnect_func (self, account);
+	TNY_CONNECTION_POLICY_GET_IFACE (self)->on_disconnect_func (self, account);
 
 	return;
 }
 
 /**
- * tny_connection_strategy_on_connection_broken:
- * @self: A #TnyConnectionStrategy instance
+ * tny_connection_policy_on_connection_broken:
+ * @self: A #TnyConnectionPolicy instance
  * @account: a #TnyAccount instance
  *
  * Happens when @account got connected.
  **/
 void 
-tny_connection_strategy_on_connection_broken (TnyConnectionStrategy *self, TnyAccount *account)
+tny_connection_policy_on_connection_broken (TnyConnectionPolicy *self, TnyAccount *account)
 {
 #ifdef DBC /* require */
-	g_assert (TNY_IS_CONNECTION_STRATEGY (self));
+	g_assert (TNY_IS_CONNECTION_POLICY (self));
 	g_assert (TNY_IS_ACCOUNT (account));
 
-	g_assert (TNY_CONNECTION_STRATEGY_GET_IFACE (self)->on_connection_broken_func != NULL);
+	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connection_broken_func != NULL);
 #endif
 
-	TNY_CONNECTION_STRATEGY_GET_IFACE (self)->on_connection_broken_func (self, account);
+	TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connection_broken_func (self, account);
 
 	return;
 }
 
 
 static void
-tny_connection_strategy_base_init (gpointer g_class)
+tny_connection_policy_base_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
@@ -128,7 +128,7 @@ tny_connection_strategy_base_init (gpointer g_class)
 }
 
 GType
-tny_connection_strategy_get_type (void)
+tny_connection_policy_get_type (void)
 {
 	static GType type = 0;
 
@@ -136,8 +136,8 @@ tny_connection_strategy_get_type (void)
 	{
 		static const GTypeInfo info = 
 		{
-		  sizeof (TnyConnectionStrategyIface),
-		  tny_connection_strategy_base_init,   /* base_init */
+		  sizeof (TnyConnectionPolicyIface),
+		  tny_connection_policy_base_init,   /* base_init */
 		  NULL,   /* base_finalize */
 		  NULL,   /* class_init */
 		  NULL,   /* class_finalize */
@@ -148,7 +148,7 @@ tny_connection_strategy_get_type (void)
 		  NULL
 		};
 		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyConnectionStrategy", &info, 0);
+			"TnyConnectionPolicy", &info, 0);
 	}
 
 	return type;

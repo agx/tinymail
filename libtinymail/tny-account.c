@@ -32,50 +32,50 @@ guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
 
 
 /**
- * tny_account_get_connection_strategy:
+ * tny_account_get_connection_policy:
  * @self: a #TnyAccount object
  *
- * Get the connection strategy for @self. You must unreference the returned 
+ * Get the connection policy for @self. You must unreference the returned 
  * value when you are finished with used it.
  *
- * Return value: connection strategy
+ * Return value: connection policy
  **/
-TnyConnectionStrategy* 
-tny_account_get_connection_strategy (TnyAccount *self)
+TnyConnectionPolicy* 
+tny_account_get_connection_policy (TnyAccount *self)
 {
-	TnyConnectionStrategy *retval;
+	TnyConnectionPolicy *retval;
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_connection_strategy_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_connection_policy_func != NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_connection_strategy_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_connection_policy_func (self);
 
 #ifdef DBC /* ensure*/
-	g_assert (TNY_IS_CONNECTION_STRATEGY (retval));
+	g_assert (TNY_IS_CONNECTION_POLICY (retval));
 #endif
 
 	return retval;
 }
 
 /**
- * tny_account_set_connection_strategy:
+ * tny_account_set_connection_policy:
  * @self: a #TnyAccount object
- * @strategy: the #TnyConnectionStrategy
+ * @policy: the #TnyConnectionStrategy
  *
  * Set the connection strategy for @self.
  **/
 void 
-tny_account_set_connection_strategy (TnyAccount *self, TnyConnectionStrategy *strategy)
+tny_account_set_connection_policy (TnyAccount *self, TnyConnectionPolicy *policy)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_IS_CONNECTION_STRATEGY (strategy));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_connection_strategy_func != NULL);
+	g_assert (TNY_IS_CONNECTION_POLICY (policy));
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_connection_policy_func != NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_connection_strategy_func (self, strategy);
+	TNY_ACCOUNT_GET_IFACE (self)->set_connection_policy_func (self, policy);
 
 #ifdef DBC /* ensure*/
 #endif

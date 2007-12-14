@@ -47,7 +47,7 @@
 #include <tny-camel-shared.h>
 #include <tny-status.h>
 
-#include <tny-camel-default-connection-strategy.h>
+#include <tny-camel-default-connection-policy.h>
 
 #include "tny-session-camel-priv.h"
 #include "tny-camel-common-priv.h"
@@ -1370,7 +1370,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	priv->retry_connect = FALSE;
-	priv->con_strat = tny_camel_default_connection_strategy_new ();
+	priv->con_strat = tny_camel_default_connection_policy_new ();
 	priv->queue = _tny_camel_queue_new (self);
 	priv->delete_this = NULL;
 	priv->is_ready = FALSE;
@@ -1743,19 +1743,19 @@ tny_camel_account_is_ready (TnyAccount *self)
 }
 
 
-static TnyConnectionStrategy* 
-tny_camel_account_get_connection_strategy (TnyAccount *self)
+static TnyConnectionPolicy* 
+tny_camel_account_get_connection_policy (TnyAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	return TNY_CONNECTION_STRATEGY (g_object_ref (priv->con_strat));
+	return TNY_CONNECTION_POLICY (g_object_ref (priv->con_strat));
 }
 
 static void 
-tny_camel_account_set_connection_strategy (TnyAccount *self, TnyConnectionStrategy *strategy)
+tny_camel_account_set_connection_policy (TnyAccount *self, TnyConnectionPolicy *policy)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	g_object_unref (priv->con_strat);
-	priv->con_strat = TNY_CONNECTION_STRATEGY (g_object_ref (strategy));
+	priv->con_strat = TNY_CONNECTION_POLICY (g_object_ref (policy));
 	return;
 }
 
@@ -2112,8 +2112,8 @@ tny_account_init (gpointer g, gpointer iface_data)
 	klass->start_operation_func = tny_camel_account_start_operation;
 	klass->stop_operation_func =  tny_camel_account_stop_operation;
 	klass->is_ready_func = tny_camel_account_is_ready;
-	klass->set_connection_strategy_func = tny_camel_account_set_connection_strategy;
-	klass->get_connection_strategy_func = tny_camel_account_get_connection_strategy;
+	klass->set_connection_policy_func = tny_camel_account_set_connection_policy;
+	klass->get_connection_policy_func = tny_camel_account_get_connection_policy;
 
 	return;
 }

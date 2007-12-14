@@ -49,7 +49,7 @@ libtinymail_1_0_headers = \
 	tny-password-getter.h \
 	tny-merge-folder.h \
 	tny-combined-account.h \
-	tny-connection-strategy.h
+	tny-connection-policy.h
 
 libtinymail_1_0_la_SOURCES = \
 	$(libtinymail_1_0_headers) \
@@ -92,7 +92,7 @@ libtinymail_1_0_la_SOURCES = \
 	tny-combined-account.c \
 	tny-idle-stopper.c \
 	tny-progress-info.c \
-	tny-connection-strategy.c \
+	tny-connection-policy.c \
 	$(private_headers)
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)

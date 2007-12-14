@@ -206,9 +206,9 @@ static gboolean
 constrat_notify_connect (gpointer user_data)
 {
 	TnyAccount *self = (TnyAccount *) user_data;
-	TnyConnectionStrategy *strategy = tny_account_get_connection_strategy (self);
+	TnyConnectionPolicy *strategy = tny_account_get_connection_policy (self);
 
-	tny_connection_strategy_on_connect (strategy, self);
+	tny_connection_policy_on_connect (strategy, self);
 
 	g_object_unref (strategy);
 
@@ -220,9 +220,9 @@ static gboolean
 constrat_notify_broken (gpointer user_data)
 {
 	TnyAccount *self = (TnyAccount *) user_data;
-	TnyConnectionStrategy *strategy = tny_account_get_connection_strategy (self);
+	TnyConnectionPolicy *strategy = tny_account_get_connection_policy (self);
 
-	tny_connection_strategy_on_connection_broken (strategy, self);
+	tny_connection_policy_on_connection_broken (strategy, self);
 
 	g_object_unref (strategy);
 
@@ -234,9 +234,9 @@ static gboolean
 constrat_notify_disconnect (gpointer user_data)
 {
 	TnyAccount *self = (TnyAccount *) user_data;
-	TnyConnectionStrategy *strategy = tny_account_get_connection_strategy (self);
+	TnyConnectionPolicy *strategy = tny_account_get_connection_policy (self);
 
-	tny_connection_strategy_on_disconnect (strategy, self);
+	tny_connection_policy_on_disconnect (strategy, self);
 
 	g_object_unref (strategy);
 

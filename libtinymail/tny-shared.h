@@ -100,8 +100,8 @@ typedef struct _TnyPasswordGetter TnyPasswordGetter;
 typedef struct _TnyPasswordGetterIface TnyPasswordGetterIface;
 typedef struct _TnyCombinedAccount TnyCombinedAccount;
 typedef struct _TnyCombinedAccountClass TnyCombinedAccountClass;
-typedef struct _TnyConnectionStrategy TnyConnectionStrategy;
-typedef struct _TnyConnectionStrategyIface TnyConnectionStrategyIface;
+typedef struct _TnyConnectionPolicy TnyConnectionPolicy;
+typedef struct _TnyConnectionPolicyIface TnyConnectionPolicyIface;
 
 typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccount *self);

@@ -1,9 +1,9 @@
 2007-12-13  Philip Van Hoof <pvanhoof@gnome.org>
 
-	* Added the TnyConnectionStrategy type for coping with connectivity
+	* Added the TnyConnectionPolicy type for coping with connectivity
 	changes (for example sheduling a reconnect or asking the user what to
 	do about the event of a lost connection)
-	* Added two connection strategies. One that retries every five seconds
+	* Added two connection policies. One that retries every five seconds
 	to reconnect, and recovers the state (the selected folder)
 
 2007-12-13  Alberto Garcia Gonzalez  <agarcia@igalia.com>
