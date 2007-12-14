@@ -91,8 +91,9 @@ tny_camel_recover_connection_strategy_on_connection_broken (TnyConnectionStrateg
 {
 	TnyCamelRecoverConnectionStrategyPriv *priv = TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE (self);
 
+	priv->recover = TRUE;
+
 	if (priv->recon_delay > 0) {
-		priv->recover = TRUE;
 		g_timeout_add_full (G_PRIORITY_HIGH, priv->recon_delay, reconnect_it, 
 			g_object_ref (account), reconnect_destroy);
 	}
