@@ -77,7 +77,7 @@ tny_camel_recover_connection_strategy_set_recover_active_folder (TnyCamelRecover
  * @milliseconds: delay before a reconnect attempt happens, use -1 to disable
  * 
  * Sets the amount of milliseconds before a reconnect attempt takes place. Use
- * -1 to disable reconnecting. Default value is 5000 milliseconds.
+ * -1 to disable reconnecting. Default value is -1 or disabled.
  **/
 void 
 tny_camel_recover_connection_strategy_set_reconnect_delay (TnyCamelRecoverConnectionStrategy *self, gint milliseconds)
@@ -139,7 +139,7 @@ tny_camel_recover_connection_strategy_instance_init (GTypeInstance *instance, gp
 	TnyCamelRecoverConnectionStrategyPriv *priv = TNY_CAMEL_RECOVER_CONNECTION_STRATEGY_GET_PRIVATE (instance);
 	priv->folder = NULL;
 	priv->recover = FALSE;
-	priv->recon_delay = 5000;
+	priv->recon_delay = -1;
 	priv->recov_folder = TRUE;
 }
 
