@@ -268,7 +268,7 @@ thread_main (gpointer data)
 	guint i = 0, length = 0;
 	TnyList *list = NULL;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
-	TnySessionCamelPriv *spriv = TNY_SESSION_CAMEL (apriv->session)->priv;
+	TnySessionCamelPriv *spriv = ((TnySessionCamel *) apriv->session)->priv;
 	TnyDevice *device = g_object_ref (spriv->device);
 
 	g_object_ref (self); /* My own reference */
