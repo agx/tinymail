@@ -103,6 +103,7 @@ tny_camel_recover_connection_strategy_on_connection_broken (TnyConnectionStrateg
 static void
 tny_camel_recover_connection_strategy_on_disconnect (TnyConnectionStrategy *self, TnyAccount *account)
 {
+	return;
 }
 
 static void 
