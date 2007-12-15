@@ -666,7 +666,7 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 
 		iter = priv->iter;
 		while (iter) {
-			if (!strcmp (iter->full_name, folder_full_name)) {
+			if (iter->full_name && folder_full_name && (!strcmp (iter->full_name, folder_full_name))) {
 				if (subscribe)
 					iter->flags |= CAMEL_FOLDER_SUBSCRIBED;
 				else
