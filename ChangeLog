@@ -1,6 +1,7 @@
 2007-12-15  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed some thread-unsafe code in TnyCamelSendQueue
+	* Use PR_Shutdown to cut an SSL connection
 
 2007-12-14  Philip Van Hoof <pvanhoof@gnome.org>
 

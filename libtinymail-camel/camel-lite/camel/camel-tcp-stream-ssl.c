@@ -141,8 +141,10 @@ camel_tcp_stream_ssl_finalize (CamelObject *object)
 {
 	CamelTcpStreamSSL *stream = CAMEL_TCP_STREAM_SSL (object);
 
-	if (stream->priv->sockfd != NULL)
+	if (stream->priv->sockfd != NULL) {
+		PR_Shutdown (stream->priv->sockfd, PR_SHUTDOWN_BOTH);
 		PR_Close (stream->priv->sockfd);
+	}
 
 	if (stream->priv->session)
 		camel_object_unref(stream->priv->session);
