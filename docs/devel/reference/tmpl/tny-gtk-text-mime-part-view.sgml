@@ -28,6 +28,8 @@ A type that can display text/* mime parts implemented using #GtkTextView
 
 </para>
 
+@status_callback: 
+@status_user_data: 
 @Returns: 
 
 

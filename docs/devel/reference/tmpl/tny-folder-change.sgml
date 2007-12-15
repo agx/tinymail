@@ -31,6 +31,14 @@ as information about what got changed.
 </para>
 
 
+<!-- ##### FUNCTION tny_folder_change_changed_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_folder_change_new ##### -->
 <para>
 

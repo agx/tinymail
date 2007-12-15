@@ -81,6 +81,7 @@ notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 }
 
 
+
 static void
 tny_merge_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
 {
@@ -90,6 +91,19 @@ tny_merge_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
 	g_object_unref (fol);
 
 	return;
+}
+
+static void
+tny_merge_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err)
+{
+	TnyIterator *iter = tny_list_create_iterator (headers);
+	while (!tny_iterator_is_done (iter)) {
+		TnyHeader *cur = (TnyHeader *) tny_iterator_get_current (iter);
+		tny_merge_folder_remove_msg (self, cur, err);
+		/* TODO: check for err */
+		tny_iterator_next (iter);
+	}
+	g_object_unref (iter);
 }
 
 static void
@@ -1699,6 +1713,7 @@ tny_folder_init (TnyFolderIface *klass)
 	klass->get_stats_func = tny_merge_folder_get_stats;
 	klass->get_url_string_func = tny_merge_folder_get_url_string;
 	klass->get_caps_func = tny_merge_folder_get_caps;
+	klass->remove_msgs_func = tny_merge_folder_remove_msgs;
 }
 
 static void

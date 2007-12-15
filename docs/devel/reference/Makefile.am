@@ -112,7 +112,7 @@ GTKDOC_LIBS= $(LIBTINYMAIL_LIBS) $(LIBTINYMAILUI_LIBS)						\
 	$(top_builddir)/libtinymail-gnome-desktop/libtinymail-gnome-desktop-$(API_VERSION).la	\
 	$(top_builddir)/libtinymail-gnomevfs/libtinymail-gnomevfs-$(API_VERSION).la		\
 	$(top_builddir)/libtinymail-queues/libtinymail-queues-$(API_VERSION).la			\
-	$(top_builddir)/tests/shared/libtestsshared.a
+	$(top_builddir)/tests/shared/libtestsshared.la
 
 
 # This includes the standard gtk-doc make rules, copied by gtkdocize.

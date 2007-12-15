@@ -32,6 +32,25 @@ A type that can merge multiple other folders together
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_merge_folder_new_with_ui_locker ##### -->
+<para>
+
+</para>
+
+@folder_name: 
+@ui_locker: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_merge_folder_set_ui_locker ##### -->
+<para>
+
+</para>
+
+@self: 
+@ui_locker: 
+
+
 <!-- ##### FUNCTION tny_merge_folder_add_folder ##### -->
 <para>
 

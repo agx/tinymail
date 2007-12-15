@@ -31,6 +31,7 @@ A abstract type that defines a store for child folders
 @parent: 
 @remove_folder_func: 
 @create_folder_func: 
+@create_folder_async_func: 
 @get_folders_func: 
 @get_folders_async_func: 
 @add_observer_func: 
@@ -57,6 +58,18 @@ A abstract type that defines a store for child folders
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_folder_store_create_folder_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+
 <!-- ##### FUNCTION tny_folder_store_get_folders ##### -->
 <para>
 
@@ -75,8 +88,8 @@ A abstract type that defines a store for child folders
 
 @self: 
 @list: 
-@callback: 
 @query: 
+@callback: 
 @status_callback: 
 @user_data: 
 

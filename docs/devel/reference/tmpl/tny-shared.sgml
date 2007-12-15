@@ -24,6 +24,13 @@ Shared include file with forward typedefs
 
 
 
+<!-- ##### MACRO TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS ##### -->
+<para>
+
+</para>
+
+
+
 <!-- ##### STRUCT TnyStatus ##### -->
 <para>
 
@@ -46,7 +53,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -238,6 +245,7 @@ Shared include file with forward typedefs
 @add_part_func: 
 @get_header_pairs_func: 
 @set_header_pair_func: 
+@decode_to_stream_async_func: 
 
 <!-- ##### STRUCT TnyAccount ##### -->
 <para>
@@ -250,7 +258,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
+@tnyaccount: the object which received the signal.
 
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
 <para>
@@ -293,6 +301,8 @@ Shared include file with forward typedefs
 @start_operation_func: 
 @stop_operation_func: 
 @is_ready_func: 
+@get_connection_policy_func: 
+@set_connection_policy_func: 
 @connection_status_changed: 
 @changed: 
 
@@ -307,8 +317,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnydevice: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -422,6 +432,7 @@ Shared include file with forward typedefs
 @parent: 
 @remove_folder_func: 
 @create_folder_func: 
+@create_folder_async_func: 
 @get_folders_func: 
 @get_folders_async_func: 
 @add_observer_func: 
@@ -478,32 +489,32 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -688,6 +699,23 @@ Shared include file with forward typedefs
 
 @parent: 
 
+<!-- ##### STRUCT TnyConnectionPolicy ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnyConnectionPolicyIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@on_connect_func: 
+@on_connection_broken_func: 
+@on_disconnect_func: 
+@set_current_func: 
+
 <!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
 This method happens whenever the password must be requested from the user. You must return the password for #TnyAccount self.
@@ -715,6 +743,30 @@ This method happens in case the password was wrong. Also take a look at tny_acco
 </para>
 
 @self: 
+@canceled: 
+@err: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyCreateFolderCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@canceled: 
+@new_folder: 
+@err: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyMimePartCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@stream: 
 @canceled: 
 @err: 
 @user_data: 

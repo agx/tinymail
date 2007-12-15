@@ -95,6 +95,22 @@ A abstract type that defines a folder
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_folder_caps_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_signal_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_folder_get_msg_remove_strategy ##### -->
 <para>
 
@@ -148,16 +164,6 @@ A abstract type that defines a folder
 
 @self: 
 @headers: 
-@err: 
-
-
-<!-- ##### FUNCTION tny_folder_remove_msg_async ##### -->
-<para>
-
-</para>
-
-@self: 
-@header: 
 @err: 
 
 

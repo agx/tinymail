@@ -35,6 +35,8 @@ normal file descriptor.
 
 </para>
 
+@status_callback: 
+@status_user_data: 
 @Returns: 
 
 

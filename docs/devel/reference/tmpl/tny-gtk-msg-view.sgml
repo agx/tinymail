@@ -111,3 +111,32 @@ This type is coupled with the #TnyTextBufferStream.
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_gtk_msg_view_set_status_callback ##### -->
+<para>
+
+</para>
+
+@self: 
+@status_callback: 
+@status_user_data: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_get_status_callback ##### -->
+<para>
+
+</para>
+
+@self: 
+@status_callback: 
+@status_user_data: 
+
+
+<!-- ##### FUNCTION tny_gtk_msg_view_set_parented ##### -->
+<para>
+
+</para>
+
+@self: 
+@parented: 
+
+
