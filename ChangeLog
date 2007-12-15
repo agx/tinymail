@@ -1,3 +1,7 @@
+2007-12-15  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed some thread-unsafe code in TnyCamelSendQueue
+
 2007-12-14  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Bugfix in the POP support: when an item is not available remotely

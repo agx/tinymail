@@ -259,19 +259,22 @@ tny_camel_send_queue_update (TnyFolderObserver *self, TnyFolderChange *change)
 	return;
 }
 
+typedef struct {
+	TnySendQueue *self;
+	TnyDevice *device;
+} MainThreadInfo;
+
 static gpointer
 thread_main (gpointer data)
 {
-	TnySendQueue *self = (TnySendQueue *) data;
+	MainThreadInfo *info = (MainThreadInfo *) data;
+	TnySendQueue *self = info->self;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	TnyFolder *sentbox = NULL, *outbox = NULL;
 	guint i = 0, length = 0;
 	TnyList *list = NULL;
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
-	TnySessionCamelPriv *spriv = ((TnySessionCamel *) apriv->session)->priv;
-	TnyDevice *device = g_object_ref (spriv->device);
+	TnyDevice *device = info->device;
 
-	g_object_ref (self); /* My own reference */
 	priv->is_running = TRUE;
 	list = tny_simple_list_new ();
 
@@ -468,13 +471,14 @@ errorhandler:
 
 	priv->is_running = FALSE;
 
-	g_object_unref (device);
 	g_object_unref (sentbox);
 	g_object_unref (outbox);
-	g_object_unref (self); /* The one added here (My own reference) */
-	g_object_unref (self); /* Thread reference (Before creation reference) */
 
 	priv->thread = NULL;
+
+	g_object_unref (info->device);
+	g_object_unref (info->self);
+	g_slice_free (MainThreadInfo, info);
 
 	return NULL;
 }
@@ -484,10 +488,17 @@ create_worker (TnySendQueue *self)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
-	if (!priv->is_running)
+	if (!priv->is_running && priv->trans_account && TNY_IS_TRANSPORT_ACCOUNT (priv->trans_account))
 	{
-		g_object_ref (self); /* Before creation reference */
-		priv->thread = g_thread_create (thread_main, self, FALSE, NULL);
+		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
+		TnySessionCamelPriv *spriv = ((TnySessionCamel *) apriv->session)->priv;
+
+		if (spriv->device && TNY_IS_DEVICE (spriv->device)) {
+			MainThreadInfo *info = g_slice_new0 (MainThreadInfo);
+			info->self = g_object_ref (self);
+			info->device = g_object_ref (spriv->device);
+			priv->thread = g_thread_create (thread_main, info, FALSE, NULL);
+		}
 	}
 
 	return;
