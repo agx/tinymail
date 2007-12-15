@@ -620,6 +620,7 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 	CamelFolder *cfolder;
 	const gchar *folder_full_name;
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+	CamelFolderInfo *iter;
 
 	priv->cant_reuse_iter = TRUE;
 
@@ -662,6 +663,17 @@ set_subscription (TnyStoreAccount *self, TnyFolder *folder, gboolean subscribe)
 	} else 
 	{
 		SetSubsInfo *info = g_slice_new (SetSubsInfo);
+
+		iter = priv->iter;
+		while (iter) {
+			if (!strcmp (iter->full_name, folder_full_name)) {
+				if (subscribe)
+					iter->flags |= CAMEL_FOLDER_SUBSCRIBED;
+				else
+					iter->flags &= ~CAMEL_FOLDER_SUBSCRIBED;
+			}
+			iter = iter->next;
+		}
 
 		/* Sync */
 		_tny_camel_folder_set_subscribed (TNY_CAMEL_FOLDER (folder), subscribe);
