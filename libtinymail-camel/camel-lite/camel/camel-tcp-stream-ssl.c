@@ -701,6 +701,7 @@ stream_close (CamelStream *stream)
 		return -1;
 	}
 
+	PR_Shutdown (((CamelTcpStreamSSL *)stream)->priv->sockfd, PR_SHUTDOWN_BOTH);
 	if (PR_Close (((CamelTcpStreamSSL *)stream)->priv->sockfd) == PR_FAILURE)
 		return -1;
 
@@ -1320,6 +1321,7 @@ socket_connect(CamelTcpStream *stream, struct addrinfo *host)
 
 			set_errno (PR_GetError ());
 			errnosave = errno;
+			PR_Shutdown (fd, PR_SHUTDOWN_BOTH);
 			PR_Close (fd);
 			errno = errnosave;
 
@@ -1371,6 +1373,7 @@ socket_connect(CamelTcpStream *stream, struct addrinfo *host)
 		} else {
 		exception:
 			errnosave = errno;
+			PR_Shutdown (fd, PR_SHUTDOWN_BOTH);
 			PR_Close (fd);
 			ssl->priv->sockfd = NULL;
 			errno = errnosave;
