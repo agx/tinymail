@@ -387,7 +387,7 @@ tny_camel_msg_header_get_subject (TnyHeader *self)
 	const gchar *enc;
 
 	if (!me->subject) {
-		enc = camel_mime_message_get_subject (me->msg);
+		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "subject");
 		me->subject = decode_it (me->msg, enc);
 	}
 
