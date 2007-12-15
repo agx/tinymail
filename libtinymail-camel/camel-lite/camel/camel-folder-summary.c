@@ -2163,9 +2163,9 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	charset = charset ? e_iconv_charset_name (charset) : NULL;
 
 	subject = summary_format_string(h, "subject", charset);
-	from = summary_format_address(h, "from", charset);
-	to = summary_format_address(h, "to", charset);
-	cc = summary_format_address(h, "cc", charset);
+	from = summary_format_string(h, "from", charset);
+	to = summary_format_string(h, "to", charset);
+	cc = summary_format_string(h, "cc", charset);
 
 	prio = camel_header_raw_find(&h, "X-Priority", NULL);
 	if (!prio)
