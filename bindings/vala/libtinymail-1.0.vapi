@@ -356,7 +356,6 @@ namespace Tny {
 		public void refresh () throws GLib.Error;
 		public void refresh_async (Tny.FolderCallback callback, Tny.StatusCallback status_callback, pointer user_data);
 		public void remove_msg (Tny.Header header) throws GLib.Error;
-		public void remove_msg_async (Tny.Header header) throws GLib.Error;
 		public void remove_msgs (Tny.List headers) throws GLib.Error;
 		public void remove_observer (Tny.FolderObserver observer);
 		public void set_msg_receive_strategy (Tny.MsgReceiveStrategy st);

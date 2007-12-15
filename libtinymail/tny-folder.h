@@ -143,7 +143,6 @@ TnyMsgReceiveStrategy* tny_folder_get_msg_receive_strategy (TnyFolder *self);
 void tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st);
 void tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err);
 void tny_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err);
-void tny_folder_remove_msg_async (TnyFolder *self, TnyHeader *header, GError **err);
 void tny_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err);
 void tny_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 void tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err);
