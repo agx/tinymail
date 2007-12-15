@@ -299,11 +299,11 @@ tny_combined_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFolder
 }
 
 static void
-tny_combined_account_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data)
+tny_combined_account_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
 
-	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (priv->store_account), list, callback, query, status_callback, user_data);
+	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (priv->store_account), list, query, callback, status_callback, user_data);
 }
 
 static void

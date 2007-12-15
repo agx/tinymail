@@ -118,7 +118,7 @@ START_TEST (tny_folder_store_test_get_folders_async)
      }
 
      folders = tny_simple_list_new ();
-     tny_folder_store_get_folders_async (account, folders, callback, NULL, status_cb, NULL);
+     tny_folder_store_get_folders_async (account, folders, NULL, callback, status_cb, NULL);
      g_timeout_add (1000*4, timeout, NULL);
      gtk_main ();
      fail_unless (tny_list_get_length (folders) == 1, "Did not find one root folder as expected");

@@ -1,5 +1,13 @@
 2007-12-15  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Moved the TnyFolderStoreQuery parameter in
+	tny_folder_store_get_folders_async
+	* Please check your E-mail clients! this is a major API change!
+
+	* This was a major API change
+
+2007-12-15  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Fixed some thread-unsafe code in TnyCamelSendQueue
 	* Use PR_Shutdown to cut an SSL connection
 	* Fixed folder subscriptions and queries

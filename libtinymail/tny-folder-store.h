@@ -49,7 +49,7 @@ struct _TnyFolderStoreIface
 	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name, GError **err);
 	void (*create_folder_async_func) (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
-	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data);
+	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*add_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
 	void (*remove_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
 
@@ -61,7 +61,7 @@ void tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GE
 TnyFolder *tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError **err);
 void tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 void tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
-void tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data);
+void tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 void tny_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer);
 void tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer);
 
