@@ -319,7 +319,7 @@ tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyCo
 
 	list = tny_simple_list_new ();
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account), 
-		list, get_folders_cb, NULL, NULL, g_object_ref (self));
+		list, get_folders_cb, self->query, NULL, g_object_ref (self));
 
 	return;
 }
@@ -456,7 +456,7 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 	 * before this one) */
 
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (folder_store), 
-		folders, get_folders_cb, NULL, NULL, g_object_ref (self));
+		folders, get_folders_cb, self->query, NULL, g_object_ref (self));
 
 	/* recurse_folders_sync (self, TNY_FOLDER_STORE (folder_store), &name_iter);  */
 
@@ -488,7 +488,7 @@ tny_gtk_folder_store_tree_model_new (TnyFolderStoreQuery *query)
 	TnyGtkFolderStoreTreeModel *self = g_object_new (TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL, NULL);
 
 	if (query) 
-		self->query = g_object_ref (G_OBJECT (query));
+		self->query = g_object_ref (query);
 
 	return GTK_TREE_MODEL (self);
 }

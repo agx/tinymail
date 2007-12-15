@@ -43,15 +43,15 @@ typedef struct _TnyFolderStoreIface TnyFolderStoreIface;
 
 struct _TnyFolderStoreIface
 {
-   GTypeInterface parent;
+	GTypeInterface parent;
 
-   void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder, GError **err);
-   TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name, GError **err);
-  void (*create_folder_async_func) (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
-   void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
+	void (*remove_folder_func) (TnyFolderStore *self, TnyFolder *folder, GError **err);
+	TnyFolder* (*create_folder_func) (TnyFolderStore *self, const gchar *name, GError **err);
+	void (*create_folder_async_func) (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	void (*get_folders_func) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
 	void (*get_folders_async_func) (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data);
-   void (*add_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
-   void (*remove_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
+	void (*add_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
+	void (*remove_observer_func) (TnyFolderStore *self, TnyFolderStoreObserver *observer);
 
 };
 

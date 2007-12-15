@@ -4826,6 +4826,9 @@ tny_camel_folder_get_folders_async_destroyer (gpointer thr_user_data)
 	g_object_unref (info->self);
 	g_object_unref (info->list);
 
+	if (info->query)
+		g_object_unref (G_OBJECT (info->query));
+
 	if (info->err)
 		g_error_free (info->err);
 
@@ -4860,9 +4863,6 @@ tny_camel_folder_get_folders_async_thread (gpointer thr_user_data)
 		if (camel_strstrcase (info->err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
 	}
-
-	if (info->query)
-		g_object_unref (G_OBJECT (info->query));
 
 	return NULL;
 }

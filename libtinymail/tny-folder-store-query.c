@@ -244,11 +244,11 @@ void
 tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *pattern, TnyFolderStoreQueryOption options)
 {
 	gint er=0;
-	gboolean addit=pattern?TRUE:FALSE;
+	gboolean addit=TRUE;
 	regex_t *regex = NULL;
 	gboolean has_regex = FALSE;
 
-	if (addit && (options & TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX)) 
+	if (pattern && (options & TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX)) 
 	{
 		regex = g_new0 (regex_t, 1);
 		er = regcomp (regex, (const char*)pattern, 0);
@@ -268,7 +268,10 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
 		TnyFolderStoreQueryItem *add = g_object_new (TNY_TYPE_FOLDER_STORE_QUERY_ITEM, NULL);
 
 		add->options = options;
-		add->pattern = g_strdup (pattern);
+		if (pattern)
+			add->pattern = g_strdup (pattern);
+		else
+			add->pattern = FALSE;
 
 		if (has_regex)
 			add->regex = regex;
