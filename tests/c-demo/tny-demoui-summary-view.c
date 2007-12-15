@@ -1071,7 +1071,8 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 				OnGetMsgInfo *info = g_slice_new (OnGetMsgInfo);
 				info->msg_view = TNY_MSG_VIEW (tny_gtk_msg_window_new (tny_platform_factory_new_msg_view (platfact)));
 
-				tny_gtk_msg_view_set_status_callback (TNY_GTK_MSG_VIEW (info->msg_view), status_update, self);
+				if (TNY_IS_GTK_MSG_VIEW (info->msg_view))
+					tny_gtk_msg_view_set_status_callback (TNY_GTK_MSG_VIEW (info->msg_view), status_update, self);
 
 				g_object_ref (info->msg_view);
 				gtk_widget_show (GTK_WIDGET (info->msg_view));

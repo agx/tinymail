@@ -839,10 +839,12 @@ rfc2047_decode_word(const char *in, size_t len)
 	size_t inlen, outlen;
 	gboolean retried = FALSE;
 	iconv_t ic;
+	int idx = 0;
 
 	d(printf("rfc2047: decoding '%.*s'\n", len, in));
 
 	/* quick check to see if this could possibly be a real encoded word */
+
 	if (len < 8 || !(in[0] == '=' && in[1] == '?')) {
 		d(printf("invalid\n"));
 		return NULL;

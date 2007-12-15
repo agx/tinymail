@@ -45,7 +45,7 @@ static GObjectClass *parent_class = NULL;
 
 
 static char*
-decode_it (CamelMimeMessage *msg, const char *str)
+decode_it (CamelMimeMessage *msg, const char *str, gboolean is_addr)
 {
 	struct _camel_header_raw *h = ((CamelMimePart *)msg)->headers;
 	const char *content, *charset;
@@ -65,6 +65,19 @@ decode_it (CamelMimeMessage *msg, const char *str)
 	while (isspace ((unsigned) *str))
 		str++;
 
+	if (is_addr) {
+		char *ret;
+		struct _camel_header_address *addr;
+		addr = camel_header_address_decode (str, charset);
+		if (addr) {
+			ret = camel_header_address_list_format (addr);
+			camel_header_address_list_clear (&addr);
+		} else {
+			ret = g_strdup (str);
+		}
+		return ret;
+	}
+
 	return camel_header_decode_string (str, charset);
 }
 
@@ -76,7 +89,7 @@ tny_camel_msg_header_get_replyto (TnyHeader *self)
 
 	if (!me->reply_to) {
 		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "reply-to");
-		me->reply_to = decode_it (me->msg, enc);
+		me->reply_to = decode_it (me->msg, enc, TRUE);
 	}
 
 	return (const gchar *) me->reply_to;
@@ -192,7 +205,7 @@ tny_camel_msg_header_get_cc (TnyHeader *self)
 
 	if (!me->cc) {
 		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "cc");
-		me->cc = decode_it (me->msg, enc);
+		me->cc = decode_it (me->msg, enc, TRUE);
 	}
 
 	return (const gchar *) me->cc;
@@ -206,7 +219,7 @@ tny_camel_msg_header_get_bcc (TnyHeader *self)
 
 	if (!me->bcc) {
 		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "bcc");
-		me->bcc = decode_it (me->msg, enc);
+		me->bcc = decode_it (me->msg, enc, TRUE);
 	}
 
 	return (const gchar *) me->bcc;
@@ -374,7 +387,7 @@ tny_camel_msg_header_get_from (TnyHeader *self)
 
 	if (!me->from) {
 		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "from");
-		me->from = decode_it (me->msg, enc);
+		me->from = decode_it (me->msg, enc, TRUE);
 	}
 
 	return (const gchar *) me->from;
@@ -388,7 +401,7 @@ tny_camel_msg_header_get_subject (TnyHeader *self)
 
 	if (!me->subject) {
 		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "subject");
-		me->subject = decode_it (me->msg, enc);
+		me->subject = decode_it (me->msg, enc, FALSE);
 	}
 
 	return (const gchar *) me->subject;
@@ -403,7 +416,7 @@ tny_camel_msg_header_get_to (TnyHeader *self)
 
 	if (!me->to) {
 		enc = camel_medium_get_header (CAMEL_MEDIUM (me->msg), "to");
-		me->to = decode_it (me->msg, enc);
+		me->to = decode_it (me->msg, enc, TRUE);
 	}
 
 	return (const gchar *) me->to;
