@@ -17,7 +17,16 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyMergeFolder:
+ *
+ * A #TnyFolder that merges other folders together 
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
+
 #include <string.h>
 #include <glib.h>
 #include <glib/gi18n-lib.h>
@@ -732,15 +741,16 @@ tny_merge_folder_get_account (TnyFolder *self)
 
 /**
  * tny_merge_folder_set_folder_type
- * @self: a #TnyMergeFolder object
- * @folder_type: the new folder type
+ * @self: a #TnyMergeFolder
+ * @folder_type: the new folder
  * 
- * Set the folder type of the TnyMergeFolder. The default is TNY_FOLDER_TYPE_MERGE
+ * Set the folder type of the #TnyMergeFolder. The default is TNY_FOLDER_TYPE_MERGE
  * but you can change this to any folder type. It will not affect anything except
- * that get_folder_type() will return the new type now.
+ * that tny_folder_get_folder_type() will return the new type.
  *
+ * since: 1.0
+ * audience: application-developer
  **/
-
 void
 tny_merge_folder_set_folder_type (TnyMergeFolder* self, TnyFolderType folder_type)
 {
@@ -1444,10 +1454,13 @@ tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
 
 /**
  * tny_merge_folder_add_folder:
- * @self: a #TnyMergeFolder object
- * @folder: a #TnyFolder object 
+ * @self: a #TnyMergeFolder
+ * @folder: a #TnyFolder 
  *
- * Add @folder to the list of folders that will be merged by @self.
+ * Add @folder to the list of folders that are merged by @self.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
@@ -1469,11 +1482,14 @@ tny_merge_folder_add_folder (TnyMergeFolder *self, TnyFolder *folder)
 
 /**
  * tny_merge_folder_remove_folder:
- * @self: a #TnyMergeFolder object
- * @folder: a #TnyFolder object 
+ * @self: a #TnyMergeFolder
+ * @folder: a #TnyFolder 
  *
- * Removes @folder from the list of folders that will be merged by
+ * Removes @folder from the list of folders that are merged by
  * @self.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_merge_folder_remove_folder (TnyMergeFolder *self, TnyFolder *folder)
@@ -1497,10 +1513,13 @@ tny_merge_folder_remove_folder (TnyMergeFolder *self, TnyFolder *folder)
 
 /**
  * tny_merge_folder_get_folders:
- * @self: a #TnyMergeFolder object
- * @list: a #TnyList to fillup
+ * @self: a #TnyMergeFolder
+ * @list: a #TnyList to which the folders will be prepended
  *
- * Returns the folders that are merged in the @self merge folder.
+ * Get the folders that are merged in the merge folder @self.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_merge_folder_get_folders (TnyMergeFolder *self, TnyList *list)
@@ -1546,11 +1565,13 @@ tny_merge_folder_get_folders (TnyMergeFolder *self, TnyList *list)
  * your UI toolkid isn't thread safe (most aren't), but so-called thread aware
  * because it has a UI context lock (like Gtk+ has), then you must create this
  * type with a TnyLockable that aquires and releases this lock correctly.
- * For Gtk+ there's a default implementation called TnyGtkLockable available
- * in libtinymailui-gtk. Please do use this, else you can have threading related
+ * For Gtk+ there's a default implementation called #TnyGtkLockable available
+ * in libtinymailui-gtk. Please use this, else you can have threading related
  * problems in your user interface software.
  *
- * Return value: a new #TnyMergeFolder instance
+ * returns (caller-owns): a new #TnyMergeFolder instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder*
 tny_merge_folder_new (const gchar *folder_name)
@@ -1571,9 +1592,11 @@ tny_merge_folder_new (const gchar *folder_name)
  *
  * Creates a a new TnyMergeFolder instance that can merge multiple #TnyFolder 
  * instances together (partly read only, though). Upon construction it 
- * instantly sets the ui locker. For Gtk+ you should use TnyGtkLockable here.
+ * instantly sets the ui locker. For Gtk+ you should use a #TnyGtkLockable here.
  *
- * Return value: a new #TnyMergeFolder instance
+ * returns (caller-owns): a new #TnyMergeFolder instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder*
 tny_merge_folder_new_with_ui_locker (const gchar *folder_name, TnyLockable *ui_locker)
@@ -1585,11 +1608,13 @@ tny_merge_folder_new_with_ui_locker (const gchar *folder_name, TnyLockable *ui_l
 
 /**
  * tny_merge_folder_set_ui_locker:
- * @self: a #TnyMergeFolder instance
+ * @self: a #TnyMergeFolder
  * @ui_locker: a #TnyLockable locker for locking your ui
  *
- * Sets the ui locker. For Gtk+ you should use TnyGtkLockable here.
+ * Sets the ui locker. For Gtk+ you should use a #TnyGtkLockable here.
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_merge_folder_set_ui_locker (TnyMergeFolder *self, TnyLockable *ui_locker)

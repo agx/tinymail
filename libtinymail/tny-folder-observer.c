@@ -17,21 +17,30 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyFolderObserver:
+ *
+ * A event observer for a #TnyFolder
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-folder-observer.h>
 
 
-
 /**
  * tny_folder_observer_update:
- * @self: A #TnyFolderObserver instance
- * @change: A #TnyFolderChange instance
+ * @self: a #TnyFolderObserver
+ * @change: a #TnyFolderChange
  *
  * Observer's update method. The @change is the delta of changes between the last 
  * and the current state. It contains for example the added and removed headers
- * and the new all and unread count of the #TnyFolder. 
+ * and the new all- and unread count of the #TnyFolder. 
  *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void 
 tny_folder_observer_update (TnyFolderObserver *self, TnyFolderChange *change)

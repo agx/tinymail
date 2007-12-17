@@ -17,6 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyHeader: 
+ *
+ * A summary item, envelope or group of E-mail headers. Depending on how you
+ * like to call it.
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #ifdef DBC
@@ -29,10 +38,13 @@
 
 /**
  * tny_header_set_replyto:
- * @self: a #TnyHeader object
- * @to: the reply-to header
+ * @self: a #TnyHeader
+ * @to (null-ok): the reply-to header or NULL
  * 
  * Set the reply-to header
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_header_set_replyto (TnyHeader *self, const gchar *to)
@@ -52,11 +64,13 @@ tny_header_set_replyto (TnyHeader *self, const gchar *to)
 
 /**
  * tny_header_get_replyto:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get the reply-to header
  * 
- * Return value: reply-to header, or NULL if not found
+ * returns (null-ok): reply-to header or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_header_get_replyto (TnyHeader *self)
@@ -71,12 +85,14 @@ tny_header_get_replyto (TnyHeader *self)
 
 /**
  * tny_header_set_bcc:
- * @self: a #TnyHeader object
- * @bcc: the bcc header in a comma separated list
+ * @self: a #TnyHeader
+ * @bcc (null-ok): the BCC header in a comma separated list or NULL
  * 
- * Set the bcc header. Look at the to header for more information
+ * Set the BCC header. Look at the To header for more information
  * about formatting.
- * 
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_header_set_bcc (TnyHeader *self, const gchar *bcc)
@@ -96,12 +112,14 @@ tny_header_set_bcc (TnyHeader *self, const gchar *bcc)
 
 /**
  * tny_header_set_cc:
- * @self: a #TnyHeader object
- * @cc: the cc header in a comma separated list
+ * @self: a #TnyHeader
+ * @cc (null-ok): the CC header in a comma separated list or NULL
  * 
- * Set the cc header. Look at the to header for more information
+ * Set the CC header. Look at the To header for more information
  * about formatting.
- * 
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_header_set_cc (TnyHeader *self, const gchar *cc)
@@ -121,11 +139,13 @@ tny_header_set_cc (TnyHeader *self, const gchar *cc)
 
 /**
  * tny_header_set_from:
- * @self: a #TnyHeader object
- * @from: the from header
+ * @self: a #TnyHeader
+ * @from (null-ok): the from header or NULL
  * 
  * Set the from header
- * 
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_header_set_from (TnyHeader *self, const gchar *from)
@@ -145,11 +165,13 @@ tny_header_set_from (TnyHeader *self, const gchar *from)
 
 /**
  * tny_header_set_subject:
- * @self: a #TnyHeader object
- * @subject: the subject header
+ * @self: a #TnyHeader
+ * @subject (null-ok): the subject header or NULL
  * 
  * Set the subject header
- * 
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_header_set_subject (TnyHeader *self, const gchar *subject)
@@ -169,16 +191,18 @@ tny_header_set_subject (TnyHeader *self, const gchar *subject)
 
 /**
  * tny_header_set_to:
- * @self: a #TnyHeader object
- * @to: the to header in a comma separated list
+ * @self: a #TnyHeader
+ * @to (null-ok): the To header in a comma separated list or NULL
  * 
- * Set the to header.
+ * Set the To header.
  *
  * The format is a comma separated list like this:
  * Full name &gt;user@domain&lt;, Full name &gt;user@domain&lt;
  *
  * There are no quotes nor anything special. Just commas.
- * 
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_header_set_to (TnyHeader *self, const gchar *to)
@@ -198,12 +222,13 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
 
 /**
  * tny_header_get_cc:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get the CC header. The returned value should not be freed.
  * 
- * Return value: cc header as a read-only string, or NULL if not found
- *
+ * returns (null-ok): CC header as a read-only string or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_header_get_cc (TnyHeader *self)
@@ -218,12 +243,13 @@ tny_header_get_cc (TnyHeader *self)
 
 /**
  * tny_header_get_bcc:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get the BCC header. The returned value should not be freed.
  * 
- * Return value: bcc header as a read-only string, or NULL if not found
- *
+ * returns (null-ok): BCC header as a read-only string or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_header_get_bcc (TnyHeader *self)
@@ -238,11 +264,13 @@ tny_header_get_bcc (TnyHeader *self)
 
 /**
  * tny_header_get_date_received:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get the Date Received header as a time_t
  * 
- * Return value: date received header
+ * returns: date received header
+ * since: 1.0
+ * audience: application-developer
  **/
 time_t
 tny_header_get_date_received (TnyHeader *self)
@@ -257,11 +285,13 @@ tny_header_get_date_received (TnyHeader *self)
 
 /**
  * tny_header_get_date_sent:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get the Date Sent header as a time_t
  * 
- * Return value: date sent header
+ * returns: date sent header
+ * since: 1.0
+ * audience: application-developer
  **/
 time_t
 tny_header_get_date_sent (TnyHeader *self)
@@ -277,13 +307,15 @@ tny_header_get_date_sent (TnyHeader *self)
 
 /**
  * tny_header_get_uid:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
- * Get an unique id of the message of which self is a message header. The 
- * returned value should not be freed.
+ * Get an unique id of the message of which @self is a message header. The 
+ * returned value should not be freed. The UID corresponds to the UID in
+ * IMAP and the UIDL in POP if UIDL is supported or the UID if not.
  * 
- * Return value: Unique follow-up uid as a read-only string, or NULL if not found
- *
+ * returns (null-ok): unique follow-up uid as a read-only string or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_header_get_uid (TnyHeader *self)
@@ -298,13 +330,15 @@ tny_header_get_uid (TnyHeader *self)
 
 /**
  * tny_header_get_message_id:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get an unique id of the message of which self is a message header. The 
- * returned value should not be freed.
+ * returned value should not be freed. The message-id corresponds to the
+ * message-id header in the MIME message.
  * 
- * Return value: message-id header as a read-only string, or NULL if not found
- *
+ * returns (null-ok): message-id header as a read-only string or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_header_get_message_id (TnyHeader *self)
@@ -320,12 +354,14 @@ tny_header_get_message_id (TnyHeader *self)
 
 /**
  * tny_header_get_message_size:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
- * Get the expected message size
+ * Get the expected message's size (the accuracy of the size prediction depends 
+ * on the availability of an accurate total size of the message at the service).
  * 
- * Return value: expected message size
- *
+ * returns: expected message size
+ * since: 1.0
+ * audience: application-developer
  **/
 guint
 tny_header_get_message_size (TnyHeader *self)
@@ -342,12 +378,13 @@ tny_header_get_message_size (TnyHeader *self)
 
 /**
  * tny_header_get_from:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get the from header. The returned value should not be freed.
  * 
- * Return value: from header as a read-only string, or NULL if not found
- *
+ * returns (null-ok): from header as a read-only string or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar* 
 tny_header_get_from (TnyHeader *self)
@@ -362,12 +399,13 @@ tny_header_get_from (TnyHeader *self)
 
 /**
  * tny_header_get_subject:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get the subject header. The returned value should not be freed.
  * 
- * Return value: subject header as a read-only string, or NULL if not found
- *
+ * returns (null-ok): subject header as a read-only string or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_header_get_subject (TnyHeader *self)
@@ -383,12 +421,13 @@ tny_header_get_subject (TnyHeader *self)
 
 /**
  * tny_header_get_to:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get the to header. The returned value should not be freed.
  * 
- * Return value: to header as a read-only string, or NULL if not found
- *
+ * returns (null-ok): to header as a read-only string or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar* 
 tny_header_get_to (TnyHeader *self)
@@ -403,14 +442,15 @@ tny_header_get_to (TnyHeader *self)
 
 /**
  * tny_header_get_folder:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
  * Get the parent folder where this message header is located. This method can
- * return NULL in case the folder isn't know. The returned value,i if not NULL,
+ * return NULL in case the folder isn't know. The returned value, if not NULL,
  * must be unreferenced after use.
  * 
- * Return value: The folder of the message header or NULL
- *
+ * returns (null-ok) (caller-owns): The folder of the message header or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder* 
 tny_header_get_folder (TnyHeader *self)
@@ -438,12 +478,15 @@ tny_header_get_folder (TnyHeader *self)
  * tny_header_get_flags:
  * @self: a #TnyHeader object
  * 
- * Get message information flags.
+ * Get message's information flags like the message's read state and whether
+ * it's detected that it has attachments.
  * 
- * No not use this method to get priority settings. Use tny_header_get_priority
- * in stead.
+ * Note: don't use this method to get priority settings.
+ * Use tny_header_get_priority in stead.
  *
- * Return value: flag bitmask
+ * returns: flags bitmask
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyHeaderFlags
 tny_header_get_flags (TnyHeader *self)
@@ -458,15 +501,18 @@ tny_header_get_flags (TnyHeader *self)
 
 /**
  * tny_header_set_flag:
- * @self: a #TnyHeader object
- * @mask: A #TnyHeaderFlags bitmask flag to set.
+ * @self: a #TnyHeader
+ * @mask: a #TnyHeaderFlags bitmask flag to set.
  * 
- * Modify message flag @mask. Modifying the TNY_HEADER_FLAG_SEEN will trigger the 
- * notification of folder observers if @self was originated from a folder.
+ * Modify message's flag @mask. Modifying the TNY_HEADER_FLAG_SEEN will trigger
+ * the notification of folder observers if @self was originated from a folder.
  *
- * Do not use this method to set priority settings. Use tny_header_set_priority
- * in stead. Don't set more than one flag. Use the labels of the TnyHeaderFlags
+ * Do not use this method to set priority settings. Use tny_header_set_priority()
+ * in stead. Don't set more than one flag. Use the labels of the #TnyHeaderFlags
  * as an enum.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_header_set_flag (TnyHeader *self, TnyHeaderFlags mask)
@@ -487,11 +533,13 @@ tny_header_set_flag (TnyHeader *self, TnyHeaderFlags mask)
 
 /**
  * tny_header_get_priority:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * 
- * Get message priority
+ * Get message's priority
  *
- * Return value: priority
+ * returns: priority of the message
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyHeaderFlags 
 tny_header_get_priority (TnyHeader *self)
@@ -503,13 +551,16 @@ tny_header_get_priority (TnyHeader *self)
 
 /**
  * tny_header_set_priority:
- * @self: a #TnyHeader object
+ * @self: a #TnyHeader
  * @priority: A priority setting (high, low or normal)
  * 
  * Set the priority of the message. To unset the priority, you can use 
  * TNY_HEADER_FLAG_NORMAL_PRIORITY as @priority. Don't combine @priority with
- * other flags. Use additional tny_header_set_flag calls if you want to do 
+ * other flags. Use additional tny_header_set_flag() calls if you want to do 
  * that.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_header_set_priority (TnyHeader *self, TnyHeaderFlags priority)
@@ -529,15 +580,18 @@ tny_header_set_priority (TnyHeader *self, TnyHeaderFlags priority)
 
 /**
  * tny_header_unset_flag:
- * @self: a #TnyHeader object
- * @mask: A #TnyHeaderFlags flag to clear.
+ * @self: a #TnyHeader
+ * @mask: a #TnyHeaderFlags flag to clear.
  * 
  * Reset message flag @mask. Modifying the TNY_HEADER_FLAG_SEEN will trigger the 
  * notification of folder observers if @self was originated from a folder.
  * 
- * Don't attempt to unset the priority. Use tny_header_set_priority (header, 
- * TNY_HEADER_FLAG_NORMAL_PRIORITY) to set the priority of a message to normal 
+ * Don't attempt to unset the priority. Use tny_header_set_priority() 
+ * with TNY_HEADER_FLAG_NORMAL_PRIORITY to set the priority of a message to normal 
  * (which is the same as unsetting it). Don't unset multiple flags.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
@@ -603,7 +657,7 @@ tny_header_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_header_flags_get_type (void)

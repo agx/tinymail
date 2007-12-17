@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnySendQueue:
+ *
+ * A queue for sending messages
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-send-queue.h>
@@ -29,11 +37,14 @@ guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
 
 /**
  * tny_send_queue_cancel:
- * @self: A #TnySendQueue instance
- * @remove: Whether or not to also remove queued messages
- * @err: a #GError instance or NULL
+ * @self: a #TnySendQueue
+ * @remove: also remove queued messages
+ * @err (null-ok): a #GError or NULL
  *
  * Cancels the current operation
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
@@ -49,12 +60,14 @@ tny_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
 
 /**
  * tny_send_queue_get_sentbox:
- * @self: A #TnySendQueue instance
+ * @self: A #TnySendQueue
  *
  * Get the folder which contains the messages that have been sent. The 
- * return value must be unreferenced after use
+ * returned value must be unreferenced after use
  *
- * Return value: a #TnyFolder instance
+ * returns (caller-owns): a #TnyFolder instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder* 
 tny_send_queue_get_sentbox (TnySendQueue *self)
@@ -80,15 +93,17 @@ tny_send_queue_get_sentbox (TnySendQueue *self)
  * @self: A #TnySendQueue instance
  *
  * Get the folder which contains the messages that have not yet been sent. The 
- * return value must be unreferenced after use. It's not guaranteed that when
+ * returned value must be unreferenced after use. It's not guaranteed that when
  * changing the content of @outbox, @self will automatically adjust itself to
  * the new situation. Although some implementations of #TnySendQueue might
- * indeed do this, it's advisable to use tny_send_queue_add in stead of 
- * tny_folder_add_msg on @outbox. The reason for that is lack of specification
+ * indeed do this, it's advisable to use tny_send_queue_add() in stead of 
+ * tny_folder_add_msg() on the outbox. The reason for that is lack of specification
  * and a #TnySendQueue implementation not having to implement #TnyFolderObserver
- * too (which makes it possible to act on changes happening to @outbox).
+ * too (which makes it possible to act on changes happening to the outbox).
  *
- * Return value: a #TnyFolder instance
+ * returns (caller-owns): a #TnyFolder instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder* 
 tny_send_queue_get_outbox (TnySendQueue *self)
@@ -111,12 +126,14 @@ tny_send_queue_get_outbox (TnySendQueue *self)
 
 /**
  * tny_send_queue_add:
- * @self: A #TnySendQueue instance
- * @msg: a #TnyMsg instance
- * @err: a #GError instance or NULL
+ * @self: A #TnySendQueue
+ * @msg: a #TnyMsg
+ * @err (null-ok): a #GError or NULL
  *
- * Add a message to the send queue.
+ * Add a message to the send queue, usually adding it to the outbox too.
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
@@ -142,13 +159,13 @@ tny_send_queue_base_init (gpointer g_class)
 /**
  * TnySendQueue::msg-sending
  * @self: the object on which the signal is emitted
- * @arg1: The message that is being 
- * @arg2: The current nth number of the message that is being sending
+ * @arg1: The message that is being sent
+ * @arg2: The current nth number of the message that is being sent
  * @arg3: The total amount of messages currently being processed
  *
  * API WARNING: This API might change
  *
- * Emitted when a message is being proccessed to sending it
+ * Emitted when a message is being sent.
  **/
 		tny_send_queue_signals[TNY_SEND_QUEUE_MSG_SENDING] =
 			g_signal_new ("msg_sending",
@@ -180,11 +197,10 @@ tny_send_queue_base_init (gpointer g_class)
 /**
  * TnySendQueue::error-happened
  * @self: the object on which the signal is emitted
- * @arg1: The header of the message that was supposed to be sent or NULL
- * @arg2: The message that was supposed to be sent or NULL
+ * @arg1 (null-ok): The header of the message that was supposed to be sent or NULL
+ * @arg2 (null-ok): The message that was supposed to be sent or NULL
  * @arg3: a GError containing the error that happened
  * @arg4: user data
- *
  *
  * Emitted when a message didn't get sent because of an error
  **/
@@ -201,6 +217,13 @@ tny_send_queue_base_init (gpointer g_class)
 	}
 }
 
+/**
+ * tny_send_queue_get_type:
+ *
+ * GType system helper function
+ *
+ * returns: a #GType
+ **/
 GType
 tny_send_queue_get_type (void)
 {
@@ -235,7 +258,7 @@ tny_send_queue_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_send_queue_signal_get_type (void)

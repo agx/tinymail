@@ -21,15 +21,24 @@
 
 #include <tny-status.h>
 
+/**
+ * TnyStatus:
+ *
+ * A progress status
+ *
+ * free-function: tny_status_free
+ **/
 
 /**
  * tny_status_set_fraction:
- * @status: a #TnyStatus instance
+ * @status: a #TnyStatus
  * @fraction: the fraction to set
  * 
  * Set the fraction of @status. The of_total member of @status will be set to 100
  * by this method.
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_status_set_fraction (TnyStatus *status, gdouble fraction)
@@ -40,11 +49,13 @@ tny_status_set_fraction (TnyStatus *status, gdouble fraction)
 
 /**
  * tny_status_get_fraction:
- * @status: a #TnyStatus instance
+ * @status: a #TnyStatus
  * 
  * Get the fraction of @status
  *
- * Return value: the fraction of @status
+ * returns: the fraction of @status
+ * since: 1.0
+ * audience: application-developer
  **/
 gdouble 
 tny_status_get_fraction (TnyStatus *status)
@@ -84,7 +95,7 @@ tny_status_new_valist (GQuark domain, int code, guint position, guint of_total, 
  * Creates a new #TnyStatus with the given @domain and @code,
  * and a message formatted with @format.
  * 
- * Return value: a new #TnyStatus
+ * returns (caller-owns): a new #TnyStatus
  **/
 TnyStatus* 
 tny_status_new (GQuark domain, gint code, guint position, guint of_total, const gchar *format, ...)
@@ -115,7 +126,7 @@ tny_status_new (GQuark domain, gint code, guint position, guint of_total, const 
  * function if @message contains text you don't have control over, 
  * that could include printf() escape sequences.
  * 
- * Return value: a new #TnyStatus
+ * returns (caller-owns): a new #TnyStatus
  **/
 TnyStatus* 
 tny_status_new_literal (GQuark domain, gint code, guint position, guint of_total, const gchar *message)
@@ -140,8 +151,10 @@ tny_status_new_literal (GQuark domain, gint code, guint position, guint of_total
  * tny_status_free:
  * @status: a #TnyStatus
  *
- * Frees a #TnyStatus and associated resources.
- * 
+ * Destroys a #TnyStatus and associated resources.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_status_free (TnyStatus *status)
@@ -157,9 +170,11 @@ tny_status_free (TnyStatus *status)
  * tny_status_copy:
  * @status: a #TnyStatus
  * 
- * Makes a copy of @status.
+ * Makes a full copy of @status (not just a shallow copy).
  * 
- * Return value: a new #TnyStatus
+ * returns (caller-owns): a new #TnyStatus
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyStatus* 
 tny_status_copy (const TnyStatus *status)
@@ -186,7 +201,9 @@ tny_status_copy (const TnyStatus *status)
  * Returns %TRUE if @status matches @domain and @code, %FALSE
  * otherwise.
  * 
- * Return value: whether @status has @domain and @code
+ * returns: TRUE if @status has @domain and @code, else FALSE
+ * since: 1.0
+ * audience: application-developer
  **/
 gboolean 
 tny_status_matches (const TnyStatus *status, GQuark domain, gint code)
@@ -208,6 +225,9 @@ tny_status_matches (const TnyStatus *status, GQuark domain, gint code)
  * 
  * Does nothing if @status is %NULL; if @status is non-%NULL, then *@status must
  * be %NULL. A new #TnyStatus is created and assigned to *@status.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_set_status (TnyStatus **status, GQuark domain, gint code, guint position, guint of_total, gchar *format, ...)
@@ -234,6 +254,9 @@ tny_set_status (TnyStatus **status, GQuark domain, gint code, guint position, gu
  * 
  * If @status is %NULL, does nothing. If @status is non-%NULL,
  * calls tny_status_free() on *@status and sets *@status to %NULL.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_clear_status (TnyStatus **status)
@@ -249,21 +272,21 @@ tny_clear_status (TnyStatus **status)
  * tny_status_get_message:
  * @status: a #TnyStatus 
  * 
- * Return value: the message of @status (as a const gchar*)
+ * returns (null-ok): the message of @status (as a const gchar*)
  **/
 
 /**
  * tny_status_get_domain:
  * @status: a #TnyStatus 
  * 
- * Return value: the domain of @status (as a TnyStatusDomain)
+ * returns: the domain of @status (as a TnyStatusDomain)
  **/
 
 /**
  * tny_status_get_code:
  * @status: a #TnyStatus 
  * 
- * Return value: the code of @status (as a TnyStatusCode)
+ * returns: the code of @status (as a TnyStatusCode)
  **/
 
 
@@ -272,7 +295,7 @@ tny_clear_status (TnyStatus **status)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_status_domain_get_type (void)
@@ -296,7 +319,7 @@ tny_status_domain_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_status_code_get_type (void)

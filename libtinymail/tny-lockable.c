@@ -17,15 +17,26 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyLockable:
+ *
+ * A type for locking and unlocking things
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-lockable.h>
 
 /**
  * tny_lockable_lock:
- * @self: a #TnyLockable object
+ * @self: a #TnyLockable
  * 
  * Lock @self
+ *
+ * since: 1.0
+ * audience: platform-developer
  **/
 void 
 tny_lockable_lock (TnyLockable *self)
@@ -41,9 +52,12 @@ tny_lockable_lock (TnyLockable *self)
 
 /**
  * tny_lockable_unlock:
- * @self: a #TnyLockable object
+ * @self: a #TnyLockable
  * 
  * Unlock @self
+ *
+ * since: 1.0
+ * audience: platform-developer
  **/
 void 
 tny_lockable_unlock (TnyLockable *self)

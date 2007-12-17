@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyMsgReceiveStrategy:
+ *
+ * A strategy for receiving messages
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-msg-receive-strategy.h>
@@ -31,16 +39,17 @@
 
 /**
  * tny_msg_receive_strategy_perform_get_msg:
- * @self: A #TnyMsgReceiveStrategy instance
- * @folder: The #TnyFolder instance from which the message will be received
- * @header: The #TnyHeader instance of the message that must be received
- * @err: A #GError instance or NULL
+ * @self: A #TnyMsgReceiveStrategy
+ * @folder: a #TnyFolder from which the message will be received
+ * @header: a #TnyHeader of the message that must be received
+ * @err (null-ok): A #GError or NULL
  *
- * Performs the receiving of a message from a folder. If not NULL, the returned
- * value must be unreferenced after use. If the returned value is NULL and @err
- * wasn't NULL, then @err will be set.
+ * Performs the receiving of a message from @folder. If not NULL, the returned
+ * value must be unreferenced after use.
  *
- * Return value: the received message or NULL
+ * returns (null-ok) (caller-owns): the received message or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyMsg *
 tny_msg_receive_strategy_perform_get_msg (TnyMsgReceiveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)

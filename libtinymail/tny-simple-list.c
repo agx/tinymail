@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnySimpleList:
+ *
+ * A simple list
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <glib.h>
@@ -200,7 +208,7 @@ tny_simple_list_init (TnySimpleList *self)
  * 
  * Create a general purpose #TnyList instance
  *
- * Return value: A general purpose #TnyList instance
+ * returns (caller-owns): A general purpose #TnyList instance
  **/
 TnyList*
 tny_simple_list_new (void)

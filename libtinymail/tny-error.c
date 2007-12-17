@@ -19,15 +19,12 @@
 
 #include <tny-error.h>
 
-
-/* TODO: These get_type() functions should be generated, as in GTK+, gnome-vfs, etc. */
-
 /**
  * tny_error_domain_get_type:
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_error_domain_get_type (void)
@@ -54,7 +51,7 @@ tny_error_domain_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_error_get_type (void)
@@ -62,9 +59,6 @@ tny_error_get_type (void)
   static GType etype = 0;
   if (etype == 0) {
     static const GEnumValue values[] = {
-
-
-
 
       { TNY_ERROR_UNSPEC, "TNY_ERROR_UNSPEC", "error_unspec" },
       { TNY_FOLDER_ERROR_SYNC, "TNY_FOLDER_ERROR_SYNC", "folder_error_sync" },

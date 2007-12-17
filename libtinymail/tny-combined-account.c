@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyCombinedAccount:
+ * 
+ * A combined account
+ *
+ * free-function: g_object_unref
+ */
+
 #include <config.h>
 #include <glib.h>
 #include <glib/gi18n-lib.h>
@@ -369,19 +377,22 @@ on_subscription_changed_signal (TnyStoreAccount *sa, TnyFolder *folder, gpointer
 
 /**
  * tny_combined_account_new:
- * @ta: A #TnyTransportAccount instance
- * @sa: a #TnyStoreAccount instance
+ * @ta: A #TnyTransportAccount
+ * @sa: a #TnyStoreAccount
  * 
  * Create a decorator for @ta, in case the tny_transport_account_send is used,
- * and for @sa in case any other method of either TnyFolderStore, TnyAccount
- * or TnyStoreAccount is used.
+ * and for @sa in case a method of either #TnyFolderStore, #TnyAccount or 
+ * #TnyStoreAccount is used.
  *
  * Note though that you must not use instances created by this constructor for
  * either setting or getting members of the #TnyAccount type. You must get the
- * actual instances to read this from using either 
- * tny_combined_account_get_transport_account or tny_combined_account_get_store_account.
+ * actual instances to read these properties.
  *
- * Return value: A new account instance that decorates both @ta and @sa
+ * returns (caller-owns): A new account instance that decorates both @ta and @sa
+ *
+ * since: 1.0
+ * complexity: high
+ * audience: application-developer
  **/
 TnyAccount *
 tny_combined_account_new (TnyTransportAccount *ta, TnyStoreAccount *sa)
@@ -401,12 +412,15 @@ tny_combined_account_new (TnyTransportAccount *ta, TnyStoreAccount *sa)
 
 /**
  * tny_combined_account_get_transport_account:
- * @self: a #TnyCombinedAccount instance
+ * @self: a #TnyCombinedAccount
  * 
  * Get the transport account that is being decorated by @self. You must unreference
  * the returned value if not needed anymore.
  *
- * Return value: the transport account being decorated
+ * returns (caller-owns): the transport account in @self
+ * since: 1.0
+ * complexity: low
+ * audience: application-developer
  **/
 TnyTransportAccount* 
 tny_combined_account_get_transport_account (TnyCombinedAccount *self)
@@ -418,12 +432,15 @@ tny_combined_account_get_transport_account (TnyCombinedAccount *self)
 
 /**
  * tny_combined_account_get_store_account:
- * @self: a #TnyCombinedAccount instance
+ * @self: a #TnyCombinedAccount
  * 
  * Get the store account that is being decorated by @self. You must unreference
  * the returned value if not needed anymore.
  *
- * Return value: the store account being decorated
+ * returns (caller-owns): the store account in @self
+ * since: 1.0
+ * complexity: low
+ * audience: application-developer
  **/
 TnyStoreAccount* 
 tny_combined_account_get_store_account (TnyCombinedAccount *self)

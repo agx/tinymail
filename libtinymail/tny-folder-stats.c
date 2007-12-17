@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyFolderStats:
+ *
+ * Some statistics about a #TnyFolder
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-folder-stats.h>
@@ -39,11 +47,13 @@ struct _TnyFolderStatsPriv
 
 /**
  * tny_folder_stats_get_unread_count:
- * @self: a #TnyFolderStats instance
+ * @self: a #TnyFolderStats
  *
- * Get the amount of unread messages in @self
+ * Get the amount of unread messages in @self.
  *
- * Return value: the amount of unread messages
+ * returns: the amount of unread messages
+ * since: 1.0
+ * audience: application-developer
  **/
 guint 
 tny_folder_stats_get_unread_count (TnyFolderStats *self)
@@ -57,11 +67,13 @@ tny_folder_stats_get_unread_count (TnyFolderStats *self)
 
 /**
  * tny_folder_stats_get_all_count:
- * @self: a #TnyFolderStats instance
+ * @self: a #TnyFolderStats
  *
- * Get the amount of messages in @self
+ * Get the amount of messages in @self.
  *
- * Return value: the amount of messages
+ * returns: the amount of messages
+ * since: 1.0
+ * audience: application-developer
  **/
 guint 
 tny_folder_stats_get_all_count (TnyFolderStats *self)
@@ -73,12 +85,14 @@ tny_folder_stats_get_all_count (TnyFolderStats *self)
 
 /**
  * tny_folder_stats_set_local_size:
- * @self: a #TnyFolderStats instance
+ * @self: a #TnyFolderStats
  * @local_size: the local size of the folder
  *
- * Set the local disk space that @self is consuming (should probably only be
- * used by the #TnyFolder implementation internally: it'll define the value
- * that tny_folder_stats_get_local_size will return).
+ * Set the local disk space that @self is consuming. This is an internal
+ * function not intended for application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_stats_set_local_size (TnyFolderStats *self, gsize local_size)
@@ -90,11 +104,13 @@ tny_folder_stats_set_local_size (TnyFolderStats *self, gsize local_size)
 
 /**
  * tny_folder_stats_get_local_size:
- * @self: a #TnyFolderStats instance
+ * @self: a #TnyFolderStats
  *
- * Get the local disk space that @self is consuming
+ * Get the local disk space that @self is consuming in its cache.
  *
- * Return value: The local size
+ * returns: local size
+ * since: 1.0
+ * audience: application-developer
  **/
 gsize 
 tny_folder_stats_get_local_size (TnyFolderStats *self)
@@ -106,11 +122,13 @@ tny_folder_stats_get_local_size (TnyFolderStats *self)
 
 /**
  * tny_folder_stats_new:
- * @folder: a #TnyFolder instance
+ * @folder: a #TnyFolder
  *
- * Creates a stats object for for @folder
+ * Creates a stats object for @folder
  *
- * Return value: a new #TnyFolderStats instance
+ * returns: a new #TnyFolderStats instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolderStats*
 tny_folder_stats_new (TnyFolder *folder)
@@ -125,12 +143,14 @@ tny_folder_stats_new (TnyFolder *folder)
 
 /**
  * tny_folder_stats_get_folder:
- * @self: a #TnyFolderStats instance
+ * @self: a #TnyFolderStats
  *
  * Get the folder of @self. The return value of this method must be unreferenced 
  * after use
  *
- * Return value: the #TnyFolder instance related to this statsset
+ * returns (caller-owns): the #TnyFolder instance related to @self
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder* 
 tny_folder_stats_get_folder (TnyFolderStats *self)

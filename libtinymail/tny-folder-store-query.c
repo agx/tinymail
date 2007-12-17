@@ -17,8 +17,13 @@
  * Boston, MA 02110-1301, USA.
  */
 
-/* TNY TODO: Make this cope with AND constructs. Also take a look at 
- * tny-camel-common.c:_tny_folder_store_query_passes */
+/**
+ * TnyFolderStoreQuery:
+ *
+ * A query for filtering folders when getting them from a store 
+ *
+ * free-function: g_object_unref
+ **/
 
 #include <config.h>
 
@@ -31,12 +36,17 @@
 static GObjectClass *parent_class;
 static GObjectClass *item_parent_class;
 
+/* TNY TODO: Make this cope with AND constructs. Also take a look at 
+ * tny-camel-common.c:_tny_folder_store_query_passes */
+
 /**
  * tny_folder_store_query_new:
  *
  * Create a new #TnyFolderStoreQuery instance
  * 
- * Return value: A new #TnyFolderStoreQuery instance
+ * returns (caller-owns): a new #TnyFolderStoreQuery instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolderStoreQuery* 
 tny_folder_store_query_new (void)
@@ -50,8 +60,7 @@ tny_folder_store_query_item_finalize (GObject *object)
 {
 	TnyFolderStoreQueryItem *self = (TnyFolderStoreQueryItem*) object;
 
-	if (self->regex) 
-	{
+	if (self->regex) {
 		regfree (self->regex);
 		g_free (self->regex);
 	}
@@ -141,7 +150,7 @@ tny_folder_store_query_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_folder_store_query_item_get_type (void)
@@ -183,24 +192,25 @@ get_regerror (int errcode, regex_t *compiled)
 
 /**
  * tny_folder_store_query_add_item:
- * @query: a #TnyFolderStoreQuery object
- * @pattern: a regular expression
+ * @query: a #TnyFolderStoreQuery
+ * @pattern (null-ok): a regular expression or NULL
  * @options: a #TnyFolderStoreQueryOption enum
  *
  * Add a query-item to @query.
  * 
  * If the options contain TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME or 
- * TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID then @pattern will be used as
- * regular expression for matching the property of the folders. What the
- * properties tny_folder_get_name and tny_folder_get_id would contain, will 
- * be used while matching.
+ * TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID and @pattern is not NULL, then
+ * @pattern will be used as regular expression for matching the property of
+ * the folders. The tny_folder_get_name() and tny_folder_get_id() are used 
+ * while matching in those cases.
  *
  * Example:
  * <informalexample><programlisting>
  * FolderStoreQuery *query = tny_folder_store_query_new ();
  * TnyList *folders = tny_simple_list_new ();
  * TnyFolderStore *store = ...; TnyIterator *iter; 
- * tny_folder_store_query_add_item (query, ".*GNOME.*", TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME);
+ * tny_folder_store_query_add_item (query, ".*GNOME.*", 
+ *          TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME);
  * tny_folder_store_get_folders (store, folders, query);
  * iter = tny_list_create_iterator (folders);
  * while (!tny_iterator_is_done (iter))
@@ -224,7 +234,8 @@ get_regerror (int errcode, regex_t *compiled)
  * FolderStoreQuery *query = tny_folder_store_query_new ();
  * TnyList *folders = tny_simple_list_new ();
  * TnyFolderStore *store = ...; TnyIterator *iter; 
- * tny_folder_store_query_add_item (query, NULL, TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED);
+ * tny_folder_store_query_add_item (query, NULL, 
+ *          TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED);
  * tny_folder_store_get_folders (store, folders, query);
  * iter = tny_list_create_iterator (folders);
  * while (!tny_iterator_is_done (iter))
@@ -287,28 +298,31 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
 
 /**
  * tny_folder_store_query_get_items:
- * @query: a #TnyFolderStoreQuery object
+ * @query: a #TnyFolderStoreQuery
  *
  * Get a list of query items in @query. The return value must be unreferenced
  * after use.
  *
- * Return value: a list of query items
+ * returns (caller-owns): a list of query items
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 TnyList*
 tny_folder_store_query_get_items (TnyFolderStoreQuery *query)
 {
-	return TNY_LIST (g_object_ref (G_OBJECT (query->items)));
+	return TNY_LIST (g_object_ref (query->items));
 }
 
 
 /**
  * tny_folder_store_query_item_get_options:
- * @item: a #TnyFolderStoreQueryItem object
+ * @item: a #TnyFolderStoreQueryItem
  *
  * Get the options of @item as a #TnyFolderStoreQueryOption enum.
  *
- * Return value: the options of a query item
- *
+ * returns: the options of a query item
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 TnyFolderStoreQueryOption 
 tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item)
@@ -319,12 +333,14 @@ tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item)
 
 /**
  * tny_folder_store_query_item_get_regex:
- * @item: a #TnyFolderStoreQueryItem object
+ * @item: a #TnyFolderStoreQueryItem
  *
- * Get the compiled regular expression of @item
+ * Get the compiled regular expression of @item. You must not free the returned
+ * value.
  *
- * Return value: the compiled regular expression of a query item
- *
+ * returns (null-ok): the compiled regular expression of a query item
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 const regex_t*
 tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item)
@@ -333,6 +349,17 @@ tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item)
 }
 
 
+/**
+ * tny_folder_store_query_item_get_pattern:
+ * @item: a #TnyFolderStoreQueryItem
+ *
+ * Get the regular expression's pattern of @item. You must not free the returned
+ * value.
+ *
+ * returns (null-ok): the pattern of the regular expression of a query item
+ * since: 1.0
+ * audience: tinymail-developer
+ **/
 const gchar* 
 tny_folder_store_query_item_get_pattern (TnyFolderStoreQueryItem *item)
 {
@@ -344,7 +371,7 @@ tny_folder_store_query_item_get_pattern (TnyFolderStoreQueryItem *item)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_folder_store_query_option_get_type (void)

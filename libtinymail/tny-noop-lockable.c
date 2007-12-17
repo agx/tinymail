@@ -17,7 +17,16 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyNoopLockable:
+ *
+ * A lockable that does nothing
+ *
+ * free-functions: g_object_unref 
+ **/
+
 #include <config.h>
+
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
@@ -71,7 +80,9 @@ tny_noop_lockable_instance_init (GTypeInstance *instance, gpointer g_class)
  *
  * Create a lockable that does nothing
  *
- * Return value: a #TnyLockable instance that does nothing
+ * returns: a #TnyLockable instance that does nothing
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyLockable*
 tny_noop_lockable_new (void)

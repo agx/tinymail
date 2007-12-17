@@ -17,6 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
+
+/**
+ * TnyAccountStore:
+ * 
+ * A account store, holding a list of accounts
+ *
+ * free-function: g_object_unref
+ */
+
 #include <config.h>
 
 #ifdef DBC
@@ -35,21 +44,16 @@ guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
 
 /**
  * tny_account_store_find_account:
- * @self: a #TnyAccountStore object
+ * @self: a #TnyAccountStore
  * @url_string: the url-string of the account to find
  *
- * Try to find the account in @self that corresponds to @url_string. If this 
- * method does not return NULL, the returned value is the found account and
- * must be unreferenced after use.
+ * Try to find the first account in account store @self that corresponds to 
+ * @url_string. If found, the returned value must be unreferenced.
  *
- * Implementors: when implementing a platform-specific library, you must
- * implement this method. Let it return the account that corresponds to
- * @url_string or let it return NULL. Also see tny_account_matches_url_string
- * at #TnyAccount.
- *
- * This method can be used to resolve url-strings to #TnyAccount instances.
- *
- * Return value: the found account or NULL.
+ * returns (null-ok) (caller-owns): the found account or NULL
+ * since: 1.0
+ * audience: application-developer
+ * complexity: high
  **/
 TnyAccount* 
 tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
@@ -60,7 +64,7 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
 	g_assert (TNY_IS_ACCOUNT_STORE (self));
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0);
-	g_assert (strstr (url_string, "://"));
+	g_assert (strstr (url_string, ":"));
 	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account_func != NULL);
 #endif
 
@@ -78,27 +82,21 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
 
 /**
  * tny_account_store_alert:
- * @self: a #TnyAccountStore object
- * @account: The account (This is NULL sometimes for some current implementations).
- * @type: the message type (severity)
+ * @self: a #TnyAccountStore
+ * @account (null-ok): The account or NULL
+ * @type: alert type
  * @question: whether or not this is a question
- * @error: A GError, of domain TNY_ACCOUNT_ERROR or TNY_ACCOUNT_STORE_ERROR, 
- * which should be used to determine what to show to the user.
+ * @error: A #GError with the alert
  *
- * This jump-to-the-ui method implements showing a message dialog appropriate 
+ * This callback method must implements showing a message dialog appropriate 
  * for the @error and @type as message type. It will return TRUE if the reply 
  * was affirmative or FALSE if not.
  *
- * You must not try reconnecting in the implementation of this method.
- *
- * Implementors: when implementing a platform-specific library, you must
- * implement this method. For example in GTK+ by using the #GtkDialog API. The
- * implementation will, for example, be used to ask the user about accepting SSL
- * certificates. The two possible answers that must be supported are 
- * "Yes" and "No" which must result in a TRUE or a FALSE return value, though 
- * your implementation should attempt to use explicit button names such as 
- * "Accept Certificate" and "Reject Certificate". Likewise, the dialog should be 
- * arranged according the the user interface guidelines of your target platform.
+ * The two possible answers that must be supported are "Yes" and "No" which must
+ * result in a TRUE or a FALSE return value, though your implementation should
+ * attempt to use explicit button names such as "Accept Certificate" and 
+ * "Reject Certificate". Likewise, the dialog should be arranged according to
+ * the user interface guidelines of your target platform.
  *
  * Although there is a @question parameter, there is not always certainty about
  * whether or not the warning actually is a question. It's save to say, however
@@ -148,7 +146,9 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * }
  * </programlisting></informalexample>
  *
- * Return value: Whether the user pressed Ok/Yes (TRUE) or Cancel/No (FALSE)
+ * returns: Affirmative = TRUE,  Negative = FALSE
+ * since: 1.0
+ * audience: platform-developer, application-developer, type-implementer
  **/
 gboolean 
 tny_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, gboolean question, const GError *error)
@@ -170,17 +170,14 @@ tny_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertTyp
 
 /**
  * tny_account_store_get_device:
- * @self: a #TnyAccountStore object
+ * @self: a #TnyAccountStore
  *
- * This method returns a #TnyDevice instance. You must unreference the return
- * value after use.
+ * This method returns the #TnyDevice instance used by #TnyAccountStore @self. You
+ * must unreference the return value after use.
  *
- * Implementors: when implementing a platform-specific library, you must
- * implement this method by letting it return a #TnyDevice instance. You must
- * add a reference count before returning.
- *
- * Return value: the device attached to this account store
- *
+ * returns (caller-owns): the device used by @self
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyDevice* 
 tny_account_store_get_device (TnyAccountStore *self)
@@ -204,20 +201,15 @@ tny_account_store_get_device (TnyAccountStore *self)
 
 /**
  * tny_account_store_get_cache_dir:
- * @self: a #TnyAccountStore object
+ * @self: a #TnyAccountStore
  * 
- * Get the local path that will be used for storing the disk cache
+ * Returns the path that will be used for storing cache. Note that the callers
+ * of this method will not free up the result. The implementation of 
+ * #TnyAccountStore @self is responsible for freeing up. 
  *
- * Implementors: when implementing a platform-specific library, you must
- * implement this method. You can for example let it return the path to some
- * folder in $HOME on the file system.
- *
- * Note that the callers of this method will not free the result. The
- * implementor of a #TnyAccountStore is responsible for freeing it up. For
- * example when destroying @self (in its finalize method).
- *
- * Return value: the local path that will be used for storing the disk cache
- *
+ * returns: cache's path
+ * since: 1.0
+ * audience: platform-developer, type-implementer
  **/
 const gchar*
 tny_account_store_get_cache_dir (TnyAccountStore *self)
@@ -242,12 +234,11 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
 
 /**
  * tny_account_store_get_accounts:
- * @self: a #TnyAccountStore object
- * @list: a #TnyList instance that will be filled with #TnyAccount instances
- * @types: a #TnyGetAccountsRequestType that describes which account types are needed
+ * @self: a #TnyAccountStore
+ * @list: a #TnyList that will be filled with #TnyAccount instances
+ * @types: a #TnyGetAccountsRequestType that indicates which account types are wanted
  * 
- * Get a read-only list of accounts in the store. You must not change @list 
- * except for referencing and unreferencing.
+ * Get a list of accounts in the account store @self.
  *
  * Example:
  * <informalexample><programlisting>
@@ -265,27 +256,19 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  * g_object_unref (G_OBJECT (list));
  * </programlisting></informalexample>
  *
- * Implementors: when implementing a platform-specific library, you must 
- * implement this method.
+ * When implementing this API it is allowed but not required to cache the list.
+ * If you are implementing an account store for #TnyCamelAccount account 
+ * instances, register the created accounts with a #TnySessionCamel instance 
+ * using the API tny_session_camel_set_current_accounts right after creating
+ * the accounts for the first time.
  *
- * It is allowed to cache the list (but not required). If you are implementing
- * an account store for account implementations from libtinymail-camel, you must
- * register the created accounts with a #TnySessionCamel instance using the 
- * libtinymail-camel specific tny_session_camel_set_current_accounts API.
+ * If you use the #TnySessionCamel to register accounts, register each account
+ * using tny_camel_account_set_session and after registering your last account
+ * use the API tny_session_camel_set_initialized
  *
- * If you use the #TnySessionCamel to register accounts, you must after 
- * registering your last initial account call the tny_session_camel_set_initialized
- * API.
- *
- * The implementation must fillup @list with available accounts. Note that if
+ * The method must fill up @list with available accounts. Note that if
  * you cache the list, you must add a reference to each account added to the
- * list (else they will be unreferenced and if the reference count would reach
- * zero, an account would no longer be correctly cached).
- *
- * With libtinymail-camel each created account must also be informed about the
- * #TnySessionCamel instance being used. Read more about this at
- * tny_camel_account_set_session of the libtinymail-camel specific 
- * #TnyCamelAccount.
+ * list.
  *
  * There are multiple samples of #TnyAccountStore implementations in
  * libtinymail-gnome-desktop, libtinymail-olpc, libtinymail-gpe, 
@@ -294,7 +277,7 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  *
  * The get_pass and forget_pass functionality of the example below is usually
  * implemented by utilizing a #TnyPasswordGetter that is returned by the 
- * #TnyPlatformFactory, that is usually available from the #TnyAccountStore. 
+ * #TnyPlatformFactory.
  *
  * Example (that uses a cache):
  * <informalexample><programlisting>
@@ -346,6 +329,9 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  *    tny_session_camel_set_initialized (session);
  * }
  * </programlisting></informalexample>
+ *
+ * since: 1.0
+ * audience: platform-developer, application-developer, type-implementer
  **/
 void
 tny_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
@@ -378,7 +364,10 @@ tny_account_store_base_init (gpointer g_class)
  * @self: the object on which the signal is emitted
  * @user_data: user data set when the signal handler was connected.
  *
- * Emitted when the store starts trying to connect the accounts
+ * Emitted when the store starts trying to connect the accounts. Usage of this
+ * signal is not recommended as it's a candidate for API changes.
+ *
+ * since: 1.0
  */
 	tny_account_store_signals[TNY_ACCOUNT_STORE_CONNECTING_STARTED] =
 	   g_signal_new ("connecting_started",
@@ -400,7 +389,8 @@ tny_account_store_base_init (gpointer g_class)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
+ * since: 1.0
  **/
 GType
 tny_account_store_get_type (void)
@@ -435,7 +425,8 @@ tny_account_store_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
+ * since: 1.0
  **/
 GType
 tny_alert_type_get_type (void)
@@ -458,7 +449,8 @@ tny_alert_type_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
+ * since: 1.0
  **/
 GType
 tny_get_accounts_request_type_get_type (void)
@@ -483,7 +475,8 @@ tny_get_accounts_request_type_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
+ * since: 1.0
  **/
 GType
 tny_account_store_signal_get_type (void)

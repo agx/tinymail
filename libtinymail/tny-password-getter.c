@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyPasswordGetter:
+ *
+ * Gets a password
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #ifdef DBC
@@ -27,12 +35,10 @@
 
 /**
  * tny_password_getter_get_password:
- * @self: a #TnyPasswordGetter object
+ * @self: a #TnyPasswordGetter
  * @aid: a unique string identifying the requested password
- * @prompt: A human-readable password question, possibly containing an untranslated error 
- * message directly from the server. This should be ignored by most implementations,
- * so NULL is an acceptable value.
- * @cancel: whether or not the user cancelled
+ * @prompt (null-ok): A human-readable password question
+ * @cancel (out): by reference whether or not the user cancelled
  * 
  * Get the password of @self identified by @aid. If you set the by reference
  * boolean @cancel to TRUE, the caller (who requested the password) will see 
@@ -41,9 +47,11 @@
  *
  * The @aid string can be used for so called password stores. It will contain 
  * a unique string. Possible values of this string are "acap.server.com" or the
- * result of a tny_account_get_id.
+ * result of a tny_account_get_id(), or a combination of things.
  *
- * Return value: the password
+ * returns (null-ok) (caller-owns): the password
+ * since: 1.0
+ * audience: application-developer, type-implementer, platform-developer
  **/
 const gchar * 
 tny_password_getter_get_password (TnyPasswordGetter *self, const gchar *aid, const gchar *prompt, gboolean *cancel)
@@ -61,7 +69,12 @@ tny_password_getter_get_password (TnyPasswordGetter *self, const gchar *aid, con
  * @self: a #TnyPasswordGetter object
  * @aid: a unique string identifying the requested password
  * 
- * Forget the password in @self identified by @aid.
+ * Forget the password in @self identified by @aid. This usually indicates that
+ * the password was wrong. A subsequent call to tny_password_getter_get_password()
+ * should not result in returning the same password anymore.
+ *
+ * since: 1.0
+ * audience: application-developer, type-implementer, platform-developer
  **/
 void 
 tny_password_getter_forget_password (TnyPasswordGetter *self, const gchar *aid)

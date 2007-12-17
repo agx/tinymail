@@ -42,7 +42,16 @@
  * USA
  */
 
+/**
+ * TnyFsStream:
+ *
+ * A stream that adapts a filedescriptor to the #TnyStream API
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -142,6 +151,8 @@ tny_fs_stream_close (TnyStream *self)
  *
  * Set the file descriptor to play adaptor for
  *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void
 tny_fs_stream_set_fd (TnyFsStream *self, int fd)
@@ -168,14 +179,17 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
  * you.
  *
  * Therefore use it with care. It's more or less an exception in the framework,
- * whether or not you call it an exception depends on your point of view).
+ * although whether or not you call it an exception depends on your point of
+ * view.
  *
  * The the instance will on top of close() when destructing also fsync() the
  * filedescriptor. It does this depending on its mood, the weather and your
- * wives periods using a complex algorithm that abuses your privacy and might
- * kill your cat and dog.
+ * wive's periods using a complex algorithm that abuses your privacy and might
+ * kill your cat and dog (yes, both of them).
  *
- * Return value: a new #TnyStream instance
+ * returns (caller-owns): a new #TnyStream instance
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 TnyStream*
 tny_fs_stream_new (int fd)
@@ -201,8 +215,7 @@ tny_fs_stream_finalize (GObject *object)
 {
 	TnyFsStream *self = (TnyFsStream *)object;	
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
-	if (priv->fd != -1)
-	{
+	if (priv->fd != -1) {
 		fsync (priv->fd);
 		close (priv->fd);	     
 	}

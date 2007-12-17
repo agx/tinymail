@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyFolderStoreChange:
+ *
+ * A delta of changes, used by #TnyFolderStoreObserver 
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-folder-store-change.h>
@@ -40,11 +48,13 @@ struct _TnyFolderStoreChangePriv
 
 /**
  * tny_folder_store_change_get_changed:
- * @self: a #TnyFolderStoreChange instance
+ * @self: a #TnyFolderStoreChange
  *
- * Get an enum with all the changed things
+ * Get a flags field with all the changed things
  *
- * Return value: An enum with all the changed things
+ * returns: the changed items as a flags field
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolderStoreChangeChanged 
 tny_folder_store_change_get_changed  (TnyFolderStoreChange *self)
@@ -57,10 +67,14 @@ tny_folder_store_change_get_changed  (TnyFolderStoreChange *self)
 
 /**
  * tny_folder_store_change_add_created_folder:
- * @self: a #TnyFolderStoreChange instance
- * @folder: the folder to add to the changeset
+ * @self: a #TnyFolderStoreChange 
+ * @folder: a #TnyFolder to add to the changeset
  *
- * Add @folder to the changeset of created folders
+ * Add @folder to the changeset of created folders. This is an internal function
+ * not intended for application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_store_change_add_created_folder (TnyFolderStoreChange *self, TnyFolder *folder)
@@ -84,10 +98,14 @@ tny_folder_store_change_add_created_folder (TnyFolderStoreChange *self, TnyFolde
 
 /**
  * tny_folder_store_change_add_removed_folder:
- * @self: a #TnyFolderStoreChange instance
- * @folder: the folder to add to the changeset
+ * @self: a #TnyFolderStoreChange
+ * @folder: a #TnyFolder to add to the changeset
  *
- * Add @folder to the changeset of removed folders
+ * Add @folder to the changeset of removed folders. This is an internal
+ * function not intended for application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_store_change_add_removed_folder (TnyFolderStoreChange *self, TnyFolder *folder)
@@ -108,10 +126,13 @@ tny_folder_store_change_add_removed_folder (TnyFolderStoreChange *self, TnyFolde
 
 /**
  * tny_folder_store_change_get_created_folders:
- * @self: a #TnyFolderStoreChange instance
- * @folders: the #TnyList where the created folders will be put it
+ * @self: a #TnyFolderStoreChange
+ * @folders: a #TnyList where the created folders will be prepended to
  *
- * Get the created folders in this changeset
+ * Get the created folders in @self.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_store_change_get_created_folders (TnyFolderStoreChange *self, TnyList *folders)
@@ -151,10 +172,13 @@ tny_folder_store_change_get_created_folders (TnyFolderStoreChange *self, TnyList
 
 /**
  * tny_folder_store_change_get_removed_folders:
- * @self: a #TnyFolderStoreChange instance
- * @folders: the #TnyList where the removed folders will be put it
+ * @self: a #TnyFolderStoreChange
+ * @folders: a #TnyList where the removed folders will be prepended to
  *
  * Get the removed folders in this changeset
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_store_change_get_removed_folders (TnyFolderStoreChange *self, TnyList *folders)
@@ -191,9 +215,13 @@ tny_folder_store_change_get_removed_folders (TnyFolderStoreChange *self, TnyList
 
 /**
  * tny_folder_store_change_reset:
- * @self: a #TnyFolderStoreChange instance
+ * @self: a #TnyFolderStoreChange
  *
- * Reset the state of @self
+ * Reset the state of @self. This is an internal function not intended for
+ * application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_store_change_reset (TnyFolderStoreChange *self)
@@ -216,11 +244,13 @@ tny_folder_store_change_reset (TnyFolderStoreChange *self)
 
 /**
  * tny_folder_store_change_new:
- * @folderstore: a #TnyFolderStore instance
+ * @folderstore: a #TnyFolderStore
  *
  * Creates a changeset for @folderstore
  *
- * Return value: a new #TnyFolderStoreChange instance
+ * returns (caller-owns): a new #TnyFolderStoreChange instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolderStoreChange*
 tny_folder_store_change_new (TnyFolderStore *folderstore)
@@ -235,12 +265,14 @@ tny_folder_store_change_new (TnyFolderStore *folderstore)
 
 /**
  * tny_folder_store_change_get_folder_store:
- * @self: a #TnyFolderStoreChange instance
+ * @self: a #TnyFolderStoreChange
  *
  * Get the folderstore of @self. The return value of this method must be 
  * unreferenced after use
  *
- * Return value: the #TnyFolderStore instance related to this changeset
+ * returns (caller-owns): the #TnyFolderStore related to this changeset
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolderStore* 
 tny_folder_store_change_get_folder_store (TnyFolderStoreChange *self)
@@ -318,6 +350,13 @@ tny_folder_store_change_class_init (TnyFolderStoreChangeClass *class)
 	return;
 }
 
+/**
+ * tny_folder_store_change_get_type:
+ *
+ * GType system helper function
+ *
+ * returns: a #GType
+ **/
 GType 
 tny_folder_store_change_get_type (void)
 {
@@ -353,7 +392,7 @@ tny_folder_store_change_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_folder_store_change_changed_get_type (void)

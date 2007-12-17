@@ -17,6 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyAccount:
+ * 
+ * A abstract account type with API shared between #TnyStoreAccount and
+ * #TnyTransportAccount.
+ *
+ * free-function: g_object_unref
+ */
+
 #include <config.h>
 
 #include <tny-status.h>
@@ -33,12 +42,14 @@ guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
 
 /**
  * tny_account_get_connection_policy:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  *
  * Get the connection policy for @self. You must unreference the returned 
  * value when you are finished with used it.
  *
- * Return value: connection policy
+ * returns (caller-owns): connection policy
+ * since: 1.0
+ * audience: application-developer, platform-developer
  **/
 TnyConnectionPolicy* 
 tny_account_get_connection_policy (TnyAccount *self)
@@ -61,10 +72,13 @@ tny_account_get_connection_policy (TnyAccount *self)
 
 /**
  * tny_account_set_connection_policy:
- * @self: a #TnyAccount object
- * @policy: the #TnyConnectionStrategy
+ * @self: a #TnyAccount
+ * @policy: a #TnyConnectionStrategy
  *
  * Set the connection strategy for @self.
+ *
+ * since: 1.0
+ * audience: application-developer, platform-developer
  **/
 void 
 tny_account_set_connection_policy (TnyAccount *self, TnyConnectionPolicy *policy)
@@ -86,14 +100,16 @@ tny_account_set_connection_policy (TnyAccount *self, TnyConnectionPolicy *policy
 
 /**
  * tny_account_is_ready:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  *
  * Some implementations of #TnyAccount need registration in a subsystem or 
  * factory before they are not only valid instances, but also ready to use. For
  * example before their connection-status-changed signal emissions are accurate.
  * This boolean property will tell you if @self is ready for that.
  *
- * Return value: whether @self is ready for use
+ * returns: TRUE if @self is ready for use, else FALSE
+ * since: 1.0
+ * audience: platform-developer
  **/
 gboolean 
 tny_account_is_ready (TnyAccount *self)
@@ -115,13 +131,16 @@ tny_account_is_ready (TnyAccount *self)
 
 /**
  * tny_account_start_operation:
- * @self: a #TnyAccount object
- * @domain: the domain of the #TnyStatus instances that will happen in @status_callback
- * @code: the code of the #TnyStatus instances that will happen in @status_callback
+ * @self: a #TnyAccount
+ * @domain: the domain of the #TnyStatus that will happen in @status_callback
+ * @code: the code of the #TnyStatus that will happen in @status_callback
  * @status_callback: status callback handler
  * @status_user_data: the user-data to give to the @status_callback
  *
- * Start an operation. This only works with methods that don't end with _async.
+ * Starts an operation. This only works for methods that don't end with _async.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
@@ -141,21 +160,24 @@ tny_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatus
 
 /**
  * tny_account_stop_operation:
- * @self: a #TnyAccount object
- * @canceled: NULL or byref whether the operation got canceled
+ * @self: a #TnyAccount
+ * @cancelled (out): NULL or byref whether the operation got canceled
  *
- * Stop the current operation. This only works with methods that don't end 
+ * Stop the current operation. This only works for methods that don't end 
  * with _async.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
-tny_account_stop_operation (TnyAccount *self, gboolean *canceled)
+tny_account_stop_operation (TnyAccount *self, gboolean *cancelled)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (TNY_ACCOUNT_GET_IFACE (self)->stop_operation_func != NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->stop_operation_func (self, canceled);
+	TNY_ACCOUNT_GET_IFACE (self)->stop_operation_func (self, cancelled);
 
 #ifdef DBC /* ensure*/
 #endif
@@ -165,22 +187,23 @@ tny_account_stop_operation (TnyAccount *self, gboolean *canceled)
 
 /**
  * tny_account_matches_url_string:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @url_string: the url-string of the account to find
  *
- * Find out whether the account matches a certain url_string.
+ * Returns whether the account's url-string matches @url_string.
  *
- * Implementors: Be forgiving about things like passwords in the url_string:
+ * When implementing be forgiving about things like passwords in the url_string:
  * while matching the folder, password and message-id pieces are insignificant.
  *
  * An example url_string can be imap://user:password@server/INBOX/005. Only 
  * "imap://user@server" is significant when searching. Also take a look at 
- * RFC 1808 and RFC 4467 for more information on url_string formatting.
+ * RFC 1808 and RFC 4467 for more information on url-string formatting.
  *
- * This method must be usable with and will be used for 
- * tny_account_store_find_account.
+ * This method will be used by tny_account_store_find_account().
  *
- * Return value: whether or not @self matches with @url_string.
+ * returns: TRUE if @self matches with @url_string, else FALSE
+ * since: 1.0
+ * audience: application-developer, platform-developer
  **/
 gboolean 
 tny_account_matches_url_string (TnyAccount *self, const gchar *url_string)
@@ -204,10 +227,15 @@ tny_account_matches_url_string (TnyAccount *self, const gchar *url_string)
 
 /**
  * tny_account_cancel:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
  * Try to cancel the current operation that is happening. This API, though,
- * guarantees nothing about any cancelations.
+ * makes no guarantees about any cancellations taking place (it's a try).
+ *
+ * Since relatively few guarantees can be made, using this API is not recommended.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_account_cancel (TnyAccount *self)
@@ -227,7 +255,7 @@ tny_account_cancel (TnyAccount *self)
 
 /**
  * tny_account_get_account_type:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  *
  * Get the account type of @self. There are two account types: a store and 
  * transport account type.
@@ -236,9 +264,11 @@ tny_account_cancel (TnyAccount *self)
  * IMAP and POP accounts.
  *
  * A transport account has a send method for sending #TnyMsg instances
- * using the transport implemented by the account (for example SMTP).
+ * using the transport layer the account uses. For example SMTP.
  *
- * Return value: The account type
+ * returns: The account type
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyAccountType
 tny_account_get_account_type (TnyAccount *self)
@@ -261,11 +291,14 @@ tny_account_get_account_type (TnyAccount *self)
 
 /**
  * tny_account_get_connection_status:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  *
- * Get the connection status of @self
+ * Get the status of the connection for account @self.
  *
- * Return value: the status of the connection
+ * returns: the status of the connection
+ * since: 1.0
+ * complexity: low
+ * audience: application-developer
  **/
 TnyConnectionStatus 
 tny_account_get_connection_status (TnyAccount *self)
@@ -288,17 +321,21 @@ tny_account_get_connection_status (TnyAccount *self)
 
 /**
  * tny_account_get_id:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
- * Get the unique id of @self
+ * Get the unique id of @self.
  *
  * A certainty you have about this property is that the id is unique in the 
- * #TnyAccountStore. It doesn't have to be unique in the entire application.
+ * #TnyAccountStore that contains @self. It doesn't have to be unique in the
+ * entire application if you have multiple #TnyAccountStore instances (which
+ * is unlikely).
  *
- * The format of the id isn't specified. The implementor of the #TnyAccountStore
+ * The format of the id isn't specified. The implementer of the #TnyAccountStore
  * must set this id using tny_account_set_id.
  * 
- * Return value: Unique id
+ * returns: unique id
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_account_get_id (TnyAccount *self)
@@ -322,11 +359,13 @@ tny_account_get_id (TnyAccount *self)
 
 /**
  * tny_account_set_name:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @name: the name
  *
  * Set the account's human readable name
  * 
+ * since: 1.0
+ * audience: platform-developer
  **/
 void 
 tny_account_set_name (TnyAccount *self, const gchar *name)
@@ -357,7 +396,7 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
   
 /**
  * tny_account_set_secure_auth_mech:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @mech: the authentication mechanism
  * 
  * Set the account's secure authentication mechanism. The possible values depend on 
@@ -380,7 +419,9 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
  * 
  * Other relevant standards:
  * - <ulink url="http://www.faqs.org/rfcs/rfc1731.html">RFC 1731 - IMAP4 Authentication Mechanisms</ulink> 
- * 
+ *
+ * since: 1.0
+ * audience: platform-developer
  **/
 void
 tny_account_set_secure_auth_mech (TnyAccount *self, const gchar *mech)
@@ -403,13 +444,15 @@ tny_account_set_secure_auth_mech (TnyAccount *self, const gchar *mech)
 
 /**
  * tny_account_set_id:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @id: the id
  *
  * Set the unique id of the account. You need to set this property before you 
  * can start using the account. The id must be unique in a #TnyAccountStore and
  * is typically set in the implementation of a #TnyAccountStore.
- * 
+ *
+ * since: 1.0
+ * audience: platform-developer
  **/
 void 
 tny_account_set_id (TnyAccount *self, const gchar *id)
@@ -432,7 +475,7 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
 
 /**
  * tny_account_set_forget_pass_func:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @forget_pass_func: a pointer to the function
  *
  * Set the function that will be called in case the password was wrong and 
@@ -468,6 +511,9 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
  *     ...
  * }
  * </programlisting></informalexample>
+ * 
+ * since: 1.0
+ * audience: platform-developer
  **/
 void
 tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pass_func)
@@ -488,11 +534,11 @@ tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pas
 
 /**
  * tny_account_get_forget_pass_func:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
- * Get a pointer to the forget-password function
+ * Get a pointer to the forget-password function for @self.
  *
- * Return value: A pointer to the forget-password function
+ * returns: A pointer to the forget-password function
  **/
 TnyForgetPassFunc
 tny_account_get_forget_pass_func (TnyAccount *self)
@@ -514,17 +560,21 @@ tny_account_get_forget_pass_func (TnyAccount *self)
 
 /**
  * tny_account_set_url_string:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @url_string: the url string (ex. mbox://path)
  *  
  * Set the url string of @self (RFC 1808). You don't need to use this for imap
- * and pop where you can use the simplified API (set_proto, set_hostname, etc).
- * This property is typically set in the implementation of a #TnyAccountStore.
+ * and pop where you can use the simplified API (tny_account_set_proto(), 
+ * tny_account_set_hostname(), etc). This property is typically set in the 
+ * implementation of a #TnyAccountStore.
  * 
- * For example the url_string for an SMTP account that uses SSL with authentication
+ * For example the url-string for an SMTP account that uses SSL with authentication
  * type PLAIN: smtp://user;auth=PLAIN@smtp.server.com/;use_ssl=wrapped
  * 
- * Don't forget to set the name, type and proto setting of the account too.
+ * Don't forget to set the name, type and protocol setting of the account too.
+ *
+ * since: 1.0
+ * audience: platform-developer
  **/
 void
 tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
@@ -552,13 +602,15 @@ tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
 
 /**
  * tny_account_set_proto:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @proto: the protocol (ex. "imap")
  * 
  * Set the protocol of @self. You need to set this property before you can start
  * using the account. This property is typically set in the implementation
  * of a #TnyAccountStore.
- * 
+ *
+ * since: 1.0
+ * audience: platform-developer
  **/
 void
 tny_account_set_proto (TnyAccount *self, const gchar *proto)
@@ -581,13 +633,16 @@ tny_account_set_proto (TnyAccount *self, const gchar *proto)
 
 /**
  * tny_account_set_user:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @user: the username
  * 
- * Set the user or login of @self. You need to set this property before you
- * can start using the account. This property is typically set in the
- * implementation of a #TnyAccountStore.
+ * Set the user or login of account @self. You need to set this property
+ * before you can start using the account. This property is typically set 
+ * in the implementation of a #TnyAccountStore.
  *
+ * since: 1.0
+ * complexity: high
+ * audience: platform-developer
  **/
 void
 tny_account_set_user (TnyAccount *self, const gchar *user)
@@ -611,13 +666,15 @@ tny_account_set_user (TnyAccount *self, const gchar *user)
 
 /**
  * tny_account_set_hostname:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @host: the hostname
  * 
- * Set the hostname of @self. You need to set this property before you can start
- * using the account. This property is typically set in the implementation of a
- * #TnyAccountStore.
+ * Set the hostname of account @self. You need to set this property before you
+ * can start using the account. This property is typically set in the 
+ * implementation of a #TnyAccountStore.
  *
+ * since: 1.0
+ * audience: platform-developer
  **/
 void
 tny_account_set_hostname (TnyAccount *self, const gchar *host)
@@ -643,12 +700,14 @@ tny_account_set_hostname (TnyAccount *self, const gchar *host)
 
 /**
  * tny_account_set_port:
- * @self: a #TnyAccount object
- * @port: the port to connect to on the hostname
+ * @self: a #TnyAccount
+ * @port: the port to connect to on the hostname of @self
  * 
  * Set the port of @self. If you don't set this property, the default port for
- * the protocol will be used (for example 143 and 993 for IMAP and 110 for POP3).
+ * the protocol will be used (for example 143, 993 for IMAP and 110, 995 for POP3).
  *
+ * since: 1.0
+ * audience: platform-developer
  **/
 void
 tny_account_set_port (TnyAccount *self, guint port)
@@ -669,7 +728,7 @@ tny_account_set_port (TnyAccount *self, guint port)
 
 /**
  * tny_account_set_pass_func:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * @get_pass_func: a pointer to the function
  * 
  * Set the function that will be called when the password is needed. The
@@ -680,6 +739,8 @@ tny_account_set_port (TnyAccount *self, guint port)
  * property is typically set in the implementation of a #TnyAccountStore. Set
  * this property as the last of all properties that you will set to an account
  * in the #TnyAccountStore.
+ *
+ * If possible, use the mlock() syscall on this memory.
  * 
  * Also see #TnyGetPassFunc for more information about the function itself. 
  *
@@ -695,7 +756,8 @@ tny_account_set_port (TnyAccount *self, guint port)
  *    pwdgetter = tny_platform_factory_new_password_getter (platfact);
  *    retval = (gchar*) tny_password_getter_get_password (pwdgetter, 
  *       tny_account_get_id (account), prompt, cancel);
- *    g_object_unref (G_OBJECT (pwdgetter));
+ *    mlock (retval, strlen (retval));
+ *    g_object_unref (pwdgetter);
  *    return retval;
  * }
  * static void
@@ -706,10 +768,13 @@ tny_account_set_port (TnyAccount *self, guint port)
  *     tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
  *     tny_account_set_pass_func (account, per_account_get_pass_func);
  *     tny_list_prepend (list, (GObject*)account);
- *     g_object_unref (G_OBJECT (account));
+ *     g_object_unref (account);
  *     ...
  * }
  * </programlisting></informalexample>
+ *
+ * since: 1.0
+ * audience: platform-developer
  **/
 void
 tny_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
@@ -730,12 +795,13 @@ tny_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
 
 /**
  * tny_account_get_proto:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
  * Get the protocol of @self. The returned value should not be freed.
  * 
- * Return value: the protocol as a read-only string
- *
+ * returns: the protocol as a read-only string
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_account_get_proto (TnyAccount *self)
@@ -759,16 +825,18 @@ tny_account_get_proto (TnyAccount *self)
 
 /**
  * tny_account_get_url_string:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
- * Get the url string of @self or NULL if it's impossible to determine the url
- * string of @self. If not NULL, the returned value must be freed.
+ * Get the url-string of account @self or NULL if it's impossible to determine
+ * the url-string of @self. If not NULL, the returned value must be freed.
  * 
  * The url string is specified in RFC 1808 and looks for example like this:
  * imap://user@hostname. Note that it doesn't necessarily contain the password 
- * of the IMAP account.
+ * of the account.
  *
- * Return value: the url string or NULL.
+ * returns (null-ok) (caller-owns): the url-string or NULL.
+ * since: 1.0
+ * audience: application-developer
  **/
 gchar*
 tny_account_get_url_string (TnyAccount *self)
@@ -784,7 +852,7 @@ tny_account_get_url_string (TnyAccount *self)
 
 #ifdef DBC /* ensure */
 	if (retval)
-		g_assert (strstr (retval, "://") != NULL);
+		g_assert (strstr (retval, ":") != NULL);
 #endif
 
 	return retval;
@@ -793,13 +861,14 @@ tny_account_get_url_string (TnyAccount *self)
 
 /**
  * tny_account_get_user:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
- * Get the user or login of @self. The returned value should not be freed. The
- * returned value van be NULL in case of no user.
+ * Get the user or login of account @self. The returned value should
+ * not be freed. The returned value can be NULL.
  * 
- * Return value: the user as a read-only string
- *
+ * returns: the user as a read-only string
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_account_get_user (TnyAccount *self)
@@ -821,13 +890,14 @@ tny_account_get_user (TnyAccount *self)
 
 /**
  * tny_account_get_name:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
- * Get the human readable name of @self. The returned value should not 
- * be freed. The returned value van be NULL in case of no human reabable name.
+ * Get the human readable name of account@self. The returned value should not 
+ * be freed. The returned value can be NULL.
  * 
- * Return value: the human readable name as a read-only string
- *
+ * returns: the human readable name as a read-only string
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_account_get_name (TnyAccount *self)
@@ -850,13 +920,15 @@ tny_account_get_name (TnyAccount *self)
 
 /**
  * tny_account_get_secure_auth_mech:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
- * Get the secure authentication mechanism for this account. Default is "PLAIN". The
- * returned value can be NULL, in which case a undefined default is used.
+ * Get the secure authentication mechanism for this account. Default is "PLAIN".
+ * The returned value can be NULL, in which case a undefined default is used.
+ * The returned value should not be freed.
  * 
- * Return value: the authentication mechanism as a read-only string
- *
+ * returns: the authentication mechanism as a read-only string
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_account_get_secure_auth_mech (TnyAccount *self)
@@ -885,8 +957,9 @@ tny_account_get_secure_auth_mech (TnyAccount *self)
  * returned value can be NULL, in which case no hostname is set (for example 
  * for a local account).
  * 
- * Return value: the hostname as a read-only string
- *
+ * returns: the hostname as a read-only string
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar*
 tny_account_get_hostname (TnyAccount *self)
@@ -909,11 +982,13 @@ tny_account_get_hostname (TnyAccount *self)
 
 /**
  * tny_account_get_port:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
  * Get the port of @self. 
  * 
- * Return value: the port
+ * returns: the port
+ * since: 1.0
+ * audience: application-developer
  **/
 guint
 tny_account_get_port (TnyAccount *self)
@@ -934,11 +1009,13 @@ tny_account_get_port (TnyAccount *self)
 }
 /**
  * tny_account_get_pass_func:
- * @self: a #TnyAccount object
+ * @self: a #TnyAccount
  * 
  * Get a pointer to the get-password function
  *
- * Return value: A pointer to the get-password function
+ * returns: A pointer to the get-password function
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyGetPassFunc
 tny_account_get_pass_func (TnyAccount *self)
@@ -974,6 +1051,9 @@ tny_account_base_init (gpointer g_class)
  * @user_data: user data set when the signal handler was connected.
  *
  * Emitted when the connection status of an account changes.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 		tny_account_signals[TNY_ACCOUNT_CONNECTION_STATUS_CHANGED] =
 		   g_signal_new ("connection_status_changed",
@@ -991,7 +1071,10 @@ tny_account_base_init (gpointer g_class)
  * @self: the object on which the signal is emitted
  * @user_data: user data set when the signal handler was connected.
  *
- * Emitted when the account changes.
+ * Emitted when one of the account's properties changes.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 		tny_account_signals[TNY_ACCOUNT_CHANGED] =
 		   g_signal_new ("changed",
@@ -1011,7 +1094,7 @@ tny_account_base_init (gpointer g_class)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_account_get_type (void)
@@ -1047,7 +1130,7 @@ tny_account_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_account_type_get_type (void)
@@ -1071,7 +1154,7 @@ tny_account_type_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_account_signal_type_get_type (void)
@@ -1094,7 +1177,7 @@ tny_account_signal_type_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_connection_status_get_type (void)

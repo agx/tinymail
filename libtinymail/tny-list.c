@@ -17,17 +17,28 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyList:
+ * 
+ * A list of things
+ *
+ * free-function: g_object_unref
+ * type-parameter: G
+ */
+
 #include <config.h>
 
 #include <tny-list.h>
 
 /**
  * tny_list_get_length:
- * @self: A #TnyList instance
+ * @self: A #TnyList
  *
  * Get the amount of items in @self.
  *
- * Return value: the length of the list
+ * returns: the length of the list
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 guint
 tny_list_get_length (TnyList *self)
@@ -42,38 +53,27 @@ tny_list_get_length (TnyList *self)
 
 /**
  * tny_list_prepend:
- * @self: A #TnyList instance
- * @item: the item to prepend
+ * @self: A #TnyList
+ * @item (type-parameter G): the item to prepend
  *
  * Prepends an item to a list. You can only prepend items that inherit from the
- * GObject base item. That's because the tinymail list infrastructure does 
- * reference counting. It effectively means that indeed you can't use non 
- * GObject types in a tinymail list. But there's not a single situation where 
- * you must do that. If you must store a non GObject in a list, you shouldn't
- * use the tinymail infrastructure for this. Consider using a doubly linked list
- * or a pointer array or any other list-type available on your development
- * platform.
+ * GObject base item. That's because Tinymail's list infrastructure does 
+ * reference counting. Consider using a doubly linked list, a pointer array or 
+ * any other list-type available on your development platform for non-GObject
+ * lists.
  *
- * However, tinymail lists can cope with any valid GObject. Not just the 
- * GObjects implemented by the tinymail framework.
+ * The @item you add will get a reference added by @self, with @self claiming 
+ * ownership of @item. When @self is finalised, that reference is taken from
+ * @item.
  *
- * All reference handling in tinymail is reference neutral. Also the lists. This
- * means that if your plan is to reparent the item to the list, that you should
- * take care of that by, after prepending or appending it, unreferencing it to 
- * get rid of its initial reference. If you don't want to reparent, but you do
- * want to destroy your item once removed from the list, then you must 
- * unreference your items twice. Note that reparenting is highly recommended
- * in most such cases (because it's a much cleaner way). However, if reparented
- * and the list itself gets destroyed, then the item will also get unreferenced.
+ * Prepending an item invalidates all existing iterators and puts them in an 
+ * unspecified state. You'll need to recreate the iterator(s) when prepending 
+ * items.
  *
- * Reparenting indeed means reparenting. Okay? Loosing your parent reference
- * means loosing your reason of existance. So you'll get destroyed.
+ * When implementing, if you have to choose, make this one the fast one
  *
- * You should not prepend, remove nor append items while iterating @self. There's
- * no guarantee whatsoever that existing iterators of @self will be valid after 
- * this method returned.
- *
- * Implementers: if you have to choose, make this one the fast one
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_list_prepend (TnyList *self, GObject* item)
@@ -97,40 +97,29 @@ tny_list_prepend (TnyList *self, GObject* item)
 
 /**
  * tny_list_append:
- * @self: A #TnyList instance
- * @item: the item to append
+ * @self: A #TnyList
+ * @item (type-parameter G): the item to prepend
  *
- * Appends an item to a list. You can only append items that inherit from the
- * GObject base item. That's because the tinymail list infrastructure does 
- * reference counting. It effectively means that indeed you can't use non 
- * GObject types in a tinymail list. But there's not a single situation where 
- * you must do that. If you must store a non GObject in a list, you shouldn't
- * use the tinymail infrastructure for this. Consider using a doubly linked list
- * or a pointer array or any other list-type available on your development
- * platform.
+ * Appends an item to a list. You can only prepend items that inherit from the
+ * GObject base item. That's because Tinymail's list infrastructure does 
+ * reference counting. Consider using a doubly linked list, a pointer array or 
+ * any other list-type available on your development platform for non-GObject
+ * lists.
  *
- * However, tinymail lists can cope with any valid GObject. Not just the 
- * GObjects implemented by the tinymail framework.
+ * The @item you add will get a reference added by @self, with @self claiming 
+ * ownership of @item. When @self is finalised, that reference is taken from
+ * @item.
  *
- * All reference handling in tinymail is reference neutral. Also the lists. This
- * means that if your plan is to reparent the item to the list, that you should
- * take care of that by, after prepending or appending it, unreferencing it to 
- * get rid of its initial reference. If you don't want to reparent, but you do
- * want to destroy your item once removed from the list, then you must 
- * unreference your items twice. Note that reparenting is highly recommended
- * in most such cases (because it's a much cleaner way). However, if reparented
- * and the list itself gets destroyed, then the item will also get unreferenced.
+ * Appending an item invalidates all existing iterators and puts them in an 
+ * unspecified state. You'll need to recreate the iterator(s) when appending 
+ * items.
  *
- * Reparenting indeed means reparenting. Okay? Loosing your parent reference
- * means loosing your reason of existance. So you'll get destroyed.
+ * When implementing, if you have to choose, make the prepend one the fast one
  *
- * You should not prepend, remove nor append items while iterating @self. There's
- * no guarantee whatsoever that existing iterators of @self will be valid after 
- * this method returned.
- *
- * Implementers: if you have to choose, make the prepend one the fast one
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
-void 
+ void 
 tny_list_append (TnyList *self, GObject* item)
 {
 #ifdef DBC /* require */
@@ -152,18 +141,20 @@ tny_list_append (TnyList *self, GObject* item)
 
 /**
  * tny_list_remove:
- * @self: A #TnyList instance
- * @item: the item to remove
+ * @self: A #TnyList
+ * @item (type-parameter G): the item to remove
  *
- * Removes an item from a list.  Removing a item might invalidate all existing
- * iterators or put them in an unknown and unspecified state. You'll need to 
- * recreate the iterator(s) if you removed an item.
+ * Removes an item from a list.  Removing a item invalidates all existing
+ * iterators and puts them in an unspecified state. You'll need to recreate
+ * the iterator(s) when removing an item.
  *
- * If you want to clear a list, consider using the tny_list_foreach or simply
+ * If you want to clear a list, consider using the tny_list_foreach() or simply
  * destroy the list instance and construct a new one. If you want to remove
  * specific items from a list, consider using a second list. You should not
- * attempt to remove items from a list while an (any) iterator is active on the
+ * attempt to remove items from a list while an iterator is active on the
  * same list.
+ * 
+ * Removing @item from @self will decrease the reference count of @item by one.
  *
  * Example (removing even items):
  * <informalexample><programlisting>
@@ -196,12 +187,6 @@ tny_list_append (TnyList *self, GObject* item)
  * g_object_unref (G_OBJECT (toremovefrom));
  * </programlisting></informalexample>
  *
- * There's no guarantee whatsoever that existing iterators of @self will be
- * valid after this method returned. 
- *
- * Note that if you didn't remove the initial reference when putting the item
- * in the list, this remove will not take care of that initial reference either. 
- *
  **/
 void 
 tny_list_remove (TnyList *self, GObject* item)
@@ -224,13 +209,13 @@ tny_list_remove (TnyList *self, GObject* item)
 
 /**
  * tny_list_remove_matches:
- * @self: A #TnyList instance
+ * @self: A #TnyList
  * @matcher: a #TnyListMatcher to match @match_data against items
  * @match_data: data used by the comparer to remove items
  *
- * Removes items from a list.  Removing a item might invalidate all existing
- * iterators or put them in an unknown and unspecified state. You'll need to 
- * recreate the iterator(s) if you removed an item.
+ * Removes items from a list.  Removing items invalidates all existing
+ * iterators and put them in an unknown and unspecified state. You'll need to 
+ * recreate the iterator(s) when removing items.
  *
  * Example (items that match):
  * <informalexample><programlisting>
@@ -250,6 +235,8 @@ tny_list_remove (TnyList *self, GObject* item)
  * Note that if you didn't remove the initial reference when putting the item
  * in the list, this remove will not take care of that initial reference either. 
  *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void 
 tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_data)
@@ -295,17 +282,15 @@ tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_d
 
 /**
  * tny_list_create_iterator:
- * @self: A #TnyList instance
+ * @self: A #TnyList
  *
- * Creates a new iterator instance for the list. The initial position
- * of the iterator is the first element.
+ * Creates a new iterator instance for the list. The initial position of the
+ * iterator is the first element.
  *
- * An iterator is a position indicator for a list. It keeps the position
- * state of a list iteration. The list itself does not keep any position 
- * information. Consuming multiple iterator instances makes it possible to
- * have multiple list iterations simultanously (i.e. multiple threads or in
- * in a loop that simultanously works with multiple position states in a
- * single list).
+ * An iterator keeps a position state of a list iteration. The list itself does
+ * not keep any position information. Using multiple iterator instances makes
+ * it possible to have simultaneous list iterations (i.e. multiple threads or
+ * in a loop that uses with multiple position states in a single list).
  *
  * Example:
  * <informalexample><programlisting>
@@ -318,26 +303,19 @@ tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_d
  *            tny_iterator_next (iter2);
  *      tny_iterator_next (iter1);
  * }
- * g_object_unref (G_OBJECT (iter1));
- * g_object_unref (G_OBJECT (iter2));
- * g_object_unref (G_OBJECT (list));
+ * g_object_unref (iter1);
+ * g_object_unref (iter2);
+ * g_object_unref (list);
  * </programlisting></informalexample>
  *
- * The reason why the method isn't called get_iterator is because it's a
- * object creation method (a factory method). It's not a property. It effectively
- * creates a new instance of an iterator. The returned iterator object should
+ * The reason why the method isn't called get_iterator is because it's a object
+ * creation method (a factory method). Therefore it's not a property. Instead
+ * it creates a new instance of an iterator. The returned iterator object should
  * (therefore) be unreferenced after use.
  * 
- * Implementers: For custom lists you must create a private iterator type and
- * return a new instance of it. You shouldn't make the internal API of that type
- * public.
- *
- * The developer will always only use the TnyIterator interface API on instances
- * of your type. You must therefore return your private iterator type, that 
- * implements TnyIterator, here.
- *
- * Return value: A new iterator for the list @self
- *
+ * returns (caller-owns) (type-parameter G): A new iterator for the list
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyIterator* 
 tny_list_create_iterator (TnyList *self)
@@ -360,12 +338,12 @@ tny_list_create_iterator (TnyList *self)
 
 /**
  * tny_list_foreach:
- * @self: A #TnyList instance
+ * @self: A #TnyList
  * @func: the function to call with each element's data.
  * @user_data: user data to pass to the function.
  *
- * Calls a function for each element in a #TnyList. It will use an internal
- * iteration which you don't have to worry about. 
+ * Calls @func for each element in a #TnyList. It will use an internal iteration
+ * which you don't have to worry about as application developer. 
  *
  * Example:
  * <informalexample><programlisting>
@@ -390,10 +368,12 @@ tny_list_create_iterator (TnyList *self)
  * element last. If during the iteration you don't remove items, it's guaranteed
  * that all current items will be iterated.
  *
- * In the func implementation and during the foreach operation you shouldn't
+ * In the func implementation and during the foreach operation you must not
  * append, remove nor prepend items to the list. In multithreaded environments
  * it's advisable to introduce a lock when using this functionality. 
  *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void 
 tny_list_foreach (TnyList *self, GFunc func, gpointer user_data)
@@ -411,17 +391,17 @@ tny_list_foreach (TnyList *self, GFunc func, gpointer user_data)
 
 /**
  * tny_list_copy:
- * @self: A #TnyList instance
+ * @self: A #TnyList
  *
- * Creates a shallow copy of the list. It doesn't copy the items. It,
- * however, creates a new list with new references to the same
- * items. The items will get an extra reference added for the new list
- * being their second parent, setting their reference count to for
- * example two. Which means that both lists (the original and the
- * copy) must be unreferenced after use.
+ * Creates a shallow copy of @self: it doesn't copy the content of the items.
+ * It creates a new list with new references to the same items. The items will
+ * get an extra reference added for the new list being their second owner,
+ * setting their reference count to for example two. Which means that the 
+ * returned value must be unreferenced after use.
  *
- * Return value: A copy of this list
- *
+ * returns (caller-owns) (type-parameter G): A copy of this list
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyList*
 tny_list_copy (TnyList *self)

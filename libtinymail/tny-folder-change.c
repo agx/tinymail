@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyFolderChange:
+ *
+ * A delta of changes, used by #TnyFolderObserver 
+ *
+ * free-functions: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-folder-change.h>
@@ -44,10 +52,14 @@ struct _TnyFolderChangePriv
 
 /**
  * tny_folder_change_set_received_msg:
- * @self: a #TnyFolderChange instance
- * @msg: a #TnyMsg instance
+ * @self: a #TnyFolderChange
+ * @msg: a #TnyMsg
  *
- * Set the message that got received
+ * Set the message that got received in @self. This is an internal function not
+ * intended for application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_change_set_received_msg (TnyFolderChange *self, TnyMsg *msg)
@@ -64,14 +76,15 @@ tny_folder_change_set_received_msg (TnyFolderChange *self, TnyMsg *msg)
 
 /**
  * tny_folder_change_get_received_msg:
- * @self: a #TnyFolderChange instance
+ * @self: a #TnyFolderChange
  *
  * Get the message that got received, if the change includes receiving a message.
  * If no message was received, NULL will be returned. If not NULL, the returned
  * value must be unreferenced after use.
  *
- * Return value: the message that got received or NULL if no message was received
- * during this change.
+ * returns (null-ok) (caller-owns): received message or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyMsg *
 tny_folder_change_get_received_msg (TnyFolderChange *self)
@@ -89,26 +102,31 @@ tny_folder_change_get_received_msg (TnyFolderChange *self)
 
 /**
  * tny_folder_change_get_changed:
- * @self: a #TnyFolderChange instance
+ * @self: a #TnyFolderChange
  *
- * Get an enum with all the changed things
+ * Get a flags field with all the changed things
  *
- * Return value: the changed-flags
+ * returns: the changed items as a flags field
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolderChangeChanged 
 tny_folder_change_get_changed  (TnyFolderChange *self)
 {
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
-
 	return priv->changed;
 }
 
 /**
  * tny_folder_change_set_new_all_count:
- * @self: a #TnyFolderChange instance
- * @new_all_count: the new all count of the folder
+ * @self: a #TnyFolderChange
+ * @new_all_count: all count
  *
- * Set the all count of the changeset
+ * Set the all count of @self. This is an internal function not intended for
+ * application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_change_set_new_all_count (TnyFolderChange *self, guint new_all_count)
@@ -125,10 +143,14 @@ tny_folder_change_set_new_all_count (TnyFolderChange *self, guint new_all_count)
 
 /**
  * tny_folder_change_set_new_unread_count:
- * @self: a #TnyFolderChange instance
- * @new_unread_count: the new unread count of the folder
+ * @self: a #TnyFolderChange 
+ * @new_unread_count: unread count
  *
- * Set the unread count of the changeset
+ * Set the unread count. This is an internal function not intended for
+ * application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_change_set_new_unread_count (TnyFolderChange *self, guint new_unread_count)
@@ -146,42 +168,48 @@ tny_folder_change_set_new_unread_count (TnyFolderChange *self, guint new_unread_
 
 /**
  * tny_folder_change_get_new_unread_count:
- * @self: a #TnyFolderChange instance
+ * @self: a #TnyFolderChange
  *
- * Get the unread count of the changeset
+ * Get the unread count of @self.
  *
- * Return value: the new unread-count
+ * returns: unread count
+ * since: 1.0
+ * audience: application-developer
  **/
 guint 
 tny_folder_change_get_new_unread_count (TnyFolderChange *self)
 {
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
-
 	return priv->new_unread_count;
 }
 
 /**
  * tny_folder_change_get_new_all_count:
- * @self: a #TnyFolderChange instance
+ * @self: a #TnyFolderChange
  *
- * Get the all count of the changeset
+ * Get the all count of @self
  *
- * Return value: the new all-count
+ * returns: all count
+ * since: 1.0
+ * audience: application-developer
  **/
 guint 
 tny_folder_change_get_new_all_count (TnyFolderChange *self)
 {
 	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
-
 	return priv->new_all_count;
 }
 
 /**
  * tny_folder_change_add_added_header:
- * @self: a #TnyFolderChange instance
- * @header: the header to add to the changeset
+ * @self: a #TnyFolderChange
+ * @header: a #TnyHeader
  *
- * Add @header to the changeset of added headers
+ * Add @header to @self. This is an internal function not intended for
+ * application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_change_add_added_header (TnyFolderChange *self, TnyHeader *header)
@@ -202,9 +230,13 @@ tny_folder_change_add_added_header (TnyFolderChange *self, TnyHeader *header)
 /**
  * tny_folder_change_add_expunged_header:
  * @self: a #TnyFolderChange instance
- * @header: the header to add to the changeset
+ * @header: a #TnyHeader
  *
- * Add @header to the changeset of expunged headers
+ * Add @header to @self. This is an internal function not intended for
+ * application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_change_add_expunged_header (TnyFolderChange *self, TnyHeader *header)
@@ -224,10 +256,13 @@ tny_folder_change_add_expunged_header (TnyFolderChange *self, TnyHeader *header)
 
 /**
  * tny_folder_change_get_added_headers:
- * @self: a #TnyFolderChange instance
- * @headers: the #TnyList where the added headers will be put it
+ * @self: a #TnyFolderChange
+ * @headers: a #TnyList where the added headers will be prepended to
  *
- * Get the added headers in this changeset
+ * Get the added headers in @self.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *headers)
@@ -265,10 +300,13 @@ tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *headers)
 
 /**
  * tny_folder_change_get_expunged_headers:
- * @self: a #TnyFolderChange instance
- * @headers: the #TnyList where the removed headers will be put it
+ * @self: a #TnyFolderChange
+ * @headers: a #TnyList where the removed headers will be prepended to
  *
- * Get the removed headers in this changeset
+ * Get the removed headers in @self.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_change_get_expunged_headers (TnyFolderChange *self, TnyList *headers)
@@ -305,9 +343,13 @@ tny_folder_change_get_expunged_headers (TnyFolderChange *self, TnyList *headers)
 
 /**
  * tny_folder_change_reset:
- * @self: a #TnyFolderChange instance
+ * @self: a #TnyFolderChange
  *
- * Reset the state of @self
+ * Reset the state of @self. This is an internal function not intended for
+ * application developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_change_reset (TnyFolderChange *self)
@@ -334,15 +376,17 @@ tny_folder_change_reset (TnyFolderChange *self)
 /**
  * tny_folder_change_get_rename:
  * @self: a #TnyFolderChange instance
- * @oldname: a pointer to a string (by reference)
+ * @oldname (null-ok) (out): a byref string or NULL
  *
  * Get the new name of the folder in case of a rename. This will return NULL
- * of no rename happened. You can pass a pointer if you need the old folder
- * name too.
+ * if no rename happened. You can pass a pointer if you need the old name of
+ * the folder too, else pass NULL.
  *
- * You should not free the returned value nor the @oldname pointer.
+ * You must not free the returned value nor the @oldname pointer.
  *
- * Return value: The new folder name or NULL
+ * return (null-ok): The new folder name or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar *
 tny_folder_change_get_rename (TnyFolderChange *self, const gchar **oldname)
@@ -370,8 +414,11 @@ tny_folder_change_get_rename (TnyFolderChange *self, const gchar **oldname)
  * @newname: the new name of the folder
  *
  * Mark the change in such a way that the user can know that a rename has 
- * happened. The TnyFolderChange will copy your @newname internally, so you
- * can do whatever you want with what you passed afterwards (like freeing it).
+ * happened. This is an internal function not intended for application 
+ * developers to alter.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
  **/
 void 
 tny_folder_change_set_rename (TnyFolderChange *self, const gchar *newname)
@@ -389,11 +436,13 @@ tny_folder_change_set_rename (TnyFolderChange *self, const gchar *newname)
 
 /**
  * tny_folder_change_new:
- * @folder: a #TnyFolder instance
+ * @folder: a #TnyFolder
  *
  * Creates a changeset for @folder
  *
- * Return value: a new #TnyFolderChange instance
+ * returns (caller-owns): a new #TnyFolderChange instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolderChange*
 tny_folder_change_new (TnyFolder *folder)
@@ -414,7 +463,9 @@ tny_folder_change_new (TnyFolder *folder)
  * Get the folder of @self. The return value of this method must be unreferenced 
  * after use.
  *
- * Return value: the #TnyFolder related to this changeset
+ * returns (caller-owns): the #TnyFolder of this changeset
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder* 
 tny_folder_change_get_folder (TnyFolderChange *self)
@@ -537,7 +588,7 @@ tny_folder_change_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_folder_change_changed_get_type (void)

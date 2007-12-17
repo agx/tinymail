@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyFolderStore:
+ *
+ * A store with folders
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #ifdef DBC
@@ -30,20 +38,21 @@
 
 /**
  * tny_folder_store_add_observer:
- * @self: a #TnyFolder instance
- * @observer: a #TnyFolderStoreObserver instance
+ * @self: a #TnyFolder
+ * @observer: a #TnyFolderStoreObserver
  *
- * Add @observer to the list of interested observers for events that could happen
- * caused by for example folder creates and deletions and other spontaneous 
- * changes.
+ * Add @observer to the list of event observers. These observers will get notified
+ * about folder creations, deletions and subscription changes. A rename will be
+ * notified as a deletion followed by a creation. Folder creations, deletions,
+ * renames and subscription state changes can happen spontaneous too.
  *
- * After this, @observer will start receiving notification of changes about @self. 
- * 
- * A weak reference is added to @observer. When @observer finalizes will @self
+ * A weak reference is added to @observer. When @observer finalises will @self
  * automatically update itself by unregistering @observer. It's recommended to
- * use tny_folder_remove_observer yourself to unregister @observer as observer for
- * @self, though.
+ * use tny_folder_remove_observer() yourself to unregister @observer as observer
+ * of @self.
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
@@ -67,14 +76,16 @@ tny_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *obs
 
 /**
  * tny_folder_store_remove_observer:
- * @self: a #TnyFolderStore instance
- * @observer: a #TnyFolderStoreObserver instance
+ * @self: a #TnyFolderStore
+ * @observer: a #TnyFolderStoreObserver
  *
- * Remove @observer from the list of interested observers for events that could
- * happen caused by for example folder creates and deletions and other 
- * spontaneous changes.
+ * Remove @observer from the list of event observers of @self.
  *
- * After this, @observer will no longer receive notification of changes about @self.  
+ * The weak reference added by tny_folder_store_add_observer() to @observer, is
+ * removed.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
@@ -98,25 +109,25 @@ tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *
 
 /**
  * tny_folder_store_remove_folder:
- * @self: a #TnyFolderStore object
- * @folder: The folder to remove
- * @err: a #GError object or NULL
+ * @self: a #TnyFolderStore
+ * @folder: a #TnyFolder to remove
+ * @err: a #GError or NULL
  *
- * Removes a folder represented by @folder from the folder store @self. You are
- * responsible for unreferencing the @folder instance yourself. This method will
- * not do this for you, leaving the @folder instance in an unusable state.
+ * Removes a @folder from the folder store @self. You are responsible for 
+ * unreferencing the @folder instance yourself. This method will not do this
+ * for you, leaving the @folder instance in an unusable state.
  *
- * All the #TnyFolderObservers and #TnyFolderStoreObservers of @folder, but of 
- * course not of @self, will automatically be unsubscribed.
+ * All the #TnyFolderObservers and #TnyFolderStoreObservers of @folder, will
+ * automatically be unsubscribed.
  * 
  * This method will always recursively delete all child folders of @self. While
  * deleting folders, the folders will also always get unsubscribed (for example
  * in case of IMAP, which means that the folder wont be in LSUB either anymore).
  *
  * Observers of @self and of any the child folders of @self will receive delete
- * observer events in deletion order (childs first, parents after that). Types
- * like the #TnyGtkFolderStoreListModel know about this and act on folder 
- * deletions by automatically updating themselves.
+ * events in deletion order (childs first, parents after that). Types like the
+ * #TnyGtkFolderStoreListModel know about this and act on folder deletions by
+ * automatically updating themselves.
  *
  * Example:
  * <informalexample><programlisting>
@@ -124,10 +135,12 @@ tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *
  * my_remove_a_folder (TnyFolderStore *store, TnyFolder *remfol, GError **err)
  * {
  *     tny_folder_store_remove_folder (store, remfol, err);
- *     g_object_unref (G_OBJECT (remfol));
+ *     g_object_unref (remfol);
  * }
  * </programlisting></informalexample>
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
@@ -150,9 +163,9 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
 
 /**
  * tny_folder_store_create_folder:
- * @self: a #TnyFolderStore object
+ * @self: a #TnyFolderStore 
  * @name: The folder name to create
- * @err: a #GError object or NULL
+ * @err (null-ok): a #GError or NULL
  *
  * Creates a new folder in @self. If not NULL, the value returned is the newly 
  * created folder instance and must be unreferenced after use.
@@ -162,12 +175,13 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
  * TnyFolderStore *store = ...
  * TnyFolder *createfol;
  * createfol = tny_folder_store_create_folder (store, "Test", NULL);
- * if (createfol) g_object_unref (G_OBJECT (createfol));
+ * if (createfol) 
+ *      g_object_unref (createfol);
  * </programlisting></informalexample>
  * 
- * Return value: A new folder instance representing the folder that was created 
- * or NULL in case of failure
- *
+ * returns (null-ok) (caller-owns): the folder that was created or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder*
 tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
@@ -191,6 +205,19 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError 
 	return retval;
 }
 
+/**
+ * tny_folder_store_create_folder_async:
+ * @self: a #TnyFolderStore 
+ * @name: The folder name to create
+ * @callback (null-ok): a #TnyCreateFolderCallback or NULL
+ * @status_callback (null-ok): a #TnyStatusCallback or NULL
+ * @user_data (null-ok): user data that will be passed to the callbacks
+ *
+ * Creates a new folder in @self, asynchronously.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
 void 
 tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
@@ -212,10 +239,10 @@ tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, T
 
 /**
  * tny_folder_store_get_folders:
- * @self: a #TnyFolderStore object
- * @list: A #TnyList to fillup
- * @query: A #TnyFolderStoreQuery object or NULL
- * @err: a #GError object or NULL
+ * @self: a #TnyFolderStore
+ * @list: a #TnyList to to which the folders will be prepended
+ * @query (null-ok): a #TnyFolderStoreQuery or NULL
+ * @err (null-ok): a #GError or NULL
  *
  * Get a list of child folders from @self. You can use @query to limit the list 
  * of folders with only folders that match a query or NULL if you don't want
@@ -232,12 +259,15 @@ tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, T
  * {
  *     TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (iter));
  *     g_print ("%s\n", tny_folder_get_name (folder));
- *     g_object_unref (G_OBJECT (folder));
+ *     g_object_unref (folder);
  *     tny_iterator_next (iter);
  * }
- * g_object_unref (G_OBJECT (iter));
- * g_object_unref (G_OBJECT (folders)); 
+ * g_object_unref (iter);
+ * g_object_unref (folders);
  * </programlisting></informalexample>
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
@@ -261,11 +291,12 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
 
 /**
  * tny_folder_store_get_folders_async:
- * @self: a #TnyFolderStore object
- * @list: A #TnyList to fillup
- * @query: A #TnyFolderStoreQuery object
- * @callback: The callback handler
- * @user_data: user data for the callback
+ * @self: a #TnyFolderStore
+ * @list: a #TnyList to to which the folders will be prepended
+ * @query (null-ok): A #TnyFolderStoreQuery object
+ * @callback (null-ok): a #TnyGetFoldersCallback or NULL
+ * @status_callback (null-ok): a #TnyStatusCallback or NULL
+ * @user_data (null-ok): user data that will be passed to the callbacks
  *
  * Get a list of child folders from the folder store @self and call back when 
  * finished. You can use @query to limit the list of folders with only folders 
@@ -274,7 +305,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * Example:
  * <informalexample><programlisting>
  * static void 
- * callback (TnyFolderStore *self, TnyList *list, GError **err, gpointer user_data)
+ * callback (TnyFolderStore *self, gboolean cancelled, TnyList *list, GError **err, gpointer user_data)
  * {
  *     TnyIterator *iter = tny_list_create_iterator (list);
  *     while (!tny_iterator_is_done (iter))
@@ -284,11 +315,10 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  *         g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
  *         tny_folder_store_get_folders_async (folder,
  *             folders, NULL, callback, NULL, NULL);
- *         g_object_unref (G_OBJECT (folder));
+ *         g_object_unref (folder);
  *         tny_iterator_next (iter);
  *     }
- *     g_object_unref (G_OBJECT (iter));
- *     g_object_unref (G_OBJECT (list));
+ *     g_object_unref (iter);
  * } 
  * static void
  * get_all_folders (TnyStoreAccount *account)
@@ -297,20 +327,12 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  *     folders = tny_simple_list_new ();
  *     tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
  *         folders, NULL, callback, NULL, NULL);
+ *     g_object_unref (folders);
  * }
  * </programlisting></informalexample>
  *
- * If you want to use this functionality, you are advised to let your application 
- * use a #GMainLoop. All Gtk+ applications have this once gtk_main () is called.
- * 
- * When using a #GMainLoop, this method will callback using g_idle_add_full.
- * Without a #GMainLoop, which the libtinymail-camel implementations detect
- * using (g_main_depth > 0), the callbacks will happen in a worker thread at an 
- * unknown moment in time (check your locking).
- *
- * When using Gtk+ the callback doesn't need gdk_threads_enter and 
- * gdk_threads_leave in Gtk+.
- *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data)

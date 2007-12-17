@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyDevice:
+ * 
+ * A device, with online and offline state
+ *
+ * free-function: g_object_unref
+ */
+
 #include <config.h>
 
 #include <tny-device.h>
@@ -25,19 +33,24 @@ guint tny_device_signals [TNY_DEVICE_LAST_SIGNAL];
 
 /**
  * tny_device_reset:
- * @self: a #TnyDevice object
+ * @self: a #TnyDevice
  * 
- * Reset the status (unforce the status).
+ * Reset the status of @self, unforce the status.
  *
- * This reverses the effects of tny_device_force_online() or 
- * tny_device_force_offline(), so that future changes of connection status will 
- * cause the connection_changed signal to be emitted, and tny_device_is_online()
+ * This reverses the effects of tny_device_force_online and
+ * tny_device_force_offline. Future changes of connection status will
+ * cause the connection_changed signal to be emitted, and tny_device_is_online
  * will return a correct value.
  *
- * The connection_changed signal will be emitted if this tny_device_is_online()
- * to return a different value than before, for instance if the network 
- * connection has actually become available or unavailable while the status was 
- * forced.
+ * The connection_changed signal will be emitted if to return a different value
+ * than before, for instance if the network connection has actually become
+ * available or unavailable while the status was forced. For example in case
+ * the forced state was offline, and after reset the actual state is online. Or
+ * in case the forced state was online, and after reset the actual state is 
+ * offline.
+ *
+ * since: 1.0
+ * audience: platform-developer, type-implementer
  **/
 void 
 tny_device_reset (TnyDevice *self)
@@ -57,21 +70,20 @@ tny_device_reset (TnyDevice *self)
 
 /**
  * tny_device_force_online:
- * @self: a #TnyDevice object
+ * @self: a #TnyDevice
  * 
  * Force online status, so that tny_device_is_online() returns TRUE, regardless 
  * of whether there is an actual network connection. The connection_changed 
- * signal will be emitted if the online status is changed by this function, 
- * but note if a real network connection is made or lost later, the 
- * connection_changed signal will not be emitted again, and tny_device_is_online()
- * will continue to return TRUE;
+ * signal will be emitted if the returned value of tny_device_is_online()
+ * changed by this function.
  *
- * This might be used on platforms that cannot detect whether a network
- * connection exists.
- *
- * This will usually not attempt to make a real network connection. 
+ * This can be used on platforms that cannot detect whether a network connection
+ * exists. This will usually not attempt to make a real network connection. 
  *
  * See also tny_device_force_offline() and tny_device_reset().
+ *
+ * since: 1.0
+ * audience: platform-developer, type-implementer
  **/
 void 
 tny_device_force_online (TnyDevice *self)
@@ -92,22 +104,18 @@ tny_device_force_online (TnyDevice *self)
 
 /**
  * tny_device_force_offline:
- * @self: a #TnyDevice object
+ * @self: a #TnyDevice
  * 
  * Force offline status, so that tny_device_is_online() returns FALSE, regardless 
- * of whether there is an actual network connection. The connection_changed 
- * signal will be emitted if the online status is changed by this function, but 
- * note if a real network connection is made or lost later, the connection_changed 
- * signal will not be emitted again, and tny_device_is_online() will continue to 
- * return FALSE;
+ * of whether there is an actual network connection.  The connection_changed 
+ * signal will be emitted if the returned value of tny_device_is_online()
+ * changed by this function.
  *
- * This might be used to mark a device as offline if the connection is partly 
- * unusable due to some specific error, such as a failure to access a server or
- * to use a particular port,  or if the user specifically chose "offline mode". 
- * It might also be used on platforms that cannot detect whether a network 
- * connection exists.  
- *
- * This will usually not attempt to disconnect a real network connection. 
+ * This can be used to mark a device as offline if the connection is unusable 
+ * due to some specific error, such as a failure to access a server or to use
+ * a particular port, or if the user specifically chose "offline mode". It can
+ * also be used on platforms that cannot detect whether a network connection
+ * exists. This will usually not attempt to disconnect a real network connection.
  *
  * Example:
  * <informalexample><programlisting>
@@ -119,6 +127,9 @@ tny_device_force_online (TnyDevice *self)
  * </programlisting></informalexample>
  *
  * See also tny_device_force_online() and tny_device_reset().
+ *
+ * since: 1.0
+ * audience: platform-developer, type-implementer
  **/
 void
 tny_device_force_offline (TnyDevice *self)
@@ -139,22 +150,25 @@ tny_device_force_offline (TnyDevice *self)
 
 /**
  * tny_device_is_online:
- * @self: a #TnyDevice object
+ * @self: a #TnyDevice
  * 
+ * Request the current state of @self. In case of forced online, this function
+ * returns TRUE. In case of forced offline, this function returns FALSE. In case
+ * of online, this function returns TRUE. In case of offline, this function
+ * returns FALSE. 
+ *
  * Example:
  * <informalexample><programlisting>
- * static void
- * connection_changed (TnyDevice *device, gboolean online, gpointer user_data)
- * {
- *      if (!online && tny_device_is_online (device))
- *           g_print ("Something is wrong\n");
- * }
  * TnyDevice *device = ...
- * g_signal_connect (G_OBJECT (device), "connection_changed",
- *       G_CALLBACK (connection_changed), self);
+ * tny_device_force_online (device);
+ * if (!tny_device_is_online (device))
+ *      g_print ("Something is wrong\n");
+ * tny_device_reset (device);
  * </programlisting></informalexample>
  * 
- * Return value: Whether the device is online
+ * returns: TRUE if online or forced online, FALSE if offline or forced offline
+ * since: 1.0
+ * audience: platform-developer, type-implementer
  **/
 gboolean 
 tny_device_is_online (TnyDevice *self)
@@ -192,9 +206,9 @@ tny_device_base_init (gpointer g_class)
  * while the status is forced with tny_device_force_online() or 
  * tny_device_force_offline().
  *
- * Implementors must make sure that the emissions of this signal always 
- * happen in the mainloop.
- */
+ * since: 1.0
+ * audience: platform-developer, type-implementer
+ **/
 		tny_device_signals[TNY_DEVICE_CONNECTION_CHANGED] =
 		   g_signal_new ("connection_changed",
 			TNY_TYPE_DEVICE,
@@ -245,7 +259,7 @@ tny_device_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_device_signal_get_type (void)

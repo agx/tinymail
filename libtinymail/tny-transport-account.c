@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyTransportAccount:
+ *
+ * A account to send E-mails with
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-transport-account.h>
@@ -25,13 +33,15 @@
 
 /**
  * tny_transport_account_send:
- * @self: a #TnyTransportAccount object
- * @msg: a #TnyMsg object
- * @err: a #GError object or NULL
+ * @self: a #TnyTransportAccount
+ * @msg: a #TnyMsg
+ * @err (null-ok): a #GError or NULL
  *
  * Send @msg. Note that @msg must be a correct #TnyMsg instance with a correct
- * #TnyHeader, which can be used as the envelope while sending.
+ * #TnyHeader, which will be used as the envelope while sending.
  * 
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_transport_account_send (TnyTransportAccount *self, TnyMsg *msg, GError **err)

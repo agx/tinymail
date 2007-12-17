@@ -17,7 +17,16 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyPair:
+ *
+ * a key - value pair
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
+
 #include <string.h>
 
 #include <tny-pair.h>
@@ -37,10 +46,13 @@ struct _TnyPairPriv
 
 /**
  * tny_pair_set_name:
- * @self: a #TnyPair instance
+ * @self: a #TnyPair
  * @name: the name to set
  *
  * Sets the name of the pair
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_pair_set_name (TnyPair *self, const gchar *name)
@@ -48,31 +60,36 @@ tny_pair_set_name (TnyPair *self, const gchar *name)
 	TnyPairPriv *priv = TNY_PAIR_GET_PRIVATE (self);
 	if (priv->name)
 		g_free (priv->name);
-	priv->name = g_strdup ((gchar*)name);
+	priv->name = g_strdup ((gchar *) name);
 	return;
 }
 
 /**
  * tny_pair_get_name:
- * @self: a #TnyPair instance
+ * @self: a #TnyPair
  * 
  * Get the name of the pair, the returned value must not be freed
  *
- * Return value: the name of the pair
+ * returns: the name of the pair
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar* 
 tny_pair_get_name (TnyPair *self)
 {
 	TnyPairPriv *priv = TNY_PAIR_GET_PRIVATE (self);
-	return (const gchar*)priv->name;
+	return (const gchar *) priv->name;
 }
 
 /**
  * tny_pair_set_value:
- * @self: a #TnyPair instance
+ * @self: a #TnyPair
  * @value: the value to set
  *
  * Sets the value of the pair
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_pair_set_value (TnyPair *self, const gchar *value)
@@ -80,24 +97,26 @@ tny_pair_set_value (TnyPair *self, const gchar *value)
 	TnyPairPriv *priv = TNY_PAIR_GET_PRIVATE (self);
 	if (priv->value)
 		g_free (priv->value);
-	priv->value = g_strdup ((gchar*)value);
+	priv->value = g_strdup ((gchar *) value);
 	return;
 }
 
 
 /**
  * tny_pair_get_value:
- * @self: a #TnyPair instance
+ * @self: a #TnyPair
  *
  * Get the value of the pair, the returned value must not be freed
  *
- * Return value: the value of the pair
+ * returns: the value of the pair
+ * since: 1.0
+ * audience: application-developer
  **/
 const gchar* 
 tny_pair_get_value (TnyPair *self)
 {
 	TnyPairPriv *priv = TNY_PAIR_GET_PRIVATE (self);
-	return (const gchar*)priv->value;
+	return (const gchar *) priv->value;
 }
 
 /**
@@ -107,7 +126,9 @@ tny_pair_get_value (TnyPair *self)
  *
  * Creates an instance of a type that holds a name and a value pair
  *
- * Return value: a new #TnyPair instance
+ * returns (caller-owns): a new #TnyPair instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyPair*
 tny_pair_new (const gchar *name, const gchar *value)

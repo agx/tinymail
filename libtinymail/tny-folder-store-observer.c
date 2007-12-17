@@ -17,18 +17,29 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyFolderStoreObserver:
+ *
+ * A event observer for a #TnyFolderStore
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-folder-store-observer.h>
 
 /**
  * tny_folder_store_observer_update:
- * @self: A #TnyFolderStoreObserver instance
- * @change: A #TnyFolderStoreChange instance
+ * @self: a #TnyFolderStoreObserver
+ * @change: a #TnyFolderStoreChange
  *
  * Observer's update method, @change is the delta of changes between the last 
- * and the current state. 
+ * and the current state. It contains for example the deleted and created
+ * folders in the folder store of @self.
  *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void 
 tny_folder_store_observer_update (TnyFolderStoreObserver *self, TnyFolderStoreChange *change)

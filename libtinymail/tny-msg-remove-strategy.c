@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyMsgRemoveStrategy:
+ *
+ * A strategy for removing messages
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-msg-remove-strategy.h>
@@ -25,26 +33,27 @@
 
 /**
  * tny_msg_remove_strategy_perform_remove:
- * @self: A #TnyMsgRemoveStrategy instance
- * @folder: The #TnyFolder instance from which the message will be removed
- * @header: The #TnyHeader instance of the message that must be removed
- * @err: A #GError instance or NULL
+ * @self: a #TnyMsgRemoveStrategy 
+ * @folder: a #TnyFolder from which the message will be removed
+ * @header: a #TnyHeader of the message that must be removed
+ * @err (null-ok): a #GError or NULL
  *
- * Performs the removal of a message from a folder
+ * Performs the removal of a message from @folder.
  *
  * This doesn't remove it from a #TnyList that holds the headers (for example 
- * for a header summary view) if the tny_folder_get_headers method happened 
+ * for a header summary view) if the tny_folder_get_headers() method happened 
  * before the deletion. You are responsible for refreshing your own lists.
+ * But take a look at #TnyFolderMonitor which serves this purpose.
  *
- * This method also doesn't "have" to remove the header from the folder. 
- * Depending on the implementation it might only marks it as removed (it for 
+ * This method also doesn't have to wipe it immediately from @folder. 
+ * Depending on the implementation it might only mark it as removed (it for 
  * example sets the TNY_HEADER_FLAG_DELETED). In such a case only after
- * performing the tny_folder_sync method on the folder, it will really be
+ * performing the tny_folder_sync() method on @folder, it will really be
  * removed.
  *
- * In such a case this means that a tny_folder_get_headers method call will
+ * In such a case this means that a tny_folder_get_headers() method call will
  * still prepend the removed message to the list. It will do this until the
- * expunge  happened. You are advised to hide messages that have been marked
+ * expunge happened. You are advised to hide messages that have been marked
  * as being deleted from your summary view. In Gtk+, for the #GtkTreeView
  * component, you can do this using the #GtkTreeModelFilter tree model filtering
  * model.
@@ -58,6 +67,8 @@
  * implementation by adding code that also permanently removes the message
  * in your inherited special type.
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)

@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyMsg:
+ *
+ * A special kind of #TnyMimePart that has a header
+ *
+ * free-function: g_object_free
+ **/
+
 #include <config.h>
 
 #ifdef DBC
@@ -30,12 +38,14 @@
 
 /**
  * tny_msg_uncache_attachments:
- * @self: a #TnyMsg object
+ * @self: a #TnyMsg
  * 
  * API WARNING: This API might change
  * 
  * Uncache the attachments of @self.
- * 
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_msg_uncache_attachments (TnyMsg *self)
@@ -55,12 +65,14 @@ tny_msg_uncache_attachments (TnyMsg *self)
 
 /**
  * tny_msg_rewrite_cache:
- * @self: a #TnyMsg object
+ * @self: a #TnyMsg
  * 
  * API WARNING: This API might change
  * 
  * Rewrite the message to cache, purging mime parts marked for purge.
- * 
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_msg_rewrite_cache (TnyMsg *self)
@@ -80,9 +92,9 @@ tny_msg_rewrite_cache (TnyMsg *self)
 
 /**
  * tny_msg_get_url_string:
- * @self: a #TnyMsg object
+ * @self: a #TnyMsg
  * 
- * Get the url_string @self or NULL if it's impossible to determine the url 
+ * Get the url string for @self or NULL if it's impossible to determine the url 
  * string of @self. If not NULL, the returned value must be freed after use.
  *
  * The url string is specified in RFC 1808 and looks for example like this:
@@ -90,7 +102,9 @@ tny_msg_rewrite_cache (TnyMsg *self)
  * the IMAP server. Note that it doesn't necessarily contain the password of the
  * IMAP account.
  * 
- * Return value: The url string or NULL.
+ * returns (null-ok): The url string or NULL.
+ * since: 1.0
+ * audience: application-developer
  **/
 gchar* 
 tny_msg_get_url_string (TnyMsg *self)
@@ -116,12 +130,14 @@ tny_msg_get_url_string (TnyMsg *self)
 
 /**
  * tny_msg_get_folder:
- * @self: a #TnyMsg object
+ * @self: a #TnyMsg
  * 
- * Get the parent folder of @self. If not NULL, the returned value must be
- * unreferenced after use.
+ * Get the parent folder of @self or NULL if @self is not contained in a folder.
+ * If not NULL, the returned value must be unreferenced after use.
  *
- * Return value: The parent folder of this message or NULL if none
+ * returns (null-ok) (caller-owns): The parent folder of this message or NULL
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder* 
 tny_msg_get_folder (TnyMsg *self)
@@ -148,20 +164,18 @@ tny_msg_get_folder (TnyMsg *self)
 
 /**
  * tny_msg_get_header:
- * @self: a #TnyMsg object
+ * @self: a #TnyMsg
  * 
  * Get the header of @self. The returned header object must be unreferenced 
- * after use. You can't use the returned instance with the #TnyFolder operations
- * like tny_folder_transfer_msgs and tny_folder_transfer_msgs_async.
+ * after use. You can't use the returned instance with #TnyFolder operations
+ * like tny_folder_transfer_msgs() and tny_folder_transfer_msgs_async()!
  *
- * Once the header instance comes from a #TnyMsg instance, it means that it has
- * been permanently detached from any folder instance. To get a header instance
- * that will work with these folder methods, you can use tny_folder_get_headers.
+ * If @self is a writable message, you can write to the returned #TnyHeader
+ * too.
  *
- * These instances are not the same as the ones that you will get using this 
- * API, indeed.
- *
- * Return value: The header of the message
+ * returns (caller-owns): header of the message
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyHeader*
 tny_msg_get_header (TnyMsg *self)

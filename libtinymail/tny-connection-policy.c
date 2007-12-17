@@ -17,7 +17,17 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyConnectionPolicy:
+ * 
+ * A connection policy. For example to attempt to reconnect or to fail
+ * in case of connectivity problems.
+ *
+ * free-function: g_object_unref
+ */
+
 #include <config.h>
+
 #include <tny-account.h>
 #include <tny-folder.h>
 #include <tny-connection-policy.h>
@@ -26,12 +36,20 @@
 
 /**
  * tny_connection_policy_set_current:
- * @self: A #TnyConnectionPolicy instance
- * @account: the current #TnyAccount instance
- * @folder: the current #TnyFolder instance
+ * @self: a #TnyConnectionPolicy
+ * @account: a #TnyAccount
+ * @folder: a #TnyFolder
  *
- * Used to set the current situation (in case @self wants to restore this 
- * situation in case of a connection event).
+ * Set the current situation of @self (in case @self wants to restore the
+ * situation when @account reconnected).
+ *
+ * Tinymail's internal administration will call this function whenever
+ * tny_folder_refresh or tny_folder_refresh_async get called. It's highly
+ * recommended to use g_object_weak_ref when setting the current and 
+ * g_object_weak_unref when unsetting the current or when finalising @self.
+ *
+ * since: 1.0
+ * audience: platform-developer, application-developer, type-implementer
  **/
 void 
 tny_connection_policy_set_current (TnyConnectionPolicy *self, TnyAccount *account, TnyFolder *folder)
@@ -51,10 +69,13 @@ tny_connection_policy_set_current (TnyConnectionPolicy *self, TnyAccount *accoun
 
 /**
  * tny_connection_policy_on_connect:
- * @self: A #TnyConnectionPolicy instance
- * @account: a #TnyAccount instance
+ * @self: A #TnyConnectionPolicy
+ * @account: a #TnyAccount
  *
- * Happens when @account got connected.
+ * Called when @account got connected.
+ *
+ * since: 1.0
+ * audience: platform-developer, application-developer, type-implementer
  **/
 void 
 tny_connection_policy_on_connect (TnyConnectionPolicy *self, TnyAccount *account)
@@ -73,10 +94,13 @@ tny_connection_policy_on_connect (TnyConnectionPolicy *self, TnyAccount *account
 
 /**
  * tny_connection_policy_on_disconnect:
- * @self: A #TnyConnectionPolicy instance
- * @account: a #TnyAccount instance
+ * @self: A #TnyConnectionPolicy
+ * @account: a #TnyAccount
  *
- * Happens when @account got disconnected.
+ * Called when @account got disconnected.
+ *
+ * since: 1.0
+ * audience: platform-developer, application-developer, type-implementer
  **/
 void 
 tny_connection_policy_on_disconnect (TnyConnectionPolicy *self, TnyAccount *account)
@@ -95,10 +119,14 @@ tny_connection_policy_on_disconnect (TnyConnectionPolicy *self, TnyAccount *acco
 
 /**
  * tny_connection_policy_on_connection_broken:
- * @self: A #TnyConnectionPolicy instance
- * @account: a #TnyAccount instance
+ * @self: A #TnyConnectionPolicy
+ * @account: a #TnyAccount
  *
- * Happens when @account got connected.
+ * Called when @account's connection broke. For example when a connection
+ * timeout occurred.
+ *
+ * since: 1.0
+ * audience: platform-developer, application-developer, type-implementer
  **/
 void 
 tny_connection_policy_on_connection_broken (TnyConnectionPolicy *self, TnyAccount *account)

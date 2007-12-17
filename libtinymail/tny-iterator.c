@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyIterator:
+ *
+ * A position indicator for a #TnyList
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-iterator.h>
@@ -24,10 +32,12 @@
 
 /**
  * tny_iterator_next:
- * @self: A #TnyIterator instance
+ * @self: A #TnyIterator
  *
  * Moves the iterator to the next node 
  *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void 
 tny_iterator_next (TnyIterator *self)
@@ -44,10 +54,12 @@ tny_iterator_next (TnyIterator *self)
 
 /**
  * tny_iterator_prev:
- * @self: A #TnyIterator instance
+ * @self: A #TnyIterator
  *
  * Moves the iterator to the previous node
  *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_iterator_prev (TnyIterator *self)
@@ -65,10 +77,12 @@ tny_iterator_prev (TnyIterator *self)
 
 /**
  * tny_iterator_first:
- * @self: A #TnyIterator instance
+ * @self: A #TnyIterator
  *
  * Moves the iterator to the first node
  *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void 
 tny_iterator_first (TnyIterator *self)
@@ -85,11 +99,13 @@ tny_iterator_first (TnyIterator *self)
 
 /**
  * tny_iterator_nth:
- * @self: A #TnyIterator instance
+ * @self: A #TnyIterator
  * @nth: The nth position
  *
  * Moves the iterator to the nth node
  *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_iterator_nth (TnyIterator *self, guint nth)
@@ -109,12 +125,13 @@ tny_iterator_nth (TnyIterator *self, guint nth)
  * tny_iterator_get_current:
  * @self: A #TnyIterator instance
  *
- * Does not move the iterator. Returns the object at the current position. If
- * there's no current position, this method returns NULL. If not NULL, the 
- * returned value must be unreferenced after use.
+ * Returns the object at the current position. If there's no current position,
+ * this method returns NULL. If not NULL, the returned value must be unreferenced
+ * after use.
  *
- * Return value: the currect object or NULL
- *
+ * returns (null-ok) (caller-owns) (type-parameter G): the currect object or NULL
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 GObject* 
 tny_iterator_get_current (TnyIterator *self)
@@ -139,7 +156,7 @@ tny_iterator_get_current (TnyIterator *self)
 
 /**
  * tny_iterator_is_done:
- * @self: A #TnyIterator instance
+ * @self: A #TnyIterator
  *
  * Does the iterator point to some valid list item? You can use this property
  * to make loops like:
@@ -155,12 +172,13 @@ tny_iterator_get_current (TnyIterator *self)
  *    g_object_unref (cur);
  *    tny_iterator_next (iter);
  * }
- * g_object_unref (G_OBJECT (iter));
- * g_object_unref (G_OBJECT (list));
+ * g_object_unref (iter);
+ * g_object_unref (list);
  * </programlisting></informalexample>
  *
- * Return value: TRUE if it points to a valid list item, FALSE otherwise
- *
+ * returns: TRUE if it points to a valid list item, FALSE otherwise
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 gboolean
 tny_iterator_is_done (TnyIterator *self)
@@ -177,14 +195,15 @@ tny_iterator_is_done (TnyIterator *self)
 
 /**
  * tny_iterator_get_list:
- * @self: A #TnyIterator instance
+ * @self: A #TnyIterator
  *
- * Does not move the iterator. Returns the list of which this iterator is an
- * iterator. The returned list object should be unreferenced after use. Remember
- * when using this property that lists shouldn't change while iterating them.
+ * Returns the list of which this iterator is an iterator. The returned list
+ * object should be unreferenced after use. Remember when using this property
+ * that lists shouldn't change while iterating them.
  *
- * Return value: The #TnyList instance being iterated
- *
+ * returns (caller-owns): The #TnyList being iterated
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyList*
 tny_iterator_get_list (TnyIterator *self)

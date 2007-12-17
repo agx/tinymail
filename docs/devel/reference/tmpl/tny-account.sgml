@@ -359,7 +359,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 @self: 
-@canceled: 
+@cancelled: 
 
 
 <!-- ##### FUNCTION tny_account_is_ready ##### -->

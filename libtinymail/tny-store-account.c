@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyStoreAccount:
+ *
+ * A account that contains folders
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #ifdef DBC
@@ -32,11 +40,14 @@ guint tny_store_account_signals [TNY_STORE_ACCOUNT_LAST_SIGNAL];
 
 /**
  * tny_store_account_delete_cache:
- * @self: a #TnyStoreAccount object
+ * @self: a #TnyStoreAccount
  *
  * Delete the cache of a store account. After this operation becomes @self an
  * unusable instance. You must finalise it as soon as possible (use g_object_unref
  * and/or take it out of your models).
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_store_account_delete_cache (TnyStoreAccount *self)
@@ -54,22 +65,20 @@ tny_store_account_delete_cache (TnyStoreAccount *self)
 
 /**
  * tny_store_account_find_folder:
- * @self: a #TnyStoreAccount object
+ * @self: a #TnyStoreAccount
  * @url_string: the url-string of the folder to find
- * @err: a #GError object
+ * @err (null-ok): a #GError or NULL
  *
  * Try to find the folder in @self that corresponds to @url_string. If this 
  * method does not return NULL, the returned value is the found folder and
  * must be unreferenced after use.
  *
- * Implementors: when implementing a #TnyStoreAccount, you must implement
- * this method. Let it return the folder that corresponds to @url_string or 
- * let it return NULL.
- *
  * This method can be used to resolve url-strings to #TnyAccount instances.
  * See tny_folder_get_url_string() for details of the @url-string syntax.
  *
- * Return value: the found account or NULL.
+ * returns (null-ok) (caller-owns): the found account or NULL.
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolder* 
 tny_store_account_find_folder (TnyStoreAccount *self, const gchar *url_string, GError **err)
@@ -96,13 +105,15 @@ tny_store_account_find_folder (TnyStoreAccount *self, const gchar *url_string, G
 
 /**
  * tny_store_account_unsubscribe:
- * @self: a #TnyStoreAccount object
- * @folder: The folder to unsubscribe from
+ * @self: a #TnyStoreAccount
+ * @folder: a #TnyFolder to unsubscribe
  *
  * API WARNING: This API might change
  *
  * Unsubscribe from a folder
- * 
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
@@ -120,13 +131,15 @@ tny_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
 
 /**
  * tny_store_account_subscribe:
- * @self: a #TnyStoreAccount object
- * @folder: The folder to subscribe to
+ * @self: a #TnyStoreAccount
+ * @folder: a #TnyFolder to subscribe
  *
  * API WARNING: This API might change
  *
  * Subscribe to a folder
- * 
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_store_account_subscribe (TnyStoreAccount *self, TnyFolder *folder)
@@ -157,6 +170,9 @@ tny_store_account_base_init (gpointer g_class)
  * @user_data: user data set when the signal handler was connected
  *
  * Emitted when the subscription of a folder change
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 		tny_store_account_signals[TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED] =
 			g_signal_new ("subscription_changed",
@@ -177,7 +193,7 @@ tny_store_account_base_init (gpointer g_class)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_store_account_get_type (void)
@@ -217,7 +233,7 @@ tny_store_account_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_store_account_signal_get_type (void)

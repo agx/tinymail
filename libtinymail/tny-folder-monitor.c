@@ -17,8 +17,18 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <string.h>
+/**
+ * TnyFolderMonitor:
+ *
+ * A publisher subscriber that subscribes as #TnyFolderObserver to a folder,
+ * and publishes to a list of #TnyList instances.
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
+
+#include <string.h>
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 
@@ -44,13 +54,15 @@ struct _TnyFolderMonitorPriv
 
 /**
  * tny_folder_monitor_add_list:
- * @self: a #TnyFolderChange instance
- * @list: a #TnyList instance
+ * @self: a #TnyFolderChange
+ * @list: a #TnyList
  *
  * Add @list to the registered lists that are interested in changes. @list will
- * remain referenced until it's unregisterd using tny_folder_monitor_remove_list
+ * remain referenced until it's unregisterd using tny_folder_monitor_remove_list()
  * or until @self is finalized.
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_monitor_add_list (TnyFolderMonitor *self, TnyList *list)
@@ -75,12 +87,14 @@ tny_folder_monitor_add_list_default (TnyFolderMonitor *self, TnyList *list)
 
 /**
  * tny_folder_monitor_remove_list:
- * @self: a #TnyFolderChange instance
- * @list: a #TnyList instance
+ * @self: a #TnyFolderChange
+ * @list: a #TnyList
  *
  * Remove @list from the lists that are interested in changes. This will remove
- * the reference that got added when you ussed the tny_folder_monitor_add_list.
+ * the reference that got added when the tny_folder_monitor_add_list() was used.
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_monitor_remove_list (TnyFolderMonitor *self, TnyList *list)
@@ -105,11 +119,13 @@ tny_folder_monitor_remove_list_default (TnyFolderMonitor *self, TnyList *list)
 
 /**
  * tny_folder_monitor_poke_status
- * @self: a #TnyFolderMonitor instance
+ * @self: a #TnyFolderMonitor
  *
- * Trigger the poke method on the folder instance being monitored.
- * Also take a look at tny_folder_poke_status in #TnyFolder.
+ * Invoke the poke method on the folder instance being monitored.
+ * Also take a look at tny_folder_poke_status() in #TnyFolder.
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_monitor_poke_status (TnyFolderMonitor *self)
@@ -282,17 +298,14 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 
 /**
  * tny_folder_monitor_stop:
- * @self: a #TnyFolderMonitor instance
+ * @self: a #TnyFolderMonitor
  *
- * Stop monitoring the folder. At some point in time you must perform method 
- * after you used tny_folder_monitor_start (for example before unreferencing 
- * @self). 
+ * Stop monitoring the folder. At some point in time you must perform this
+ * method. But after you used tny_folder_monitor_start() (use it for example
+ * just before unreferencing @self). 
  *
- * The reason for that is that unless you stop @self, it would still have a
- * reference being held by the #TnyFolder instance being monitored. By stopping
- * this monitor, you explicitly ask that folder instance to unregister @self as
- * an observer. And by that loosing that reference too.
- *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_monitor_stop (TnyFolderMonitor *self)
@@ -311,16 +324,14 @@ tny_folder_monitor_stop_default (TnyFolderMonitor *self)
 
 /**
  * tny_folder_monitor_start:
- * @self: a #TnyFolderMonitor instance
+ * @self: a #TnyFolderMonitor
  *
  * Start monitoring the folder. The starting of a monitor implies that @self
- * will become an observer of the folder instance. This adds a reference to @self
- * that at some point in time must be removed using tny_folder_monitor_stop.
+ * will become an observer of the folder instance. At some point in time you
+ * must use tny_folder_monitor_stop() to stop monitoring the folder.
  *
- * This means that if you start the monitor, you must also at some point stop it.
- * 
- * Keep this in mind: monitoring means that registered lists are kept alive. A
- * list that is alive means that it's consuming memory!
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_folder_monitor_start (TnyFolderMonitor *self)
@@ -339,11 +350,13 @@ tny_folder_monitor_start_default (TnyFolderMonitor *self)
 
 /**
  * tny_folder_monitor_new:
- * @folder: a #TnyFolder instance
+ * @folder: a #TnyFolder
  *
  * Creates a folder monitor for @folder
  *
- * Return value: a new #TnyFolderMonitor instance
+ * returns (caller-owns): a new #TnyFolderMonitor instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyFolderObserver*
 tny_folder_monitor_new (TnyFolder *folder)

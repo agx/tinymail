@@ -1,5 +1,9 @@
 2007-12-17  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* New documentation style, first commit (GtkDocFuture)
+
+2007-12-17  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Bugfix in tny_folder_get_folders_async
 	* Bugfix in $Label1 on IMAP
 
