@@ -409,6 +409,7 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 		g_free (applied_type);
 		camel_multipart_set_boundary (body, NULL);
 		camel_medium_set_content_object (medium, CAMEL_DATA_WRAPPER (body));
+		camel_object_unref (body);
 	} else
 		body = CAMEL_MULTIPART (containee);
 
@@ -719,6 +720,7 @@ tny_camel_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream 
 
 	camel_object_unref (cstream);
 	camel_object_unref (medium);
+	camel_object_unref (wrapper);
 
 	return retval;
 }
@@ -748,6 +750,7 @@ tny_camel_mime_part_get_stream_default (TnyMimePart *self)
 	if (!wrapper) {
 		wrapper = camel_data_wrapper_new (); 
 		camel_medium_set_content_object (medium, wrapper);
+		camel_object_unref (wrapper);
 	} 
 
 	if (wrapper->stream) {
