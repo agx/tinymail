@@ -4904,6 +4904,7 @@ tny_camel_folder_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFold
 	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folders_async_func (self, list, query, callback, status_callback, user_data);
 }
 
+
 static void 
 tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {

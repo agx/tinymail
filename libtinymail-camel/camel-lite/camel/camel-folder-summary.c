@@ -164,7 +164,6 @@ camel_message_info_clear_normal_flags (CamelMessageInfo *min)
 	mi->flags &= ~CAMEL_MESSAGE_NORMAL_PRIORITY;
 	mi->flags &= ~CAMEL_MESSAGE_LOW_PRIORITY;
 
-	mi->flags &= ~CAMEL_MESSAGE_SECURE;
 	mi->flags &= ~CAMEL_MESSAGE_FOLDER_FLAGGED;
 }
 
@@ -2748,7 +2747,7 @@ summary_build_content_info(CamelFolderSummary *s, CamelMessageInfo *msginfo, Cam
 		ct = camel_mime_parser_content_type(mp);
 		/* update attachments flag as we go */
 
-
+/*
 		if (camel_content_type_is(ct, "application", "pgp-signature")
 #ifdef ENABLE_SMIME
 		    || camel_content_type_is(ct, "application", "x-pkcs7-signature")
@@ -2757,6 +2756,7 @@ summary_build_content_info(CamelFolderSummary *s, CamelMessageInfo *msginfo, Cam
 			)
 			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE);
 
+*/
 
 		/* and scan/index everything */
 		while (camel_mime_parser_step(mp, &buffer, &len) != CAMEL_MIME_PARSER_STATE_BODY_END)
@@ -2773,10 +2773,10 @@ summary_build_content_info(CamelFolderSummary *s, CamelMessageInfo *msginfo, Cam
 		ct = camel_mime_parser_content_type(mp);
 		if (camel_content_type_is(ct, "multipart", "mixed"))
 			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_ATTACHMENTS, CAMEL_MESSAGE_ATTACHMENTS);
-		if (camel_content_type_is(ct, "multipart", "signed")
+		/*if (camel_content_type_is(ct, "multipart", "signed")
 		    || camel_content_type_is(ct, "multipart", "encrypted"))
 			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE);
-
+		*/
 		while (camel_mime_parser_step(mp, &buffer, &len) != CAMEL_MIME_PARSER_STATE_MULTIPART_END) {
 			camel_mime_parser_unstep(mp);
 			part = summary_build_content_info(s, msginfo, mp);
@@ -2843,16 +2843,18 @@ summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msgi
 	if (camel_content_type_is(ct, "multipart", "*")) {
 		if (camel_content_type_is(ct, "multipart", "mixed"))
 			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_ATTACHMENTS, CAMEL_MESSAGE_ATTACHMENTS);
+/*
 		if (camel_content_type_is(ct, "multipart", "signed")
 		    || camel_content_type_is(ct, "multipart", "encrypted"))
 			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE);
+*/
 	} else if (camel_content_type_is(ct, "application", "pgp-signature")
 #ifdef ENABLE_SMIME
 		    || camel_content_type_is(ct, "application", "x-pkcs7-signature")
 		    || camel_content_type_is(ct, "application", "pkcs7-signature")
 #endif
 		) {
-		camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE);
+/*		camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE); */
 	}
 
 	/* using the object types is more accurate than using the mime/types */
@@ -3224,7 +3226,7 @@ static struct flag_names_t {
 	{ "flagged", CAMEL_MESSAGE_FLAGGED },
 	{ "seen", CAMEL_MESSAGE_SEEN },
 	{ "attachments", CAMEL_MESSAGE_ATTACHMENTS },
-	{ "secure", CAMEL_MESSAGE_SECURE },
+/*	{ "secure", CAMEL_MESSAGE_SECURE }, */
 	{ NULL, 0 }
 };
 
