@@ -4901,7 +4901,7 @@ tny_camel_folder_get_folders_async_cancelled_callback (gpointer thr_user_data)
 static void 
 tny_camel_folder_get_folders_async (TnyFolderStore *self, TnyList *list, TnyGetFoldersCallback callback, TnyFolderStoreQuery *query, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folders_async_func (self, list, callback, query, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folders_async_func (self, list, query, callback, status_callback, user_data);
 }
 
 static void 
