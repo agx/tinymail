@@ -17,19 +17,27 @@
  * Boston, MA 02110-1301, USA.
  */
 
+
+/**
+ * TnyHeaderView:
+ * 
+ * A view for a #TnyHeader
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-header-view.h>
 
 /**
  * tny_header_view_clear:
- * @self: A #TnyHeaderView instance
+ * @self: A #TnyHeaderView
  *
- * Clear @self (show nothing)
+ * Clear @self, show nothing
  *
- * Implementors: this method should clear view @self (display nothing and 
- * clearup)
- * 
+ * since: 1.0
+ * audience: application-developer, type-implementer 
  **/
 void
 tny_header_view_clear (TnyHeaderView *self)
@@ -46,17 +54,17 @@ tny_header_view_clear (TnyHeaderView *self)
 
 /**
  * tny_header_view_set_header:
- * @self: A #TnyHeaderView instance
- * @header: A #TnyHeader instace
+ * @self: A #TnyHeaderView
+ * @header: A #TnyHeader
  *
  * Set @self to display @header
  * 
- * Implementors: this method should cause @self to show @header to the user.
- * This typically means showing the from, to, subject, date and cc labels.
+ * Note that the #TnyHeaderView type is often used in a composition with a 
+ * #TnyMsgView type (the #TnyMsgView implementation contains  or aggregates a 
+ * #TnyHeaderView).
  *
- * The #TnyHeaderView type is often used in a composition with a #TnyMsgView
- * type (the #TnyMsgView implementation contains or aggregates a #TnyHeaderView).
- *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_header_view_set_header (TnyHeaderView *self, TnyHeader *header)

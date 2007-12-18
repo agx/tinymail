@@ -89,7 +89,7 @@ get_msg_callback (TnyQueueTask *task, gpointer func_result)
 	info->err = NULL;
 
 	if (info->callback && info->folder)
-		info->callback (info->folder, FALSE, msg, &info->err, info->user_data);
+		info->callback (info->folder, FALSE, msg, info->err, info->user_data);
 
 	if (msg)
 		g_object_unref (msg);
@@ -241,7 +241,7 @@ int_folder_monitor_get_type (void)
 }
 
 static void
-refresh_done (TnyFolder *folder, gboolean cancelled, GError **err, gpointer user_data)
+refresh_done (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data)
 {
 	IntFolderMonitor *mon = user_data;
 	tny_folder_remove_observer (folder, TNY_FOLDER_OBSERVER (mon));

@@ -17,24 +17,26 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyMsgView:
+ * 
+ * A type that can view a #TnyMsg and usually inherits from #TnyMimePartView
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-msg-view.h>
 
 /**
  * tny_msg_view_create_new_inline_viewer:
- * @self: A #TnyMsgView instance
+ * @self: a #TnyMsgView
  *
- * Create a new #TnyMsgView that can be used to display an inline message. 
- * Usually it will return a new instance of the same type as @self. The
- * returned instance must be unreferenced after use.
- *
- * Implementors: This method should create and return a new #TnyMsgView instance 
- * usually of the same type as @self. This method will be used when a
- * #TnyMsgView needs to create a #TnyMsgView instance for displaying inlined 
- * messages (like what message/rfc822 mime parts are). For example the 
- * #TnyGtkMsgView implementation will use this method to create for itself a 
- * new #TnyMsgView instance that it can embed in itself.
+ * Create a new #TnyMsgView that can be used to display an inline message, 
+ * like a message/rfc822 MIME part. Usually it will return a new instance of
+ * the same type as @self. The returned instance must be unreferenced after
+ * use.
  *
  * Example:
  * <informalexample><programlisting>
@@ -45,11 +47,9 @@
  * }
  * </programlisting></informalexample>
  *
- * Note that if you want to pass contructor parameters, that you will have to
- * store them yourself (for example in a static global field in the .c file) and
- * repeat them in the new instance that will be created by this method.
- *
- * Return value: A #TnyMsgView instance
+ * returns (caller-owns): a #TnyMsgView instance
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyMsgView* 
 tny_msg_view_create_new_inline_viewer (TnyMsgView *self)
@@ -64,14 +64,13 @@ tny_msg_view_create_new_inline_viewer (TnyMsgView *self)
 
 /**
  * tny_msg_view_create_mime_part_view_for:
- * @self: A #TnyMsgView instance
- * @part: A #TnyMimePart instance
+ * @self: a #TnyMsgView
+ * @part: a #TnyMimePart
  *
  * Create a #TnyMimePartView instance for viewing @part. The returned instance
- * must be unreferenced after use.
- *
- * Implementors: This method should create and return a new #TnyMimePartView 
- * that is suitable for displaying @part.
+ * must be unreferenced after use. It's recommended to return the result of
+ * calling the function on the super of @self (like in the example below) in
+ * case your type's implementation can't display @part.
  *
  * Example:
  * <informalexample><programlisting>
@@ -79,9 +78,7 @@ tny_msg_view_create_new_inline_viewer (TnyMsgView *self)
  * tny_my_html_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
  * {
  *    TnyMimePartView *retval = NULL;
- *    g_assert (TNY_IS_MIME_PART (part));
- *    if (tny_mime_part_content_type_is (part, "text/html"))
- *    {
+ *    if (tny_mime_part_content_type_is (part, "text/html")) {
  *        GtkWidget *widget = (GtkWidget *) self;
  *        retval = tny_my_html_mime_part_view_new ();
  *    } else
@@ -93,7 +90,9 @@ tny_msg_view_create_new_inline_viewer (TnyMsgView *self)
  * ps. For a real and complete working example take a look at the implementation of 
  * #TnyMozEmbedMsgView in libtinymailui-mozembed.
  *
- * Return value: A #TnyMimePartView instance for viewing @part
+ * returns (caller-owns): a #TnyMimePartView instance
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyMimePartView*
 tny_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
@@ -108,11 +107,12 @@ tny_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 
 /**
  * tny_msg_view_clear:
- * @self: A #TnyMsgView instance
+ * @self: A #TnyMsgView
  *
- * Clear @self (show nothing)
+ * Clear @self, show nothing
  * 
- * Implementors: this method should clear @self (display nothing and clearup)
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_msg_view_clear (TnyMsgView *self)
@@ -129,14 +129,13 @@ tny_msg_view_clear (TnyMsgView *self)
 
 /**
  * tny_msg_view_set_unavailable:
- * @self: A #TnyMsgView instance
+ * @self: a #TnyMsgView
  *
- * Set @self to display that a message was unavailable
+ * Set @self to display that a message was unavailable. You can for example
+ * implement this method by simply calling tny_msg_view_clear().
  * 
- * Implementors: this method should set @self to display a message like
- * "Message unavailable" or trigger another indication that a specific message
- * isn't available.
- *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_msg_view_set_unavailable (TnyMsgView *self)
@@ -153,19 +152,19 @@ tny_msg_view_set_unavailable (TnyMsgView *self)
 
 /**
  * tny_msg_view_get_msg:
- * @self: A #TnyMsgView instance
+ * @self: a #TnyMsgView
  *
  * Get the current message of @self. If @self is not displaying any message,
  * NULL will be returned. Else the return value must be unreferenced after use.
  *
- * Implementors: this method should return the mime part this view is currently
- * viewing. It must add a reference to the instance before returning it. If the
- * view isn't viewing any mime part, it must return NULL.
+ * When inheriting from a #TnyMimePartView, this method is most likely going to
+ * be an alias for tny_mime_part_view_get_part(), with the returned #TnyMimePart
+ * casted to a #TnyMsg (in this case, the method in the #TnyMimePartView should
+ * return a #TnyMsg, indeed).
  *
- * Usually this method is an alias for tny_mime_part_view_get_part of 
- * #TnyMimePartView
- *
- * Return value: A #TnyMsg instance or NULL
+ * returns (null-ok) (caller-owns): A #TnyMsg instance or NULL
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyMsg* 
 tny_msg_view_get_msg (TnyMsgView *self)
@@ -180,22 +179,18 @@ tny_msg_view_get_msg (TnyMsgView *self)
 
 /**
  * tny_msg_view_set_msg:
- * @self: A #TnyMsgView instance
- * @msg: A #TnyMsg instace
+ * @self: a #TnyMsgView
+ * @msg: a #TnyMsg
  *
  * Set the message which view @self must display.
  * 
- * Implementors: this method should cause @self to show @msg to the user. 
- * This includes showing the header (for which you can make a composition with 
- * a #TnyHeaderView), the message body and the attachments (for which you 
- * typically use the #TnyMimePartView interface and implementations).
- *
- * You can get a list of mime parts using the tny_mime_part_get_parts API of
- * the #TnyMimePart type. You can use the tny_msg_view_create_mime_part_view_for
- * API to get an instance of a #TnyMimePartView that can view the mime part.
+ * Note that you can get a list of mime parts using the tny_mime_part_get_parts()
+ * API of the #TnyMimePart type. You can use the tny_msg_view_create_mime_part_view_for()
+ * API to get a #TnyMimePartView that can view the mime part.
  * 
- * Usually this method is an alias or decorator for tny_mime_part_view_set_part
- * of #TnyMimePartView
+ * When inheriting from a #TnyMimePartView this method is most likely going to
+ * decorate or alias tny_mime_part_view_set_part(), with the passed #TnyMsg
+ * casted to a #TnyMimePart.
  *
  * Example:
  * <informalexample><programlisting>
@@ -207,29 +202,30 @@ tny_msg_view_get_msg (TnyMsgView *self)
  *     tny_msg_view_clear (self);
  *     header = tny_msg_get_header (msg);
  *     tny_header_view_set_header (priv->headerview, header);
- *     g_object_unref (G_OBJECT (header));
+ *     g_object_unref (header);
  *     tny_mime_part_view_set_part (TNY_MIME_PART_VIEW (self),
  *                TNY_MIME_PART (msg));
  *     tny_mime_part_get_parts (TNY_MIME_PART (msg), list);
  *     iterator = tny_list_create_iterator (list);
- *     while (!tny_iterator_is_done (iterator))
- *     {
+ *     while (!tny_iterator_is_done (iterator)) {
  *         TnyMimePart *part = tny_iterator_get_current (iterator);
  *         TnyMimePartView *mpview;
  *         mpview = tny_msg_view_create_mime_part_view_for (self, part);
  *         if (mpview)
  *             tny_mime_part_view_set_part (mpview, part);
- *         g_object_unref (G_OBJECT(part));
+ *         g_object_unref (part);
  *         tny_iterator_next (iterator);
  *     }
- *     g_object_unref (G_OBJECT (iterator));
- *     g_object_unref (G_OBJECT (list));
+ *     g_object_unref (iterator);
+ *     g_object_unref (list);
  * }
  * </programlisting></informalexample>
  *
  * ps. For a real and complete working example take a look at the implementation of 
  * #TnyGtkMsgView in libtinymailui-gtk.
  *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg)

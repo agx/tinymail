@@ -36,6 +36,7 @@
 <!ENTITY libtinymail-TnyMergeFolder SYSTEM "xml/tny-merge-folder.xml">
 <!ENTITY libtinymail-TnyShared SYSTEM "xml/tny-shared.xml">
 <!ENTITY libtinymail-TnyCombinedAccount SYSTEM "xml/tny-combined-account.xml">
+<!ENTITY libtinymail-TnyConnectionPolicy "xml/tny-connection-policy.xml">
 
 <!ENTITY libtinymail-camel-TnyCamelSendQueue SYSTEM "xml/tny-camel-send-queue.xml">
 <!ENTITY libtinymail-camel-TnyCamelMsgRemoveStrategy SYSTEM "xml/tny-camel-msg-remove-strategy.xml">
@@ -54,6 +55,11 @@
 <!ENTITY libtinymail-camel-TnyCamelPOPFolder SYSTEM "xml/tny-camel-pop-folder.xml">
 <!ENTITY libtinymail-camel-TnyCamelMimePart SYSTEM "xml/tny-camel-mime-part.xml">
 <!ENTITY libtinymail-camel-TnyCamelMsg SYSTEM "xml/tny-camel-msg.xml">
+<!ENTITY libtinymail-camel-TnyCamelBsMsg SYSTEM "xml/tny-camel-bs-msg.xml">
+<!ENTITY libtinymail-camel-TnyCamelBsMsgReceiveStrategy SYSTEM "xml/tny-camel-bs-msg-receive-strategy.xml">
+<!ENTITY libtinymail-camel-TnyCamelBsMimePart SYSTEM "xml/tny-camel-bs-mime-part.xml">
+<!ENTITY libtinymail-camel-TnyCamelRecoverConnectionPolicy SYSTEM "xml/tny-camel-recover-connection-policy.xml">
+<!ENTITY libtinymail-camel-TnyCamelDefaultConnectionPolicy SYSTEM "xml/tny-camel-default-connection-policy.xml">
 <!ENTITY libtinymail-camel-TnySessionCamel SYSTEM "xml/tny-session-camel.xml">
 <!ENTITY libtinymail-camel-TnyStreamCamel SYSTEM "xml/tny-stream-camel.xml">
 <!ENTITY libtinymail-camel-TnyCamelShared SYSTEM "xml/tny-camel-shared.xml">
@@ -74,6 +80,9 @@
 <!ENTITY libtinymailui-gtk-TnyGtkTextMimePartView SYSTEM "xml/tny-gtk-text-mime-part-view.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkLockable SYSTEM "xml/tny-gtk-lockable.xml">
 <!ENTITY libtinymailui-gtk-TnyGtkPasswordDialog SYSTEM "xml/tny-gtk-password-dialog.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkExpanderMimePartView SYSTEM "xml/tny-gtk-expander-mime-part-view.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkPixbufStream SYSTEM "xml/tny-gtk-pixbuf-stream.xml">
+<!ENTITY libtinymailui-gtk-TnyGtkImageMimePartView SYSTEM "xml/tny-gtk-image-mime-part-view.xml">
 
 <!ENTITY libtinymailui-TnyMimePartSaver SYSTEM "xml/tny-mime-part-saver.xml">
 <!ENTITY libtinymailui-TnyMsgWindow SYSTEM "xml/tny-msg-window.xml">
@@ -162,6 +171,7 @@
 		&libtinymail-TnyFolderStoreObserver;
 		&libtinymail-TnyFolderStoreChange;
 		&libtinymail-TnyPasswordGetter;
+		&libtinymail-TnyConnectionPolicy;
 		&libtinymail-TnyEnums;
 		&libtinymail-TnyShared;
 		&libtinymail-TnyStatus;
@@ -196,6 +206,9 @@
 		&libtinymailui-gtk-TnyGtkAttachmentMimePartView;
 		&libtinymailui-gtk-TnyGtkLockable;
 		&libtinymailui-gtk-TnyGtkPasswordDialog;
+		&libtinymailui-gtk-TnyGtkExpanderMimePartView;
+		&libtinymailui-gtk-TnyGtkPixbufStream;
+		&libtinymailui-gtk-TnyGtkImageMimePartView;
 		&libtinymailui-gtk-TnyGtkEnums;
 	</chapter>
 
@@ -251,6 +264,11 @@
 		&libtinymail-camel-TnyCamelPOPFolder;
 		&libtinymail-camel-TnyCamelMimePart;
 		&libtinymail-camel-TnyCamelMsg;
+		&libtinymail-camel-TnyCamelDefaultConnectionPolicy;
+		&libtinymail-camel-TnyCamelRecoverConnectionPolicy;
+		&libtinymail-camel-TnyCamelBsMimePart;
+		&libtinymail-camel-TnyCamelBsMsgReceiveStrategy;
+		&libtinymail-camel-TnyCamelBsMsg;
 		&libtinymail-camel-TnySessionCamel;
 		&libtinymail-camel-TnyStreamCamel;
 		&libtinymail-camel-TnyCamelShared;

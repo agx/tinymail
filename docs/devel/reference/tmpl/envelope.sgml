@@ -1,0 +1,57 @@
+<!-- ##### SECTION Title ##### -->
+envelope
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### TYPEDEF envelope_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT envelope ##### -->
+<para>
+
+</para>
+
+@date: 
+@subject: 
+@from: 
+@sender: 
+@reply_to: 
+@to: 
+@cc: 
+@bcc: 
+@in_reply_to: 
+@message_id: 
+
+<!-- ##### FUNCTION envelope_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION envelope_free ##### -->
+<para>
+
+</para>
+
+@node: 
+
+

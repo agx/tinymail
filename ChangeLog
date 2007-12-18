@@ -1,3 +1,11 @@
+2007-12-18  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* New documentation style, second commit (GtkDocFuture)
+	* API fixes in TnyMimePart and TnyGtkImageMimePartView
+	* Fixes for the unit tests and functional tests
+
+	* This was a major API change
+
 2007-12-17  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* New documentation style, first commit (GtkDocFuture)

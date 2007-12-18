@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyMimePartView:
+ * 
+ * A type that can view a #TnyMimePart
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-mime-part-view.h>
@@ -24,12 +32,12 @@
 
 /**
  * tny_mime_part_view_clear:
- * @self: A #TnyMimePartView instance
+ * @self: a #TnyMimePartView
  *
- * Clear @self (show nothing)
+ * Clear @self, show nothing
  *
- * Implementors: this method should clear @self (display nothing and cleanup)
- *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_mime_part_view_clear (TnyMimePartView *self)
@@ -46,25 +54,24 @@ tny_mime_part_view_clear (TnyMimePartView *self)
 
 /**
  * tny_mime_part_view_get_part:
- * @self: A #TnyMimePartView instance
+ * @self: a #TnyMimePartView
  *
  * Get the current mime part of @self. If @self is not displaying any mime part,
- * NULL will be returned. Else the return value must be unreferenced after use.
- * 
- * Implementors: this method should return the mime part this view is currently
- * viewing. It must add a reference to the instance before returning it. If the 
- * view isn't viewing any mime part, it must return NULL.
+ * NULL will be returned. Else the return value must be unreferenced after use. 
  *
  * Example:
  * <informalexample><programlisting>
  * static TnyMimePart* 
  * tny_gtk_text_mime_part_view_get_part (TnyMimePartView *self)
  * {
- *      return TNY_MIME_PART (g_object_ref (priv->part));
+ *      TnyGtkTextMimePartViewPriv *priv = TNY_GTK_TEXT_MIME_PART_VIEW_GET_PRIV (self);
+ *      return priv->part?TNY_MIME_PART (g_object_ref (priv->part)):NULL;
  * }
  * </programlisting></informalexample>
  *
- * Return value: A #TnyMimePart instance or NULL
+ * returns (null-ok) (caller-owns): a #TnyMimePart instance or NULL
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyMimePart*
 tny_mime_part_view_get_part (TnyMimePartView *self)
@@ -79,27 +86,44 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
 
 /**
  * tny_mime_part_view_set_part:
- * @self: A #TnyMimePartView instance
- * @mime_part: A #TnyMimePart instace
+ * @self: a #TnyMimePartView
+ * @mime_part: a #TnyMimePart
  *
- * Set mime part which @self should display. Note that if possible, try to wait
- * as long as possible to call this API. As soon as this API is used, and the
- * part's data is not available locally, will the part's data be requested from
- * the service.
+ * Set the MIME part which @self should display. Note that if possible, try to
+ * wait for as long as possible to call this API. As soon as this API is used,
+ * and the part's data is not available locally, will the part's data be
+ * requested from the service.
  *
  * If you can delay the need for calling this API, for example by offering the
- * user a feature to make it visible ather than making the part always visible,
+ * user a feature to make it visible rather than making the part always visible,
  * then this is a smart thing to do to save bandwidth consumption in your final
  * application.
  *
  * For example #GtkExpander and setting it when the child widget gets realized
- * in case you are using libtinymailui-gtk.
- * 
- * Implementors: this method should cause the view @self to show the mime part
- * @mime_part to the user. 
+ * in case you are using libtinymailui-gtk. A convenient #TnyGtkExpanderMimePartView
+ * is available in libtinymailui-gtk that does exactly this. It will call for the
+ * API when you expand the expander (the user presses the expand-arrow).
+ *
+ * Note that it's recommended to use tny_mime_part_decode_to_stream_async() over
+ * tny_mime_part_decode_to_stream() if you want your user interface to remain 
+ * responsive in case Tinymail's engine needs to pull data from a service.
  *
  * Example:
  * <informalexample><programlisting>
+ * static void
+ * on_mime_part_decoded (TnyMimePart *part, TnyStream *dest, gboolean cancelled, GError *err, gpointer user_data)
+ * {
+ *        TnyMimePartView *self = (TnyMimePartView *) user_data;
+ *        if (!cancelled && !err)
+ *             make_part_really_visible_now (self, part);
+ *        g_object_unref (self);
+ * }
+ * static void
+ * on_status (GObject *part, TnyStatus *status, gpointer user_data)
+ * {
+ *        TnyMimePartView *self = (TnyMimePartView *) user_data;
+ *        move_progress_bar (self, tny_status_get_fraction (status));
+ * }
  * static void 
  * tny_gtk_text_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
  * {
@@ -111,7 +135,8 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  *                gtk_text_buffer_set_text (buffer, "", 0);
  *           dest = tny_gtk_text_buffer_stream_new (buffer);
  *           tny_stream_reset (dest);
- *           tny_mime_part_decode_to_stream (part, dest);
+ *           tny_mime_part_decode_to_stream_async (part, dest, on_mime_part_decoded, 
+ *                   on_status, g_object_ref (self));
  *           tny_stream_reset (dest);
  *           g_object_unref (dest);
  *           priv->part = TNY_MIME_PART (g_object_ref (part));
@@ -124,6 +149,9 @@ tny_mime_part_view_get_part (TnyMimePartView *self)
  *          g_object_unref (priv->part);
  * }
  * </programlisting></informalexample>
+ *
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *mime_part)

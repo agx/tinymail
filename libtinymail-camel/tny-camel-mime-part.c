@@ -223,8 +223,8 @@ decode_async_callback (gpointer user_data)
 	DecodeAsyncInfo *info = (DecodeAsyncInfo *) user_data;
 	if (info->callback) { 
 		/* TODO: tny_lockable_lock (priv->ui_locker); */
-		info->callback (TNY_MIME_PART (info->self), TNY_STREAM (info->stream), 
-			FALSE, info->err, info->user_data);
+		info->callback (TNY_MIME_PART (info->self), 
+			FALSE, TNY_STREAM (info->stream), info->err, info->user_data);
 		/* TODO: tny_lockable_unlock (priv->ui_locker); */
 	}
 	return FALSE;

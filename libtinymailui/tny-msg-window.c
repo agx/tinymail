@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyMsgWindow:
+ * 
+ * A type that can view a #TnyMsg in a window
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-msg-window.h>

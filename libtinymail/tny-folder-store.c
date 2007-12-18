@@ -205,6 +205,29 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError 
 	return retval;
 }
 
+
+
+/** 
+ * TnyCreateFolderCallback:
+ * @self: a #TnyFolderStore that caused the callback
+ * @cancelled: if the operation got cancelled
+ * @new_folder (null-ok): a newly created #TnyFolder or NULL
+ * @err (null-ok): if an error occurred
+ * @user_data (null-ok):  user data that was passed to the callbacks
+ *
+ * A folder store callback for when a folder creation was requested. If allocated,
+ * you must cleanup @user_data at the end of your implementation of the callback.
+ * All other fields in the parameters of the callback are read-only.
+ *
+ * When cancelled, @cancelled will be TRUE while @err might nonetheless be NULL.
+ * If @err is not NULL, an error occurred that you should handle gracefully.
+ * The @new_folder folder parameter will only not be NULL if the creation of the
+ * folder in @self was considered successful.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+
 /**
  * tny_folder_store_create_folder_async:
  * @self: a #TnyFolderStore 
@@ -288,6 +311,30 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
 
 	return;
 }
+
+
+
+/** 
+ * TnyGetFoldersCallback:
+ * @self: a #TnyFolderStore that caused the callback
+ * @cancelled: if the operation got cancelled
+ * @list (null-ok): a #TnyList with fetched #TnyFolder instances or NULL
+ * @err (null-ok): if an error occurred
+ * @user_data (null-ok):  user data that was passed to the callbacks
+ *
+ * A folder store callback for when a list of folders was requested. If allocated,
+ * you must cleanup @user_data at the end of your implementation of the callback.
+ * All other fields in the parameters of the callback are read-only.
+ *
+ * When cancelled, @cancelled will be TRUE while @err might nonetheless be NULL.
+ * If @err is not NULL, an error occurred that you should handle gracefully.
+ * The @list parameter might be NULL in case of cancellation or error. If not
+ * NULL it contains the list of folders in @self that got fetched during the
+ * request.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
 
 /**
  * tny_folder_store_get_folders_async:

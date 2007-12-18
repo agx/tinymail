@@ -17,6 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
+
+/**
+ * TnyAccountStoreView:
+ * 
+ * A view for a #TnyAccountStore
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-account-store-view.h>
@@ -24,12 +33,13 @@
 
 /**
  * tny_account_store_view_set_account_store:
- * @self: A #TnyAccountStoreView instance
- * @account_store: A #TnyAccountStore instace
+ * @self: A #TnyAccountStoreView
+ * @account_store: A #TnyAccountStore
  *
  * Set the account store of the view.
  *
- * Implementors: This should let @self display @account_store.
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 void
 tny_account_store_view_set_account_store (TnyAccountStoreView *self, TnyAccountStore *account_store)

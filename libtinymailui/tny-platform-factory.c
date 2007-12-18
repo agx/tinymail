@@ -20,6 +20,14 @@
 /* The reason why this type is defined in libtinymailui rather than libtinymail
    is because the factory also returns types defined in libtinymailui */
    
+/**
+ * TnyPlatformFactory:
+ * 
+ * A factory that creates some instances
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <tny-platform-factory.h>
@@ -27,15 +35,14 @@
 
 /**
  * tny_platform_factory_new_msg:
- * @self: a TnyPlatformFactory object
+ * @self: a TnyPlatformFactory
  *
  * Create a new #TnyMsg instance. The returned instance must be 
  * unreferenced after use.
  *
- * Implementors: when implementing a platform-specific library, return a 
- * new #TnyMsg instance.
- *
- * Return value: a #TnyMsg instance
+ * returns (caller-owns): a #TnyMsg instance
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyMsg* 
 tny_platform_factory_new_msg (TnyPlatformFactory *self)
@@ -51,15 +58,14 @@ tny_platform_factory_new_msg (TnyPlatformFactory *self)
 
 /**
  * tny_platform_factory_new_password_getter:
- * @self: a TnyPlatformFactory object
+ * @self: a TnyPlatformFactory
  *
  * Create a new #TnyPasswordGetter instance. The returned instance must be 
  * unreferenced after use.
  *
- * Implementors: when implementing a platform-specific library, return a 
- * new #TnyPasswordGetter instance.
- *
- * Return value: a #TnyPasswordGetter instance
+ * returns (caller-owns): a #TnyPasswordGetter instance
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyPasswordGetter* 
 tny_platform_factory_new_password_getter (TnyPlatformFactory *self)
@@ -74,15 +80,14 @@ tny_platform_factory_new_password_getter (TnyPlatformFactory *self)
 
 /**
  * tny_platform_factory_new_mime_part:
- * @self: a TnyPlatformFactory object
+ * @self: a TnyPlatformFactory
  *
  * Create a new #TnyMimePart instance. The returned instance must be 
  * unreferenced after use.
  *
- * Implementors: when implementing a platform-specific library, return a 
- * new #TnyMimePart instance.
- *
- * Return value: a #TnyMimePart instance
+ * returns (caller-owns): a #TnyMimePart instance
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyMimePart* 
 tny_platform_factory_new_mime_part (TnyPlatformFactory *self)
@@ -98,16 +103,18 @@ tny_platform_factory_new_mime_part (TnyPlatformFactory *self)
 
 /**
  * tny_platform_factory_new_account_store:
- * @self: a TnyPlatformFactory object
+ * @self: a TnyPlatformFactory
  *
  * Create a new #TnyAccountStore instance. The returned instance must be 
  * unreferenced after use.
  *
- * Implementors: when implementing a platform-specific library, return a 
- * new #TnyAccountStore instance. It's allowed to reuse one instance, just
- * make sure that you add a reference then.
+ * When implementing a platform-specific library, return a new #TnyAccountStore
+ * instance. It's allowed to reuse one instance, just make sure that you add a
+ * reference.
  *
- * Return value: a #TnyAccountStore instance
+ * returns (caller-owns): a #TnyAccountStore instance
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyAccountStore*
 tny_platform_factory_new_account_store (TnyPlatformFactory *self)
@@ -122,17 +129,17 @@ tny_platform_factory_new_account_store (TnyPlatformFactory *self)
 
 /**
  * tny_platform_factory_new_device:
- * @self: a TnyPlatformFactory object
+ * @self: a TnyPlatformFactory
  *
  * Create a new #TnyDevice instance. The returned instance must be 
  * unreferenced after use.
  *
- * Implementors: when implementing a platform-specific library, return a 
- * new #TnyDevice instance. It's allowed to reuse one instance, just
- * make sure that you add a reference then.
+ * When implementing a platform-specific library, return a new #TnyDevice instance.
+ * It's allowed to reuse one instance, just make sure that you add a reference.
  *
- * Return value: a #TnyDevice instance
- *
+ * returns (caller-owns): a #TnyDevice instance
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyDevice*
 tny_platform_factory_new_device (TnyPlatformFactory *self)
@@ -147,16 +154,17 @@ tny_platform_factory_new_device (TnyPlatformFactory *self)
 
 /**
  * tny_platform_factory_new_msg_view:
- * @self: a TnyPlatformFactory object
+ * @self: a TnyPlatformFactory
  *
  * Create a new #TnyMsgView instance. The returned instance must be 
  * unreferenced after use.
  *
- * Implementors: when implementing a platform-specific library, return a 
- * new #TnyMsgView instance. It's allowed to reuse one instance, just
- * make sure that you add a reference then.
+ * When implementing a platform-specific library, return a new #TnyMsgView instance.
+ * It's allowed to reuse one instance, just make sure that you add a reference.
  *
- * Return value: a #TnyMsgView instance
+ * returns (caller-owns): a #TnyMsgView instance
+ * since: 1.0
+ * audience: application-developer, type-implementer
  **/
 TnyMsgView*
 tny_platform_factory_new_msg_view (TnyPlatformFactory *self)

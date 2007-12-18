@@ -1,0 +1,92 @@
+<!-- ##### SECTION Title ##### -->
+bodystruct
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### TYPEDEF bodystruct_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF mimeparam_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT mimeparam ##### -->
+<para>
+
+</para>
+
+@next: 
+@name: 
+@value: 
+
+<!-- ##### STRUCT disposition_t ##### -->
+<para>
+
+</para>
+
+@type: 
+@params: 
+
+<!-- ##### STRUCT bodystruct ##### -->
+<para>
+
+</para>
+
+@next: 
+
+<!-- ##### FUNCTION bodystruct_parse ##### -->
+<para>
+
+</para>
+
+@inbuf: 
+@inlen: 
+@err: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bodystruct_free ##### -->
+<para>
+
+</para>
+
+@node: 
+
+
+<!-- ##### FUNCTION mimeparam_get_value_for ##### -->
+<para>
+
+</para>
+
+@mp: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION bodystruct_dump ##### -->
+<para>
+
+</para>
+
+@part: 
+
+

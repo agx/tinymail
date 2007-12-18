@@ -471,8 +471,9 @@ decode_async_callback (gpointer user_data)
 	}
 
 	if (info->callback) { 
-		info->callback (TNY_MIME_PART (info->self), TNY_STREAM (info->stream), 
-			info->cancelled, info->err, info->user_data);
+		info->callback (TNY_MIME_PART (info->self),  
+			info->cancelled, TNY_STREAM (info->stream), 
+			info->err, info->user_data);
 	}
 
 	tny_lockable_unlock (info->session->priv->ui_lock);
@@ -509,7 +510,9 @@ decode_async_cancelled_callback (gpointer user_data)
 	DecodeAsyncInfo *info = (DecodeAsyncInfo *) user_data;
 	if (info->callback) { 
 		tny_lockable_lock (info->session->priv->ui_lock);
-		info->callback (TNY_MIME_PART (info->self), TNY_STREAM (info->stream), TRUE, info->err, info->user_data);
+		info->callback (TNY_MIME_PART (info->self), TRUE,
+			TNY_STREAM (info->stream), info->err, 
+			info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 	return FALSE;

@@ -79,7 +79,7 @@ tny_gtk_image_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
 }
 
 static void 
-on_mime_part_decoded (TnyMimePart *part, TnyStream *dest, gboolean canceled, GError *err, gpointer user_data)
+on_mime_part_decoded (TnyMimePart *part, gboolean canceled, TnyStream *dest, GError *err, gpointer user_data)
 {
 	TnyMimePartView *self = (TnyMimePartView *) user_data;
 	GdkPixbuf *pixbuf;

@@ -103,18 +103,23 @@ typedef struct _TnyCombinedAccountClass TnyCombinedAccountClass;
 typedef struct _TnyConnectionPolicy TnyConnectionPolicy;
 typedef struct _TnyConnectionPolicyIface TnyConnectionPolicyIface;
 
+typedef void (*TnyStatusCallback) (GObject *self, TnyStatus *status, gpointer user_data);
+
 typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);
 typedef void (*TnyForgetPassFunc) (TnyAccount *self);
-typedef void (*TnyFolderCallback) (TnyFolder *self, gboolean canceled, GError *err, gpointer user_data);
-typedef void (*TnyCreateFolderCallback) (TnyFolderStore *self, gboolean canceled, TnyFolder *new_folder, GError *err, gpointer user_data);
-typedef void (*TnyMimePartCallback) (TnyMimePart *self, TnyStream *stream, gboolean canceled, GError *err, gpointer user_data);
-typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean canceled, TnyList *headers, GError *err, gpointer user_data);
-typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean canceled, TnyMsg *msg, GError *err, gpointer user_data);
-typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, gboolean canceled, GError *err, gpointer user_data);
-typedef void (*TnyStatusCallback) (GObject *self, TnyStatus *status, gpointer user_data);
-typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, gboolean canceled, TnyList *list, GError *err, gpointer user_data);
-typedef void (*TnyCopyFolderCallback) (TnyFolder *self, gboolean canceled, TnyFolderStore *into, TnyFolder *new_folder, GError *err, gpointer user_data);
-typedef void (*TnySendQueueAddCallback) (TnySendQueue *self, gboolean canceled, TnyMsg *msg, GError *err, gpointer user_data);
+
+typedef void (*TnyMimePartCallback) (TnyMimePart *self, gboolean cancelled, TnyStream *stream, GError *err, gpointer user_data);
+
+typedef void (*TnyGetFoldersCallback) (TnyFolderStore *self, gboolean cancelled, TnyList *list, GError *err, gpointer user_data);
+typedef void (*TnyCreateFolderCallback) (TnyFolderStore *self, gboolean cancelled, TnyFolder *new_folder, GError *err, gpointer user_data);
+
+typedef void (*TnyFolderCallback) (TnyFolder *self, gboolean cancelled, GError *err, gpointer user_data);
+typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data);
+typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data);
+typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data);
+typedef void (*TnyCopyFolderCallback) (TnyFolder *self, gboolean cancelled, TnyFolderStore *into, TnyFolder *new_folder, GError *err, gpointer user_data);
+
+typedef void (*TnySendQueueAddCallback) (TnySendQueue *self, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data);
 
 G_END_DECLS
 
