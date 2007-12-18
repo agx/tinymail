@@ -691,6 +691,29 @@ tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
 	return;
 }
 
+
+/** 
+ * TnyMimePartCallback:
+ * @self: a #TnyFolderStore that caused the callback
+ * @cancelled: if the operation got cancelled
+ * @stream: the stream you passed
+ * @err (null-ok): if an error occurred
+ * @user_data (null-ok):  user data that was passed to the callbacks
+ *
+ * A MIME part callback for when a MIME part decode was requested. If allocated,
+ * you must cleanup @user_data at the end of your implementation of the callback.
+ * All other fields in the parameters of the callback are read-only.
+ *
+ * When cancelled, @cancelled will be TRUE while @err might nonetheless be NULL.
+ * If @err is not NULL, an error occurred that you should handle gracefully.
+ * The @stream parameter will contain the stream that you passed but will now be
+ * written, if the operation succeeded.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+
+
 /**
  * tny_mime_part_decode_to_stream_async:
  * @self: a #TnyMimePart object
