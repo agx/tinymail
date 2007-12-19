@@ -126,7 +126,7 @@ tny_pair_get_value (TnyPair *self)
  *
  * Creates an instance of a type that holds a name and a value pair
  *
- * returns (caller-owns): a new #TnyPair instance
+ * returns: (caller-owns): a new #TnyPair instance
  * since: 1.0
  * audience: application-developer
  **/

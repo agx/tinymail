@@ -111,7 +111,7 @@ tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *
  * tny_folder_store_remove_folder:
  * @self: a #TnyFolderStore
  * @folder: a #TnyFolder to remove
- * @err: a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Removes a @folder from the folder store @self. You are responsible for 
  * unreferencing the @folder instance yourself. This method will not do this
@@ -165,7 +165,7 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
  * tny_folder_store_create_folder:
  * @self: a #TnyFolderStore 
  * @name: The folder name to create
- * @err (null-ok): a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Creates a new folder in @self. If not NULL, the value returned is the newly 
  * created folder instance and must be unreferenced after use.
@@ -179,7 +179,7 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
  *      g_object_unref (createfol);
  * </programlisting></informalexample>
  * 
- * returns (null-ok) (caller-owns): the folder that was created or NULL
+ * returns: (null-ok) (caller-owns): the folder that was created or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -211,9 +211,9 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError 
  * TnyCreateFolderCallback:
  * @self: a #TnyFolderStore that caused the callback
  * @cancelled: if the operation got cancelled
- * @new_folder (null-ok): a newly created #TnyFolder or NULL
- * @err (null-ok): if an error occurred
- * @user_data (null-ok):  user data that was passed to the callbacks
+ * @new_folder: (null-ok): a newly created #TnyFolder or NULL
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
  *
  * A folder store callback for when a folder creation was requested. If allocated,
  * you must cleanup @user_data at the end of your implementation of the callback.
@@ -232,9 +232,9 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError 
  * tny_folder_store_create_folder_async:
  * @self: a #TnyFolderStore 
  * @name: The folder name to create
- * @callback (null-ok): a #TnyCreateFolderCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @callback: (null-ok): a #TnyCreateFolderCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  *
  * Creates a new folder in @self, asynchronously.
  *
@@ -264,8 +264,8 @@ tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, T
  * tny_folder_store_get_folders:
  * @self: a #TnyFolderStore
  * @list: a #TnyList to to which the folders will be prepended
- * @query (null-ok): a #TnyFolderStoreQuery or NULL
- * @err (null-ok): a #GError or NULL
+ * @query: (null-ok): a #TnyFolderStoreQuery or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Get a list of child folders from @self. You can use @query to limit the list 
  * of folders with only folders that match a query or NULL if you don't want
@@ -318,9 +318,9 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * TnyGetFoldersCallback:
  * @self: a #TnyFolderStore that caused the callback
  * @cancelled: if the operation got cancelled
- * @list (null-ok): a #TnyList with fetched #TnyFolder instances or NULL
- * @err (null-ok): if an error occurred
- * @user_data (null-ok):  user data that was passed to the callbacks
+ * @list: (null-ok): a #TnyList with fetched #TnyFolder instances or NULL
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
  *
  * A folder store callback for when a list of folders was requested. If allocated,
  * you must cleanup @user_data at the end of your implementation of the callback.
@@ -340,10 +340,10 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * tny_folder_store_get_folders_async:
  * @self: a #TnyFolderStore
  * @list: a #TnyList to to which the folders will be prepended
- * @query (null-ok): A #TnyFolderStoreQuery object
- * @callback (null-ok): a #TnyGetFoldersCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @query: (null-ok): A #TnyFolderStoreQuery object
+ * @callback: (null-ok): a #TnyGetFoldersCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  *
  * Get a list of child folders from the folder store @self and call back when 
  * finished. You can use @query to limit the list of folders with only folders 

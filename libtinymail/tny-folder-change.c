@@ -82,7 +82,7 @@ tny_folder_change_set_received_msg (TnyFolderChange *self, TnyMsg *msg)
  * If no message was received, NULL will be returned. If not NULL, the returned
  * value must be unreferenced after use.
  *
- * returns (null-ok) (caller-owns): received message or NULL
+ * returns: (null-ok) (caller-owns): received message or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -376,7 +376,7 @@ tny_folder_change_reset (TnyFolderChange *self)
 /**
  * tny_folder_change_get_rename:
  * @self: a #TnyFolderChange instance
- * @oldname (null-ok) (out): a byref string or NULL
+ * @oldname: (null-ok) (out): a byref string or NULL
  *
  * Get the new name of the folder in case of a rename. This will return NULL
  * if no rename happened. You can pass a pointer if you need the old name of
@@ -384,7 +384,7 @@ tny_folder_change_reset (TnyFolderChange *self)
  *
  * You must not free the returned value nor the @oldname pointer.
  *
- * return (null-ok): The new folder name or NULL
+ * return: (null-ok): The new folder name or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -440,7 +440,7 @@ tny_folder_change_set_rename (TnyFolderChange *self, const gchar *newname)
  *
  * Creates a changeset for @folder
  *
- * returns (caller-owns): a new #TnyFolderChange instance
+ * returns: (caller-owns): a new #TnyFolderChange instance
  * since: 1.0
  * audience: application-developer
  **/
@@ -463,7 +463,7 @@ tny_folder_change_new (TnyFolder *folder)
  * Get the folder of @self. The return value of this method must be unreferenced 
  * after use.
  *
- * returns (caller-owns): the #TnyFolder of this changeset
+ * returns: (caller-owns): the #TnyFolder of this changeset
  * since: 1.0
  * audience: application-developer
  **/

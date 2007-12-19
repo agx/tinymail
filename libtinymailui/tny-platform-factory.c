@@ -40,7 +40,7 @@
  * Create a new #TnyMsg instance. The returned instance must be 
  * unreferenced after use.
  *
- * returns (caller-owns): a #TnyMsg instance
+ * returns: (caller-owns): a #TnyMsg instance
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
@@ -63,7 +63,7 @@ tny_platform_factory_new_msg (TnyPlatformFactory *self)
  * Create a new #TnyPasswordGetter instance. The returned instance must be 
  * unreferenced after use.
  *
- * returns (caller-owns): a #TnyPasswordGetter instance
+ * returns: (caller-owns): a #TnyPasswordGetter instance
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
@@ -85,7 +85,7 @@ tny_platform_factory_new_password_getter (TnyPlatformFactory *self)
  * Create a new #TnyMimePart instance. The returned instance must be 
  * unreferenced after use.
  *
- * returns (caller-owns): a #TnyMimePart instance
+ * returns: (caller-owns): a #TnyMimePart instance
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
@@ -112,7 +112,7 @@ tny_platform_factory_new_mime_part (TnyPlatformFactory *self)
  * instance. It's allowed to reuse one instance, just make sure that you add a
  * reference.
  *
- * returns (caller-owns): a #TnyAccountStore instance
+ * returns: (caller-owns): a #TnyAccountStore instance
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
@@ -137,7 +137,7 @@ tny_platform_factory_new_account_store (TnyPlatformFactory *self)
  * When implementing a platform-specific library, return a new #TnyDevice instance.
  * It's allowed to reuse one instance, just make sure that you add a reference.
  *
- * returns (caller-owns): a #TnyDevice instance
+ * returns: (caller-owns): a #TnyDevice instance
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
@@ -162,7 +162,7 @@ tny_platform_factory_new_device (TnyPlatformFactory *self)
  * When implementing a platform-specific library, return a new #TnyMsgView instance.
  * It's allowed to reuse one instance, just make sure that you add a reference.
  *
- * returns (caller-owns): a #TnyMsgView instance
+ * returns: (caller-owns): a #TnyMsgView instance
  * since: 1.0
  * audience: application-developer, type-implementer
  **/

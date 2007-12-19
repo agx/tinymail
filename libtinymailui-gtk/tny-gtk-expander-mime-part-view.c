@@ -149,7 +149,7 @@ tny_gtk_expander_mime_part_view_set_view (TnyGtkExpanderMimePartView *self, TnyM
  * a #GtkExpander. The @view instance must inherit #GtkWidget. The 
  * returned value will inherit #GtkExpander.
  *
- * returns (caller-owns): a new #TnyMimePartView
+ * returns: (caller-owns): a new #TnyMimePartView
  * since: 1.0
  * audience: application-developer
  **/

@@ -1,9 +1,10 @@
 2007-12-19  Philip Van Hoof <pvanhoof@gnome.org>
 
-	* New documentaiton style, third commit (libtinymailui-gtk)
+	* New documentation style, third commit (libtinymailui-gtk)
 	* Implemented support for LIST-EXTENDED's SUBSCRIBED parameter
 	* A fix in TnyGnomeDevice
 	* Experimental improvements for LIST
+	* Made the new documentation style backward compatible for gtk-doc
 
 2007-12-18  Philip Van Hoof <pvanhoof@gnome.org>
 

@@ -81,7 +81,7 @@ tny_gtk_lockable_instance_init (GTypeInstance *instance, gpointer g_class)
  * Create a #TnyLockable that uses gdk_threads_enter() and gdk_threads_leave()
  * as lock and unlock implementations.
  *
- * returns (caller-owns): a new #TnyLockable
+ * returns: (caller-owns): a new #TnyLockable
  * since: 1.0
  * audience: application-developer
  **/

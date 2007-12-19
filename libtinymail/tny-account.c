@@ -47,7 +47,7 @@ guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
  * Get the connection policy for @self. You must unreference the returned 
  * value when you are finished with used it.
  *
- * returns (caller-owns): connection policy
+ * returns: (caller-owns): connection policy
  * since: 1.0
  * audience: application-developer, platform-developer
  **/
@@ -134,8 +134,8 @@ tny_account_is_ready (TnyAccount *self)
  * @self: a #TnyAccount
  * @domain: the domain of the #TnyStatus that will happen in @status_callback
  * @code: the code of the #TnyStatus that will happen in @status_callback
- * @status_callback: status callback handler
- * @status_user_data: the user-data to give to the @status_callback
+ * @status_callback: (null-ok) status callback handler or NULL
+ * @status_user_data: (null-ok): the user-data to give to the @status_callback or NULL
  *
  * Starts an operation. This only works for methods that don't end with _async.
  *
@@ -161,7 +161,7 @@ tny_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatus
 /**
  * tny_account_stop_operation:
  * @self: a #TnyAccount
- * @cancelled (out): NULL or byref whether the operation got canceled
+ * @cancelled: (out): NULL or byref whether the operation got canceled
  *
  * Stop the current operation. This only works for methods that don't end 
  * with _async.
@@ -1048,7 +1048,7 @@ tny_account_base_init (gpointer g_class)
  * TnyAccount::connection-status-changed
  * @self: the object on which the signal is emitted
  * @status: the #TnyConnectionStatus
- * @user_data: user data set when the signal handler was connected.
+ * @user_data: (null-ok): user data set when the signal handler was connected.
  *
  * Emitted when the connection status of an account changes.
  *
@@ -1069,7 +1069,7 @@ tny_account_base_init (gpointer g_class)
 /**
  * TnyAccount::changed
  * @self: the object on which the signal is emitted
- * @user_data: user data set when the signal handler was connected.
+ * @user_data: (null-ok): user data set when the signal handler was connected.
  *
  * Emitted when one of the account's properties changes.
  *

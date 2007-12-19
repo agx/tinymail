@@ -199,7 +199,7 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
  * Whenever data must be retrieved or takes long to load, @status_callback will
  * be called to let the outside world know about what this compenent is doing.
  *
- * returns (caller-owns): a new #TnyMimePartSaveStrategy
+ * returns: (caller-owns): a new #TnyMimePartSaveStrategy
  * since: 1.0
  * audience: application-developer
  **/

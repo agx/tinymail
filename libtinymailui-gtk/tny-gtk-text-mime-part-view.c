@@ -137,15 +137,15 @@ tny_gtk_text_mime_part_view_clear_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_text_mime_part_view_new:
- * @status_callback (null-ok): a #TnyStatusCallback for when status information happens or NULL
- * @status_user_data (null-ok): user data for @status_callback
+ * @status_callback: (null-ok): a #TnyStatusCallback for when status information happens or NULL
+ * @status_user_data: (null-ok): user data for @status_callback
  *
  * Create a new #TnyMimePartView for showing plain text MIME parts.
  *
  * Whenever data must be retrieved or takes long to load, @status_callback will
  * be called to let the outside world know about what this compenent is doing.
  *
- * returns (caller-owns): a new #TnyMimePartView 
+ * returns: (caller-owns): a new #TnyMimePartView 
  **/
 TnyMimePartView*
 tny_gtk_text_mime_part_view_new (TnyStatusCallback status_callback, gpointer status_user_data)

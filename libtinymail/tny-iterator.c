@@ -129,7 +129,7 @@ tny_iterator_nth (TnyIterator *self, guint nth)
  * this method returns NULL. If not NULL, the returned value must be unreferenced
  * after use.
  *
- * returns (null-ok) (caller-owns) (type-parameter G): the currect object or NULL
+ * returns: (null-ok) (caller-owns) (type-parameter G): the currect object or NULL
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
@@ -201,7 +201,7 @@ tny_iterator_is_done (TnyIterator *self)
  * object should be unreferenced after use. Remember when using this property
  * that lists shouldn't change while iterating them.
  *
- * returns (caller-owns): The #TnyList being iterated
+ * returns: (caller-owns): The #TnyList being iterated
  * since: 1.0
  * audience: application-developer, type-implementer
  **/

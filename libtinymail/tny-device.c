@@ -199,7 +199,7 @@ tny_device_base_init (gpointer g_class)
  * TnyDevice::connection-changed
  * @self: the object on which the signal is emitted
  * @arg1: Whether or not the device is now online
- * @user_data: user data set when the signal handler was connected.
+ * @user_data: (null-ok): user data set when the signal handler was connected.
  *
  * Emitted when the connection status of a device changes.
  * This signal will not be emitted in response to actual connection changes 

@@ -187,7 +187,7 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
  * wive's periods using a complex algorithm that abuses your privacy and might
  * kill your cat and dog (yes, both of them).
  *
- * returns (caller-owns): a new #TnyStream instance
+ * returns: (caller-owns): a new #TnyStream instance
  * since: 1.0
  * audience: tinymail-developer
  **/
@@ -217,7 +217,7 @@ tny_fs_stream_finalize (GObject *object)
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	if (priv->fd != -1) {
 		fsync (priv->fd);
-		close (priv->fd);	     
+		close (priv->fd);
 	}
 	priv->fd = -1;
 	priv->eos = TRUE;

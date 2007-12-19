@@ -350,8 +350,8 @@ tny_gtk_msg_view_set_parented (TnyGtkMsgView *self, gboolean parented)
 
 /**
  * tny_gtk_msg_view_set_status_callback:
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @stats_user_data (null-ok): user data for @status_callback
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @stats_user_data: (null-ok): user data for @status_callback
  *
  * Set the status callback info. This callback can be NULL and will be called
  * when status information happens. You can for example set a progress bar's
@@ -371,8 +371,8 @@ tny_gtk_msg_view_set_status_callback (TnyGtkMsgView *self, TnyStatusCallback sta
 
 /**
  * tny_gtk_msg_view_get_status_callback:
- * @status_callback (out): byref a #TnyStatusCallback 
- * @stats_user_data (out): byref user data for @status_callback
+ * @status_callback: (out): byref a #TnyStatusCallback 
+ * @stats_user_data: (out): byref user data for @status_callback
  *
  * Get the status callback info. Usually internally used.
  *
@@ -779,7 +779,7 @@ tny_gtk_msg_view_mp_clear (TnyMimePartView *self)
  *
  * Create a new #TnyMsgView
  *
- * returns (caller-owns): a new #TnyMsgView 
+ * returns: (caller-owns): a new #TnyMsgView 
  * since: 1.0
  * audience: application-developer
  **/

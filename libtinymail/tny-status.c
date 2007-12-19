@@ -95,7 +95,7 @@ tny_status_new_valist (GQuark domain, int code, guint position, guint of_total, 
  * Creates a new #TnyStatus with the given @domain and @code,
  * and a message formatted with @format.
  * 
- * returns (caller-owns): a new #TnyStatus
+ * returns: (caller-owns): a new #TnyStatus
  **/
 TnyStatus* 
 tny_status_new (GQuark domain, gint code, guint position, guint of_total, const gchar *format, ...)
@@ -126,7 +126,7 @@ tny_status_new (GQuark domain, gint code, guint position, guint of_total, const 
  * function if @message contains text you don't have control over, 
  * that could include printf() escape sequences.
  * 
- * returns (caller-owns): a new #TnyStatus
+ * returns: (caller-owns): a new #TnyStatus
  **/
 TnyStatus* 
 tny_status_new_literal (GQuark domain, gint code, guint position, guint of_total, const gchar *message)
@@ -172,7 +172,7 @@ tny_status_free (TnyStatus *status)
  * 
  * Makes a full copy of @status (not just a shallow copy).
  * 
- * returns (caller-owns): a new #TnyStatus
+ * returns: (caller-owns): a new #TnyStatus
  * since: 1.0
  * audience: application-developer
  **/
@@ -272,7 +272,7 @@ tny_clear_status (TnyStatus **status)
  * tny_status_get_message:
  * @status: a #TnyStatus 
  * 
- * returns (null-ok): the message of @status (as a const gchar*)
+ * returns: (null-ok): the message of @status (as a const gchar*)
  **/
 
 /**

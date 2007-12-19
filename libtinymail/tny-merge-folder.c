@@ -1569,7 +1569,7 @@ tny_merge_folder_get_folders (TnyMergeFolder *self, TnyList *list)
  * in libtinymailui-gtk. Please use this, else you can have threading related
  * problems in your user interface software.
  *
- * returns (caller-owns): a new #TnyMergeFolder instance
+ * returns: (caller-owns): a new #TnyMergeFolder instance
  * since: 1.0
  * audience: application-developer
  **/
@@ -1594,7 +1594,7 @@ tny_merge_folder_new (const gchar *folder_name)
  * instances together (partly read only, though). Upon construction it 
  * instantly sets the ui locker. For Gtk+ you should use a #TnyGtkLockable here.
  *
- * returns (caller-owns): a new #TnyMergeFolder instance
+ * returns: (caller-owns): a new #TnyMergeFolder instance
  * since: 1.0
  * audience: application-developer
  **/

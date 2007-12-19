@@ -102,7 +102,7 @@ tny_msg_rewrite_cache (TnyMsg *self)
  * the IMAP server. Note that it doesn't necessarily contain the password of the
  * IMAP account.
  * 
- * returns (null-ok): The url string or NULL.
+ * returns: (null-ok): The url string or NULL.
  * since: 1.0
  * audience: application-developer
  **/
@@ -135,7 +135,7 @@ tny_msg_get_url_string (TnyMsg *self)
  * Get the parent folder of @self or NULL if @self is not contained in a folder.
  * If not NULL, the returned value must be unreferenced after use.
  *
- * returns (null-ok) (caller-owns): The parent folder of this message or NULL
+ * returns: (null-ok) (caller-owns): The parent folder of this message or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -173,7 +173,7 @@ tny_msg_get_folder (TnyMsg *self)
  * If @self is a writable message, you can write to the returned #TnyHeader
  * too.
  *
- * returns (caller-owns): header of the message
+ * returns: (caller-owns): header of the message
  * since: 1.0
  * audience: application-developer
  **/

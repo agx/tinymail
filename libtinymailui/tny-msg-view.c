@@ -47,7 +47,7 @@
  * }
  * </programlisting></informalexample>
  *
- * returns (caller-owns): a #TnyMsgView instance
+ * returns: (caller-owns): a #TnyMsgView instance
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
@@ -90,7 +90,7 @@ tny_msg_view_create_new_inline_viewer (TnyMsgView *self)
  * ps. For a real and complete working example take a look at the implementation of 
  * #TnyMozEmbedMsgView in libtinymailui-mozembed.
  *
- * returns (caller-owns): a #TnyMimePartView instance
+ * returns: (caller-owns): a #TnyMimePartView instance
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
@@ -162,7 +162,7 @@ tny_msg_view_set_unavailable (TnyMsgView *self)
  * casted to a #TnyMsg (in this case, the method in the #TnyMimePartView should
  * return a #TnyMsg, indeed).
  *
- * returns (null-ok) (caller-owns): A #TnyMsg instance or NULL
+ * returns: (null-ok) (caller-owns): A #TnyMsg instance or NULL
  * since: 1.0
  * audience: application-developer, type-implementer
  **/

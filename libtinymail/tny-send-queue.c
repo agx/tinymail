@@ -39,7 +39,7 @@ guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
  * tny_send_queue_cancel:
  * @self: a #TnySendQueue
  * @remove: also remove queued messages
- * @err (null-ok): a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Cancels the current operation
  *
@@ -65,7 +65,7 @@ tny_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
  * Get the folder which contains the messages that have been sent. The 
  * returned value must be unreferenced after use
  *
- * returns (caller-owns): a #TnyFolder instance
+ * returns: (caller-owns): a #TnyFolder instance
  * since: 1.0
  * audience: application-developer
  **/
@@ -101,7 +101,7 @@ tny_send_queue_get_sentbox (TnySendQueue *self)
  * and a #TnySendQueue implementation not having to implement #TnyFolderObserver
  * too (which makes it possible to act on changes happening to the outbox).
  *
- * returns (caller-owns): a #TnyFolder instance
+ * returns: (caller-owns): a #TnyFolder instance
  * since: 1.0
  * audience: application-developer
  **/
@@ -128,7 +128,7 @@ tny_send_queue_get_outbox (TnySendQueue *self)
  * tny_send_queue_add:
  * @self: A #TnySendQueue
  * @msg: a #TnyMsg
- * @err (null-ok): a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Add a message to the send queue, usually adding it to the outbox too.
  *
@@ -181,7 +181,7 @@ tny_send_queue_base_init (gpointer g_class)
  * TnySendQueue::msg-sent
  * @self: the object on which the signal is emitted
  * @arg1: The message that got sent
- * @arg4: user data
+ * @arg4: (null-ok): user data
  *
  * Emitted when a message got sent
  **/
@@ -197,10 +197,10 @@ tny_send_queue_base_init (gpointer g_class)
 /**
  * TnySendQueue::error-happened
  * @self: the object on which the signal is emitted
- * @arg1 (null-ok): The header of the message that was supposed to be sent or NULL
- * @arg2 (null-ok): The message that was supposed to be sent or NULL
+ * @arg1: (null-ok): The header of the message that was supposed to be sent or NULL
+ * @arg2: (null-ok): The message that was supposed to be sent or NULL
  * @arg3: a GError containing the error that happened
- * @arg4: user data
+ * @arg4: (null-ok): user data
  *
  * Emitted when a message didn't get sent because of an error
  **/

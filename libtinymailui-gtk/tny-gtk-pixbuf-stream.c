@@ -185,7 +185,7 @@ tny_gtk_pixbuf_stream_reset_default (TnyStream *self)
  *
  * Create an adaptor instance between #TnyStream and #GdkPixbuf
  *
- * returns (caller-owns): a new #TnyStream instance
+ * returns: (caller-owns): a new #TnyStream instance
  * since: 1.0
  * audience: application-developer
  **/

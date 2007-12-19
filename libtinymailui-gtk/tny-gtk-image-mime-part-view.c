@@ -155,7 +155,7 @@ tny_gtk_image_mime_part_view_clear_default (TnyMimePartView *self)
  * Whenever data must be retrieved or takes long to load, @status_callback will
  * be called to let the outside world know about what this compenent is doing.
  *
- * returns (caller-owns): a new #TnyMimePartView for images
+ * returns: (caller-owns): a new #TnyMimePartView for images
  * since: 1.0
  * audience: application-developer
  **/

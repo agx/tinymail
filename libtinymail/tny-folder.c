@@ -75,7 +75,7 @@ tny_folder_get_caps (TnyFolder *self)
  * this: imap://server/INBOX/folder. Note that it doesn't necessarily contain 
  * the password of the IMAP account but can contain it.
  * 
- * returns (null-ok) (caller-owns): The url string or NULL.
+ * returns: (null-ok) (caller-owns): The url string or NULL.
  * since: 1.0
  * audience: application-developer
  **/
@@ -114,7 +114,7 @@ tny_folder_get_url_string (TnyFolder *self)
  * #TnyFolder that will get you the same counts in a less expensive way. With
  * this method you get a combined statistic, however.
  *
- * return (caller-owns): some statistics of the folder
+ * return: (caller-owns): some statistics of the folder
  * since: 1.0
  * audience: application-developer
  **/
@@ -230,7 +230,7 @@ tny_folder_poke_status (TnyFolder *self)
  * Get the strategy for receiving a message. The return value of this method
  * must be unreferenced after use.
  *
- * returns (caller-owns): the strategy for receiving a message
+ * returns: (caller-owns): the strategy for receiving a message
  * since: 1.0
  * audience: application-developer
  **/
@@ -305,7 +305,7 @@ tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
  * @into: a #TnyFolderStore
  * @new_name: the new name in @into
  * @del: whether or not to delete the original location
- * @err (null-ok): a #GError object or NULL
+ * @err: (null-ok): a #GError object or NULL
  *
  * Copies @self to @into giving the new folder the name @new_name. Returns the
  * newly created folder in @into, which will carry the name @new_name. For some
@@ -339,7 +339,7 @@ tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
  * If @new_name already exists in @into and @err is not NULL, then an error will
  * be set in @err and no further action will be performed.
  * 
- * returns (null-ok) (caller-owns): a new folder instance to whom was copied or NULL
+ * returns: (null-ok) (caller-owns): a new folder instance to whom was copied or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -378,10 +378,10 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
  * TnyCopyFolderCallback:
  * @self: a #TnyFolder that caused the callback
  * @cancelled: if the operation got cancelled
- * @into (null-ok): where @self got copied to
- * @new_folder (null-ok): the new folder in @into
- * @err (null-ok): if an error occurred
- * @user_data (null-ok):  user data that was passed to the callbacks
+ * @into: (null-ok): where @self got copied to
+ * @new_folder: (null-ok): the new folder in @into
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
  *
  * A folder callback for when a copy of a folder was requested. If allocated,
  * you must cleanup @user_data at the end of your implementation of the callback.
@@ -414,9 +414,9 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
  * @into: a #TnyFolderStore
  * @new_name: the new name in @into
  * @del: whether or not to delete the original location
- * @callback (null-ok): a #TnyCopyFolderCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @callback: (null-ok): a #TnyCopyFolderCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  *
  * See tny_folder_copy(). This is the asynchronous version of the same function.
  *
@@ -486,7 +486,7 @@ tny_folder_copy_async (TnyFolder *self, TnyFolderStore *into, const gchar *new_n
  * Get the strategy for removing a message. The return value of this method
  * must be unreferenced after use.
  *
- * returns (caller-owns): the strategy for removing a message
+ * returns: (caller-owns): the strategy for removing a message
  * since: 1.0
  * audience: application-developer
  **/
@@ -550,7 +550,7 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
  * tny_folder_sync:
  * @self: a #TnyFolder
  * @expunge: also expunge deleted messages
- * @err (null-ok): a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Persist changes made to a folder to its backing store, expunging deleted 
  * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well if @expunge
@@ -587,9 +587,9 @@ tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
  * tny_folder_sync_async:
  * @self: a #TnyFolder
  * @expunge: also expunge deleted messages
- * @callback (null-ok): a #TnySyncFolderCallback or NULL
+ * @callback: (null-ok): a #TnySyncFolderCallback or NULL
  * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  *
  * The authors of Tinymail know that sync async sounds paradoxical. Though if
  * you think about it, it makes perfect sense: you synchronize the content in
@@ -619,8 +619,8 @@ tny_folder_sync_async (TnyFolder *self, gboolean expunge, TnyFolderCallback call
  * TnyFolderCallback:
  * @self: a #TnyFolder that caused the callback
  * @cancelled: if the operation got cancelled
- * @err (null-ok): if an error occurred
- * @user_data (null-ok):  user data that was passed to the callbacks
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
  *
  * A generic folder callback. If allocated, you must cleanup @user_data at the
  * end of your implementation of the callback. All other fields in the parameters
@@ -634,9 +634,9 @@ tny_folder_sync_async (TnyFolder *self, gboolean expunge, TnyFolderCallback call
  * tny_folder_add_msg_async:
  * @self: a #TnyFolder
  * @msg: a #TnyMsg
- * @callback (null-ok): a #TnyFolderCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @callback: (null-ok): a #TnyFolderCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  *
  * Add a message to a @self. It's recommended to destroy @msg afterwards because 
  * after receiving the same message from the folder again, the instance wont be
@@ -666,7 +666,7 @@ tny_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callba
  * tny_folder_add_msg:
  * @self: a #TnyFolder
  * @msg: a #TnyMsg
- * @err (null-ok): a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Add a message to a @self. It's recommended to destroy @msg afterwards because 
  * after receiving the same message from the folder again, the instance wont be
@@ -695,7 +695,7 @@ tny_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
  * tny_folder_remove_msg:
  * @self: a #TnyFolder
  * @header: a #TnyHeader of the message to remove
- * @err: a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Remove a message from a folder. It will use the #TnyMsgRemoveStrategy of 
  * @self to perform the removal itself. For more details, check out the 
@@ -752,7 +752,7 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * tny_folder_remove_msgs:
  * @self: a #TnyFolder
  * @headers: a #TnyList with #TnyHeader items of the messages to remove
- * @err: a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Remove messages from a folder. It will use the #TnyMsgRemoveStrategy of 
  * @self to perform the removal itself. For more details, check out the 
@@ -782,9 +782,9 @@ tny_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err)
 /**
  * tny_folder_refresh_async:
  * @self: a #TnyFolder
- * @callback (null-ok): a #TnyFolderCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @callback: (null-ok): a #TnyFolderCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  *
  * Refresh @self and callback when finished. This gets the summary information
  * from the E-Mail service, writes it to the the on-disk cache and/or updates it.
@@ -854,7 +854,7 @@ tny_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, TnyStatus
 /**
  * tny_folder_refresh:
  * @self: a #TnyFolder
- * @err: a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Refresh @self. This gets the summary information from the E-Mail service, 
  * writes it to the the on-disk cache and/or updates it.
@@ -983,7 +983,7 @@ tny_folder_get_all_count (TnyFolder *self)
  * Get a the account of this folder or NULL. If not NULL, you must unreference
  * the return value after use.
  * 
- * returns (null-ok) (caller-owns): the account of this folder or NULL
+ * returns: (null-ok) (caller-owns): the account of this folder or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -1014,7 +1014,7 @@ tny_folder_get_account (TnyFolder *self)
  * @header_list: a #TnyList of #TnyHeader instances in @self to move
  * @folder_dst: a destination #TnyFolder
  * @delete_originals: TRUE moves msgs, FALSE copies
- * @err: a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  * 
  * Transfers messages of which the headers are in @header_list from @self to 
  * @folder_dst. They could be moved or just copied depending on the value of 
@@ -1047,8 +1047,8 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  * TnyTransferMsgsCallback:
  * @self: a #TnyFolder that caused the callback
  * @cancelled: if the operation got cancelled
- * @err (null-ok): if an error occurred
- * @user_data (null-ok):  user data that was passed to the callbacks
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
  *
  * A folder callback for when a transfer of messages was requested. If allocated,
  * you must cleanup @user_data at the end of your implementation of the callback.
@@ -1067,9 +1067,9 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  * @header_list: a #TnyList of #TnyHeader instances in @self to move
  * @folder_dst: a destination #TnyFolder
  * @delete_originals: TRUE moves msgs, FALSE copies
- * @callback (null-ok): a #TnyTransferMsgsCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @callback: (null-ok): a #TnyTransferMsgsCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  * 
  * Transfers messages of which the headers are in @header_list from @self to 
  * @folder_dst. They could be moved or just copied depending on the value of 
@@ -1103,7 +1103,7 @@ tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder
  * tny_folder_get_msg:
  * @self: a #TnyFolder
  * @header: a #TnyHeader the message to get
- * @err: a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  * 
  * Get a message in @self identified by @header. If not NULL, you must 
  * unreference the return value after use.
@@ -1115,7 +1115,7 @@ tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder
  * TnyHeader *header = ...
  * TnyMsg *message = tny_folder_get_msg (folder, header, NULL);
  * tny_msg_view_set_msg (message_view, message);
- * g_object_unref (G_OBJECT (message));
+ * g_object_unref (message);
  * </programlisting></informalexample>
  *
  * Note that once you received the message this way, the entire message instance
@@ -1126,7 +1126,7 @@ tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder
  * other #TnyFolder methods. The message's instance nor its header will receive 
  * updates from the observable folder.
  * 
- * returns (null-ok) (caller-owns): The message instance or NULL
+ * returns: (null-ok) (caller-owns): The message instance or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -1158,7 +1158,7 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * tny_folder_find_msg:
  * @self: a #TnyFolder
  * @url_string: the url string
- * @err: a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  * 
  * Get the message in @self identified by @url_string. If not NULL, you must 
  * unreference the return value after use. See tny_folder_get_url_string() for
@@ -1173,7 +1173,7 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * g_object_unref (message);
  * </programlisting></informalexample>
  *
- * returns (null-ok) (caller-owns): The message instance or NULL
+ * returns: (null-ok) (caller-owns): The message instance or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -1205,9 +1205,9 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
  * TnyGetMsgCallback:
  * @self: a #TnyFolder that caused the callback
  * @cancelled: if the operation got cancelled
- * @msg (null-ok): a #TnyMsg with the fetched message or NULL
- * @err (null-ok): if an error occurred
- * @user_data (null-ok):  user data that was passed to the callbacks
+ * @msg: (null-ok): a #TnyMsg with the fetched message or NULL
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
  *
  * A folder callback for when a message fetch was requested. If allocated, you
  * must cleanup @user_data at the end of your implementation of the callback. All 
@@ -1225,9 +1225,9 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
  * tny_folder_get_msg_async:
  * @self: a #TnyFolder
  * @header: a #TnyHeader of the message to get
- * @callback (null-ok): a #TnyGetMsgCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @callback: (null-ok): a #TnyGetMsgCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  *
  * Get a message in @self identified by @header asynchronously.
  *
@@ -1274,7 +1274,7 @@ tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback 
  * @self: a #TnyFolder 
  * @headers: A #TnyList where the headers will be prepended to
  * @refresh: synchronize with the service first
- * @err: a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  * 
  * Get the list of message header instances that are in @self. Also read
  * about tny_folder_refresh() and tny_folder_refresh_async().
@@ -1322,9 +1322,9 @@ tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GEr
  * TnyGetHeadersCallback:
  * @self: a #TnyFolder that caused the callback
  * @cancelled: if the operation got cancelled
- * @headers (null-ok): a #TnyList with fetched #TnyHeader instances or NULL
- * @err (null-ok): if an error occurred
- * @user_data (null-ok):  user data that was passed to the callbacks
+ * @headers: (null-ok): a #TnyList with fetched #TnyHeader instances or NULL
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
  *
  * A folder callback for when headers where requested. If allocated, you must
  * cleanup @user_data at the end of your implementation of the callback. All
@@ -1343,9 +1343,9 @@ tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GEr
  * @self: a TnyFolder
  * @headers: A #TnyList where the headers will be prepended to
  * @refresh: synchronize with the service first
- * @callback (null-ok): a #TnyGetHeadersCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @callback: (null-ok): a #TnyGetHeadersCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  * 
  * Get the list of message header instances that are in @self. Also read
  * about tny_folder_refresh() and tny_folder_refresh_async().
@@ -1473,7 +1473,7 @@ tny_folder_get_folder_type  (TnyFolder *self)
  * return value after use if not NULL. Note that not every folder strictly has
  * to be inside a folder store. This API will in that case return NULL.
  * 
- * returns (null-ok) (caller-owns): the folder store of this folder or NULL
+ * returns: (null-ok) (caller-owns): the folder store of this folder or NULL
  * since: 1.0
  * complexity: low
  * audience: application-developer

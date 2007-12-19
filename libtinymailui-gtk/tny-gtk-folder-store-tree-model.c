@@ -502,7 +502,7 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
  *
  * Create a new #GtkTreeModel for showing #TnyFolderStore instances
  * 
- * returns (caller-owns): a new #GtkTreeModel for #TnyFolderStore instances
+ * returns: (caller-owns): a new #GtkTreeModel for #TnyFolderStore instances
  * since: 1.0
  * audience: application-developer
  **/

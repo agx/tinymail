@@ -50,7 +50,7 @@ guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
  * Try to find the first account in account store @self that corresponds to 
  * @url_string. If found, the returned value must be unreferenced.
  *
- * returns (null-ok) (caller-owns): the found account or NULL
+ * returns: (null-ok) (caller-owns): the found account or NULL
  * since: 1.0
  * audience: application-developer
  * complexity: high
@@ -83,10 +83,10 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
 /**
  * tny_account_store_alert:
  * @self: a #TnyAccountStore
- * @account (null-ok): The account or NULL
+ * @account: (null-ok): The account or NULL
  * @type: alert type
  * @question: whether or not this is a question
- * @error: A #GError with the alert
+ * @error: (null-ok): A #GError with the alert
  *
  * This callback method must implements showing a message dialog appropriate 
  * for the @error and @type as message type. It will return TRUE if the reply 
@@ -175,7 +175,7 @@ tny_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertTyp
  * This method returns the #TnyDevice instance used by #TnyAccountStore @self. You
  * must unreference the return value after use.
  *
- * returns (caller-owns): the device used by @self
+ * returns: (caller-owns): the device used by @self
  * since: 1.0
  * audience: application-developer
  **/
@@ -362,7 +362,7 @@ tny_account_store_base_init (gpointer g_class)
 /**
  * TnyAccountStore::connecting-started
  * @self: the object on which the signal is emitted
- * @user_data: user data set when the signal handler was connected.
+ * @user_data: (null-ok): user data set when the signal handler was connected.
  *
  * Emitted when the store starts trying to connect the accounts. Usage of this
  * signal is not recommended as it's a candidate for API changes.

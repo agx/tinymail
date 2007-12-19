@@ -388,7 +388,7 @@ on_subscription_changed_signal (TnyStoreAccount *sa, TnyFolder *folder, gpointer
  * either setting or getting members of the #TnyAccount type. You must get the
  * actual instances to read these properties.
  *
- * returns (caller-owns): A new account instance that decorates both @ta and @sa
+ * returns: (caller-owns): A new account instance that decorates both @ta and @sa
  *
  * since: 1.0
  * complexity: high
@@ -417,7 +417,7 @@ tny_combined_account_new (TnyTransportAccount *ta, TnyStoreAccount *sa)
  * Get the transport account that is being decorated by @self. You must unreference
  * the returned value if not needed anymore.
  *
- * returns (caller-owns): the transport account in @self
+ * returns: (caller-owns): the transport account in @self
  * since: 1.0
  * complexity: low
  * audience: application-developer
@@ -437,7 +437,7 @@ tny_combined_account_get_transport_account (TnyCombinedAccount *self)
  * Get the store account that is being decorated by @self. You must unreference
  * the returned value if not needed anymore.
  *
- * returns (caller-owns): the store account in @self
+ * returns: (caller-owns): the store account in @self
  * since: 1.0
  * complexity: low
  * audience: application-developer

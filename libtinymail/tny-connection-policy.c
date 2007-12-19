@@ -94,7 +94,7 @@ tny_connection_policy_on_connect (TnyConnectionPolicy *self, TnyAccount *account
 
 /**
  * tny_connection_policy_on_disconnect:
- * @self: A #TnyConnectionPolicy
+ * @self: a #TnyConnectionPolicy
  * @account: a #TnyAccount
  *
  * Called when @account got disconnected.

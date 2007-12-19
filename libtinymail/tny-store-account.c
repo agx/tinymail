@@ -67,7 +67,7 @@ tny_store_account_delete_cache (TnyStoreAccount *self)
  * tny_store_account_find_folder:
  * @self: a #TnyStoreAccount
  * @url_string: the url-string of the folder to find
- * @err (null-ok): a #GError or NULL
+ * @err: (null-ok): a #GError or NULL
  *
  * Try to find the folder in @self that corresponds to @url_string. If this 
  * method does not return NULL, the returned value is the found folder and
@@ -76,7 +76,7 @@ tny_store_account_delete_cache (TnyStoreAccount *self)
  * This method can be used to resolve url-strings to #TnyAccount instances.
  * See tny_folder_get_url_string() for details of the @url-string syntax.
  *
- * returns (null-ok) (caller-owns): the found account or NULL.
+ * returns: (null-ok) (caller-owns): the found account or NULL.
  * since: 1.0
  * audience: application-developer
  **/
@@ -167,7 +167,7 @@ tny_store_account_base_init (gpointer g_class)
  * TnyStoreAccount::subscription-changed
  * @self: the object on which the signal is emitted
  * @arg1: the #TnyFolder of the folder whose subscription has changed
- * @user_data: user data set when the signal handler was connected
+ * @user_data: (null-ok): user data set when the signal handler was connected
  *
  * Emitted when the subscription of a folder change
  *

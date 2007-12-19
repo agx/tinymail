@@ -42,7 +42,7 @@
  * tny_mime_part_set_header_pair:
  * @self: a #TnyMimePart
  * @name: the name of the header
- * @value (null-ok): the value of the header or NULL to unset
+ * @value: (null-ok): the value of the header or NULL to unset
  * 
  * Set a header pair (name: value) or delete a header (use NULL as value).
  *
@@ -276,7 +276,7 @@ tny_mime_part_is_attachment (TnyMimePart *self)
 /**
  * tny_mime_part_set_content_location:
  * @self: a #TnyMimePart
- * @content_location (null-ok): the location or NULL 
+ * @content_location: (null-ok): the location or NULL 
  * 
  * Set the content location of @self or NULL to unset it.
  *
@@ -302,7 +302,7 @@ tny_mime_part_set_content_location (TnyMimePart *self, const gchar *content_loca
 /**
  * tny_mime_part_set_description:
  * @self: a #TnyMimePart
- * @description (null-ok): the description or NULL
+ * @description: (null-ok): the description or NULL
  * 
  * Set the description of @self or NULL to unset it.
  *
@@ -328,7 +328,7 @@ tny_mime_part_set_description (TnyMimePart *self, const gchar *description)
 /**
  * tny_mime_part_set_content_id:
  * @self: a #TnyMimePart
- * @content_id (null-ok): the content id or NULL
+ * @content_id: (null-ok): the content id or NULL
  * 
  * Set the content id of @self or NULL to unset it.
  *
@@ -388,7 +388,7 @@ tny_mime_part_set_purged (TnyMimePart *self)
 /**
  * tny_mime_part_set_filename:
  * @self: a #TnyMimePart
- * @filename (null-ok): the filename or NULL
+ * @filename: (null-ok): the filename or NULL
  * 
  * Set the filename of @self or NULL to unset it.
  *
@@ -414,7 +414,7 @@ tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
 /**
  * tny_mime_part_set_content_type:
  * @self: a #TnyMimePart
- * @contenttype (null-ok): the content_type or NULL
+ * @contenttype: (null-ok): the content_type or NULL
  * 
  * Set the content type of @self, Formatted as "type/subtype" or NULL to unset
  * it (will default to text/plain then).
@@ -446,7 +446,7 @@ tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype)
  * Get the filename of @self if it's an attachment or NULL otherwise. The
  * returned value should not be freed.
  *
- * returns (null-ok): the filename of the part as a read-only string or NULL
+ * returns: (null-ok): the filename of the part as a read-only string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -475,7 +475,7 @@ tny_mime_part_get_filename (TnyMimePart *self)
  * 
  * Get the content-id of @self. The returned value should not be freed.
  *
- * returns (null-ok): the content-id of the part as a read-only string or NULL
+ * returns: (null-ok): the content-id of the part as a read-only string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -529,7 +529,7 @@ tny_mime_part_is_purged (TnyMimePart *self)
  * 
  * Get the description of @self. The returned value should not be freed.
  *
- * returns (null-ok): the description of the part as a read-only string or NULL
+ * returns: (null-ok): the description of the part as a read-only string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -558,7 +558,7 @@ tny_mime_part_get_description (TnyMimePart *self)
  * 
  * Get the content location of @self. The returned value should not be freed.
  *
- * returns (null-ok): the content-location of the part as a read-only string or NULL
+ * returns: (null-ok): the content-location of the part as a read-only string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -697,8 +697,8 @@ tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
  * @self: a #TnyFolderStore that caused the callback
  * @cancelled: if the operation got cancelled
  * @stream: the stream you passed
- * @err (null-ok): if an error occurred
- * @user_data (null-ok):  user data that was passed to the callbacks
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
  *
  * A MIME part callback for when a MIME part decode was requested. If allocated,
  * you must cleanup @user_data at the end of your implementation of the callback.
@@ -718,9 +718,9 @@ tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
  * tny_mime_part_decode_to_stream_async:
  * @self: a #TnyMimePart object
  * @stream: a #TnyMsgStream stream
- * @callback (null-ok): a #TnyMimePartCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data (null-ok): user data that will be passed to the callbacks
+ * @callback: (null-ok): a #TnyMimePartCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
  *
  * This method does the same as tny_mime_part_decode_to_stream(). It just does 
  * everything asynchronous and callsback when finished.
@@ -824,7 +824,7 @@ tny_mime_part_get_stream (TnyMimePart *self)
  * Get the mime part type in the format "type/subtype".  You shouldn't free the 
  * returned value. In case of NULL, the intended type is usually "text/plain".
  *
- * returns (null-ok): content-type of a message part as a read-only string or NULL
+ * returns: (null-ok): content-type of a message part as a read-only string or NULL
  * since: 1.0
  * audience: application-developer
  **/

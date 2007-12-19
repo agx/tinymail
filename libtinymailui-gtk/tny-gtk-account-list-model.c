@@ -74,7 +74,7 @@ static GObjectClass *parent_class = NULL;
  * g_object_unref (model);
  * </programlisting></informalexample>
  *
- * returns (caller-owns): a new #GtkTreeModel for accounts
+ * returns: (caller-owns): a new #GtkTreeModel for accounts
  * since: 1.0
  * audience: application-developer
  **/

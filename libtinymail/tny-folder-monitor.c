@@ -354,7 +354,7 @@ tny_folder_monitor_start_default (TnyFolderMonitor *self)
  *
  * Creates a folder monitor for @folder
  *
- * returns (caller-owns): a new #TnyFolderMonitor instance
+ * returns: (caller-owns): a new #TnyFolderMonitor instance
  * since: 1.0
  * audience: application-developer
  **/

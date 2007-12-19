@@ -148,7 +148,7 @@ tny_gtk_header_view_clear_default (TnyHeaderView *self)
  *
  * Create a new #TnyHeaderView
  *
- * returns (caller-owns): a new #TnyHeaderView
+ * returns: (caller-owns): a new #TnyHeaderView
  * since: 1.0
  * audience: application-developer
  **/

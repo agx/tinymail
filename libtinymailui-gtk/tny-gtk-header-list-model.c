@@ -234,9 +234,9 @@ _get_readable_date (time_t file_time_raw)
 /**
  * tny_gtk_header_list_model_received_date_sort_func:
  * @model: a #GtkTreeModel the comparison is within
- * @a : a #GtkTreeIter in @model
- * @b : another #GtkTreeIter in @model
- * @user_data: user data passed
+ * @a: a #GtkTreeIter in @model
+ * @b: another #GtkTreeIter in @model
+ * @user_data: (null-ok): user data passed
  *
  * A #GtkTreeIterCompareFunc that sorts using the received date
  *
@@ -268,9 +268,9 @@ tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeI
 /**
  * tny_gtk_header_list_model_sent_date_sort_func:
  * @model: the #GtkTreeModel the comparison is within
- * @a : a GtkTreeIter in @model
- * @b : another GtkTreeIter in @model
- * @user_data: user data passed
+ * @a: a GtkTreeIter in @model
+ * @b: another GtkTreeIter in @model
+ * @user_data: (null-ok): user data passed
  *
  * A @GtkTreeIterCompareFunc that sorts using the sent date
  *
@@ -1059,9 +1059,9 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
  * @self: a #TnyGtkHeaderListModel
  * @folder: a #TnyFolder
  * @refresh: refresh first
- * @callback (null-ok): a #TnyGetHeadersCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @user_data: user data for the callbacks
+ * @callback: (null-ok): a #TnyGetHeadersCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data for the callbacks
  *
  * Set the @folder of @self where #TnyHeader instances are located
  * 
@@ -1128,7 +1128,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
  *
  * Create a new #GtkTreeModel for #TnyHeader instances
  *
- * returns (caller-owns): a new #GtkTreeModel for #TnyHeader instances
+ * returns: (caller-owns): a new #GtkTreeModel for #TnyHeader instances
  * since: 1.0
  * audience: application-developer
  **/

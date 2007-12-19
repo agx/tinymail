@@ -69,7 +69,7 @@ tny_mime_part_view_clear (TnyMimePartView *self)
  * }
  * </programlisting></informalexample>
  *
- * returns (null-ok) (caller-owns): a #TnyMimePart instance or NULL
+ * returns: (null-ok) (caller-owns): a #TnyMimePart instance or NULL
  * since: 1.0
  * audience: application-developer, type-implementer
  **/

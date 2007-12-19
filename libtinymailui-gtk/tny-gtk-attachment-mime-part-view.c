@@ -133,7 +133,7 @@ tny_gtk_attachment_mime_part_view_clear_default (TnyMimePartView *self)
  * The @iview parameter that you must pass is the #GtkTreeModel containing the
  * #TnyMimePart instances that are attachments.
  * 
- * returns (caller-owns): a new #TnyMimePartView for showing MIME parts that are attachments
+ * returns: (caller-owns): a new #TnyMimePartView for showing MIME parts that are attachments
  * since: 1.0
  * audience: application-developer
  **/

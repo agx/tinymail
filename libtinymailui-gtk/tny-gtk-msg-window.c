@@ -249,7 +249,7 @@ tny_gtk_msg_window_set_view (TnyGtkMsgWindow *self, TnyMsgView *view)
  * @view instance must inherit the #GtkWidget type. The returned value will
  * inherit #GtkWindow
  *
- * returns: a new #TnyMsgWindow
+ * returns: (caller-owns): a new #TnyMsgWindow
  * since: 1.0
  * audience: application-developer
  **/

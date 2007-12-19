@@ -126,7 +126,7 @@ tny_folder_stats_get_local_size (TnyFolderStats *self)
  *
  * Creates a stats object for @folder
  *
- * returns: a new #TnyFolderStats instance
+ * returns: a new #TnyFolderStats
  * since: 1.0
  * audience: application-developer
  **/
@@ -148,7 +148,7 @@ tny_folder_stats_new (TnyFolder *folder)
  * Get the folder of @self. The return value of this method must be unreferenced 
  * after use
  *
- * returns (caller-owns): the #TnyFolder instance related to @self
+ * returns: (caller-owns): the #TnyFolder instance related to @self
  * since: 1.0
  * audience: application-developer
  **/

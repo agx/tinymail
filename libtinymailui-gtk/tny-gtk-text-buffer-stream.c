@@ -247,7 +247,7 @@ tny_gtk_text_buffer_stream_set_text_buffer (TnyGtkTextBufferStream *self, GtkTex
  *
  * Create an adaptor instance between #TnyStream and #GtkTextBuffer
  *
- * returns (caller-owns): a new #TnyStream
+ * returns: (caller-owns): a new #TnyStream
  * since: 1.0
  * audience: application-developer
  **/

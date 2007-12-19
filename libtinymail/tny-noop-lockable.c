@@ -80,7 +80,7 @@ tny_noop_lockable_instance_init (GTypeInstance *instance, gpointer g_class)
  *
  * Create a lockable that does nothing
  *
- * returns: a #TnyLockable instance that does nothing
+ * returns: (caller-owns): a #TnyLockable instance that does nothing
  * since: 1.0
  * audience: application-developer
  **/

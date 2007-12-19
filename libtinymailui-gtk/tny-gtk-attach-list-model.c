@@ -137,7 +137,7 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, l
  *
  * Get a new #GtkTreeModel for #TnyMimePart instances that are attachments.
  *
- * returns (caller-owns) a new #GtkTreeModel #TnyMimePart instances
+ * returns: (caller-owns) a new #GtkTreeModel #TnyMimePart instances
  * since: 1.0
  * audience: application-developer
  **/

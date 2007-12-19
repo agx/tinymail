@@ -102,7 +102,7 @@ tny_mime_part_saver_set_save_strategy (TnyMimePartSaver *self, TnyMimePartSaveSt
  * }
  * </programlisting></informalexample>
  *
- * returns (caller-owns): the #TnyMimePartSaveStrategy for @self
+ * returns: (caller-owns): the #TnyMimePartSaveStrategy for @self
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
