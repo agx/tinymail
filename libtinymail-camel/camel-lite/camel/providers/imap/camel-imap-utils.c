@@ -411,10 +411,6 @@ imap_parse_list_response (CamelImapStore *store, const char *buf, int *flags, ch
 		if (is_lsub && flags && !g_ascii_strcasecmp (mailbox, "INBOX"))
 			*flags &= ~CAMEL_FOLDER_NOSELECT;
 
-/*
-		if (!g_ascii_strcasecmp (mailbox, "INBOX"))
-			*flags |= CAMEL_FOLDER_SUBSCRIBED;
-*/
 		*folder = mailbox;
 
 	}

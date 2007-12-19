@@ -3498,7 +3498,7 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 					if (j == 1) {
 						/* It's in LSUB but not in LIST? */
 
-						fi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
+						fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
 						if ((fi->flags & (CAMEL_IMAP_FOLDER_MARKED | CAMEL_IMAP_FOLDER_UNMARKED)))
 							imap_store->capabilities |= IMAP_CAPABILITY_useful_lsub;
 					}
@@ -3510,9 +3510,10 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 						camel_folder_info_free(fi);
 					}
 				} else {
-					if (j == 1)
+					if (j == 1) {
+						fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
 						hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
-
+					}
 					if (j == 0)
 					{
 						hfi->unread = fi->unread;
@@ -3721,7 +3722,9 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 
 		if (top[0] == 0) {
 			if (imap_store->namespace && imap_store->namespace[0]) {
-				/* get_folders_sync(imap_store, "INBOX", ex); */
+
+				if (!(imap_store->capabilities & IMAP_CAPABILITY_LISTEXT))
+					get_folders_sync(imap_store, "INBOX", ex);
 				if (camel_exception_is_set(ex))
 					goto fail;
 
