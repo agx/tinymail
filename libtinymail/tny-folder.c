@@ -114,7 +114,7 @@ tny_folder_get_url_string (TnyFolder *self)
  * #TnyFolder that will get you the same counts in a less expensive way. With
  * this method you get a combined statistic, however.
  *
- * return: (caller-owns): some statistics of the folder
+ * returns: (caller-owns): some statistics of the folder
  * since: 1.0
  * audience: application-developer
  **/
@@ -588,7 +588,7 @@ tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
  * @self: a #TnyFolder
  * @expunge: also expunge deleted messages
  * @callback: (null-ok): a #TnySyncFolderCallback or NULL
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
  * @user_data: (null-ok): user data that will be passed to the callbacks
  *
  * The authors of Tinymail know that sync async sounds paradoxical. Though if
