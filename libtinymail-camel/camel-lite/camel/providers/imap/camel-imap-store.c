@@ -3687,7 +3687,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 	if (camel_debug("imap:folder_info"))
 		printf("get folder info online\n");
 
-	if ((flags & CAMEL_STORE_FOLDER_INFO_SUBSCRIBED)
+	if (FALSE && (flags & CAMEL_STORE_FOLDER_INFO_SUBSCRIBED)
 	    && camel_store_summary_count((CamelStoreSummary *)imap_store->summary) > 0) {
 		time_t now;
 		int ref;
@@ -3721,7 +3721,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 
 		if (top[0] == 0) {
 			if (imap_store->namespace && imap_store->namespace[0]) {
-				get_folders_sync(imap_store, "INBOX", ex);
+				/* get_folders_sync(imap_store, "INBOX", ex); */
 				if (camel_exception_is_set(ex))
 					goto fail;
 
@@ -3750,15 +3750,18 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 			g_free(name);
 		}
 
-		get_folders_sync(imap_store, pattern, ex);
-		if (camel_exception_is_set(ex))
-			goto fail;
+		
 		if (pattern[0] != '*' && imap_store->dir_sep) {
 			pattern[i] = imap_store->dir_sep;
 			pattern[i+1] = (flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?'*':'%';
 			pattern[i+2] = 0;
 			get_folders_sync(imap_store, pattern, ex);
-		}
+		} else
+			get_folders_sync(imap_store, pattern, ex);
+
+		if (camel_exception_is_set(ex))
+			goto fail;
+
 		camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
 		camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
 
