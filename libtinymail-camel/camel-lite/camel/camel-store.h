@@ -94,7 +94,11 @@ typedef struct _CamelFolderInfo {
 /* a sent-items folder */
 #define CAMEL_FOLDER_TYPE_SENT (5 << 10)
 
+
 /* next bit is 1<<13 */
+
+/* Argh, sometimes I hate IMAP :) */
+#define CAMEL_FOLDER_NONEXISTENT (1<<13)
 
 /* store premissions */
 #define CAMEL_STORE_READ  (1 << 0)

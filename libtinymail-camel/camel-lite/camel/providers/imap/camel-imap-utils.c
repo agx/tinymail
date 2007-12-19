@@ -350,6 +350,11 @@ imap_parse_list_response (CamelImapStore *store, const char *buf, int *flags, ch
 				*flags |= CAMEL_FOLDER_CHILDREN;
 			else if (!g_ascii_strncasecmp (word, "\\HasNoChildren", len))
 				*flags |= CAMEL_FOLDER_NOCHILDREN;
+			else if (!g_ascii_strncasecmp (word, "\\Subscribed", len))
+				*flags |= CAMEL_FOLDER_SUBSCRIBED;
+			else if (!g_ascii_strncasecmp (word, "\\NonExistent", len))
+				*flags |= CAMEL_FOLDER_NONEXISTENT;
+
 		}
 
 		word += len;
@@ -406,6 +411,10 @@ imap_parse_list_response (CamelImapStore *store, const char *buf, int *flags, ch
 		if (is_lsub && flags && !g_ascii_strcasecmp (mailbox, "INBOX"))
 			*flags &= ~CAMEL_FOLDER_NOSELECT;
 
+/*
+		if (!g_ascii_strcasecmp (mailbox, "INBOX"))
+			*flags |= CAMEL_FOLDER_SUBSCRIBED;
+*/
 		*folder = mailbox;
 
 	}

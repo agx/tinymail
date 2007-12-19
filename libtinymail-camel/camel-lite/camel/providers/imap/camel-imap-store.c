@@ -734,18 +734,18 @@ static struct {
 	{ "NAMESPACE",		IMAP_CAPABILITY_NAMESPACE },
 	{ "UIDPLUS",		IMAP_CAPABILITY_UIDPLUS },
 	{ "LITERAL+",		IMAP_CAPABILITY_LITERALPLUS },
-	{ "STARTTLS",           IMAP_CAPABILITY_STARTTLS },
-	{ "XGWEXTENSIONS",      IMAP_CAPABILITY_XGWEXTENSIONS },
-	{ "XGWMOVE",            IMAP_CAPABILITY_XGWMOVE },
-	{ "LOGINDISABLED",      IMAP_CAPABILITY_LOGINDISABLED },
-	{ "CONDSTORE",          IMAP_CAPABILITY_CONDSTORE },
-	{ "IDLE",         	IMAP_CAPABILITY_IDLE },
-	{ "BINARY",         	IMAP_CAPABILITY_BINARY },
-	{ "QRESYNC",         	IMAP_CAPABILITY_QRESYNC },
-	{ "ENABLE",         	IMAP_CAPABILITY_ENABLE },
-	{ "ESEARCH",         	IMAP_CAPABILITY_ESEARCH },
-	{ "CONVERT",         	IMAP_CAPABILITY_CONVERT },
-
+	{ "STARTTLS",		IMAP_CAPABILITY_STARTTLS },
+	{ "XGWEXTENSIONS",	IMAP_CAPABILITY_XGWEXTENSIONS },
+	{ "XGWMOVE",		IMAP_CAPABILITY_XGWMOVE },
+	{ "LOGINDISABLED",	IMAP_CAPABILITY_LOGINDISABLED },
+	{ "CONDSTORE",		IMAP_CAPABILITY_CONDSTORE },
+	{ "IDLE",		IMAP_CAPABILITY_IDLE },
+	{ "BINARY",		IMAP_CAPABILITY_BINARY },
+	{ "QRESYNC",		IMAP_CAPABILITY_QRESYNC },
+	{ "ENABLE",		IMAP_CAPABILITY_ENABLE },
+	{ "ESEARCH",		IMAP_CAPABILITY_ESEARCH },
+	{ "CONVERT",		IMAP_CAPABILITY_CONVERT },
+	{ "LIST-EXTENDED",	IMAP_CAPABILITY_LISTEXT },
 	{ NULL, 0 }
 };
 
@@ -3326,7 +3326,7 @@ parse_list_response_as_folder_info (CamelImapStore *imap_store,
 	char sep, *dir, *path;
 	CamelURL *url;
 	CamelImapStoreInfo *si;
-	guint32 newflags;
+	/* guint32 newflags; */
 
 	if (!imap_parse_list_response (imap_store, response, &flags, &sep, &dir))
 		return NULL;
@@ -3338,13 +3338,13 @@ parse_list_response_as_folder_info (CamelImapStore *imap_store,
 	if (si == NULL)
 		return NULL;
 
-	newflags = (si->info.flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED) | (flags & ~CAMEL_STORE_INFO_FOLDER_SUBSCRIBED);
-	if (si->info.flags != newflags) {
-		si->info.flags = newflags;
+	/* newflags = (si->info.flags & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED) | (flags & ~CAMEL_STORE_INFO_FOLDER_SUBSCRIBED); */
+	if (si->info.flags != flags) {
+		si->info.flags = flags;
 		camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
 	}
 
-	flags = (flags & ~CAMEL_FOLDER_SUBSCRIBED) | (si->info.flags & CAMEL_STORE_FOLDER_INFO_SUBSCRIBED);
+	/* flags = (flags & ~CAMEL_FOLDER_SUBSCRIBED) | (si->info.flags & CAMEL_STORE_FOLDER_INFO_SUBSCRIBED); */
 
 	fi = camel_folder_info_new ();
 
@@ -3440,6 +3440,10 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 	int i, count, j;
 	GHashTable *present;
 	CamelStoreInfo *si;
+	int loops = 2;
+
+	if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
+		loops = 1;
 
 	/* We do a LIST followed by LSUB, and merge the results.  LSUB may not be a strict
 	   subset of LIST for some servers, so we can't use either or separately */
@@ -3449,11 +3453,18 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 
 	present = g_hash_table_new(folder_hash, folder_eq);
 
-	for (j=0;j<2;j++) {
+	for (j = 0; j < loops; j++) {
+
 		camel_imap_store_stop_idle (imap_store);
-		response = camel_imap_command (imap_store, NULL, ex,
-					       "%s \"\" %G", j==1 ? "LSUB" : "LIST",
-					       pattern);
+
+		if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
+			response = camel_imap_command (imap_store, NULL, ex,
+				"%s \"\" %G", "LIST (SUBSCRIBED)",
+				pattern);
+		else
+			response = camel_imap_command (imap_store, NULL, ex,
+				"%s \"\" %G", j==1 ? "LSUB" : "LIST",
+				pattern);
 		if (!response)
 			goto fail;
 
@@ -3462,7 +3473,8 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 			fi = parse_list_response_as_folder_info (imap_store, list);
 
 			if (fi) {
-				if (FALSE && j == 0) {					struct imap_status_item *item, *items;
+				if (FALSE && j == 0) {
+					struct imap_status_item *item, *items;
 					item = items = get_folder_status (imap_store, fi->full_name, "MESSAGES UNSEEN", TRUE);
 					while (item != NULL) {
 						if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
@@ -3472,6 +3484,11 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 						item = item->next;
 					}
 					imap_status_item_free (items);
+				}
+
+				if (fi->flags & CAMEL_FOLDER_NONEXISTENT) {
+					camel_folder_info_free(fi);
+					continue;
 				}
 
 				hfi = g_hash_table_lookup(present, fi->full_name);
@@ -3488,8 +3505,10 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 
 					if (j == 0) /* From the LSUB we don't add folders */
 						g_hash_table_insert(present, fi->full_name, fi);
-					else
+					else {
+						fi->flags |= CAMEL_FOLDER_NONEXISTENT;
 						camel_folder_info_free(fi);
+					}
 				} else {
 					if (j == 1)
 						hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
