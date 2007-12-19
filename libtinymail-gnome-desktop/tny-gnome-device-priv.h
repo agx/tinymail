@@ -24,8 +24,8 @@ typedef struct _TnyGnomeDevicePriv TnyGnomeDevicePriv;
 
 struct _TnyGnomeDevicePriv
 {
-	gboolean forced, fset;
-    
+	gboolean forced, fset, current_state;
+
 #ifdef GNOME
 	gboolean invnm;
 	guint callback_id;

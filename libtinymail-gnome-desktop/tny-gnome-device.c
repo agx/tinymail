@@ -130,8 +130,13 @@ tny_gnome_device_force_offline (TnyDevice *self)
 static void
 tny_gnome_device_on_online (TnyDevice *self)
 {
+	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
+
 	gdk_threads_enter ();
-	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
+	if (!priv->current_state) {
+		priv->current_state = TRUE;
+		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
+	}
 	gdk_threads_leave ();
 
 	return;
@@ -140,8 +145,13 @@ tny_gnome_device_on_online (TnyDevice *self)
 static void
 tny_gnome_device_on_offline (TnyDevice *self)
 {
+	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
+
 	gdk_threads_enter ();
-	g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, FALSE);
+	if (priv->current_state) {
+		priv->current_state = FALSE;
+		g_signal_emit (self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, FALSE);
+	}
 	gdk_threads_leave ();
 
 	return;
@@ -198,12 +208,16 @@ tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
 #ifdef IMMEDIATE_ONLINE_TEST
 	priv->fset = TRUE;
 	priv->forced = TRUE;
+	priv->current_state = TRUE;
+#else
+	priv->current_state = FALSE;
 #endif
 
 #ifdef GNOME
 	priv->invnm = FALSE;
 	priv->nm_ctx = libnm_glib_init ();
 #ifndef IMMEDIATE_ONLINE_TEST
+	priv->current_state = tny_gnome_device_is_online (TNY_DEVICE (self));
 	priv->callback_id = libnm_glib_register_callback 
 		(priv->nm_ctx, nm_callback, self, NULL);
 #endif
