@@ -1478,8 +1478,10 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 	SyncFolderInfo *info = thr_user_data;
 	TnyFolder *self = info->self;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
+	TnyCamelAccountPriv *apriv = NULL;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
@@ -1495,7 +1497,10 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 		camel_folder_sync (priv->folder, info->expunge, &ex);
 		priv->want_changes = TRUE;
 
-		info->cancelled = camel_operation_cancel_check (apriv->cancel);
+		if (apriv)
+			info->cancelled = camel_operation_cancel_check (apriv->cancel);
+		else
+			info->cancelled = FALSE;
 
 		priv->cached_length = camel_folder_get_message_count (priv->folder);
 		priv->unread_length = (guint)camel_folder_get_unread_message_count (priv->folder);
@@ -1507,11 +1512,11 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 			"Can't load folder %s\n", 
 			priv->folder_name?priv->folder_name:"(null)");
 
-	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
+	if (apriv)
+		_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	info->err = NULL;
-	if (camel_exception_is_set (&ex))
-	{
+	if (camel_exception_is_set (&ex)) {
 		g_set_error (&info->err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_REFRESH,
 			camel_exception_get_description (&ex));
@@ -1688,8 +1693,10 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	RefreshFolderInfo *info = thr_user_data;
 	TnyFolder *self = info->self;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
+	TnyCamelAccountPriv *apriv = NULL;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
@@ -1719,8 +1726,7 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	info->err = NULL;
-	if (camel_exception_is_set (&ex))
-	{
+	if (camel_exception_is_set (&ex)) {
 		g_set_error (&info->err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_REFRESH,
 			camel_exception_get_description (&ex));
@@ -3260,19 +3266,20 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 	CopyFolderInfo *info = thr_user_data;
 	TnyFolder *self = info->self;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
+	TnyCamelAccountPriv *apriv = NULL;
 	GError *nerr = NULL;
 	CpyRecRet *cpyr;
 	TnyFolderStore *orig_store = NULL;
+
+	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
 	info->cancelled = FALSE;
 
 	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
-						  tny_camel_folder_copy_async_status, 
-						  info, "Copying folder");
-
+		tny_camel_folder_copy_async_status, 
+		info, "Copying folder");
 
 	info->adds = NULL; 
 	info->rems = NULL;
@@ -3300,7 +3307,8 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 
-	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
+	if (apriv)
+		_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	info->err = NULL;
 	if (nerr != NULL)
