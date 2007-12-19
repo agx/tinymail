@@ -17,6 +17,21 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkAccountListModel:
+ *
+ * A #GtkTreeModel for #TnyAccount instances
+ *
+ * Note that a #TnyGtkAccountListModel is a #TnyList too. You can use the
+ * #TnyList API on instances of this type too.
+ *
+ * Note that you must make sure that you unreference #TnyAccount instances that
+ * you get out of the instance column of this type using the #GtkTreeModel API
+ * gtk_tree_model_get().
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <glib.h>
@@ -45,19 +60,23 @@ static GObjectClass *parent_class = NULL;
 /**
  * tny_gtk_account_list_model_new:
  *
- * Create a new #GtkTreeModel instance suitable for showing a list of accounts.
- * Note that when using gtk_combo_box_set_model or gtk_tree_view_set_model, the 
- * view will add its reference to your model instance. If you want the view to
- * become the owner, you must get rid of your initial reference.
+ * Create a new #GtkTreeModel suitable for showing a list of accounts. Note
+ * that when using gtk_combo_box_set_model() or gtk_tree_view_set_model(),
+ * the view will add its reference to your model instance. If you want the
+ * view to become the owner, you must get rid of your initial reference.
  *
+ * Example:
  * <informalexample><programlisting>
  * GtkTreeModel *model = tny_gtk_account_list_model_new ();
  * GtkTreeView *view = ...;
+ * tny_account_store_get_accounts (accstore, TNY_LIST (model), ...);
  * gtk_tree_view_set_model (view, model);
- * g_object_unref (model); // this is probably what you want to do
+ * g_object_unref (model);
  * </programlisting></informalexample>
  *
- * Return value: a new #GtkTreeModel instance suitable for showing accounts
+ * returns (caller-owns): a new #GtkTreeModel for accounts
+ * since: 1.0
+ * audience: application-developer
  **/
 GtkTreeModel*
 tny_gtk_account_list_model_new (void)
@@ -260,6 +279,13 @@ tny_list_init (TnyListIface *klass)
 	return;
 }
 
+/**
+ * tny_gtk_account_list_model_get_type:
+ *
+ * GType system helper function
+ *
+ * returns: a #GType
+ **/
 GType
 tny_gtk_account_list_model_get_type (void)
 {
@@ -304,7 +330,7 @@ tny_gtk_account_list_model_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType 
 tny_gtk_account_list_model_column_get_type (void)

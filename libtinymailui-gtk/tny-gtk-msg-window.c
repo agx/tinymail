@@ -21,16 +21,20 @@
 /**
  * TnyGtkMsgWindow:
  *
+ * A #TnyMsgView that is a #GtkWindow too.
+ *
  * All implementations are rather simple, they all simply forward the instruction
  * to a priv->msg_view instance which is a #TnyMsgView or the decorated one.
  *
  * Next to forwarding the instructions, this implementation also makes sure that
- * priv->msg_view is embedded in a GtkWindow and that for example the window's
+ * priv->msg_view is embedded in a #GtkWindow and that for example the window's
  * title is set correctly (and things like that).
  *
  * You can inherit this type in case you want to have a more decorated windowed 
  * message viewer. You can also again decorate it (I would recommend decorating
  * #TnyGtkMsgView in stead, in that case).
+ *
+ * free-function: g_object_unref
  **/
 
 #include <config.h>
@@ -208,11 +212,14 @@ tny_gtk_msg_window_mp_get_part_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_msg_window_set_view:
- * @self: a #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  * @view: a #TnyMsgView to decorate
  *
- * Set the @view to decorate with @self. The @view instance must inherit the 
- * #GtkWidget type.
+ * Set @view to become decorated or windowed by @self. The @view must inherit
+ * #GtkWidget.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_gtk_msg_window_set_view (TnyGtkMsgWindow *self, TnyMsgView *view)
@@ -236,13 +243,15 @@ tny_gtk_msg_window_set_view (TnyGtkMsgWindow *self, TnyMsgView *view)
 
 /**
  * tny_gtk_msg_window_new:
- * @msgview: a #TnyMsgView to decorate
+ * @msgview: a #TnyMsgView to decorate or wrap with a #GtkWindow
  *
- * Create a GtkWindow that implements #TnyMsgView by decorating @msgview. The 
+ * Create a #GtkWindow that implements #TnyMsgView by decorating @msgview. The 
  * @view instance must inherit the #GtkWidget type. The returned value will
  * inherit #GtkWindow
  *
- * Return value: a new #TnyMsgWindow instance implemented for Gtk+
+ * returns: a new #TnyMsgWindow
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyMsgWindow*
 tny_gtk_msg_window_new (TnyMsgView *msgview)

@@ -17,6 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkImageMimePartView:
+ *
+ * A #TnyMimePartView that can render a #TnyMimePart that is an image. It's
+ * recommended to use this type together with a #TnyGtkExpanderMimePartView.
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <glib/gi18n-lib.h>
@@ -136,14 +145,19 @@ tny_gtk_image_mime_part_view_clear_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_image_mime_part_view_new:
- * @status_callback: a #TnyStatusCallback for when status information happens
- * @status_user_data: user data for @status_callback
+ * @status_callback (null-ok): a #TnyStatusCallback or NULL
+ * @status_user_data (null-ok): user data for @status_callback
  *
- * Create a new #TnyMimePartView for Gtk+. The returned value will inherit
- * #GtkImage. It's recommended to use a #TnyGtkExpanderMimePartView to wrap this
- * type.
+ * Create a new #TnyMimePartView for displaying image #TnyMimePartView instances.
+ * The returned value inherits #GtkImage. It's recommended to use a
+ * #TnyGtkExpanderMimePartView to wrap this type.
  *
- * Return value: a new #TnyMimePartView instance implemented for Gtk+
+ * Whenever data must be retrieved or takes long to load, @status_callback will
+ * be called to let the outside world know about what this compenent is doing.
+ *
+ * returns (caller-owns): a new #TnyMimePartView for images
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyMimePartView*
 tny_gtk_image_mime_part_view_new (TnyStatusCallback status_callback, gpointer status_user_data)

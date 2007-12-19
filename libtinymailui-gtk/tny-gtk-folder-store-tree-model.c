@@ -17,6 +17,30 @@
  * Boston, MA 02110-1301, USA.
  */
 
+
+/**
+ * TnyGtkFolderStoreTreeModel:
+ *
+ * A #GtkTreeModel for #TnyFolderStore instances that'll become #TnyFolderStoreObserver
+ * and #TnyFolderObserver (in case the #TnyFolderStore instance is a #TnyFolder
+ * too) of each added #TnyFolderStore and each of its children en grandchildren
+ * (recursively).
+ *
+ * It will detect changes in the instance's tree structure this way and it will
+ * adapt itself to a new situation automatically. It also contains columns that
+ * contain certain popular numbers (like the unread and the total counts of
+ * #TnyFolder instances).
+ *
+ * Note that a #TnyGtkFolderStoreTreeModel is a #TnyList too. You can use the
+ * #TnyList API on instances of this type too.
+ *
+ * Note that you must make sure that you unreference #TnyFolderStore instances
+ * that you get out of the instance column of this type using the #GtkTreeModel
+ * API gtk_tree_model_get().
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <glib.h>
@@ -474,13 +498,13 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 
 /**
  * tny_gtk_folder_store_tree_model_new:
- * @query: the #TnyFolderStoreQuery that will be used to retrieve the folders of each folder_store
+ * @query: the #TnyFolderStoreQuery that will be used to retrieve the child folders of each #TnyFolderStore
  *
- * Create a new #GtkTreeModel instance suitable for showing  
- * #TnyFolderStore instances
+ * Create a new #GtkTreeModel for showing #TnyFolderStore instances
  * 
- * Return value: a new #GtkTreeModel instance suitable for showing  
- * #TnyFolderStore instances
+ * returns (caller-owns): a new #GtkTreeModel for #TnyFolderStore instances
+ * since: 1.0
+ * audience: application-developer
  **/
 GtkTreeModel*
 tny_gtk_folder_store_tree_model_new (TnyFolderStoreQuery *query)
@@ -596,11 +620,14 @@ tny_gtk_folder_store_tree_model_create_iterator (TnyList *self)
 
 /**
  * tny_gtk_folder_store_tree_model_prepend:
- * @self: A #TnyGtkFolderStoreTreeModel instance
- * @item: A #TnyFolderStore instance to add
+ * @self: a #TnyGtkFolderStoreTreeModel
+ * @item: a #TnyFolderStore to add
  * @root_name: The node's root name 
  *
  * Prepends an item to the model
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_gtk_folder_store_tree_model_prepend (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name)
@@ -637,11 +664,14 @@ tny_gtk_folder_store_tree_model_prepend_i (TnyList *self, GObject* item)
 
 /**
  * tny_gtk_folder_store_tree_model_append:
- * @self: A #TnyGtkFolderStoreTreeModel instance
- * @item: A #TnyFolderStore instance to add
+ * @self: a #TnyGtkFolderStoreTreeModel
+ * @item: a #TnyFolderStore to add
  * @root_name: The node's root name 
  *
  * Appends an item to the model
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_gtk_folder_store_tree_model_append (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name)
@@ -1068,7 +1098,7 @@ tny_list_init (TnyListIface *klass)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_gtk_folder_store_tree_model_get_type (void)
@@ -1129,7 +1159,7 @@ tny_gtk_folder_store_tree_model_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_gtk_folder_store_tree_model_column_get_type (void)

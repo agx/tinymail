@@ -16,7 +16,19 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+
+/**
+ * TnyGtkTextBufferStream:
+ *
+ * A #TnyStream for building a #GtkTextBuffer from a stream in Tinymail, like when
+ * streaming a #TnyMimePart that is a plain text to a #GtkTextBuffer that will be
+ * used by a #GtkTextView.
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
+
 #include <string.h>
 #include <glib.h>
 
@@ -205,11 +217,13 @@ tny_gtk_text_buffer_stream_reset_default (TnyStream *self)
 
 /**
  * tny_gtk_text_buffer_stream_set_text_buffer:
- * @self: A #TnyGtkTextBufferStream instance
- * @buffer: The #GtkTextBuffer to write to or read from
+ * @self: a #TnyGtkTextBufferStream
+ * @buffer: a #GtkTextBuffer to write to or read from
  *
  * Set the #GtkTextBuffer to play adaptor for
  *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_gtk_text_buffer_stream_set_text_buffer (TnyGtkTextBufferStream *self, GtkTextBuffer *buffer)
@@ -229,11 +243,13 @@ tny_gtk_text_buffer_stream_set_text_buffer (TnyGtkTextBufferStream *self, GtkTex
 
 /**
  * tny_gtk_text_buffer_stream_new:
- * @buffer: The #GtkTextBuffer to write to or read from
+ * @buffer: a #GtkTextBuffer to write to or read from
  *
  * Create an adaptor instance between #TnyStream and #GtkTextBuffer
  *
- * Return value: a new #TnyStream instance
+ * returns (caller-owns): a new #TnyStream
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyStream*
 tny_gtk_text_buffer_stream_new (GtkTextBuffer *buffer)

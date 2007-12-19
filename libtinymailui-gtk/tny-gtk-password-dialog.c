@@ -17,8 +17,16 @@
  * Boston, MA 02110-1301, USA.
  */
 
-/* TODO: Refactory this type to libtinymailui-gtk */
+/**
+ * TnyGtkPasswordDialog:
+ *
+ * A #TnyPasswordGetter that will ask the user to enter the password in Gtk+
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
+
 #include <string.h>
 #include <sys/mman.h>
 
@@ -120,7 +128,9 @@ tny_gtk_password_dialog_forget_password (TnyPasswordGetter *self, const gchar *a
  * 
  * Create a dialog window that will ask the user for a password
  *
- * Return value: A new #GtkDialog password dialog instance implemented for Gtk+
+ * returns (caller-owns): A new #GtkDialog password dialog
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyPasswordGetter*
 tny_gtk_password_dialog_new (void)

@@ -17,6 +17,24 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkFolderStoreTreeModel:
+ *
+ * A #GtkTreeModel for #TnyHeader instances. Just like with any other #TnyList,
+ * you can use it together with a #TnyFolderMonitor. You will typically fill
+ * instances of this type using tny_folder_get_headers().
+ *
+ * Note that a #TnyGtkFolderStoreTreeModel is a #TnyList too. You can use the
+ * #TnyList API on instances of this type too. This is what #TnyFolderMonitor
+ * does too.
+ *
+ * Note that you must make sure that you unreference #TnyHeader instances that 
+ * you get out of the instance column of this type using the #GtkTreeModel API
+ * gtk_tree_model_get().
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <glib.h>
@@ -215,14 +233,16 @@ _get_readable_date (time_t file_time_raw)
 
 /**
  * tny_gtk_header_list_model_received_date_sort_func:
- * @model: The GtkTreeModel the comparison is within
- * @a : A GtkTreeIter in model
- * @b : Another GtkTreeIter in model
- * @user_data: Data passed
+ * @model: a #GtkTreeModel the comparison is within
+ * @a : a #GtkTreeIter in @model
+ * @b : another #GtkTreeIter in @model
+ * @user_data: user data passed
  *
- * A GtkTreeIterCompareFunc that sorts using the received date
+ * A #GtkTreeIterCompareFunc that sorts using the received date
  *
- * Return value: a negative integer, zero, or a positive integer 
+ * returns: a negative integer, zero, or a positive integer 
+ * since: 1.0
+ * audience: application-developer, tinymail-developer
  **/
 gint 
 tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
@@ -247,14 +267,16 @@ tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeI
 
 /**
  * tny_gtk_header_list_model_sent_date_sort_func:
- * @model: The GtkTreeModel the comparison is within
- * @a : A GtkTreeIter in model
- * @b : Another GtkTreeIter in model
- * @user_data: Data passed
+ * @model: the #GtkTreeModel the comparison is within
+ * @a : a GtkTreeIter in @model
+ * @b : another GtkTreeIter in @model
+ * @user_data: user data passed
  *
- * A GtkTreeIterCompareFunc that sorts using the sent date
+ * A @GtkTreeIterCompareFunc that sorts using the sent date
  *
- * Return value: a negative integer, zero, or a positive integer 
+ * returns: a negative integer, zero, or a positive integer 
+ * since: 1.0
+ * audience: application-developer, tinymail-developer
  **/
 gint  
 tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
@@ -1034,15 +1056,17 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 
 /**
  * tny_gtk_header_list_model_set_folder:
- * @self: A #TnyGtkHeaderListModel instance
- * @folder: a #TnyFolder instance
+ * @self: a #TnyGtkHeaderListModel
+ * @folder: a #TnyFolder
  * @refresh: refresh first
- * @callback: a #TnyGetHeadersCallback
- * @status_callback: a #TnyStatusCallback
+ * @callback (null-ok): a #TnyGetHeadersCallback or NULL
+ * @status_callback (null-ok): a #TnyStatusCallback or NULL
  * @user_data: user data for the callbacks
  *
- * Set the folder where the #TnyHeader instances are located
+ * Set the @folder of @self where #TnyHeader instances are located
  * 
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *folder, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
@@ -1102,11 +1126,11 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 /**
  * tny_gtk_header_list_model_new:
  *
- * Create a new #GtkTreeModel instance suitable for showing lots of 
- * #TnyHeader instances
+ * Create a new #GtkTreeModel for #TnyHeader instances
  *
- * Return value: a new #GtkTreeModel instance suitable for showing lots of 
- * #TnyHeader instances
+ * returns (caller-owns): a new #GtkTreeModel for #TnyHeader instances
+ * since: 1.0
+ * audience: application-developer
  **/
 GtkTreeModel*
 tny_gtk_header_list_model_new (void)
@@ -1121,7 +1145,7 @@ tny_gtk_header_list_model_new (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_gtk_header_list_model_get_type (void)
@@ -1176,7 +1200,7 @@ tny_gtk_header_list_model_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType
 tny_gtk_header_list_model_column_get_type (void)

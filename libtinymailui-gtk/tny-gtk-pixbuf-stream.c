@@ -16,7 +16,21 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  */
+
+
+/**
+ * TnyGtkPixbufStream:
+ *
+ * A #TnyStream for building a #GdkPixbuf from a stream in Tinymail, like when
+ * streaming a #TnyMimePart that is an image to a #GdkPixbuf that will be used
+ * by a #GtkImage.
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
+
+
 #include <string.h>
 #include <glib.h>
 
@@ -171,7 +185,9 @@ tny_gtk_pixbuf_stream_reset_default (TnyStream *self)
  *
  * Create an adaptor instance between #TnyStream and #GdkPixbuf
  *
- * Return value: a new #TnyStream instance
+ * returns (caller-owns): a new #TnyStream instance
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyStream*
 tny_gtk_pixbuf_stream_new (const gchar *mime_type)

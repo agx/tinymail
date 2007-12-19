@@ -17,6 +17,16 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkMsgView:
+ *
+ * a #TnyMsgView for showing a message in Gtk+. It's recommended to wrap instances
+ * of this type into a #GtkScrolledWindow.
+ *
+ * free-function: g_object_unref
+ **/
+
+
 #include <config.h>
 
 #include <glib/gi18n-lib.h>
@@ -94,11 +104,13 @@ static gboolean tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *pa
 
 /**
  * tny_gtk_msg_view_get_display_html:
- * @self: A #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  *
  * Get whether or not to display text/html mime parts
  * 
- * Return value: whether or not to display text/html mime parts
+ * returns: whether or not to display text/html mime parts
+ * since: 1.0
+ * audience: application-developer
  **/
 gboolean 
 tny_gtk_msg_view_get_display_html (TnyGtkMsgView *self)
@@ -109,11 +121,13 @@ tny_gtk_msg_view_get_display_html (TnyGtkMsgView *self)
 
 /**
  * tny_gtk_msg_view_get_display_rfc822:
- * @self: A #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  *
  * Get whether or not to display message/rfc822 mime parts
  *
- * Return value: whether or not to display message/rfc822 mime parts
+ * returns: whether or not to display message/rfc822 mime parts
+ * since: 1.0
+ * audience: application-developer
  **/
 gboolean 
 tny_gtk_msg_view_get_display_rfc822 (TnyGtkMsgView *self)
@@ -124,11 +138,13 @@ tny_gtk_msg_view_get_display_rfc822 (TnyGtkMsgView *self)
 
 /**
  * tny_gtk_msg_view_get_display_attachments:
- * @self: A #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  *
  * Get whether or not to display attachments
  *
- * Return value: whether or not to display attachments
+ * returns: whether or not to display attachments
+ * since: 1.0
+ * audience: application-developer
  **/
 gboolean 
 tny_gtk_msg_view_get_display_attachments (TnyGtkMsgView *self)
@@ -139,11 +155,13 @@ tny_gtk_msg_view_get_display_attachments (TnyGtkMsgView *self)
 
 /**
  * tny_gtk_msg_view_get_display_plain:
- * @self: A #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  *
  * Get whether or not to display text/plain mime parts
  * 
- * Return value: whether or not to display text/plain mime parts
+ * returns: whether or not to display text/plain mime parts
+ * since: 1.0
+ * audience: application-developer
  **/
 gboolean 
 tny_gtk_msg_view_get_display_plain (TnyGtkMsgView *self)
@@ -155,20 +173,25 @@ tny_gtk_msg_view_get_display_plain (TnyGtkMsgView *self)
 
 /**
  * tny_gtk_msg_view_set_display_html:
- * @self: A #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  * @setting: whether or not to display text/html mime parts
  *
  * With this setting will the default implementation of #TnyGtkMsgView display
  * the HTML source code of text/html mime parts. Default is FALSE.
  *
  * Note that these settings only affect the instance in case an overridden
- * implementation of tny_msg_view_create_mime_part_view_for doesn't handle
+ * implementation of tny_msg_view_create_mime_part_view_for() doesn't handle
  * creating a viewer for a mime part.
  * 
  * So for example in case a more advanced implementation that inherits this
  * type implements viewing a text/html mime part, and will therefore not call
- * this types original tny_msg_view_create_mime_part_view_for method for the
- * mime part anymore, the setting isn't used.
+ * this types original tny_msg_view_create_mime_part_view_for() method for
+ * the mime part anymore, the setting isn't used.
+ *
+ * The effect, by default, of this setting is showing the HTML source code.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_gtk_msg_view_set_display_html (TnyGtkMsgView *self, gboolean setting)
@@ -180,22 +203,23 @@ tny_gtk_msg_view_set_display_html (TnyGtkMsgView *self, gboolean setting)
 
 /**
  * tny_gtk_msg_view_set_display_rfc822:
- * @self: A #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  * @setting: whether or not to display message/rfc822 mime parts
  *
  * With this setting will the default implementation of #TnyGtkMsgView display
  * RFC822 inline message mime parts (forwards). Default is FALSE.
  *
- * (Note that this support is unimplemented at this moment)
- *
  * Note that these settings only affect the instance in case an overridden
- * implementation of tny_msg_view_create_mime_part_view_for doesn't handle
+ * implementation of tny_msg_view_create_mime_part_view_for() doesn't handle
  * creating a viewer for a mime part.
  * 
  * So for example in case a more advanced implementation that inherits this
  * type implements viewing a text/html mime part, and will therefore not call
- * this types original tny_msg_view_create_mime_part_view_for method for the
- * mime part anymore, the setting isn't used.
+ * this types original tny_msg_view_create_mime_part_view_for() method for
+ * the mime part anymore, the setting isn't used.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_gtk_msg_view_set_display_rfc822 (TnyGtkMsgView *self, gboolean setting)
@@ -208,7 +232,7 @@ tny_gtk_msg_view_set_display_rfc822 (TnyGtkMsgView *self, gboolean setting)
 
 /**
  * tny_gtk_msg_view_set_display_attachments:
- * @self: A #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  * @setting: whether or not to display attachment mime parts
  *
  * With this setting will the default implementation of #TnyGtkMsgView display
@@ -216,13 +240,16 @@ tny_gtk_msg_view_set_display_rfc822 (TnyGtkMsgView *self, gboolean setting)
  * of the #TnyGtkMsgView's scrollwindow. Default is TRUE.
  *
  * Note that these settings only affect the instance in case an overridden
- * implementation of tny_msg_view_create_mime_part_view_for doesn't handle
+ * implementation of tny_msg_view_create_mime_part_view_for() doesn't handle
  * creating a viewer for a mime part.
  * 
  * So for example in case a more advanced implementation that inherits this
  * type implements viewing a text/html mime part, and will therefore not call
- * this types original tny_msg_view_create_mime_part_view_for method for the
- * mime part anymore, the setting isn't used.
+ * this types original tny_msg_view_create_mime_part_view_for() method for
+ * the mime part anymore, the setting isn't used.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_gtk_msg_view_set_display_attachments (TnyGtkMsgView *self, gboolean setting)
@@ -241,13 +268,16 @@ tny_gtk_msg_view_set_display_attachments (TnyGtkMsgView *self, gboolean setting)
  * text/plain mime parts. Default is TRUE.
  *
  * Note that these settings only affect the instance in case an overridden
- * implementation of tny_msg_view_create_mime_part_view_for doesn't handle
+ * implementation of tny_msg_view_create_mime_part_view_for() doesn't handle
  * creating a viewer for a mime part.
  * 
  * So for example in case a more advanced implementation that inherits this
  * type implements viewing a text/html mime part, and will therefore not call
- * this types original tny_msg_view_create_mime_part_view_for method for the
- * mime part anymore, the setting isn't used.
+ * this types original tny_msg_view_create_mime_part_view_for() method for
+ * the mime part anymore, the setting isn't used.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void 
 tny_gtk_msg_view_set_display_plain (TnyGtkMsgView *self, gboolean setting)
@@ -302,10 +332,13 @@ tny_gtk_msg_view_create_new_inline_viewer (TnyMsgView *self)
 
 /**
  * tny_gtk_msg_view_set_parented:
- * @self: a #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  * @parented: parented or not
  *
  * Set @self as parented. Usually internally used.
+ *
+ * since: 1.0
+ * audience: type-implementer, tinymail-developer
  **/
 void 
 tny_gtk_msg_view_set_parented (TnyGtkMsgView *self, gboolean parented)
@@ -317,12 +350,15 @@ tny_gtk_msg_view_set_parented (TnyGtkMsgView *self, gboolean parented)
 
 /**
  * tny_gtk_msg_view_set_status_callback:
- * @status_callback: a #TnyStatusCallback 
- * @stats_user_data: user data for @status_callback
+ * @status_callback (null-ok): a #TnyStatusCallback or NULL
+ * @stats_user_data (null-ok): user data for @status_callback
  *
  * Set the status callback info. This callback can be NULL and will be called
  * when status information happens. You can for example set a progress bar's
  * position here (for for example when downloading of a message takes place).
+ *
+ * since: 1.0
+ * audience: application-developer, type-implementer, tinymail-developer
  **/
 void 
 tny_gtk_msg_view_set_status_callback (TnyGtkMsgView *self, TnyStatusCallback status_callback, gpointer status_user_data)
@@ -334,11 +370,14 @@ tny_gtk_msg_view_set_status_callback (TnyGtkMsgView *self, TnyStatusCallback sta
 }
 
 /**
- * tny_gtk_msg_view_set_status_callback:
- * @status_callback: byref a #TnyStatusCallback 
- * @stats_user_data: byref user data for @status_callback
+ * tny_gtk_msg_view_get_status_callback:
+ * @status_callback (out): byref a #TnyStatusCallback 
+ * @stats_user_data (out): byref user data for @status_callback
  *
  * Get the status callback info. Usually internally used.
+ *
+ * since: 1.0
+ * audience: type-implementer, tinymail-developer
  **/
 void 
 tny_gtk_msg_view_get_status_callback (TnyGtkMsgView *self, TnyStatusCallback *status_callback, gpointer *status_user_data)
@@ -370,8 +409,8 @@ tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 
 /**
  * tny_gtk_msg_view_create_mime_part_view_for_default:
- * @self: a #TnyGtkMsgView instance
- * @part: a #TnyMimePart instance
+ * @self: a #TnyGtkMsgView
+ * @part: a #TnyMimePart
  *
  * This is non-public API documentation
  *
@@ -469,8 +508,8 @@ on_mpview_realize (GtkWidget *widget, gpointer user_data)
 
 /**
  * tny_gtk_msg_view_display_part:
- * @self: a #TnyGtkMsgView instance
- * @part: a #TnyMimePart instance
+ * @self: a #TnyGtkMsgView
+ * @part: a #TnyMimePart
  *
  * This is non-public API documentation
  * 
@@ -556,7 +595,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part, const gchar 
 
 /**
  * tny_gtk_msg_view_display_parts:
- * @self: a #TnyGtkMsgView instance
+ * @self: a #TnyGtkMsgView
  * @parts: a #TnyList instance containing #TnyMimePart instances
  * @desc: description of the parent part (if any)
  *
@@ -661,8 +700,8 @@ tny_gtk_msg_view_mp_set_part (TnyMimePartView *self, TnyMimePart *part)
 
 /**
  * tny_gtk_msg_view_mp_set_part_default:
- * @self: a #TnyGtkMsgView instance
- * @part: a #TnyMimePart instance
+ * @self: a #TnyGtkMsgView
+ * @part: a #TnyMimePart
  *
  * This is non-public API documentation
  *
@@ -738,9 +777,11 @@ tny_gtk_msg_view_mp_clear (TnyMimePartView *self)
 /**
  * tny_gtk_msg_view_new:
  *
- * Create a new #TnyMsgView instance implemented for Gtk+
+ * Create a new #TnyMsgView
  *
- * Return value: a new #TnyMsgView instance implemented for Gtk+
+ * returns (caller-owns): a new #TnyMsgView 
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyMsgView*
 tny_gtk_msg_view_new (void)
@@ -915,7 +956,7 @@ tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType 
 tny_gtk_msg_view_get_type (void)

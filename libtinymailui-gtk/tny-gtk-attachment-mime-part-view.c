@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkAttachmentMimePartView:
+ *
+ * A #TnyMimePartView for showing a #TnyMimePart that is also an attachment
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <glib/gi18n-lib.h>
@@ -119,11 +127,15 @@ tny_gtk_attachment_mime_part_view_clear_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_attachment_mime_part_view_new:
- * @iview: A #TnyGtkAttachListModel instance
+ * @iview: A #TnyGtkAttachListModel
  * 
- * Create a new #TnyMimePartView instance implemented for Gtk+
+ * Create a new #TnyMimePartView for showing MIME parts that are attachments.
+ * The @iview parameter that you must pass is the #GtkTreeModel containing the
+ * #TnyMimePart instances that are attachments.
  * 
- * Return value: a new #TnyMimePartView instance implemented for Gtk+
+ * returns (caller-owns): a new #TnyMimePartView for showing MIME parts that are attachments
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyMimePartView*
 tny_gtk_attachment_mime_part_view_new (TnyGtkAttachListModel *iview)
@@ -202,7 +214,7 @@ tny_gtk_attachment_mime_part_view_class_init (TnyGtkAttachmentMimePartViewClass 
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType 
 tny_gtk_attachment_mime_part_view_get_type (void)

@@ -17,6 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkMimePartSaveStrategy:
+ *
+ * a #TnyMimePartSaveStrategy that saves a #TnyMimePart using a file dialog
+ * in Gtk+ and GnomeVFS if available.
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <glib/gi18n-lib.h>
@@ -181,13 +190,18 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
 
 /**
  * tny_gtk_mime_part_save_strategy_new:
- * @status_callback: a #TnyStatusCallback for when status information happens
+ * @status_callback (null-ok): a #TnyStatusCallback for when status information happens or NULL
  * @status_user_data: user data for @status_callback
  *
- * Create a new #TnyMimePartSaveStrategy instance implemented for Gtk+. It will
- * use the GtkFileChooserDialog type and if available support for GnomeVFS.
+ * Create a new #TnyMimePartSaveStrategy It will use the #GtkFileChooserDialog type and if
+ * available consume its support for GnomeVFS.
  *
- * Return value: a new #TnyMimePartSaveStrategy instance implemented for Gtk+
+ * Whenever data must be retrieved or takes long to load, @status_callback will
+ * be called to let the outside world know about what this compenent is doing.
+ *
+ * returns (caller-owns): a new #TnyMimePartSaveStrategy
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyMimePartSaveStrategy*
 tny_gtk_mime_part_save_strategy_new (TnyStatusCallback status_callback, gpointer status_user_data)

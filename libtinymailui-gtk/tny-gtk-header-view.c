@@ -17,6 +17,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkHeaderView:
+ *
+ * A simple view for a #TnyHeader
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <glib/gi18n-lib.h>
@@ -138,9 +146,11 @@ tny_gtk_header_view_clear_default (TnyHeaderView *self)
 /**
  * tny_gtk_header_view_new:
  *
- * Create a new #TnyHeaderView instance implemented for Gtk+
+ * Create a new #TnyHeaderView
  *
- * Return value: a new #TnyHeaderView instance implemented for Gtk+
+ * returns (caller-owns): a new #TnyHeaderView
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyHeaderView*
 tny_gtk_header_view_new (void)
@@ -276,7 +286,7 @@ tny_gtk_header_view_class_init (TnyGtkHeaderViewClass *class)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType 
 tny_gtk_header_view_get_type (void)

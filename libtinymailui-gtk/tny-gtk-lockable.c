@@ -17,6 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkLockable:
+ *
+ * A #TnyLockable that has its tny_lockable_lock() and tny_lockable_ulock()
+ * implemented using gdk_threads_enter() and gdk_threads_leave().
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 #include <glib.h>
 #include <glib/gi18n-lib.h>
@@ -69,10 +78,12 @@ tny_gtk_lockable_instance_init (GTypeInstance *instance, gpointer g_class)
 /**
  * tny_gtk_lockable_new:
  *
- * Create a #TnyLockable instance that uses gdk_threads_enter and gdk_threads_leave
+ * Create a #TnyLockable that uses gdk_threads_enter() and gdk_threads_leave()
  * as lock and unlock implementations.
  *
- * Return value: a new #TnyLockable instance implemented for Gtk+
+ * returns (caller-owns): a new #TnyLockable
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyLockable*
 tny_gtk_lockable_new (void)

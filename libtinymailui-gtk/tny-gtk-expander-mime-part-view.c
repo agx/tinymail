@@ -17,7 +17,17 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkExpanderMimePartView:
+ *
+ * A #TnyMimePartView that wraps another #TnyMimePartView into a #GtkExpander.
+ * The type is a #TnyMimePartView by itself too (it decorates the one it wraps).
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
+
 #include <gtk/gtk.h>
 
 #include <tny-gtk-expander-mime-part-view.h>
@@ -102,16 +112,21 @@ tny_gtk_expander_mime_part_view_clear_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_expander_mime_part_view_set_view:
- * @self: a #TnyGtkMsgView instance
- * @view: a #TnyMimePartView to decorate
+ * @self: a #TnyGtkMsgView
+ * @view: a #TnyMimePartView to make expandable
  *
- * Set the @view to decorate with @self. The @view instance must inherit the 
- * #GtkWidget type.
+ * Set @view to become decorated and expanded by @self. The @view must inherit
+ * #GtkWidget and implement #TnyMimePartView.
+ *
+ * since: 1.0
+ * audience: application-developer
  **/
 void
 tny_gtk_expander_mime_part_view_set_view (TnyGtkExpanderMimePartView *self, TnyMimePartView *view)
 {
 	TnyGtkExpanderMimePartViewPriv *priv = TNY_GTK_EXPANDER_MIME_PART_VIEW_GET_PRIVATE (self);
+
+	g_assert (GTK_IS_WIDGET (view));
 
 	if (priv->decorated)
 		gtk_container_remove (GTK_CONTAINER (self), GTK_WIDGET (priv->decorated));
@@ -128,13 +143,15 @@ tny_gtk_expander_mime_part_view_set_view (TnyGtkExpanderMimePartView *self, TnyM
 
 /**
  * tny_gtk_expander_mime_part_view_new:
- * @view: the #TnyMimePartView to make expandable
+ * @view: a #TnyMimePartView to make expandable
  *
- * Create a new #TnyMimePartView for Gtk+ that wraps another mime part view with
- * an expander (#GtkExpander). The @view instance must inherit the 
- * #GtkWidget type. The returned value will inherit #GtkExpander.
+ * Create a new #TnyMimePartView that wraps another mime part view with
+ * a #GtkExpander. The @view instance must inherit #GtkWidget. The 
+ * returned value will inherit #GtkExpander.
  *
- * Return value: a new #TnyMimePartView instance implemented for Gtk+
+ * returns (caller-owns): a new #TnyMimePartView
+ * since: 1.0
+ * audience: application-developer
  **/
 TnyMimePartView*
 tny_gtk_expander_mime_part_view_new (TnyMimePartView *view)

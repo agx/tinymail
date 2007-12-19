@@ -17,6 +17,21 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/**
+ * TnyGtkAttachListModel:
+ *
+ * A #GtkTreeModel for #TnyMimePart instances that happen to be attachments too.
+ *
+ * Note that a #TnyGtkAttachListModel is a #TnyList too. You can use the
+ * #TnyList API on instances of this type too.
+ *
+ * Note that you must make sure that you unreference #TnyMimePart instances
+ * that you get out of the instance column of this type using the #GtkTreeModel
+ * API gtk_tree_model_get().
+ *
+ * free-function: g_object_unref
+ **/
+
 #include <config.h>
 
 #include <glib.h>
@@ -120,9 +135,11 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, l
 /**
  * tny_gtk_attach_list_model_new:
  *
- * Get a new #GtkTreeModel instance suitable for showing #TnyMimePart.
+ * Get a new #GtkTreeModel for #TnyMimePart instances that are attachments.
  *
- * Return value: a new #GtkTreeModel instance suitable for showing a #TnyMimePart
+ * returns (caller-owns) a new #GtkTreeModel #TnyMimePart instances
+ * since: 1.0
+ * audience: application-developer
  **/
 GtkTreeModel*
 tny_gtk_attach_list_model_new (void)
@@ -344,6 +361,14 @@ tny_list_init (TnyListIface *klass)
 	return;
 }
 
+
+/**
+ * tny_gtk_attach_list_model_get_type:
+ *
+ * GType system helper function
+ *
+ * returns: a #GType
+ **/
 GType
 tny_gtk_attach_list_model_get_type (void)
 {
@@ -389,7 +414,7 @@ tny_gtk_attach_list_model_get_type (void)
  *
  * GType system helper function
  *
- * Return value: a GType
+ * returns: a #GType
  **/
 GType 
 tny_gtk_attach_list_model_column_get_type (void)
