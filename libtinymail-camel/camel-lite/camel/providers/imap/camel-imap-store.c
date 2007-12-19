@@ -3722,7 +3722,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 
 		if (top[0] == 0) {
 			if (imap_store->namespace && imap_store->namespace[0]) {
-				get_folders_sync(imap_store, "INBOX", ex);
+				get_folders_sync (imap_store, "INBOX", ex);
 				if (camel_exception_is_set(ex))
 					goto fail;
 
