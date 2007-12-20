@@ -473,7 +473,7 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 {
 	CamelImapResponseType type;
 	char *respbuf;
-	int len;
+	int len = -1;
 
 	if (camel_imap_store_readline (store, &respbuf, ex) < 0) {
 		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
