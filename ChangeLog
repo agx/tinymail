@@ -1,3 +1,9 @@
+2007-12-20 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* tny-maemo-conic-device.c; fix for typo in
+	    tny_maemo_conic_device_connect_async which could cause
+	    warnings and other problems
+
 2007-12-19  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* New documentation style, third commit (libtinymailui-gtk)

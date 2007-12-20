@@ -329,10 +329,12 @@ tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self,
 	GError *err = NULL;
 	ConIcConnectFlags flags;
 
+	g_return_if_fail (self && TNY_IS_MAEMO_CONIC_DEVICE(self));
+
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
 	info = g_slice_new (ConnectInfo);
-	info->self = (TnyMaemoConicDevice *) g_object_ref (info);
+	info->self = (TnyMaemoConicDevice *) g_object_ref (self);
 	info->callback = callback;
 	info->user_data = user_data;
 	info->iap_id = g_strdup (iap_id);
