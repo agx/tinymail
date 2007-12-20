@@ -1,5 +1,11 @@
 2007-12-20  Alberto Garcia Gonzalez  <agarcia@igalia.com>
 
+	* libtinymail/tny-store-acount.c:
+	(tny_store_account_find_folder): Fixed assertion to allow
+	maildir:/path/to/msg URLs
+
+2007-12-20  Alberto Garcia Gonzalez  <agarcia@igalia.com>
+
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-command.c:
 	(camel_imap_command_response): Set an initial value to variable len
 

@@ -89,7 +89,7 @@ tny_store_account_find_folder (TnyStoreAccount *self, const gchar *url_string, G
 	g_assert (TNY_IS_STORE_ACCOUNT (self));
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0);
-	g_assert (strstr (url_string, "://"));
+	g_assert (strstr (url_string, ":/"));
 	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->find_folder_func != NULL);
 #endif
 
