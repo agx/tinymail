@@ -397,7 +397,7 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
  * requested tny_folder_copy_async(), you specified to delete the original folder.
  * Therefore will @self point to an instance that is about to be removed as an
  * instance locally, and of which the remote folder has already been removed in
- * case the copy was indeed successful and the requested included deleting the
+ * case the copy was indeed successful and the request included deleting the
  * original. In such a case is @self as a folder not to be trusted any longer.
  * In this case wont @self be NULL, but any operation that you'll do on it will
  * yield unexpected and more importantly unspecified results. Please do not 
