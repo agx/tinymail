@@ -145,8 +145,8 @@ tny_gtk_image_mime_part_view_clear_default (TnyMimePartView *self)
 
 /**
  * tny_gtk_image_mime_part_view_new:
- * @status_callback (null-ok): a #TnyStatusCallback or NULL
- * @status_user_data (null-ok): user data for @status_callback
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @status_user_data: (null-ok): user data for @status_callback
  *
  * Create a new #TnyMimePartView for displaying image #TnyMimePartView instances.
  * The returned value inherits #GtkImage. It's recommended to use a

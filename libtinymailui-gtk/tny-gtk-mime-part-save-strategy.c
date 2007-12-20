@@ -190,8 +190,8 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
 
 /**
  * tny_gtk_mime_part_save_strategy_new:
- * @status_callback (null-ok): a #TnyStatusCallback for when status information happens or NULL
- * @status_user_data: user data for @status_callback
+ * @status_callback: (null-ok): a #TnyStatusCallback for when status information happens or NULL
+ * @status_user_data: (null-ok): user data for @status_callback
  *
  * Create a new #TnyMimePartSaveStrategy It will use the #GtkFileChooserDialog type and if
  * available consume its support for GnomeVFS.

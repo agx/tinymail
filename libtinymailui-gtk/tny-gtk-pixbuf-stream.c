@@ -201,6 +201,16 @@ tny_gtk_pixbuf_stream_new (const gchar *mime_type)
 	return TNY_STREAM (self);
 }
 
+/**
+ * tny_gtk_pixbuf_stream_get_pixbuf:
+ * @self: a #TnyGtkPixbufStream
+ *
+ * Get the #GfkPixbuf that got created when we streamed data to @self.
+ *
+ * returns: (caller-owns): a #GdkPixbuf instance
+ * since: 1.0
+ * audience: application-developer
+ **/
 GdkPixbuf *
 tny_gtk_pixbuf_stream_get_pixbuf (TnyGtkPixbufStream *self)
 {

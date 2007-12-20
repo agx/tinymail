@@ -350,6 +350,7 @@ tny_gtk_msg_view_set_parented (TnyGtkMsgView *self, gboolean parented)
 
 /**
  * tny_gtk_msg_view_set_status_callback:
+ * @self: a #TnyGtkMsgView
  * @status_callback: (null-ok): a #TnyStatusCallback or NULL
  * @stats_user_data: (null-ok): user data for @status_callback
  *
@@ -371,6 +372,7 @@ tny_gtk_msg_view_set_status_callback (TnyGtkMsgView *self, TnyStatusCallback sta
 
 /**
  * tny_gtk_msg_view_get_status_callback:
+ * @self: a #TnyGtkMsgView
  * @status_callback: (out): byref a #TnyStatusCallback 
  * @stats_user_data: (out): byref user data for @status_callback
  *
