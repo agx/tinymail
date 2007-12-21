@@ -1956,7 +1956,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 		"text", TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id (column, TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN);
 	gtk_tree_view_column_set_sizing (column, GTK_TREE_VIEW_COLUMN_FIXED);
-	gtk_tree_view_column_set_fixed_width (column, 100);
+	gtk_tree_view_column_set_fixed_width (column, 230);
 	gtk_tree_view_append_column (GTK_TREE_VIEW(priv->header_view), column);
 
 	if (G_UNLIKELY (FALSE))
