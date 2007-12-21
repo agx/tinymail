@@ -61,6 +61,9 @@ void camel_du (char *name, int *my_size)
 	DIR *dir;
 	struct dirent *ent;
 
+	if (!name)
+		return;
+
 	dir = opendir (name);
 
 	if (!dir)
@@ -68,8 +71,7 @@ void camel_du (char *name, int *my_size)
 
 	while ((ent = readdir (dir)))
 	{
-		if (!ignorent (ent->d_name))
-		{
+		if (!ignorent (ent->d_name) && ent->d_name) {
 			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
 			if (isdir (p))
 				camel_du (p, my_size);
