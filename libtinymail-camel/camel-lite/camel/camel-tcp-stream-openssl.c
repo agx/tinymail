@@ -911,8 +911,7 @@ ssl_verify (int ok, X509_STORE_CTX *ctx)
 				    GET_STRING (X509_get_subject_name (cert)),
 				    fingerprint, cert->valid ? _("GOOD") : _("BAD"));
 
-	prompt = g_strdup_printf (_("Bad certificate\n\n%s\n\n%s\n\n"
-				    "Do you wish to accept anyway?"),
+	prompt = g_strdup_printf (_("SSL Certificate check:\n\n%s\n\n%s\n"),
 				    cert_str, x509_strerror (err));
 
 	ok = camel_session_alert_user_with_id (session, CAMEL_SESSION_ALERT_WARNING,

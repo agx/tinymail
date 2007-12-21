@@ -1052,7 +1052,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 		g_free(fingerprint);
 
 		/* construct our user prompt */
-		prompt = g_strdup_printf (_("SSL Certificate check for %s:\n\n%s\n\nDo you wish to accept?"),
+		prompt = g_strdup_printf (_("SSL Certificate check for %s:\n\n%s\n"),
 					  ssl->priv->expected_host, cert_str);
 		g_free (cert_str);
 
