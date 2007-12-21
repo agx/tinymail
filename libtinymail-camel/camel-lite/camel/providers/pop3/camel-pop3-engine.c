@@ -485,7 +485,8 @@ ioerror:
 		pe->current = NULL;
 	}
 
-	camel_service_disconnect (CAMEL_SERVICE (pe->store), FALSE, &ex);
+	if (pe->store && CAMEL_IS_SERVICE (pe->store))
+		camel_service_disconnect ((CamelService *) pe->store, FALSE, &ex);
 
 	camel_object_unref (pe);
 	g_static_rec_mutex_unlock (pe->lock);

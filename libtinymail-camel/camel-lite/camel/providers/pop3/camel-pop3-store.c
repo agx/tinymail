@@ -413,6 +413,13 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	} else
 		tcp_stream = camel_tcp_stream_raw_new ();
 
+	if (!tcp_stream) {
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+				_("Could not connect to %s: %s"),
+				service->url->host, _("Couldn't create socket"));
+		return FALSE;
+	}
+
 	if ((ret = camel_tcp_stream_connect ((CamelTcpStream *) tcp_stream, ai)) == -1) {
 		if (errno == EINTR)
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
@@ -433,6 +440,13 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 
 	if ((delete_days = (gchar *) camel_url_get_param(service->url,"delete_after")))
 		store->delete_after =  atoi(delete_days);
+
+	if (!tcp_stream) {
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+				_("Could not connect to %s: %s"),
+				service->url->host, _("Couldn't create socket"));
+		return FALSE;
+	}
 
 	if (!(store->engine = camel_pop3_engine_new (tcp_stream, flags))) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
