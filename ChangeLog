@@ -17,8 +17,6 @@
 
 2007-12-21  Philip Van Hoof <pvanhoof@gnome.org>
 
-	* Experimental support for NAMESPACE in IMAP accounts
-	* Better handling of LIST and LSUB requests
 	* Code robustness
 	* Changed the account item of a folder to be hard referenced in stead
 	of weakly
