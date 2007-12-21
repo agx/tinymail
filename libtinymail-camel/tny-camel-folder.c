@@ -1313,12 +1313,6 @@ tny_camel_folder_get_account_default (TnyFolder *self)
 	return TNY_ACCOUNT (g_object_ref (priv->account));
 }
 
-static void 
-notify_account_del (gpointer user_data, GObject *account)
-{
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (user_data);
-	priv->account = NULL;
-}
 
 void
 _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
@@ -1328,9 +1322,8 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 	g_assert (TNY_IS_CAMEL_ACCOUNT (account));
 
 	if (priv->account)
-		g_object_weak_unref (G_OBJECT (priv->account), notify_account_del, self);
-	priv->account = account;
-	g_object_weak_ref (G_OBJECT (priv->account), notify_account_del, self);
+		g_object_unref (priv->account);
+	priv->account = TNY_ACCOUNT (g_object_ref (account));
 
 	if (priv->store)
 		camel_object_unref (priv->store);
@@ -5430,7 +5423,7 @@ tny_camel_folder_finalize (GObject *object)
 		camel_object_unref (priv->store);
 
 	if (priv->account)
-		g_object_weak_unref (G_OBJECT (priv->account), notify_account_del, self);
+		g_object_unref (priv->account);
 
 	if (priv->parent)
 		g_object_weak_unref (G_OBJECT (priv->parent), notify_parent_del, self);
