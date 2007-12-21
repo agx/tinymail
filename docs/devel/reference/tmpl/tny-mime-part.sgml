@@ -89,6 +89,8 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 
 @self: 
 @stream: 
+@err: 
+@Returns: 
 
 
 <!-- ##### FUNCTION tny_mime_part_construct_from_stream ##### -->
@@ -216,6 +218,8 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 
 @self: 
 @stream: 
+@err: 
+@Returns: 
 
 
 <!-- ##### FUNCTION tny_mime_part_get_parts ##### -->
