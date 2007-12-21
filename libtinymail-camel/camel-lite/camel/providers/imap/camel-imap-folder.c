@@ -171,7 +171,6 @@ static GData *parse_fetch_response (CamelImapFolder *imap_folder, char *msg_att)
 static void camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 			   GArray *expunged, CamelException *ex, CamelFolderChangeInfo *changes, gboolean exists_happened);
 
-GPtrArray* _camel_imap_store_get_recent_messages (CamelImapStore *imap_store, const char *folder_name, int *messages, int *unseen, gboolean withthem);
 
 static void imap_delete_attachments (CamelFolder *folder, const char *uid);
 static void imap_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
@@ -3861,6 +3860,7 @@ idle_thread (gpointer data)
 				process_idle_response (idle_resp);
 				idle_response_free (idle_resp);
 				idle_resp = NULL;
+				retval = NULL;
 			} else if (idle_resp && idle_resp->exists_happened) {
 
 				/* We can't deal with new EXISTS responses
@@ -3963,6 +3963,7 @@ idle_thread (gpointer data)
 					process_idle_response (idle_resp);
 					idle_response_free (idle_resp);
 					idle_resp = NULL;
+					retval = NULL;
 				}
 			}
 
