@@ -26,6 +26,7 @@
 #endif
 
 #include <string.h>
+#include <errno.h>
 
 #include <tny-mime-part.h>
 #include <tny-camel-mime-part.h>
@@ -37,6 +38,7 @@
 #include <tny-list.h>
 #include <tny-simple-list.h>
 #include <tny-camel-msg.h>
+#include <tny-error.h>
 
 static GObjectClass *parent_class = NULL;
 
@@ -244,7 +246,7 @@ tny_camel_mime_part_decode_to_stream_async_default (TnyMimePart *self, TnyStream
 {
 	DecodeAsyncInfo *info = g_slice_new0 (DecodeAsyncInfo);
 
-	tny_mime_part_decode_to_stream (self, stream);
+	tny_mime_part_decode_to_stream (self, stream, NULL);
 
 	info->self = g_object_ref (self);
 	info->stream = g_object_ref (stream);
@@ -537,20 +539,20 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 	return FALSE;
 }
 
-static void
-tny_camel_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
+static gssize
+tny_camel_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream, GError **err)
 {
-	TNY_CAMEL_MIME_PART_GET_CLASS (self)->write_to_stream_func (self, stream);
-	return;
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->write_to_stream_func (self, stream, err);
 }
 
-static void
-tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *stream)
+static gssize
+tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *stream, GError **err)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
 	CamelStream *cstream;
+	gssize bytes = -1;
 
 	g_assert (TNY_IS_STREAM (stream));
 
@@ -567,24 +569,34 @@ tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *strea
 		g_error (_("Mime part does not yet have a source stream, use "
 			"tny_mime_part_construct_from_stream first"));
 		camel_object_unref (cstream);
-		return;
+		g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_ERROR_UNSPEC,
+				_("Mime part does not yet have a source stream, use "
+				"tny_mime_part_construct_from_stream first"));
+		return bytes;
 	}
 
 	/* This should work but doesn't . . .
 	camel_data_wrapper_write_to_stream (wrapper, cstream); */
 
 	camel_stream_reset (wrapper->stream);
-	camel_stream_write_to_stream (wrapper->stream, cstream);
+	bytes = (gssize) camel_stream_write_to_stream (wrapper->stream, cstream);
 
 	camel_object_unref (cstream);
 	camel_object_unref (medium);
 
-	return;
+	if (bytes < 0) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_ERROR_UNSPEC,
+				strerror (errno));
+	}
+	
+	return bytes;
 }
 
 
 
-static void
+static ssize_t
 camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 {
 	/* Stolen from evolution, evil evil me!! moehahah */
@@ -593,6 +605,7 @@ camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 	CamelMimeFilterCharset *filter;
 	const char *charset = "UTF-8"; /* I default to UTF-8, like it or not */
 	CamelMimeFilterWindows *windows = NULL;
+	ssize_t bytes = -1;
 
 	if (dw->mime_type && (charset = camel_content_type_param 
 			(dw->mime_type, "charset")) && 
@@ -623,25 +636,24 @@ camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 		camel_object_unref (filter);
 	}
 
-	camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
+	bytes = camel_data_wrapper_decode_to_stream (dw, (CamelStream *)filter_stream);
 	camel_stream_flush ((CamelStream *)filter_stream);
 	camel_object_unref (filter_stream);
 
 	if (windows)
 		camel_object_unref(windows);
 
-	return;
+	return bytes;
 }
 
-static void
-tny_camel_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
+static gssize
+tny_camel_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream, GError **err)
 {
-	TNY_CAMEL_MIME_PART_GET_CLASS (self)->decode_to_stream_func (self, stream);
-	return;
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->decode_to_stream_func (self, stream, err);
 }
 
-static void
-tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stream)
+static gssize
+tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stream, GError **err)
 {
 
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
@@ -667,15 +679,23 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 		return;
 	}
 
+	gssize bytes = -1;
+	
 	if (camel_content_type_is (wrapper->mime_type, "text", "*"))
-		camel_stream_format_text (wrapper, cstream);
+		bytes = (gssize) camel_stream_format_text (wrapper, cstream);
 	else
-		camel_data_wrapper_decode_to_stream (wrapper, cstream);
+		bytes = (gssize) camel_data_wrapper_decode_to_stream (wrapper, cstream);
 
 	camel_object_unref (cstream);
 	camel_object_unref (medium);
+	
+	if (bytes < 0) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+				TNY_ERROR_UNSPEC,
+				strerror (errno));
+	}
 
-	return;
+	return bytes;
 }
 
 static gint

@@ -487,8 +487,8 @@ scan_dirs(CamelStore *store, guint32 flags, CamelFolderInfo *topfi, CamelURL *ur
 		if (dir == NULL) {
 			g_free(name);
 			camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM,
-					     _("Could not scan folder `%s': %s"),
-					     root, g_strerror(errno));
+					     _("Could not scan folder `%s', opendir(`%s') failed: %s"),
+					     root, name, g_strerror(errno));
 			goto fail;
 		}
 

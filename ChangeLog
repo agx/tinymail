@@ -1,3 +1,20 @@
+2007-12-21 Felipe Erias Morandeira <femorandeira@igalia.com>
+
+        * libtinymail/tny-mime-part.[hc] : changed the signature of
+                tny_mime_part_write_to_stream and tny_mime_part_decode_to_stream to
+                return the number of bytes written and use a GError to notify problems.
+        * libtinymail-camel/tny-camel-mime-part.[hc] : adapted the functions that
+                implemented the previous two functions to comply with their new
+                signatures.
+        * libtinymail-camel/tny-camel-bs-mime-part.[hc] : adapted the functions
+                that implemented the previous two functions to comply with their
+                new signatures.
+        * libtinymail-camel/camel-lite/camel/providers/local/camel-maildir-store.c:
+        * libtinymailui-webkit/tny-webkit-html-mime-part-view.c:
+        * libtinymailui/tny-mime-part-save-strategy.c:
+        * libtinymail-test/tny-mime-part-test.c:
+                Small changes to use the new signatures of the two functions.
+
 2007-12-21  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Experimental support for NAMESPACE in IMAP accounts

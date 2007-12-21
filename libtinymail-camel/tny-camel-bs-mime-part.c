@@ -124,13 +124,14 @@ decode_to_stream (CamelStream *from_stream, CamelStream *stream, const gchar *en
 	return ret;
 }
 
-static void
+static gssize
 bs_camel_stream_format_text (CamelStream *from_stream, CamelStream *stream, const gchar *charset, const gchar *encoding)
 {
 	CamelStreamFilter *filter_stream;
 	CamelMimeFilterCharset *filter;
 	CamelMimeFilterWindows *windows = NULL;
-
+	gssize bytes_written = -1;
+		
 	if (g_ascii_strncasecmp (charset, "iso-8859-", 9) == 0) {
 		CamelStream *null;
 
@@ -161,19 +162,20 @@ bs_camel_stream_format_text (CamelStream *from_stream, CamelStream *stream, cons
 		camel_object_unref (filter);
 	}
 
-	decode_to_stream (from_stream, (CamelStream *)filter_stream, encoding, TRUE);
+	bytes_written = (gssize) decode_to_stream (from_stream, (CamelStream *)filter_stream, encoding, TRUE);
 	camel_stream_flush ((CamelStream *)filter_stream);
 	camel_object_unref (filter_stream);
 
 	if (windows)
 		camel_object_unref(windows);
 
-	return;
+	return bytes_written;
 }
 
-static void 
+static gssize 
 decode_from_stream_to (TnyMimePart *self, TnyStream *from_stream, TnyStream *stream, gboolean binary, gboolean decode_text)
 {
+	gssize bytes_written = -1;
 	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
 
 	if (decode_text && camel_strcase_equal (priv->bodystructure->content.type, "TEXT")) 
@@ -189,33 +191,35 @@ decode_from_stream_to (TnyMimePart *self, TnyStream *from_stream, TnyStream *str
 		if (!charset)
 			charset = "UTF-8";
 
-		bs_camel_stream_format_text (cfrom_stream, cto_stream, charset, encoding);
+		bytes_written = (gssize) bs_camel_stream_format_text (cfrom_stream, cto_stream, charset, encoding);
 
 		camel_object_unref (cfrom_stream);
 		camel_object_unref (cto_stream);
 	} else {
 		if (binary)
-			tny_stream_write_to_stream (from_stream, stream);
+			bytes_written = tny_stream_write_to_stream (from_stream, stream);
 		else {
 			CamelStream *cfrom_stream = tny_stream_camel_new (from_stream);
 			CamelStream *cto_stream = tny_stream_camel_new (stream);
 			gchar *encoding = priv->bodystructure->encoding;
 
-			decode_to_stream (cfrom_stream, cto_stream, encoding, FALSE);
+			bytes_written = (gssize) decode_to_stream (cfrom_stream, cto_stream, encoding, FALSE);
 
 			camel_object_unref (cfrom_stream);
 			camel_object_unref (cto_stream);
 		}
 	}
+	return bytes_written;
 }
 
-static void 
+static gssize 
 fetch_part (TnyMimePart *self, TnyStream *stream, gboolean decode_text)
 {
 	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
 	GError *err = NULL;
 	gboolean binary = TRUE;
 	TnyStream *from_stream;
+	gssize return_value = 0;
 
 	/* binary = !camel_strcase_equal (priv->bodystructure->content.type, "TEXT"); */
 	from_stream = tny_camel_bs_msg_receive_strategy_start_receiving_part (
@@ -224,14 +228,15 @@ fetch_part (TnyMimePart *self, TnyStream *stream, gboolean decode_text)
 	if (err) {
 		g_warning ("Error while fetching part: %s", err->message);
 		g_error_free (err);
+		return_value = -1;
 	} else if (from_stream)
-		decode_from_stream_to (self, from_stream, stream, binary, decode_text);
+		return_value = decode_from_stream_to (self, from_stream, stream, binary, decode_text);
 
 	if (from_stream)
 		g_object_unref (from_stream);
 
 
-	return;
+	return return_value;
 }
 
 static void 
@@ -402,18 +407,16 @@ tny_camel_bs_mime_part_is_attachment_default (TnyMimePart *self)
 
 }
 
-static void
-tny_camel_bs_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
+static gssize
+tny_camel_bs_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream, GError **err)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->write_to_stream_func (self, stream);
-	return;
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->write_to_stream_func (self, stream, err);
 }
 
-static void
-tny_camel_bs_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *stream)
+static gssize
+tny_camel_bs_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *stream, GError **err)
 {
-	fetch_part (self, stream, FALSE);
-	return;
+	return fetch_part (self, stream, FALSE);
 }
 
 
@@ -619,18 +622,16 @@ tny_camel_bs_mime_part_decode_to_stream_async_default (TnyMimePart *self, TnyStr
 }
 
 
-static void
-tny_camel_bs_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
+static gssize
+tny_camel_bs_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream, GError **err)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->decode_to_stream_func (self, stream);
-	return;
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->decode_to_stream_func (self, stream, err);
 }
 
-static void
-tny_camel_bs_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stream)
+static gssize
+tny_camel_bs_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stream, GError **err)
 {
-	fetch_part (self, stream, TRUE);
-	return;
+	return fetch_part (self, stream, TRUE);
 }
 
 static gint

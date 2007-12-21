@@ -132,7 +132,7 @@ START_TEST (tny_mime_part_test_stream)
 /* TODO (this one crashes)
 
 	tny_mime_part_construct_from_stream (iface, from, "text/plain");
-	tny_mime_part_write_to_stream (iface, to);
+	tny_mime_part_write_to_stream (iface, to, NULL);
 
 	while (!tny_stream_is_eos (to) && n < 1)
 	{

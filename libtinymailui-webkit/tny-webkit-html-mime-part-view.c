@@ -88,7 +88,7 @@ tny_webkit_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *par
 
 		dest = tny_webkit_stream_new (GTK_WEBKIT (self));
 		tny_stream_reset (dest);
-		tny_mime_part_decode_to_stream (part, dest);
+		tny_mime_part_decode_to_stream (part, dest, NULL);
 		g_object_unref (G_OBJECT (dest));
 
 		g_object_ref (G_OBJECT (part));

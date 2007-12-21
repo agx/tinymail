@@ -50,8 +50,8 @@ struct _TnyCamelBsMimePartClass
 	const gchar* (*get_content_type_func) (TnyMimePart *self);
 	gboolean (*content_type_is_func) (TnyMimePart *self, const gchar *content_type);
 	TnyStream* (*get_stream_func) (TnyMimePart *self);
-	void (*decode_to_stream_func) (TnyMimePart *self, TnyStream *stream);
-	void (*write_to_stream_func) (TnyMimePart *self, TnyStream *stream);
+	gssize (*decode_to_stream_func) (TnyMimePart *self, TnyStream *stream, GError **err);
+	gssize (*write_to_stream_func) (TnyMimePart *self, TnyStream *stream, GError **err);
 	gint (*construct_from_stream_func) (TnyMimePart *self, TnyStream *stream, const gchar *type);
 	const gchar* (*get_filename_func) (TnyMimePart *self);
 	const gchar* (*get_content_id_func) (TnyMimePart *self);

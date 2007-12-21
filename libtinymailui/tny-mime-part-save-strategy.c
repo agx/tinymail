@@ -78,7 +78,7 @@
  *            fd = open (uri, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
  *            if (fd != -1) {
  *                      TnyStream *stream = tny_fs_stream_new (fd);
- *                      tny_mime_part_decode_to_stream (part, stream);
+ *                      tny_mime_part_decode_to_stream (part, stream, NULL);
  *                      g_object_unref (stream);
  *            }
  *      }

@@ -618,11 +618,12 @@ tny_mime_part_get_content_location (TnyMimePart *self)
  * }
  * </programlisting></informalexample>
  *
+ * returns: Returns %-1 on error, or the number of bytes succesfully copied.
  * since: 1.0
  * audience: application-developer
  **/
-void
-tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
+gssize
+tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream, GError **err)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
@@ -631,8 +632,7 @@ tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
 	g_assert (TNY_MIME_PART_GET_IFACE (self)->write_to_stream_func != NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->write_to_stream_func (self, stream);
-	return;
+	return TNY_MIME_PART_GET_IFACE (self)->write_to_stream_func (self, stream, err);
 }
 
 
@@ -674,11 +674,12 @@ tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream)
  * }
  * </programlisting></informalexample>
  *
+ * returns: Returns %-1 on error, or the number of bytes succesfully copied.
  * since: 1.0
  * audience: application-developer
  **/
-void
-tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
+gssize
+tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream, GError **err)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
@@ -687,8 +688,7 @@ tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream)
 	g_assert (TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_func != NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_func (self, stream);
-	return;
+	return TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_func (self, stream, err);
 }
 
 
