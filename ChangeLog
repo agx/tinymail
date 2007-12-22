@@ -1,3 +1,8 @@
+2007-12-22  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Experimental support for NAMESPACE
+	* Major improvements for LIST and LSUB
+
 2007-12-21 Felipe Erias Morandeira <femorandeira@igalia.com>
 
         * libtinymail/tny-mime-part.[hc] : changed the signature of

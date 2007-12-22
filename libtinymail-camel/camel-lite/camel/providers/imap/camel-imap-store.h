@@ -160,6 +160,7 @@ struct _CamelImapStore {
 	/* NB: namespace should be handled by summary->namespace */
 	char *namespace, dir_sep, *base_url, *storage_path;
 	GHashTable *authtypes;
+	struct _namespaces *namespaces;
 
 	time_t refresh_stamp;
 	gchar *idle_prefix;

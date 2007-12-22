@@ -1044,6 +1044,7 @@ camel_folder_info_build (GPtrArray *folders, const char *namespace,
 				camel_url_set_param (url, "noselect", "yes");
 				pfi->uri = camel_url_to_string (url, 0);
 				camel_url_free (url);
+				pfi->flags |= CAMEL_FOLDER_SUBSCRIBED | CAMEL_FOLDER_NOSELECT;
 
 				g_hash_table_insert (hash, pname, pfi);
 				g_ptr_array_add (folders, pfi);
