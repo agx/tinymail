@@ -3454,7 +3454,7 @@ static void
 get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gboolean has_other, gboolean has_shared, CamelException *ex)
 {
 	CamelImapResponse *response;
-	CamelFolderInfo *fi, *hfi;
+	CamelFolderInfo *fi = NULL, *first = NULL, *hfi;
 	char *list;
 	int i, count, j;
 	GHashTable *present;
@@ -3464,7 +3464,6 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 	gboolean bah = FALSE;
 
 	if (!namespace->prefix || strlen (namespace->prefix) == 0) {
-		loops = 4;
 		bah = TRUE;
 		prefix = g_strdup_printf ("");
 		if (has_other || has_shared)
@@ -3474,78 +3473,128 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 	else
 		prefix = g_strdup(namespace->prefix);
 
+	present = g_hash_table_new(folder_hash, folder_eq);
+
+	camel_imap_store_stop_idle (imap_store);
+
 	if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT) {
+
 		if (bah)
 			loops = 2;
 		else
 			loops = 1;
-	}
 
-	present = g_hash_table_new(folder_hash, folder_eq);
+		for (j = 0; j < loops; j++) {
 
-	for (j = 0; j < loops; j++) {
+			if (j == 1) {
+				gchar *str = "INBOX";
+				g_free (prefix);
+				if (first && first->full_name)
+					str = first->full_name;
+				prefix = g_strdup_printf ("%s%c", str, namespace->delim);
+				lst = "*";
+			}
 
-		camel_imap_store_stop_idle (imap_store);
-
-		if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
 			response = camel_imap_command (imap_store, NULL, ex,
 				"%s \"%s\" %s", "LIST (SUBSCRIBED)", 
 				prefix, lst);
-		else
-			response = camel_imap_command (imap_store, NULL, ex,
-				"%s \"%s\" %s", j==1 ? "LSUB" : "LIST", 
-				prefix, lst);
 
-		if (bah && loops == 2) {
-			g_free (prefix);
-			prefix = g_strdup_printf ("INBOX%c", namespace->delim);
-			lst = "*";
-		}
+			if (!response)
+				goto fail;
 
-		if (!response)
-			goto fail;
+			for (i = 0; i < response->untagged->len; i++) {
+				list = response->untagged->pdata[i];
+				fi = parse_list_response_as_folder_info (imap_store, list);
 
-		for (i = 0; i < response->untagged->len; i++) {
-			list = response->untagged->pdata[i];
-			fi = parse_list_response_as_folder_info (imap_store, list);
-
-			if (fi) {
-				if (fi->flags & CAMEL_FOLDER_NONEXISTENT) {
-					camel_folder_info_free(fi);
-					continue;
-				}
-
-				hfi = g_hash_table_lookup(present, fi->full_name);
-
-				if (hfi == NULL) {
-
-					if (j == 1) {
-						/* It's in LSUB but not in LIST? */
-						fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
-						if ((fi->flags & (CAMEL_IMAP_FOLDER_MARKED | CAMEL_IMAP_FOLDER_UNMARKED)))
-							imap_store->capabilities |= IMAP_CAPABILITY_useful_lsub;
-					}
-
-					if (j == 0) /* From the LSUB we don't add folders */
-						g_hash_table_insert(present, fi->full_name, fi);
-					else {
-						fi->flags |= CAMEL_FOLDER_NONEXISTENT;
+				if (fi) {
+					if (fi->flags & CAMEL_FOLDER_NONEXISTENT) {
 						camel_folder_info_free(fi);
+						continue;
 					}
-				} else {
-					if (j == 1) {
-						fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
-						hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
-					}
-					if (j == 0) {
+					hfi = g_hash_table_lookup(present, fi->full_name);
+					if (hfi == NULL) {
+						g_hash_table_insert(present, fi->full_name, fi);
+						if (!first)
+							first = fi;
+					} else {
 						hfi->unread = fi->unread;
 						hfi->total = fi->total;
 					}
 				}
+				camel_imap_response_free (imap_store, response);
 			}
 		}
-		camel_imap_response_free (imap_store, response);
+	} else {
+
+		if (bah)
+			loops = 4;
+		else
+			loops = 2;
+
+		for (j = 0; j < loops; j++) {
+
+			if (j == 2) {
+				gchar *str = "INBOX";
+				g_free (prefix);
+				if (first && first->full_name)
+					str = first->full_name;
+				prefix = g_strdup_printf ("%s%c", str, namespace->delim);
+				lst = "*";
+			}
+
+			response = camel_imap_command (imap_store, NULL, ex,
+				"%s \"%s\" %s", j==1 ? "LSUB" : "LIST", 
+				prefix, lst);
+
+			if (!response)
+				goto fail;
+
+			for (i = 0; i < response->untagged->len; i++) 
+			{
+				list = response->untagged->pdata[i];
+				fi = parse_list_response_as_folder_info (imap_store, list);
+
+				if (fi) {
+					if (fi->flags & CAMEL_FOLDER_NONEXISTENT) {
+						camel_folder_info_free(fi);
+						continue;
+					}
+
+					hfi = g_hash_table_lookup(present, fi->full_name);
+
+					if (hfi == NULL) {
+
+						if (j == 1) {
+							/* It's in LSUB but not in LIST? */
+							fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
+							if ((fi->flags & (CAMEL_IMAP_FOLDER_MARKED | CAMEL_IMAP_FOLDER_UNMARKED)))
+								imap_store->capabilities |= IMAP_CAPABILITY_useful_lsub;
+						}
+
+						if (j == 0) { /* From the LSUB we don't add folders */
+							g_hash_table_insert(present, fi->full_name, fi);
+							if (!first)
+								first = fi;
+						} else {
+							fi->flags |= CAMEL_FOLDER_NONEXISTENT;
+							camel_folder_info_free(fi);
+						}
+					} else {
+						if (j == 1) {
+							fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
+							hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
+						}
+						if (j == 0) {
+							hfi->unread = fi->unread;
+							hfi->total = fi->total;
+						}
+					}
+				}
+			}
+			camel_imap_response_free (imap_store, response);
+		}
 	}
+
 
 	g_free (prefix);
 
