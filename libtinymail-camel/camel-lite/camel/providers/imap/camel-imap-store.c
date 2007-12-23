@@ -3798,7 +3798,8 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto fail;
 
-	if (top[0] == 0) {
+	if (imap_store->capabilities & IMAP_CAPABILITY_NAMESPACE) 
+	{
 		struct _namespaces *ns = imap_store->namespaces;
 
 		/* Asking LIST and LSUB recursively is fine for the personal 
@@ -3834,23 +3835,35 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 			goto fail;
 
 	} else {
-		char *pattern;
-		int i;
-		char *name;
-		name = camel_imap_store_summary_full_from_path(imap_store->summary, top);
-		if (name == NULL)
-			name = camel_imap_store_summary_path_to_full(imap_store->summary, top, imap_store->dir_sep);
-		i = strlen(name);
-		pattern = g_alloca(i+5);
-		strcpy(pattern, name);
-		g_free(name);
-		if (imap_store->dir_sep) {
-			pattern[i] = imap_store->dir_sep;
-			pattern[i+1] = (flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?'*':'%';
-			pattern[i+2] = 0;
-			get_folders_sync(imap_store, pattern, ex);
+
+		/* No NAMESPACE capability */
+
+		if (strlen (top) > 0) {
+			char *pattern;
+			int i;
+			char *name;
+			name = camel_imap_store_summary_full_from_path(imap_store->summary, top);
+			if (name == NULL)
+				name = camel_imap_store_summary_path_to_full(imap_store->summary, top, imap_store->dir_sep);
+			i = strlen (name);
+			pattern = g_alloca(i+5);
+			strcpy (pattern, name);
+			g_free (name);
+
+			if (imap_store->dir_sep) {
+				pattern[i] = imap_store->dir_sep;
+				pattern[i+1] = (flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?'*':'%';
+				pattern[i+2] = 0;
+				get_folders_sync(imap_store, pattern, ex);
+			} else {
+				pattern[i] = '/'; /* Guess */
+				pattern[i+1] = (flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?'*':'%';
+				pattern[i+2] = 0;
+				get_folders_sync(imap_store, pattern, ex);
+			}
 		} else
-			get_folders_sync(imap_store, pattern, ex);
+			get_folders_sync(imap_store, 
+				(flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?"*":"%", ex);
 
 		if (camel_exception_is_set(ex))
 			goto fail;
