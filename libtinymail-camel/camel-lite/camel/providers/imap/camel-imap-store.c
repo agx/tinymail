@@ -3461,8 +3461,11 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 	CamelStoreInfo *si;
 	int loops = 2;
 	char *prefix, *lst = "*";
+	gboolean bah = FALSE;
 
 	if (!namespace->prefix || strlen (namespace->prefix) == 0) {
+		loops = 4;
+		bah = TRUE;
 		prefix = g_strdup_printf ("");
 		if (has_other || has_shared)
 			lst = "%";
@@ -3471,8 +3474,12 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 	else
 		prefix = g_strdup(namespace->prefix);
 
-	if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
-		loops = 1;
+	if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT) {
+		if (bah)
+			loops = 2;
+		else
+			loops = 1;
+	}
 
 	present = g_hash_table_new(folder_hash, folder_eq);
 
@@ -3488,6 +3495,12 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 			response = camel_imap_command (imap_store, NULL, ex,
 				"%s \"%s\" %s", j==1 ? "LSUB" : "LIST", 
 				prefix, lst);
+
+		if (bah && loops == 2) {
+			g_free (prefix);
+			prefix = g_strdup_printf ("INBOX%c", namespace->delim);
+			lst = "*";
+		}
 
 		if (!response)
 			goto fail;
