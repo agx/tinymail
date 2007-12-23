@@ -3451,7 +3451,7 @@ fail:
 
 
 static void
-get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, CamelException *ex)
+get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gboolean has_other, gboolean has_shared, CamelException *ex)
 {
 	CamelImapResponse *response;
 	CamelFolderInfo *fi, *hfi;
@@ -3460,6 +3460,16 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, Ca
 	GHashTable *present;
 	CamelStoreInfo *si;
 	int loops = 2;
+	char *prefix, *lst = "*";
+
+	if (!namespace->prefix || strlen (namespace->prefix) == 0) {
+		prefix = g_strdup_printf ("");
+		if (has_other || has_shared)
+			lst = "%";
+	} else if (namespace->prefix[strlen(namespace->prefix)-1] != namespace->delim)
+		prefix = g_strdup_printf ("%s%c", namespace->prefix, namespace->delim);
+	else
+		prefix = g_strdup(namespace->prefix);
 
 	if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
 		loops = 1;
@@ -3472,13 +3482,12 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, Ca
 
 		if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
 			response = camel_imap_command (imap_store, NULL, ex,
-				"%s \"%s\" %G", "LIST (SUBSCRIBED)",
-				(strlen (namespace->prefix) > 0)?"*":"%");
+				"%s \"%s\" %s", "LIST (SUBSCRIBED)", 
+				prefix, lst);
 		else
 			response = camel_imap_command (imap_store, NULL, ex,
-				"%s \"%s\" %G", j==1 ? "LSUB" : "LIST",
-				namespace->prefix, 
-				(strlen (namespace->prefix) > 0)?"*":"%");
+				"%s \"%s\" %s", j==1 ? "LSUB" : "LIST", 
+				prefix, lst);
 
 		if (!response)
 			goto fail;
@@ -3524,6 +3533,8 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, Ca
 		}
 		camel_imap_response_free (imap_store, response);
 	}
+
+	g_free (prefix);
 
 	/* Sync summary to match */
 
@@ -3678,7 +3689,10 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 		struct _namespaces *ns = imap_store->namespaces;
 
 		if (ns->personal)
-			get_folders_sync_ns (imap_store, ns->personal, ex);
+			get_folders_sync_ns (imap_store, ns->personal, 
+				(gboolean) ns->other, 
+				(gboolean) ns->shared, ex);
+
 		if (camel_exception_is_set(ex))
 			goto fail;
 
