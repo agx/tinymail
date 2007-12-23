@@ -63,7 +63,9 @@ extern guint tny_folder_signals[TNY_FOLDER_LAST_SIGNAL];
 enum _TnyFolderCaps
 {
 	TNY_FOLDER_CAPS_WRITABLE = 1<<0,
-	TNY_FOLDER_CAPS_PUSHEMAIL = 1<<1
+	TNY_FOLDER_CAPS_PUSHEMAIL = 1<<1,
+	TNY_FOLDER_CAPS_NOSELECT = 1<<2,
+	TNY_FOLDER_CAPS_NOCHILDREN = 1<<3
 };
 
 typedef enum _TnyFolderCaps TnyFolderCaps;

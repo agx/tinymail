@@ -4703,6 +4703,12 @@ _tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 
 	priv->iter = iter;
+
+	if (iter->flags & CAMEL_FOLDER_NOCHILDREN)
+		priv->caps |= TNY_FOLDER_CAPS_NOCHILDREN;
+	if (iter->flags & CAMEL_FOLDER_NOSELECT)
+		priv->caps |= TNY_FOLDER_CAPS_NOSELECT;
+
 	priv->iter_parented = TRUE;
 
 	return;
