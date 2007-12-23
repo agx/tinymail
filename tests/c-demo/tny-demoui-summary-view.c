@@ -82,12 +82,6 @@ static GObjectClass *parent_class = NULL;
 #include <tny-folder-monitor.h>
 
 
-#ifdef ASYNCWORKER
-#include <tny-async-worker-queue.h>
-#include <tny-get-msg-queue.h>
-#endif
-
-
 typedef struct _TnyDemouiSummaryViewPriv TnyDemouiSummaryViewPriv;
 
 struct _TnyDemouiSummaryViewPriv
@@ -1088,55 +1082,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 	}
 }
 
-#ifdef ASYNCWORKER
-static TnyQueue *fullqueue = NULL;
-static TnyQueue *real_queue = NULL;
-
-static TnyQueue*
-get_queue (void)
-{
-	if (!real_queue)
-		real_queue = tny_async_worker_queue_new_from_scratch ();
-	return real_queue;
-}
-
-static void 
-on_full_download_folder_activate (GtkMenuItem *mitem, gpointer user_data)
-{
-	TnyDemouiSummaryView *self = user_data;
-	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
-	GtkTreeIter iter;
-	GtkTreeModel *model;
-
-	if (gtk_tree_selection_get_selected (priv->mailbox_select, &model, &iter))
-	{
-		gint type;
-
-		gtk_tree_model_get (model, &iter, 
-			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
-			&type, -1);
-
-		if (type != TNY_FOLDER_TYPE_ROOT) 
-		{ 
-			TnyFolder *folder;
-
-			gtk_tree_model_get (model, &iter, 
-				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
-				&folder, -1);
-
-
-			if (!fullqueue)
-				fullqueue = tny_get_msg_queue_new (get_queue ());
-
-			tny_get_msg_queue_full_msg_retrieval (TNY_GET_MSG_QUEUE (fullqueue), 
-				folder, NULL, NULL, status_update, self);
-
-			g_object_unref (G_OBJECT (folder));
-
-		}
-	}
-}
-#endif
 
 static void 
 on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
@@ -1675,9 +1620,6 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	int button, event_time;
 	GtkSelectionMode mode;
 	GtkWidget *mrename, *mdelete, *mcreate, *mmerge, *muncache;
-#ifdef ASYNCWORKER
-	GtkWidget *fdown;
-#endif
 
 	menu = gtk_menu_new ();
 
@@ -1685,10 +1627,6 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	mcreate = gtk_menu_item_new_with_label (_("Create folder"));
 	mdelete = gtk_menu_item_new_with_label (_("Delete folder"));
 	muncache = gtk_menu_item_new_with_label (_("Uncache account of this folder"));
-
-#ifdef ASYNCWORKER
-	fdown = gtk_menu_item_new_with_label (_("Download entire folder"));
-#endif
 
 	mode = gtk_tree_selection_get_mode (priv->mailbox_select);
 
@@ -1707,21 +1645,12 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 		G_CALLBACK (on_delete_folder_activate), user_data);
 	g_signal_connect (G_OBJECT (mmerge), "activate",
 		G_CALLBACK (on_merge_view_activate), user_data);
-#ifdef ASYNCWORKER
-	g_signal_connect (G_OBJECT (fdown), "activate",
-		G_CALLBACK (on_full_download_folder_activate), user_data);
-#endif
 
 	gtk_menu_prepend (menu, mrename);
 	gtk_menu_prepend (menu, mcreate);
 	gtk_menu_prepend (menu, mdelete);
 	gtk_menu_prepend (menu, muncache);
 	gtk_menu_prepend (menu, mmerge);
-#ifdef ASYNCWORKER
-	gtk_menu_prepend (menu, fdown);
-
-	gtk_widget_show (fdown);
-#endif
 	gtk_widget_show (mrename);
 	gtk_widget_show (mcreate);
 	gtk_widget_show (mdelete);

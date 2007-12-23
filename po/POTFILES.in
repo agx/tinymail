@@ -337,13 +337,7 @@ libtinymail/tny-noop-lockable.c
 libtinymail/tny-signals-marshal.c
 libtinymail-tp/tny-tp-mail-notifier.c
 libtinymail-acap/tny-acap-account-store.c
-libtinymail-queues/tny-get-msg-queue.c
-libtinymail-queues/tny-generic-send-queue.c
-libtinymail-queues/tny-queue.c
-libtinymail-queues/tny-queue-task.c
 libtinymailui-gnome-keyring/tny-gnome-keyring-password-getter.c
-libtinymail-asyncworker/tny-async-worker-queue.c
-libtinymail-asyncworker/tny-async-worker-queue-task.c
 libtinymailui-webkit/tny-webkit-msg-view.c
 libtinymailui-webkit/tny-webkit-stream.c
 libtinymailui-webkit/tny-webkit-html-mime-part-view.c
