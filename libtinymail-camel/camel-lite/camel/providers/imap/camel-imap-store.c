@@ -3464,13 +3464,56 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 	gboolean bah = FALSE;
 
 	if (!namespace->prefix || strlen (namespace->prefix) == 0) {
-		bah = TRUE;
+
+		/**
+		 * NAMESPACE (("" ".") ("x" "y") ("x" "y") ... 
+		 * In this case the IMAP server didn't give us a cute namespace,
+		 * for personal but it has other namespaces. Therefore we'll
+		 * have to do two LIST requests (to get personal): 
+		 * 
+		 *    o. LIST "" %   -  and store the first in thefirst
+		 *
+		 *    o. - If there was a thefirst in the result, we ask for
+		 *         LIST "thefirst." *, 
+		 *         
+		 *       - If there was no thefirst in the result, we ask for
+		 *         LIST "INBOX." *
+		 * 
+		 * But in case there are no other namespaces than personal, we'll
+		 * just ask for LIST "" *, which will be fine (in that case) as
+		 * we won't get a huge list for the shared and other namespaces.
+		 **/
+
+ 		/* We'll start with SELECT context */
 		prefix = g_strdup_printf ("");
-		if (has_other || has_shared)
+
+ 		/* We'll start with % if we know that there are other namespaces.
+		 * The reason is that otherwise we'd ask for LIST "" * here:
+		 * That request could result in a huge LIST on some IMAP servers.
+		 * For example IMAP servers that proxy NNTP newsgroups the 
+		 * shared or other namespaces. */
+
+		if (has_other || has_shared) {
+			bah = TRUE;
 			lst = "%";
+		}
+
 	} else if (namespace->prefix[strlen(namespace->prefix)-1] != namespace->delim)
+
+		/**
+		 * NAMESPACE (("something" ".") ...
+		 * Usually, IMAP servers give you "something." in stead, but
+		 * this one didn't, so we'll just do that here. I don't really
+		 * understand from the IMAP spec what the correct way is, looks
+		 * like there's quite a bit of confusion among the IMAP server
+		 * developers about this too. So let's just cope with both here.
+		 **/
 		prefix = g_strdup_printf ("%s%c", namespace->prefix, namespace->delim);
-	else
+	else 
+		/**
+		 * NAMESPACE (("something." ".")..
+		 * This one is fine as-is. We'll just ask for LIST "something." *
+		 **/
 		prefix = g_strdup(namespace->prefix);
 
 	present = g_hash_table_new(folder_hash, folder_eq);
@@ -3478,6 +3521,9 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 	camel_imap_store_stop_idle (imap_store);
 
 	if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT) {
+
+		/* If we have LIST-EXTENDED (we can forget about LSUB if we 
+		 * add (SUBSCRIBED) and parse the flags). */
 
 		if (bah)
 			loops = 2;
@@ -3487,6 +3533,8 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 		for (j = 0; j < loops; j++) {
 
 			if (j == 1) {
+				/* If we got the first last time, ask for the 
+				 * list under that first. */
 				gchar *str = "INBOX";
 				g_free (prefix);
 				if (first && first->full_name)
@@ -3507,10 +3555,17 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 				fi = parse_list_response_as_folder_info (imap_store, list);
 
 				if (fi) {
+
+					/* If the folder was flagged \NonExistent, 
+					 * then we are simply not interested. */
+
 					if (fi->flags & CAMEL_FOLDER_NONEXISTENT) {
 						camel_folder_info_free(fi);
 						continue;
 					}
+
+					/* Else, we are */
+
 					hfi = g_hash_table_lookup(present, fi->full_name);
 					if (hfi == NULL) {
 						g_hash_table_insert(present, fi->full_name, fi);
@@ -3534,6 +3589,8 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 		for (j = 0; j < loops; j++) {
 
 			if (j == 2) {
+				/* If we got the first last time, ask for the 
+				 * list under that first. */
 				gchar *str = "INBOX";
 				g_free (prefix);
 				if (first && first->full_name)
@@ -3555,36 +3612,26 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 				fi = parse_list_response_as_folder_info (imap_store, list);
 
 				if (fi) {
-					if (fi->flags & CAMEL_FOLDER_NONEXISTENT) {
-						camel_folder_info_free(fi);
-						continue;
-					}
 
 					hfi = g_hash_table_lookup(present, fi->full_name);
-
 					if (hfi == NULL) {
 
-						if (j == 1) {
-							/* It's in LSUB but not in LIST? */
-							fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
-							if ((fi->flags & (CAMEL_IMAP_FOLDER_MARKED | CAMEL_IMAP_FOLDER_UNMARKED)))
-								imap_store->capabilities |= IMAP_CAPABILITY_useful_lsub;
-						}
-
-						if (j == 0) { /* From the LSUB we don't add folders */
+						if (j == 1 || j == 3) {
+							/* It's in LSUB but not in LIST, so it's 
+							 * a \ NonExistent (like above in LIST-EXTENDED) */
+							fi->flags |= CAMEL_FOLDER_SUBSCRIBED | CAMEL_FOLDER_NONEXISTENT;
+							camel_folder_info_free(fi);
+						} else {
 							g_hash_table_insert(present, fi->full_name, fi);
 							if (!first)
 								first = fi;
-						} else {
-							fi->flags |= CAMEL_FOLDER_NONEXISTENT;
-							camel_folder_info_free(fi);
 						}
 					} else {
-						if (j == 1) {
+						/* It's in LSUB and in LIST, so subscribed */
+						if (j == 1 || j == 3) {
 							fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
 							hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
-						}
-						if (j == 0) {
+						} else {
 							hfi->unread = fi->unread;
 							hfi->total = fi->total;
 						}
