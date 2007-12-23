@@ -3581,6 +3581,10 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 		}
 	} else {
 
+		/* If we don't have LIST-EXTENDED we'll have to ask both the
+		   LIST and the LSUB (this one is about the personal namespace,
+		   so recursively asking for all is probably fine). */
+
 		if (bah)
 			loops = 4;
 		else
@@ -3797,6 +3801,10 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 	if (top[0] == 0) {
 		struct _namespaces *ns = imap_store->namespaces;
 
+		/* Asking LIST and LSUB recursively is fine for the personal 
+		 * namespace. Whoever puts thousands of folders in his personal
+		 * namespace is just asking for it ... */
+
 		if (ns->personal)
 			get_folders_sync_ns (imap_store, ns->personal, 
 				(gboolean) ns->other, 
@@ -3805,13 +3813,23 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 		if (camel_exception_is_set(ex))
 			goto fail;
 
+		/* However, administrators sometimes put NNTP newsgroup roots 
+		 * in either Other or Shared. Therefore perhaps we should not 
+		 * ask for LIST in those namespaces. At least not for now, as 
+		 * right now we really only support recursively asking, in 
+		 * stead of node per node and using % in stead of * as wildcart
+		 * character. (recursively fetching alt.* of NNTP is not a 
+		 * very good idea nowadays...) */
+
 		if (ns->other)
 			get_folders_sync_ns_only_lsub (imap_store, ns->other, ex);
+
 		if (camel_exception_is_set(ex))
 			goto fail;
 
 		if (ns->shared)
 			get_folders_sync_ns_only_lsub (imap_store, ns->shared, ex);
+
 		if (camel_exception_is_set(ex))
 			goto fail;
 
