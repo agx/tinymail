@@ -123,9 +123,13 @@ static void
 notify_folder_store_observers_about (TnyFolderStore *self, TnyFolderStoreChange *change)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
+	TnyCamelAccountPriv *apriv = NULL;
 	GList *list, *list_iter;
 
+	if (!priv->account)
+		return;
+
+	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 	g_static_rec_mutex_lock (priv->obs_lock);
 	if (!priv->sobs) {
 		g_static_rec_mutex_unlock (priv->obs_lock);
@@ -176,9 +180,13 @@ static void
 notify_folder_observers_about (TnyFolder *self, TnyFolderChange *change)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
+	TnyCamelAccountPriv *apriv = NULL;
 	GList *list, *list_iter;
 
+	if (!priv->account)
+		return;
+
+	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 	g_static_rec_mutex_lock (priv->obs_lock);
 	if (!priv->obs) {
 		g_static_rec_mutex_unlock (priv->obs_lock);
@@ -866,6 +874,11 @@ tny_camel_folder_add_msg_async_thread (gpointer thr_user_data)
 	TnyFolder *self = info->self;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+	if (!priv->account) {
+		info->cancelled = TRUE;
+		return NULL;
+	}
+
 	g_static_rec_mutex_lock (priv->folder_lock);
 
 	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account), 
@@ -989,8 +1002,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyFolderChange *change = NULL;
 
-	if (!TNY_IS_CAMEL_MSG (msg))
-	{
+	if (!TNY_IS_CAMEL_MSG (msg)) {
 		g_critical ("You must not use a non-TnyCamelMsg implementation "
 			"of TnyMsg with TnyCamelFolder types. This indicates a "
 			"problem in the software (unsupported operation)\n");
@@ -1001,6 +1013,13 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 			priv->account, err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_ADD_MSG))
 		return;
+
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_ADD_MSG,
+			"Folder not ready for adding messages");
+		return;
+	}
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
@@ -1052,6 +1071,13 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 			priv->account, err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_REMOVE_MSG))
 		return;
+
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REMOVE_MSGS,
+			"Folder not ready for removing");
+		return;
+	}
 
 	if (!priv->remove_strat) {
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
@@ -1110,6 +1136,13 @@ tny_camel_folder_remove_msgs_default (TnyFolder *self, TnyList *headers, GError 
 			priv->account, err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_REMOVE_MSGS))
 		return;
+
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REMOVE_MSGS,
+			"Folder not ready for removing");
+		return;
+	}
 
 	if (!priv->remove_strat) {
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
@@ -1310,9 +1343,15 @@ static TnyAccount*
 tny_camel_folder_get_account_default (TnyFolder *self)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	return TNY_ACCOUNT (g_object_ref (priv->account));
+	return priv->account?TNY_ACCOUNT (g_object_ref (priv->account)):NULL;
 }
 
+static void 
+notify_account_del (gpointer user_data, GObject *parent)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (user_data);
+	priv->account = NULL;
+}
 
 void
 _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
@@ -1322,8 +1361,10 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 	g_assert (TNY_IS_CAMEL_ACCOUNT (account));
 
 	if (priv->account)
-		g_object_unref (priv->account);
-	priv->account = TNY_ACCOUNT (g_object_ref (account));
+		g_object_weak_unref (G_OBJECT (priv->account), notify_account_del, self);
+
+	g_object_weak_ref (G_OBJECT (account), notify_account_del, self);
+	priv->account = account;
 
 	if (priv->store)
 		camel_object_unref (priv->store);
@@ -1474,6 +1515,12 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 	TnyCamelAccountPriv *apriv = NULL;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
+
+	if (!priv->account) {
+		info->cancelled = TRUE;
+		return NULL;
+	}
+
 	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 
 	g_static_rec_mutex_lock (priv->folder_lock);
@@ -1505,8 +1552,7 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 			"Can't load folder %s\n", 
 			priv->folder_name?priv->folder_name:"(null)");
 
-	if (apriv)
-		_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	info->err = NULL;
 	if (camel_exception_is_set (&ex)) {
@@ -1651,9 +1697,11 @@ tny_camel_folder_refresh_async_callback (gpointer thr_user_data)
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
 
-	constrat = tny_account_get_connection_policy (priv->account);
-	tny_connection_policy_set_current (constrat, priv->account, self);
-	g_object_unref (constrat);
+	if (priv->account) {
+		constrat = tny_account_get_connection_policy (priv->account);
+		tny_connection_policy_set_current (constrat, priv->account, self);
+		g_object_unref (constrat);
+	}
 
 	tny_idle_stopper_stop (info->stopper);
 
@@ -1688,6 +1736,11 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = NULL;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+	if (!priv->account) {
+		info->cancelled = TRUE;
+		return NULL;
+	}
 
 	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 
@@ -1842,6 +1895,13 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 			TNY_FOLDER_ERROR_REFRESH))
 		return;
 
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH,
+			"Folder not ready for refresh");
+		return;
+	}
+
 	g_static_rec_mutex_lock (priv->folder_lock);
 
 	if (!load_folder_no_lock (priv))
@@ -1880,9 +1940,11 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	notify_folder_observers_about_in_idle (self, change);
 	g_object_unref (change);
 
-	constrat = tny_account_get_connection_policy (priv->account);
-	tny_connection_policy_set_current (constrat, priv->account, self);
-	g_object_unref (constrat);
+	if (priv->account) {
+		constrat = tny_account_get_connection_policy (priv->account);
+		tny_connection_policy_set_current (constrat, priv->account, self);
+		g_object_unref (constrat);
+	}
 
 	return;
 }
@@ -2070,6 +2132,13 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
 			TNY_FOLDER_ERROR, TNY_FOLDER_ERROR_REFRESH))
 		return;
+
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_REFRESH,
+			"Folder not ready for getting headers");
+		return;
+	}
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
@@ -2399,6 +2468,13 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 			TNY_FOLDER_ERROR_GET_MSG))
 		return NULL;
 
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_GET_MSG,
+			"Folder not ready for getting messages");
+		return;
+	}
+
 	g_assert (TNY_IS_HEADER (header));
 
 	if (!priv->receive_strat) {
@@ -2457,6 +2533,13 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 			priv->account, err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_GET_MSG))
 		return NULL;
+
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_GET_MSG,
+			"Folder not ready for finding messages");
+		return;
+	}
 
 	if (!priv->receive_strat) {
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
@@ -3126,6 +3209,14 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 			TNY_FOLDER_ERROR_COPY))
 		return NULL;
 
+
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_COPY,
+			"Folder not ready for copy");
+		return;
+	}
+
 	orig_store = tny_folder_get_folder_store (self);
 
 	/* If the caller is trying to move the folder to the location where it
@@ -3264,6 +3355,11 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 	CpyRecRet *cpyr;
 	TnyFolderStore *orig_store = NULL;
 
+	if (!priv->account) {
+		info->cancelled = TRUE;
+		return NULL;
+	}
+
 	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 
 	g_static_rec_mutex_lock (priv->folder_lock);
@@ -3300,8 +3396,7 @@ tny_camel_folder_copy_async_thread (gpointer thr_user_data)
 
 	info->cancelled = camel_operation_cancel_check (apriv->cancel);
 
-	if (apriv)
-		_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	info->err = NULL;
 	if (nerr != NULL)
@@ -3523,6 +3618,13 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			priv->account, err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_TRANSFER_MSGS))
 		return;
+
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_ERROR, 
+			TNY_FOLDER_ERROR_TRANSFER_MSGS,
+			"Folder not ready for transfer");
+		return;
+	}
 
 	list_length = tny_list_get_length (headers);
 
@@ -4202,13 +4304,22 @@ void
 _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, TnyFolderStoreChange *change, GError **err)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
+	TnyCamelStoreAccountPriv *apriv = NULL;
 	CamelStore *store = priv->store;
 	TnyCamelFolder *cfol = TNY_CAMEL_FOLDER (folder);
 	TnyCamelFolderPriv *cpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (cfol);
 	gchar *cfolname; gchar *folname; gint parlen;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	gboolean changed = FALSE;
+
+	if (!priv->account) {
+		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
+			TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
+			"Folder not ready for removal");
+		return;
+	}
+
+	apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 
 	g_static_rec_mutex_lock (apriv->factory_lock);
 
@@ -4390,6 +4501,9 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
 		return;
 
+	if (!priv->account)
+		return;
+
 	changes = recurse_remove (self, folder, changes, &nerr);
 
 	if (changes) {
@@ -4455,8 +4569,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 			TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
 		return NULL;
 
-	if (!name || strlen (name) <= 0)
-	{
+	if (!name || strlen (name) <= 0) {
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				"Failed to create folder with no name");
@@ -4464,8 +4577,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 		return NULL;
 	}
 
-	if (!priv->folder_name)
-	{
+	if (!priv->folder_name) {
 		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				"Failed to create folder %s", name);
@@ -4482,8 +4594,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	info = camel_store_create_folder (store, priv->folder_name, name, &ex);
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
-	if (!info || camel_exception_is_set (&ex)) 
-	{
+	if (!info || camel_exception_is_set (&ex) || !priv->account) {
 		if (camel_exception_is_set (&ex))
 			g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
@@ -4763,19 +4874,16 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 	  while (iter)
 	  {
 		/* Also take a look at camel-maildir-store.c:525 */
-		if (!(iter->flags & CAMEL_FOLDER_VIRTUAL) && _tny_folder_store_query_passes (query, iter))
+		if (!(iter->flags & CAMEL_FOLDER_VIRTUAL) && _tny_folder_store_query_passes (query, iter) && priv->account)
 		{
 			gboolean was_new = FALSE;
-
 			TnyCamelFolder *folder = (TnyCamelFolder *) tny_camel_store_account_factor_folder (
 				TNY_CAMEL_STORE_ACCOUNT (priv->account), 
 				iter->full_name, &was_new);
-
 			if (was_new)
 				_tny_camel_folder_set_folder_info (self, folder, iter);
-
 			tny_list_prepend (list, G_OBJECT (folder));
-			g_object_unref (G_OBJECT (folder));
+			g_object_unref (folder);
 		}
 		iter = iter->next;
 	  }
@@ -5320,14 +5428,13 @@ tny_camel_folder_get_url_string_default (TnyFolder *self)
 	 * Check for strlen(), because camel produces an empty (non-null) 
 	 * uri for POP. */
 
-	if (priv->iter && priv->iter->uri && (strlen (priv->iter->uri) > 0))
-	{
+	if (priv->iter && priv->iter->uri && (strlen (priv->iter->uri) > 0)) {
+
 		retval = g_strdup_printf ("%s", priv->iter->uri);
-	} else if (priv->account)
-	{
+
+	} else if (priv->account) {
 		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
-		if (apriv->service)
-		{
+		if (apriv->service) {
 			char *urls = camel_service_get_url (apriv->service);
 			if (!priv->folder)
 				load_folder_no_lock (priv);
@@ -5429,7 +5536,7 @@ tny_camel_folder_finalize (GObject *object)
 		camel_object_unref (priv->store);
 
 	if (priv->account)
-		g_object_unref (priv->account);
+		g_object_weak_unref (G_OBJECT (priv->account), notify_account_del, self);
 
 	if (priv->parent)
 		g_object_weak_unref (G_OBJECT (priv->parent), notify_parent_del, self);
@@ -5439,16 +5546,14 @@ tny_camel_folder_finalize (GObject *object)
 	g_static_rec_mutex_lock (priv->folder_lock);
 	priv->dont_fkill = FALSE;
 
-	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account))
-	{
+	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account)) {
 		TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
 		g_static_rec_mutex_lock (apriv->factory_lock);
 		apriv->managed_folders = g_list_remove (apriv->managed_folders, self);
 		g_static_rec_mutex_unlock (apriv->factory_lock);
 	}
 
-	if (!priv->iter_parented && priv->iter)
-	{
+	if (!priv->iter_parented && priv->iter) {
 		CamelStore *store = priv->store;
 		camel_store_free_folder_info (store, priv->iter);
 	}
