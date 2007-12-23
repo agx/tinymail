@@ -821,125 +821,207 @@ header_decode_lwsp(const char **in)
 	*in = inptr;
 }
 
+static void
+print_hex (unsigned char *data, size_t len)
+{
+	size_t i, x;
+	unsigned char *p = data;
+	char high, low;
+
+	x = 0;
+	printf ("%04u    ", x);
+	for (i = 0; i < len; i++) {
+		high = *p >> 4;
+		high = (high<10) ? high + '0' : high + 'a' - 10;
+
+		low = *p & 0x0f;
+		low = (low<10) ? low + '0' : low + 'a' - 10;
+
+		printf ("0x%c%c  ", high, low);
+
+		p++;
+		x++;
+		if (i % 8 == 7) {
+			printf ("\n%04u    ", x);
+		}
+	}
+	printf ("\n");
+}
+
+static size_t
+conv_to_utf8 (const char *encname, char *in, size_t inlen, char *out, size_t outlen)
+{
+	char *charset, *inbuf, *outbuf;
+	iconv_t ic;
+	size_t inbuf_len, outbuf_len, ret;
+
+	charset = (char *) e_iconv_charset_name (encname);
+
+	ic = e_iconv_open ("UTF-8", charset);
+	if (ic == (iconv_t) -1) {
+		printf ("e_iconv_open() error\n");
+		return (size_t)-1;
+	}
+
+	inbuf = in;
+	inbuf_len = inlen;
+
+	outbuf = out;
+	outbuf_len = outlen;
+
+	ret = e_iconv (ic, (const char **) &inbuf, &inbuf_len, &outbuf, &outbuf_len);
+	if (ret == (size_t)-1) {
+		printf ("e_iconv() error! source charset is %s, target charset is %s\n", charset, "UTF-8");
+		printf ("converted %u bytes, but last %u bytes can't convert!!\n", inlen - inbuf_len, inbuf_len);
+		printf ("source data:\n");
+		print_hex (in, inlen);
+
+		*outbuf = '\0';
+		printf ("target string is \"%s\"\n", out);
+
+		return (size_t)-1;
+	}
+
+	ret = outlen - outbuf_len;
+	out[ret] = '\0';
+
+	e_iconv_close (ic);
+
+	return ret;
+}
+
 /* decode rfc 2047 encoded string segment */
+#define DECWORD_LEN 1024
+#define UTF8_DECWORD_LEN 2048
+
 static char *
 rfc2047_decode_word(const char *in, size_t len)
 {
-	const char *inptr = in+2;
-	const char *inend = in+len-2;
-	const char *inbuf;
-	const char *charset;
-	char *encname, *p;
-	int tmplen;
-	size_t ret;
-	char *decword = NULL;
-	char *decoded = NULL;
-	char *outbase = NULL;
-	char *outbuf;
-	size_t inlen, outlen;
-	gboolean retried = FALSE;
-	iconv_t ic;
-	int idx = 0;
+	char prev_charset[32], curr_charset[32];
+	char encode;
+	char *start, *inptr, *inend;
+	char decword[DECWORD_LEN], utf8_decword[UTF8_DECWORD_LEN];
+	char *decword_ptr, *utf8_decword_ptr;
+	size_t inlen, outlen, ret;
 
 	d(printf("rfc2047: decoding '%.*s'\n", len, in));
 
-	/* quick check to see if this could possibly be a real encoded word */
+	prev_charset[0] = curr_charset[0] = '\0';
 
-	if (len < 8 || !(in[0] == '=' && in[1] == '?')) {
+	decword_ptr = decword;
+	utf8_decword_ptr = utf8_decword;
+
+	/* quick check to see if this could possibly be a real encoded word */
+	if (len < 8
+	    || !(in[0] == '=' && in[1] == '?'
+		 && in[len-1] == '=' && in[len-2] == '?')) {
 		d(printf("invalid\n"));
 		return NULL;
 	}
 
-	/* skip past the charset to the encoding type */
-	inptr = memchr (inptr, '?', inend-inptr);
-	if (inptr != NULL && inptr < inend + 2 && inptr[2] == '?') {
-		d(printf("found ?, encoding is '%c'\n", inptr[0]));
-		inptr++;
-		tmplen = inend-inptr-2;
-		decword = g_alloca (tmplen); /* this will always be more-than-enough room */
-		switch(toupper(inptr[0])) {
-		case 'Q':
-			inlen = quoted_decode((const unsigned char *) inptr+2, tmplen, (unsigned char *) decword);
-			break;
-		case 'B': {
-			int state = 0;
-			unsigned int save = 0;
+	inptr = (char *) in;
+	inend = (char *) (in + len);
+	outlen = sizeof(utf8_decword);
 
-			inlen = camel_base64_decode_step((unsigned char *) inptr+2, tmplen, (unsigned char *) decword, &state, &save);
-			/* if state != 0 then error? */
-			break;
+	while (inptr < inend) {
+		/* begin */
+		inptr = memchr (inptr, '?', inend-inptr);
+		if (!inptr || *(inptr-1) != '=') {
+			return NULL;
 		}
+
+		inptr++;
+
+		/* charset */
+		start = inptr;
+		inptr = memchr (inptr, '?', inend-inptr);
+		if (!inptr) {
+			return NULL;
+		}
+		strncpy (curr_charset, start, inptr-start); /* maybe overflow */
+		curr_charset[inptr-start] = '\0';
+		if (prev_charset[0] == '\0') { /* first charset in multi encode words */
+			strcpy (prev_charset, curr_charset);
+		}
+		d(printf ("curr_charset = %s\n", curr_charset));
+
+		/* if (charset.perv != charset.curr) iconv perv to utf8 */
+		if (prev_charset[0] != '\0' && strcmp(prev_charset, curr_charset)) {
+			inlen = decword_ptr - decword;
+			ret = conv_to_utf8 (prev_charset, decword, inlen, utf8_decword_ptr, outlen);
+			if (ret == (size_t)-1) {
+				printf ("conv_to_utf8() error!\n");
+				return NULL;
+			}
+
+			utf8_decword_ptr += ret;
+			outlen = outlen - ret;
+
+			decword_ptr = decword; /* reset decword_ptr */
+			strcpy (prev_charset, curr_charset);
+		}
+
+		/* encode */
+		inptr++;
+		encode = *inptr;
+		inptr++;
+		if (*inptr != '?') {
+			return NULL;
+		}
+
+		/* text */
+		inptr++;
+		start = inptr;
+		inptr = memchr (inptr, '?', inend-inptr);
+		if (!inptr || *(inptr+1) != '=') {
+			return NULL;
+		}
+
+		/* decode */
+		switch(encode) {
+
+		case 'Q':
+		case 'q':
+			inlen = quoted_decode(start, inptr-start, decword_ptr);
+			break;
+		case 'B':
+		case 'b':
+			{
+				int state = 0;
+				unsigned int save = 0;
+
+				inlen = camel_base64_decode_step(start, inptr-start, decword_ptr, &state, &save);
+				/* if state != 0 then error? */
+			}
+			break;
 		default:
 			/* uhhh, unknown encoding type - probably an invalid encoded word string */
 			return NULL;
 		}
 		d(printf("The encoded length = %d\n", inlen));
 		if (inlen > 0) {
-			/* yuck, all this snot is to setup iconv! */
-			tmplen = inptr - in - 3;
-			encname = g_alloca (tmplen + 1);
-			memcpy (encname, in + 2, tmplen);
-			encname[tmplen] = '\0';
-
-			/* rfc2231 updates rfc2047 encoded words...
-			 * The ABNF given in RFC 2047 for encoded-words is:
-			 *   encoded-word := "=?" charset "?" encoding "?" encoded-text "?="
-			 * This specification changes this ABNF to:
-			 *   encoded-word := "=?" charset ["*" language] "?" encoding "?" encoded-text "?="
-			 */
-
-			/* trim off the 'language' part if it's there... */
-			p = strchr (encname, '*');
-			if (p)
-				*p = '\0';
-
-			charset = e_iconv_charset_name (encname);
-
-			inbuf = decword;
-
-			outlen = inlen * 6 + 16;
-			outbase = g_alloca (outlen);
-			outbuf = outbase;
-
-		retry:
-			ic = e_iconv_open ("UTF-8", charset);
-			if (ic != (iconv_t) -1) {
-				ret = e_iconv (ic, &inbuf, &inlen, &outbuf, &outlen);
-				if (ret != (size_t) -1) {
-					e_iconv (ic, NULL, 0, &outbuf, &outlen);
-					*outbuf = 0;
-					decoded = g_strdup (outbase);
-				} else {
-					perror ("iconv");
-					e_iconv (ic, NULL, 0, &outbuf, &outlen);
-					*outbuf = 0;
-					decoded = g_strdup (outbase);
-					/* decoded = g_strdup (inbuf); */
-				}
-
-				e_iconv_close (ic);
-			} else {
-				w(g_warning ("Cannot decode charset, header display may be corrupt: %s: %s",
-					     charset, strerror (errno)));
-
-				if (!retried) {
-					charset = e_iconv_locale_charset ();
-					if (!charset)
-						charset = "iso-8859-1";
-
-					retried = TRUE;
-					goto retry;
-				}
-
-				/* we return the encoded word here because we've got to return valid utf8 */
-				decoded = g_strndup (in, inlen);
-			}
+			decword_ptr += inlen;
+		} else {
+			return NULL;
 		}
+
+		inptr += 2;	/* skip '?=' */
+	} /* end of "while (inptr < inend)" */
+
+	/* at last, iconv to utf8 */
+	inlen = decword_ptr - decword;
+	ret = conv_to_utf8 (curr_charset, decword, inlen, utf8_decword_ptr, outlen);
+	if (ret == (size_t)-1) {
+		printf ("conv_to_utf8() error!\n");
+		return NULL;
 	}
 
-	d(printf("decoded '%s'\n", decoded));
+	utf8_decword_ptr += ret;
+	*utf8_decword_ptr = '\0';
 
-	return decoded;
+	d(printf("decoded '%s'\n", utf8_decword));
+
+	return strdup (utf8_decword);
 }
 
 /* ok, a lot of mailers are BROKEN, and send iso-latin1 encoded
@@ -1014,66 +1096,209 @@ append_quoted_pair (GString *str, const char *in, gssize inlen)
 	return str;
 }
 
+typedef enum {
+	BEGIN,
+	BEGIN_SPACE,
+	NOENCODED_WORD,
+	ENCODED_WORD_CHARSET,
+	ENCODED_WORD_ENCODED_TEXT,
+	ENCODED_WORD_END,
+	ENCODED_WORD_END_SPACE,
+	END
+} StatsType;
+
 /* decodes a simple text, rfc822 + rfc2047 */
 static char *
 header_decode_text (const char *in, size_t inlen, int ctext, const char *default_charset)
 {
 	GString *out;
-	const char *inptr, *inend, *start, *chunk, *locale_charset;
-	GString *(* append) (GString *, const char *, gssize);
+	StatsType stats;
+	const char *inptr, *inend, *start, *locale_charset;;
 	char *dword = NULL;
-	guint32 mask;
 
 	locale_charset = e_iconv_locale_charset ();
-
-	if (ctext) {
-		mask = (CAMEL_MIME_IS_SPECIAL | CAMEL_MIME_IS_SPACE | CAMEL_MIME_IS_CTRL);
-		append = append_quoted_pair;
-	} else {
-		mask = (CAMEL_MIME_IS_LWSP);
-		append = g_string_append_len;
-	}
 
 	out = g_string_new ("");
 	inptr = in;
 	inend = inptr + inlen;
-	chunk = NULL;
 
-	while (inptr < inend) {
-		start = inptr;
-		while (inptr < inend && camel_mime_is_type (*inptr, mask))
-			inptr++;
+	stats = BEGIN;
 
-		if (inptr == inend) {
-			append (out, start, inptr - start);
-			break;
-		} else if (dword == NULL) {
-			append (out, start, inptr - start);
-		} else {
-			chunk = start;
-		}
-
-		start = inptr;
-		while (inptr < inend && !camel_mime_is_type (*inptr, mask))
-			inptr++;
-
-		dword = rfc2047_decode_word(start, inptr-start);
-		if (dword) {
-			g_string_append(out, dword);
-			g_free(dword);
-		} else {
-			if (!chunk)
-				chunk = start;
-
-			if ((default_charset == NULL || !append_8bit (out, chunk, inptr-chunk, default_charset))
-			    && (locale_charset == NULL || !append_8bit(out, chunk, inptr-chunk, locale_charset))) {
-
-			
-				append_latin1(out, chunk, inptr-chunk);
+	/* we'll get multi encoded word, and then decode them! */
+	while (stats != END) {
+		switch (stats) {
+		case BEGIN:
+			if (isspace(*inptr)) {
+				stats = BEGIN_SPACE;
+				start = inptr;
+			} else if (*inptr == '=' && *(inptr+1) == '?') {
+				stats = ENCODED_WORD_CHARSET;
+				start = inptr;
+				inptr++;
+			} else if (*inptr == '\0') {
+				stats = END;
+			} else { //if (isgraph(*inptr)) { // we accept multi-byte encode
+				stats = NOENCODED_WORD;
+				start = inptr;
 			}
+			break;
+
+		case BEGIN_SPACE:
+			if (isspace(*inptr)) {
+				/* do nothing */
+			} else if (*inptr == '=' && *(inptr+1) == '?') {
+				stats = ENCODED_WORD_CHARSET;
+				start = inptr;
+				inptr++;
+			} else if (*inptr == '\0') {
+				stats = END;
+			} else { //if (isgraph(*inptr)) { // we accept multi-byte encode
+				stats = NOENCODED_WORD;
+				start = inptr;
+			}
+			break;
+
+		case NOENCODED_WORD:
+			if (isspace(*inptr)) {
+				/* do nothing */
+			} else if (*inptr == '=' && *(inptr+1) == '?') {
+				if ((default_charset == NULL || !append_8bit (out, start, inptr - start, default_charset))
+				      && (locale_charset == NULL || !append_8bit (out, start, inptr - start, locale_charset)))
+					append_latin1 (out, start, inptr - start);
+
+				stats = ENCODED_WORD_CHARSET;
+				start = inptr;
+				inptr++;
+			} else if (*inptr == '\0') {
+				inptr--;
+				while (isspace(*inptr)) {
+					inptr--;
+				}
+				if ((default_charset == NULL || !append_8bit (out, start, inptr + 1 - start, default_charset))
+						&& (locale_charset == NULL || !append_8bit (out, start, inptr + 1 - start, locale_charset)))
+					append_latin1 (out, start, inptr - start);
+
+				stats = END;
+			} else { //if (isgraph(*inptr)) { // we accept multi-byte encode
+				/* do nothing */
+			}
+			break;
+	  
+		case ENCODED_WORD_CHARSET:
+			if (isspace (*inptr)) {
+				stats = NOENCODED_WORD;
+			} else if (*inptr == '?') {
+				inptr++;
+				if ((*inptr == 'Q' || *inptr == 'q'
+				     || *inptr == 'B' || *inptr == 'b')
+				    && *(inptr+1) == '?') {
+					inptr++;
+					stats = ENCODED_WORD_ENCODED_TEXT;
+				} else {
+					stats = NOENCODED_WORD;
+				}
+			} else if (*inptr == '\0') {
+				if ((default_charset == NULL || !append_8bit (out, start, inptr + 1 - start, default_charset))
+				      && (locale_charset == NULL || !append_8bit (out, start, inptr + 1 - start, locale_charset)))
+					append_latin1 (out, start, inptr - start);
+
+				stats = END;
+			} else if (isgraph(*inptr)) {
+				/* do nothing */
+			} else {
+				/* impossible */
+			}
+			break;
+
+		case ENCODED_WORD_ENCODED_TEXT:
+			if (isspace (*inptr)) {
+				stats = NOENCODED_WORD; /* maybe do nothing */
+			} else if (*inptr == '?' && *(inptr+1) == '=') {
+				/* we will decode it in stats ENCODED_WORD_END */
+				stats = ENCODED_WORD_END;
+				inptr++;
+			} else if (*inptr == '\0') {
+				if ((default_charset == NULL || !append_8bit (out, start, inptr + 1 - start, default_charset))
+				      && (locale_charset == NULL || !append_8bit (out, start, inptr + 1 - start, locale_charset)))
+					append_latin1 (out, start, inptr - start);
+
+				stats = END;
+			} else if (isgraph(*inptr)) {
+				/* do nothing */
+			} else {
+				/* impossible */
+			}
+			break;
+	  
+		case ENCODED_WORD_END:
+			if (isspace(*inptr)) {
+				/* fix some buggy mail clients */
+				stats = ENCODED_WORD_END_SPACE;
+			} else if (*inptr == '=' && *(inptr+1) == '?') {
+				stats = ENCODED_WORD_CHARSET;
+				inptr++;
+			} else {
+				dword = rfc2047_decode_word (start, inptr - start);
+				if (dword) {
+					g_string_append (out, dword);
+					g_free (dword);
+				} else {
+					if ((default_charset == NULL || !append_8bit (out, start, inptr + 1 - start, default_charset))
+					      && (locale_charset == NULL || !append_8bit (out, start, inptr + 1 - start, locale_charset)))
+						append_latin1 (out, start, inptr - start);
+				}
+
+				if (*inptr == '\0') {
+					stats = END;
+				} else { //if (isgraph(*inptr)) { // we accept multi-byte encode
+					start = inptr;
+					stats = NOENCODED_WORD;
+				}
+			}
+			break;
+	  
+		case ENCODED_WORD_END_SPACE:
+			if (isspace(*inptr)) {
+				/* do nothing */
+			} else if (*inptr == '=' && *(inptr+1) == '?') {
+				/* yes, combine two encoded words */
+				stats = ENCODED_WORD_CHARSET;
+				inptr++;
+			} else {
+				if (*inptr == '\0') {
+					stats = END;
+				} else { //if (isgraph(*inptr)) { // we accept multi-byte encode
+					stats = NOENCODED_WORD;
+				}
+
+				inptr--;
+				while (isspace(*inptr)) {
+					inptr--;
+				}
+				inptr++;
+
+				dword = rfc2047_decode_word (start, inptr - start);
+				if (dword) {
+					g_string_append (out, dword);
+					g_free (dword);
+				} else {
+					if ((default_charset == NULL || !append_8bit (out, start, inptr + 1 - start, default_charset))
+					      && (locale_charset == NULL || !append_8bit (out, start, inptr + 1 - start, locale_charset)))
+						append_latin1 (out, start, inptr - start);
+				}
+
+				if (stats == NOENCODED_WORD) {
+					start = inptr;
+				}
+			}
+			break;
+	  
+		default:
+			/* impossible */
+			break;
 		}
 
-		chunk = NULL;
+		inptr++;
 	}
 
 	dword = out->str;

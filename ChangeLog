@@ -3,6 +3,7 @@
 	* Removed libtinymail-queues and libtinymail-asyncworker since those
 	two libs are not going to be supported in Tinymail 1.0
 	* Improvements to the NAMESPACE, LIST and LSUB things
+	* Ported a patch for the rfc2047 decoder from Jacky gtkdict at yahoo.com.cn
 
 2007-12-22  Philip Van Hoof <pvanhoof@gnome.org>
 
