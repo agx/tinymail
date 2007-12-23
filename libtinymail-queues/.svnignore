@@ -1,9 +1,0 @@
-Makefile.in
-libtinymail-queues-1.0.pc
-config.h
-.deps
-Makefile
-.libs
-.svnignore
-stamp-h3
-libtinymail-queues.pc

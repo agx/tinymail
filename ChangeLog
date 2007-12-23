@@ -1,5 +1,11 @@
 2007-12-22  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Removed libtinymail-queues and libtinymail-asyncworker since those
+	two libs are not going to be supported in Tinymail 1.0
+	* Improvements to the NAMESPACE, LIST and LSUB things
+
+2007-12-22  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Experimental support for NAMESPACE
 	* Major improvements for LIST and LSUB
 

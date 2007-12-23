@@ -34,13 +34,6 @@ if BUILD_TP
 SUBDIRS += libtinymail-tp
 endif
 
-if BUILD_QUEUES
-SUBDIRS += libtinymail-queues
-endif
-
-if BUILD_ASYNCWORKER
-SUBDIRS += libtinymail-asyncworker
-endif
 
 SUBDIRS += tests bindings po 
 
