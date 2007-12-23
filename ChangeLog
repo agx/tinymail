@@ -1,4 +1,4 @@
-2007-12-22  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-23  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Removed libtinymail-queues and libtinymail-asyncworker since those
 	two libs are not going to be supported in Tinymail 1.0
