@@ -20,21 +20,3 @@ implements #TnySendQueue and you can also use that API with it to add messages.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT TnyGenericSendQueue ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### FUNCTION tny_generic_send_queue_new ##### -->
-<para>
-
-</para>
-
-@decorated: 
-@account: 
-@outbox: 
-@sentbox: 
-@Returns: 
-
-

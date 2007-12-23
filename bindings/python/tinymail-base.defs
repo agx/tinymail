@@ -2853,9 +2853,10 @@
 (define-method write_to_stream
   (of-object "TnyMimePart")
   (c-name "tny_mime_part_write_to_stream")
-  (return-type "none")
+  (return-type "gssize")
   (parameters
     '("TnyStream*" "stream")
+    '("GError**" "err")
   )
 )
 
@@ -2959,9 +2960,10 @@
 (define-method decode_to_stream
   (of-object "TnyMimePart")
   (c-name "tny_mime_part_decode_to_stream")
-  (return-type "none")
+  (return-type "gssize")
   (parameters
     '("TnyStream*" "stream")
+    '("GError**" "err")
   )
 )
 
@@ -3031,17 +3033,19 @@
 
 (define-virtual decode_to_stream_func
   (of-object "TnyMimePart")
-  (return-type "none")
+  (return-type "gssize")
   (parameters
     '("TnyStream*" "stream")
+    '("GError**" "err")
   )
 )
 
 (define-virtual write_to_stream_func
   (of-object "TnyMimePart")
-  (return-type "none")
+  (return-type "gssize")
   (parameters
     '("TnyStream*" "stream")
+    '("GError**" "err")
   )
 )
 

@@ -49,8 +49,6 @@ A abstract type that defines a store for accounts
 
 </para>
 
-@:
-
 @tnyaccountstore: the object which received the signal.
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
