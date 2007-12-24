@@ -859,10 +859,8 @@ rfc2047_decode_word(const char *in, size_t len)
 		decword = g_alloca (tmplen); /* this will always be more-than-enough room */
 		switch(toupper(inptr[0])) {
 		case 'Q':
-		case 'q':
 			inlen = quoted_decode((const unsigned char *) inptr+2, tmplen, (unsigned char *) decword);
 			break;
-		case 'b': 
 		case 'B': {
 			int state = 0;
 			unsigned int save = 0;
