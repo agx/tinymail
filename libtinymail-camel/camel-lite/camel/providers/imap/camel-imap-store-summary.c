@@ -403,7 +403,22 @@ CamelImapStoreNamespace *camel_imap_store_summary_namespace_new(CamelImapStoreSu
 
 void camel_imap_store_summary_namespace_add(CamelImapStoreSummary *s, CamelImapStoreNamespace *ns)
 {
-	s->namespaces = g_list_prepend (s->namespaces, ns);
+	gboolean add = TRUE;
+	GList *lst = s->namespaces;
+
+	while (lst) {
+		CamelImapStoreNamespace *n = lst->data;
+		if (n->full_name && ns->full_name && !strcmp (n->full_name, ns->full_name)) {
+			add = FALSE;
+			break;
+		}
+		lst = lst->next;
+	}
+
+	if (add)
+		s->namespaces = g_list_prepend (s->namespaces, ns);
+
+	return;
 }
 
 void camel_imap_store_summary_namespace_set(CamelImapStoreSummary *s, CamelImapStoreNamespace *ns)
