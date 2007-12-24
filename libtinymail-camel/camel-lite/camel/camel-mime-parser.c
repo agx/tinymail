@@ -1303,13 +1303,12 @@ header_done:
 static struct _header_scan_stack *
 folder_scan_content(struct _header_scan_state *s, int *lastone, char **data, size_t *length)
 {
-	int atleast = s->atleast;
-	int newatleast = 0;
-	register char *inptr=NULL;
-	char *inend = NULL;
-	char *start = NULL;
-	int len = 0;
-	struct _header_scan_stack *part = NULL;
+	int atleast = s->atleast, newatleast;
+	register char *inptr;
+	char *inend;
+	char *start;
+	int len;
+	struct _header_scan_stack *part;
 	int onboundary = FALSE;
 
 	c(printf("scanning content\n"));
@@ -1521,16 +1520,13 @@ folder_scan_init_with_stream(struct _header_scan_state *s, CamelStream *stream)
 static void
 folder_scan_step(struct _header_scan_state *s, char **databuffer, size_t *datalength)
 {
-	struct _header_scan_stack *h = NULL;
-	struct _header_scan_stack **hb = NULL;
-	const char *content = NULL;
-	const char *bound = NULL;
-	int type = 0;
-	int state = 0;
-	int seenlast = 0;
+	struct _header_scan_stack *h, *hb;
+	const char *content;
+	const char *bound;
+	int type, state, seenlast;
 	CamelContentType *ct = NULL;
-	struct _header_scan_filter *f = NULL;
-	size_t presize = 0;
+	struct _header_scan_filter *f;
+	size_t presize;
 
 /*	printf("\nSCAN PASS: state = %d '%s'\n", s->state, states[s->state]);*/
 
@@ -1573,14 +1569,14 @@ tail_recurse:
 
 		h = s->parts;
 		do {
-			hb = (struct _header_scan_stack **) folder_scan_content(s, &state, databuffer, datalength);
+			hb = folder_scan_content(s, &state, databuffer, datalength);
 			if (s->scan_pre_from && *datalength > 0) {
 				d(printf("got pre-from content %d bytes\n", *datalength));
 				return;
 			}
-		} while (hb == ((struct _header_scan_stack **) h) && *datalength>0);
+		} while (hb==h && *datalength>0);
 
-		if (*datalength==0 && hb == ((struct _header_scan_stack **) h)) {
+		if (*datalength==0 && hb==h) {
 			d(printf("found 'From '\n"));
 			s->start_of_from = folder_tell(s);
 			folder_scan_skip_line(s, h->from_line);
@@ -1663,7 +1659,7 @@ tail_recurse:
 		f = s->filters;
 
 		do {
-			hb = (struct _header_scan_stack **) folder_scan_content (s, &state, databuffer, datalength);
+			hb = folder_scan_content (s, &state, databuffer, datalength);
 
 			d(printf ("\n\nOriginal content: '"));
 			d(fwrite(*databuffer, sizeof(char), *datalength, stdout));
@@ -1680,7 +1676,7 @@ tail_recurse:
 				}
 				return;
 			}
-		} while (hb == ((struct _header_scan_stack **) h) && *datalength > 0);
+		} while (hb == h && *datalength > 0);
 
 		/* check for any filter completion data */
 		while (f) {
@@ -1707,7 +1703,7 @@ tail_recurse:
 		seenlast = FALSE;
 		do {
 			do {
-				hb = (struct _header_scan_stack **) folder_scan_content(s, &state, databuffer, datalength);
+				hb = folder_scan_content(s, &state, databuffer, datalength);
 				if (*datalength>0) {
 					/* instead of a new state, we'll just store it locally and provide
 					   an accessor function */
@@ -1723,9 +1719,9 @@ tail_recurse:
 						g_byte_array_append(h->pretext, (guint8 *) *databuffer, *datalength);
 					}
 				}
-			} while (hb == ((struct _header_scan_stack **) h) && *datalength>0);
+			} while (hb==h && *datalength>0);
 			h->prestage++;
-			if (*datalength==0 && hb == ((struct _header_scan_stack **) h) && !seenlast) {
+			if (*datalength==0 && hb==h && !seenlast) {
 				d(printf("got boundary: %s last=%d\n", hb->boundary, state));
 				s->start_of_boundary = folder_tell(s);
 				folder_scan_skip_line(s, NULL);

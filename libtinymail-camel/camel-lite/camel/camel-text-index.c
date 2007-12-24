@@ -353,7 +353,7 @@ text_index_compress(CamelIndex *idx)
 	return ret;
 }
 
-/* Attempt to camel_recover index space by compressing the indices */
+/* Attempt to recover index space by compressing the indices */
 static int
 text_index_compress_nosync(CamelIndex *idx)
 {

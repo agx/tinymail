@@ -115,16 +115,16 @@ init_header_name_table(void)
 	g_hash_table_insert (header_name_table, "Content-Type", (gpointer)HEADER_CONTENT_TYPE);
 
 	header_formatted_table = g_hash_table_new (camel_strcase_hash, camel_strcase_equal);
-	g_hash_table_insert(header_formatted_table, "Content-Type", (gpointer)write_raw);
-	g_hash_table_insert(header_formatted_table, "Content-Disposition", (gpointer)write_raw);
-	g_hash_table_insert(header_formatted_table, "To", (gpointer)write_raw);
-	g_hash_table_insert(header_formatted_table, "From", (gpointer)write_raw);
-	g_hash_table_insert(header_formatted_table, "Reply-To", (gpointer)write_raw);
-	g_hash_table_insert(header_formatted_table, "Cc", (gpointer)write_raw);
-	g_hash_table_insert(header_formatted_table, "Bcc", (gpointer)write_raw);
-	g_hash_table_insert(header_formatted_table, "Message-ID", (gpointer)write_raw);
-	g_hash_table_insert(header_formatted_table, "In-Reply-To", (gpointer)write_raw);
-	g_hash_table_insert(header_formatted_table, "References", (gpointer)write_references);
+	g_hash_table_insert(header_formatted_table, "Content-Type", write_raw);
+	g_hash_table_insert(header_formatted_table, "Content-Disposition", write_raw);
+	g_hash_table_insert(header_formatted_table, "To", write_raw);
+	g_hash_table_insert(header_formatted_table, "From", write_raw);
+	g_hash_table_insert(header_formatted_table, "Reply-To", write_raw);
+	g_hash_table_insert(header_formatted_table, "Cc", write_raw);
+	g_hash_table_insert(header_formatted_table, "Bcc", write_raw);
+	g_hash_table_insert(header_formatted_table, "Message-ID", write_raw);
+	g_hash_table_insert(header_formatted_table, "In-Reply-To", write_raw);
+	g_hash_table_insert(header_formatted_table, "References", write_references);
 }
 
 static void

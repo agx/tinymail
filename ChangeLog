@@ -1,3 +1,7 @@
+2007-12-24  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Merging with Camel upstream
+
 2007-12-23  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Removed libtinymail-queues and libtinymail-asyncworker since those

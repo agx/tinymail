@@ -839,7 +839,6 @@ rfc2047_decode_word(const char *in, size_t len)
 	size_t inlen, outlen;
 	gboolean retried = FALSE;
 	iconv_t ic;
-	int idx = 0;
 
 	d(printf("rfc2047: decoding '%.*s'\n", len, in));
 
@@ -916,7 +915,6 @@ rfc2047_decode_word(const char *in, size_t len)
 					decoded = g_strdup (outbase);
 					/* decoded = g_strdup (inbuf); */
 				}
-
 				e_iconv_close (ic);
 			} else {
 				w(g_warning ("Cannot decode charset, header display may be corrupt: %s: %s",
@@ -1066,11 +1064,8 @@ header_decode_text (const char *in, size_t inlen, int ctext, const char *default
 				chunk = start;
 
 			if ((default_charset == NULL || !append_8bit (out, chunk, inptr-chunk, default_charset))
-			    && (locale_charset == NULL || !append_8bit(out, chunk, inptr-chunk, locale_charset))) {
-
-			
+			    && (locale_charset == NULL || !append_8bit(out, chunk, inptr-chunk, locale_charset)))
 				append_latin1(out, chunk, inptr-chunk);
-			}
 		}
 
 		chunk = NULL;
@@ -3102,7 +3097,7 @@ camel_header_param_list_format_append (GString *out, struct _camel_header_param 
 			continue;
 		}
 
-		value = header_encode_param ((char *) p->value, &encoded);
+		value = header_encode_param ((unsigned char *) p->value, &encoded);
 		if (!value) {
 			w(g_warning ("appending parameter %s=%s violates rfc2184", p->name, p->value));
 			value = g_strdup (p->value);
