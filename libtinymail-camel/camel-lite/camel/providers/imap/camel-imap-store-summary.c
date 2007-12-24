@@ -169,7 +169,7 @@ camel_imap_store_summary_full_name(CamelImapStoreSummary *s, const char *full_na
 	for (i=0;i<count;i++) {
 		info = (CamelImapStoreInfo *)camel_store_summary_index((CamelStoreSummary *)s, i);
 		if (info) {
-			if (strcmp(info->full_name, full_name) == 0)
+			if (info->full_name && strcmp(info->full_name, full_name) == 0)
 				return info;
 			camel_store_summary_info_free((CamelStoreSummary *)s, (CamelStoreInfo *)info);
 		}
@@ -293,6 +293,40 @@ camel_imap_store_summary_path_to_full(CamelImapStoreSummary *s, const char *path
 	return f;
 }
 
+static void 
+create_parents (CamelImapStoreSummary *s, const char *path)
+{
+	gchar *p = g_strdup (path);
+	int i = 1, len = strlen (p);
+
+	while (i < len) {
+		char tmp;
+		if (p[i] == '/') {
+			tmp = p[i];
+			p[i]=0;
+			if (!(!strcmp (path, p))) {
+				CamelImapStoreInfo *info;
+
+				info = camel_imap_store_summary_full_name(s, p);
+
+				if (!info) {
+					info = (CamelImapStoreInfo *)camel_store_summary_add_from_path((CamelStoreSummary *)s, p);
+					if (info)
+						camel_store_info_set_string((CamelStoreSummary *)s, (CamelStoreInfo *)info, CAMEL_IMAP_STORE_INFO_FULL_NAME, p);
+				}
+
+				/* if (info) this is a leak, but for some reason it otherwise crashes ... :(
+				 *	camel_store_summary_info_free((CamelStoreSummary *)s, (CamelStoreInfo *)info);
+				 */
+			}
+			p[i]=tmp;
+		}
+		i++;
+	}
+	g_free (p);
+}
+
+
 CamelImapStoreInfo *
 camel_imap_store_summary_add_from_full(CamelImapStoreSummary *s, const char *full, char dir_sep)
 {
@@ -341,7 +375,10 @@ camel_imap_store_summary_add_from_full(CamelImapStoreSummary *s, const char *ful
 		pathu8 = camel_imap_store_summary_full_to_path(s, full_name, dir_sep);
 	}
 
+	create_parents (s, pathu8);
+
 	info = (CamelImapStoreInfo *)camel_store_summary_add_from_path((CamelStoreSummary *)s, pathu8);
+
 	if (info) {
 		d(printf("  '%s' -> '%s'\n", pathu8, full_name));
 		camel_store_info_set_string((CamelStoreSummary *)s, (CamelStoreInfo *)info, CAMEL_IMAP_STORE_INFO_FULL_NAME, full_name);

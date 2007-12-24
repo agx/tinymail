@@ -612,7 +612,7 @@ camel_store_summary_add_from_path(CamelStoreSummary *s, const char *path)
 
 	info = g_hash_table_lookup(s->folders_path, path);
 	if (info != NULL) {
-		g_warning("Trying to add folder '%s' to summary that already has it", path);
+		/* g_warning("Trying to add folder '%s' to summary that already has it", path); */
 		info = NULL;
 	} else {
 		info = camel_store_summary_info_new_from_path(s, path);

@@ -1,6 +1,10 @@
 2007-12-24  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Merging with Camel upstream
+	* When offline, folders in namespace that had a parent that was not
+	subscribed, were not accessible. This was because the parents where
+	not created, as LSUB didn't list those. This patch creates the
+	parents.
 
 2007-12-23  Philip Van Hoof <pvanhoof@gnome.org>
 
