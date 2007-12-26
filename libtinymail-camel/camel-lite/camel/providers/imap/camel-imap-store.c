@@ -1002,8 +1002,13 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (!must_tls && (not_ssl || ssl_mode != MODE_TLS))
 	{
 		/* LOGINDISABLED but no SSL either? :-\ */
-		if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED)
-			return FALSE;
+		if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED) {
+			clean_quit = TRUE;
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				"Failed to connect to IMAP server %s: %s",
+				service->url->host, "LOGINDISABLED");
+			goto exception;
+		}
 
 		/* we're done */
 		return TRUE;
@@ -1070,7 +1075,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		clean_quit = TRUE;
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 			_("Failed to connect to IMAP server %s in secure mode: %s"),
-			service->url->host, _("Unknown error"));
+			service->url->host, _("LOGINDISABLED"));
 		goto exception;
 	}
 
