@@ -1001,6 +1001,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 
 	if (!must_tls && (not_ssl || ssl_mode != MODE_TLS))
 	{
+		/* LOGINDISABLED but no SSL either? :-\ */
+		if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED)
+			return FALSE;
+
 		/* we're done */
 		return TRUE;
 	}
