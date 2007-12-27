@@ -1,3 +1,7 @@
+2007-12-27  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Updates from Camel upstream, rfc 2047 decoder
+
 2007-12-26  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Committed Jeffrey Stedfast's patch for Camel upstream to
