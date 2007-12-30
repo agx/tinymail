@@ -48,6 +48,7 @@ struct _bodystruct {
 	guint ref_count;
 };
 
+
 bodystruct_t * bodystruct_parse (guchar *inbuf, guint inlen, GError **err);
 void bodystruct_free (bodystruct_t *node);
 

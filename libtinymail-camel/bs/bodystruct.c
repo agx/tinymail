@@ -429,6 +429,7 @@ read_unknown_qstring (unsigned char **in, unsigned char *inend, GError **err)
 }
 
 
+
 static struct _envelope *
 decode_envelope (unsigned char **in, unsigned char *inend, GError **err)
 {
@@ -1123,6 +1124,20 @@ bodystruct_parse (guchar *inbuf, guint inlen, GError **err)
 	return r;
 }
 
+envelope_t*
+envelope_parse (guchar *inbuf, guint inlen, GError **err)
+{
+	unsigned char *start = (unsigned char  *) strstr ((const char *) inbuf, "ENVELOPE");
+	int lendif;
+
+	if (!start)
+		return decode_envelope (&inbuf, inbuf + inlen, err);
+
+	start += 8;
+	lendif = (int) start - (int) inbuf;
+
+	return decode_envelope (&start, (unsigned char *) ( start + (inlen - lendif) ), err);
+}
 
 
 
