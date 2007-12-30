@@ -795,14 +795,13 @@ maildir_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChange
 			g_free(name);
 		} else if (mdi && (mdi->info.info.flags & CAMEL_MESSAGE_FOLDER_FLAGGED)) {
 			char *newname = camel_maildir_summary_info_to_name(mdi);
-			char *dest, *t;
+			char *dest;
 
 			/* do we care about additional metainfo stored inside the message? */
 			/* probably should all go in the filename? */
 
 			/* have our flags/ i.e. name changed? */
-			t = camel_maildir_get_filename (cls->folder_path, mdi, info->uid);
-			if (strcmp(newname, t)) {
+			if (strcmp(newname, camel_maildir_info_filename (mdi))) {
 				name = g_strdup_printf("%s/cur/%s", cls->folder_path, camel_maildir_info_filename(mdi));
 				dest = g_strdup_printf("%s/cur/%s", cls->folder_path, newname);
 				rename(name, dest);
@@ -815,7 +814,6 @@ maildir_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChange
 			} else {
 				g_free(newname);
 			}
-			g_free (t);
 
 			/* strip FOLDER_MESSAGE_FLAGED, etc */
 			mdi->info.info.flags &= 0xffff;
