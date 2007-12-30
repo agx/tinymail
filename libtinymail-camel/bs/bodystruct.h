@@ -54,7 +54,9 @@ void bodystruct_free (bodystruct_t *node);
 
 const gchar* mimeparam_get_value_for (mimeparam_t *mp, const gchar *key);
 
+#ifdef DEBUG
 void bodystruct_dump (bodystruct_t *part);
+#endif
 
 G_END_DECLS
 

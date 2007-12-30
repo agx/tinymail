@@ -928,7 +928,7 @@ mimeparam_get_value_for (mimeparam_t *mp, const gchar *key)
 	return NULL;
 }
 
-
+#ifdef DEBUG
 static void
 bodystruct_dump_r (bodystruct_t *part, gint depth)
 {
@@ -1061,6 +1061,13 @@ bodystruct_dump_r (bodystruct_t *part, gint depth)
 }
 
 void
+bodystruct_dump (bodystruct_t *part)
+{
+	bodystruct_dump_r (part, 0);
+}
+#endif
+
+void
 bodystruct_free (bodystruct_t *node)
 {
 	struct _bodystruct *next;
@@ -1099,11 +1106,6 @@ bodystruct_free (bodystruct_t *node)
 	}
 }
 
-void
-bodystruct_dump (bodystruct_t *part)
-{
-	bodystruct_dump_r (part, 0);
-}
 
 bodystruct_t *
 bodystruct_parse (guchar *inbuf, guint inlen, GError **err)
