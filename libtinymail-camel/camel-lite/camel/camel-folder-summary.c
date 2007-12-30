@@ -711,6 +711,7 @@ perform_content_info_load(CamelFolderSummary *s)
 }
 
 
+
 /**
  * camel_folder_summary_load:
  * @summary: a #CamelFolderSummary object

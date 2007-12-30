@@ -50,6 +50,7 @@ CamelFolder *camel_maildir_folder_new(CamelStore *parent_store, const char *full
 /* Standard Camel function */
 CamelType camel_maildir_folder_get_type(void);
 
+
 G_END_DECLS
 
 #endif /* CAMEL_MAILDIR_FOLDER_H */

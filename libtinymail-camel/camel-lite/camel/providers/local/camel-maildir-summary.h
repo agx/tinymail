@@ -71,8 +71,10 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info);
 int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char *name);
 
 /* TODO: could proably use get_string stuff */
-#define camel_maildir_info_filename(x) (((CamelMaildirMessageInfo *)x)->filename)
+#define camel_maildir_info_filename(x) (((CamelMaildirMessageInfo *)x)->filename?((CamelMaildirMessageInfo *)x)->filename:"")
 #define camel_maildir_info_set_filename(x, s) (g_free(((CamelMaildirMessageInfo *)x)->filename),((CamelMaildirMessageInfo *)x)->filename = s)
+
+char *camel_maildir_get_filename (const gchar *fpath, CamelMaildirMessageInfo *mdi, const gchar *uid);
 
 G_END_DECLS
 

@@ -143,7 +143,6 @@ camel_local_summary_construct(CamelLocalSummary *new, const char *filename, cons
 	new->index = index;
 	if (index)
 		camel_object_ref((CamelObject *)index);
-	camel_folder_summary_load ((CamelFolderSummary *) new);
 }
 
 static int

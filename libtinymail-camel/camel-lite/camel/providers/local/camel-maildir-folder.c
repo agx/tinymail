@@ -191,7 +191,7 @@ maildir_append_message (CamelFolder *folder, CamelMimeMessage *message, const Ca
 		goto fail_write;
 
 	/* now move from tmp to cur (bypass new, does it matter?) */
-	dest = g_strdup_printf("%s/cur/%s", lf->folder_path, camel_maildir_info_filename (mdi));
+	dest = camel_maildir_get_filename (lf->folder_path, mdi, mi->uid);
 	if (rename (name, dest) == -1)
 		goto fail_write;
 
@@ -230,6 +230,7 @@ maildir_append_message (CamelFolder *folder, CamelMimeMessage *message, const Ca
 	g_free (dest);
 }
 
+
 static CamelMimeMessage *
 maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveType type, gint param, CamelException * ex)
 {
@@ -237,7 +238,8 @@ maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveT
 	CamelStream *message_stream = NULL;
 	CamelMimeMessage *message = NULL;
 	CamelMessageInfo *info;
-	char *name;
+	char *name, *filen; 
+	gboolean nfree = FALSE;
 	CamelMaildirMessageInfo *mdi;
 
 	d(printf("getting message: %s\n", uid));
@@ -256,8 +258,7 @@ maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveT
 
 	mdi = (CamelMaildirMessageInfo *)info;
 
-	/* what do we do if the message flags (and :info data) changes?  filename mismatch - need to recheck I guess */
-	name = g_strdup_printf("%s/cur/%s", lf->folder_path, camel_maildir_info_filename(mdi));
+	name = camel_maildir_get_filename (lf->folder_path, mdi, uid);
 
 	camel_message_info_free(info);
 
@@ -304,7 +305,7 @@ maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *m
 	mdi = (CamelMaildirMessageInfo *)info;
 
 	/* write it out to tmp, use the uid we got from the summary */
-	name = g_strdup_printf("%s/tmp/%s", lf->folder_path, camel_maildir_info_filename(mdi));
+	name = g_strdup_printf("%s/tmp/%s", lf->folder_path, info->uid);
 	output_stream = camel_stream_fs_new_with_name (name, O_WRONLY|O_CREAT, 0600);
 	if (output_stream == NULL)
 		goto fail_write;
@@ -314,7 +315,7 @@ maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *m
 		goto fail_write;
 
 	/* now move from tmp to cur (bypass new, does it matter?) */
-	dest = g_strdup_printf("%s/cur/%s", lf->folder_path, camel_maildir_info_filename(mdi));
+	dest = camel_maildir_get_filename (lf->folder_path, mdi, info->uid);
 	if (rename (name, dest) == -1)
 		goto fail_write;
 
