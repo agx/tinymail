@@ -636,6 +636,7 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 	camel_folder_summary_prepare_hash ((CamelFolderSummary *)cls);
 
 	while ( (d = readdir(dir)) ) {
+		gboolean mfree = FALSE;
 
 		camel_operation_progress(NULL, count, total);
 		count++;
@@ -654,10 +655,12 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 		if (!uid)
 			uid = strchr(d->d_name, ':');
 
-		if (uid)
-			uid = g_strndup(d->d_name, uid - d->d_name);
-		else
-			uid = g_strdup(d->d_name);
+		if (uid) {
+			uid =  g_strndup(d->d_name, uid - d->d_name);
+			mfree = TRUE;
+		} else
+			uid = d->d_name;
+
 
 		info = camel_folder_summary_uid ((CamelFolderSummary *)cls, uid);
 		if (info == NULL) {
@@ -670,7 +673,8 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 		} else
 			camel_message_info_free(info);
 
-		g_free(uid);
+		if (mfree)
+			g_free(uid);
 	}
 	closedir(dir);
 
@@ -686,8 +690,6 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 		while ( (d = readdir(dir)) )
 			total++;
 		rewinddir(dir);
-
-		camel_folder_summary_prepare_hash (s);
 
 		while ( (d = readdir(dir)) ) {
 			char *name, *newname, *destname, *destfilename;
@@ -736,7 +738,6 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 			g_free(src);
 			g_free(dest);
 		}
-		camel_folder_summary_kill_hash (s);
 
 		camel_operation_end(NULL);
 	}
