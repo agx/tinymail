@@ -31,7 +31,8 @@ One laptop per child
 
 svn co https://svn.tinymail.org/svn/tinymail
 cd tinymail/trunk
-./autogen.sh --prefix=/opt/tinymail-olpc --with-platform=olpc
+./autogen.sh --prefix=/opt/tinymail-olpc --with-platform=olpc \
+	--enable-imap-part-fetch
 make && make install
 
 Now simply copy /opt/tinymail-olpc to the device
@@ -62,7 +63,8 @@ GPE
 
 svn co https://svn.tinymail.org/svn/tinymail
 cd tinymail/trunk
-./autogen.sh --prefix=/opt/tinymail --with-platform=gpe
+./autogen.sh --prefix=/opt/tinymail --with-platform=gpe \
+	--enable-imap-part-fetch
 make && make install
 
 Now run /opt/tinymail/bin/tinymail
@@ -74,7 +76,8 @@ For dependencies per distribution, check out requirements.txt
 
 svn co https://svn.tinymail.org/svn/tinymail
 cd tinymail/trunk
-./autogen.sh --prefix=/opt/tinymail
+./autogen.sh --prefix=/opt/tinymail \
+	--enable-imap-part-fetch
 make && make install
 
 Now run /opt/tinymail/bin/tinymail
@@ -115,7 +118,7 @@ ps. The password is "unittest"
 The make distcheck target
 -------------------------
 ./autogen.sh --prefix=/opt/tinymail --with-html-component=mozembed \
-	--enable-gtk-doc --enable-tests
+	--enable-gtk-doc --enable-tests --enable-imap-part-fetch
 make
 make distcheck
 
@@ -136,7 +139,8 @@ The DEBUG define will enable IMAP, POP, NNTP and SMTP debugging. If you compile
 with this define you'll see some of the traffic on your stdout.
 
 CFLAGS="-DDEBUG -DDBC -D_GNU_SOURCE -O0 -Wall -g -ggdb" ./autogen.sh \
-	--prefix=/opt/tinymail --enable-tests --enable-unit-tests && \
+	--prefix=/opt/tinymail --enable-tests --enable-unit-tests \
+	--enable-imap-part-fetch && \
 	 make && sudo make install
 
 -DMERGEFOLDERTEST
@@ -153,7 +157,8 @@ export CFLAGS="-DDEBUG -DDBC -O0 -g -ggdb"
 Typical for development
 -----------------------
 CFLAGS="-DDEBUG -DDBC -O0 -Wstrict-prototypes -Wall -g -ggdb" ./autogen.sh --prefix=/opt/tinymail \
-	--with-platform=maemo --with-ssl=openssl && make && make install
+	--with-platform=maemo --with-ssl=openssl --enable-imap-part-fetch \
+	&& make && make install
 
 You typically compile E-mail clients this way now:
 PKG_CONFIG_PATH=/opt/tinymail/lib/pkgconfig/ ./autogen --prefix=/opt/myclient --with-platform=maemo
@@ -187,6 +192,9 @@ svn co https://garage.maemo.org/svn/modest/modest/trunk modest
 cd $HOME/repos/tinymail
 CFLAGS="-DDEBUG -DDBC -O0 -g -ggdb" ./autogen.sh --with-ssl=openssl --prefix=/opt/tinymail \
 	--with-platform=maemo
+
+# Modest does not yet support --enable-imap-part-fetch correctly
+
 make && make install
 
 cd $HOME/repos/maemo-providers-data
