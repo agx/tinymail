@@ -542,8 +542,8 @@ notify_views_add_destroy (gpointer data)
 	priv->updating_views = -1;
 	g_mutex_unlock (priv->ra_lock);
 
-	if (priv->timeout_span < 1000)
-		priv->timeout_span += 100;
+	if (priv->timeout_span < 5000)
+		priv->timeout_span += 500;
 	priv->add_timeout = 0;
 	g_object_unref (data);
 
