@@ -2,6 +2,7 @@
 
 	* Performance enhancements
 	* Bugfix for the bodystructure parser and per-MIME-part fetching
+	* Experimental performance improvement in tny-gtk-header-list-model.c
 
 2007-12-27  Philip Van Hoof <pvanhoof@gnome.org>
 

@@ -542,12 +542,36 @@ notify_views_add_destroy (gpointer data)
 	priv->updating_views = -1;
 	g_mutex_unlock (priv->ra_lock);
 
-	if (priv->timeout_span < 5000)
-		priv->timeout_span += 300;
+	if (priv->timeout_span < 1000)
+		priv->timeout_span += 100;
 	priv->add_timeout = 0;
 	g_object_unref (data);
 
 	return;
+}
+
+typedef struct 
+{
+  gint depth;
+  gint *indices;
+}GtkTreePathInternal;
+
+static inline GtkTreePath *
+gtk_tree_path_new_internal (gint index)
+{
+  GtkTreePathInternal *retval = g_slice_new (GtkTreePathInternal);
+  retval->depth = 1;
+  retval->indices = g_slice_alloc (sizeof(gint));
+  retval->indices[0] = index;
+  return (GtkTreePath *) retval;
+}
+
+static inline void
+gtk_tree_path_free_internal (GtkTreePath *path_in)
+{
+  GtkTreePathInternal *path = (GtkTreePathInternal *) path_in;
+  g_slice_free1 (sizeof(gint), path->indices);
+  g_slice_free (GtkTreePathInternal, path);
 }
 
 static gboolean
@@ -569,9 +593,9 @@ notify_views_add (gpointer data)
 
 	already_registered = priv->registered;
 
-	if (priv->items->len - already_registered > 1000) 
+	if (priv->items->len - already_registered > 3000) 
 	{
-		going_tb_registered = already_registered + 1000;
+		going_tb_registered = already_registered + 3000;
 		needmore = TRUE;
 	} else
 		going_tb_registered = priv->items->len;
@@ -589,14 +613,11 @@ notify_views_add (gpointer data)
 	{
 		iter.stamp = priv->stamp;
 		iter.user_data = (gpointer) i;
-		path = gtk_tree_path_new ();
-		gtk_tree_path_append_index (path, i);
-		if (G_LIKELY (path))
-		{
-			priv->cur_len = i+1;
-			gtk_tree_model_row_inserted ((GtkTreeModel *) data, path, &iter);
-			gtk_tree_path_free (path);
-		}
+		path = gtk_tree_path_new_internal (i);
+		// gtk_tree_path_append_index (path, i);
+		priv->cur_len = i+1;
+		gtk_tree_model_row_inserted ((GtkTreeModel *) data, path, &iter);
+		gtk_tree_path_free_internal (path);
 	}
 	gdk_threads_leave();
 
