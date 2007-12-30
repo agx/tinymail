@@ -181,7 +181,7 @@ find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 		retval = g_hash_table_lookup (s->uidhash, uid);
 	g_mutex_unlock (s->hash_lock);
 
-	if (retval == NULL)
+	if (retval == NULL && s->uidhash == NULL)
 		for (i=0; G_LIKELY (i < s->messages->len) ; i++)
 		{
 			CamelMessageInfo *info = s->messages->pdata[i];

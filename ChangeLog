@@ -1,3 +1,8 @@
+2007-12-30  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Performance enhancements
+	* Bugfix for the bodystructure parser and per-MIME-part fetching
+
 2007-12-27  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Updates from Camel upstream, rfc 2047 decoder
