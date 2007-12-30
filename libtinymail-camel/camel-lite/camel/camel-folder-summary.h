@@ -293,8 +293,8 @@ void camel_folder_summary_touch(CamelFolderSummary *summary);
 void camel_folder_summary_add(CamelFolderSummary *summary, CamelMessageInfo *info);
 
 /* build/add raw summary items */
-CamelMessageInfo *camel_folder_summary_add_from_header(CamelFolderSummary *summary, struct _camel_header_raw *headers);
-CamelMessageInfo *camel_folder_summary_add_from_parser(CamelFolderSummary *summary, CamelMimeParser *parser);
+CamelMessageInfo *camel_folder_summary_add_from_header(CamelFolderSummary *summary, struct _camel_header_raw *headers, const gchar *uid);
+CamelMessageInfo *camel_folder_summary_add_from_parser(CamelFolderSummary *summary, CamelMimeParser *parser, const gchar *uid);
 CamelMessageInfo *camel_folder_summary_add_from_message(CamelFolderSummary *summary, CamelMimeMessage *message);
 
 /* Just build raw summary items */

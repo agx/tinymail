@@ -284,13 +284,16 @@ add_range_xover(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high,
 		if (xover == NULL) {
 			mi = (CamelMessageInfoBase *)camel_folder_summary_uid(s, cns->priv->uid);
 			if (mi == NULL) {
+				gchar *nuid;
 
 				if (acnt > 1000) {
 					camel_folder_summary_save (s, ex);
 					acnt = 0;
 				}
 				acnt++;
-				mi = (CamelMessageInfoBase *)camel_folder_summary_add_from_header(s, headers);
+				nuid = camel_folder_summary_next_uid_string (s);
+				mi = (CamelMessageInfoBase *)camel_folder_summary_add_from_header(s, headers, nuid);
+				g_free (nuid);
 				if (mi) {
 					mi->size = (size);
 					cns->high = n;
@@ -370,7 +373,7 @@ add_range_head(CamelNNTPSummary *cns, CamelNNTPStore *store, unsigned int high, 
 					acnt = 0;
 				}
 				acnt++;
-				mi = camel_folder_summary_add_from_parser(s, mp);
+				mi = camel_folder_summary_add_from_parser(s, mp, cns->priv->uid);
 				while (camel_mime_parser_step(mp, NULL, NULL) != CAMEL_MIME_PARSER_STATE_EOF)
 					;
 				if (mi == NULL) {

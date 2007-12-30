@@ -489,10 +489,14 @@ summary_update(CamelLocalSummary *cls, off_t offset, CamelFolderChangeInfo *chan
 	while (camel_mime_parser_step(mp, NULL, NULL) == CAMEL_MIME_PARSER_STATE_FROM) {
 		CamelMessageInfo *info;
 		off_t pc = camel_mime_parser_tell_start_from (mp) + 1;
+		gchar *nuid;
 
 		camel_operation_progress (NULL, pc, size);
 
-		info = camel_folder_summary_add_from_parser(s, mp);
+		nuid = camel_folder_summary_next_uid_string (s);
+		info = camel_folder_summary_add_from_parser(s, mp, nuid);
+		g_free (nuid);
+
 		if (info == NULL) {
 			camel_exception_setv(ex, 1, _("Fatal mail parser error near position %ld in folder %s"),
 					     camel_mime_parser_tell(mp), cls->folder_path);

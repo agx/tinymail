@@ -172,16 +172,19 @@ find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 {
 	CamelMessageInfo *retval = NULL;
 	guint i = 0;
+	gboolean check_for = TRUE;
 
 	if (uid == NULL || strlen (uid) <= 0)
 		return NULL;
 
 	g_mutex_lock (s->hash_lock);
-	if (s->uidhash != NULL)
+	if (s->uidhash != NULL) {
 		retval = g_hash_table_lookup (s->uidhash, uid);
+		check_for = FALSE;
+	}
 	g_mutex_unlock (s->hash_lock);
 
-	if (retval == NULL && s->uidhash == NULL)
+	if (retval == NULL && check_for) {
 		for (i=0; G_LIKELY (i < s->messages->len) ; i++)
 		{
 			CamelMessageInfo *info = s->messages->pdata[i];
@@ -194,6 +197,7 @@ find_message_info_with_uid (CamelFolderSummary *s, const char *uid)
 				break;
 			}
 		}
+	}
 
 	return retval;
 }
@@ -1323,9 +1327,13 @@ camel_folder_summary_mmap_add(CamelFolderSummary *s, CamelMessageInfo *info)
  * Returns the newly added record
  **/
 CamelMessageInfo *
-camel_folder_summary_add_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
+camel_folder_summary_add_from_header(CamelFolderSummary *s, struct _camel_header_raw *h, const gchar *uid)
 {
 	CamelMessageInfo *info = camel_folder_summary_info_new_from_header(s, h);
+
+	if (info->uid)
+		g_free (info->uid);
+	info->uid = g_strdup (uid);
 
 	camel_folder_summary_add(s, info);
 
@@ -1347,7 +1355,7 @@ camel_folder_summary_add_from_header(CamelFolderSummary *s, struct _camel_header
  * Returns the newly added record
  **/
 CamelMessageInfo *
-camel_folder_summary_add_from_parser(CamelFolderSummary *s, CamelMimeParser *mp)
+camel_folder_summary_add_from_parser(CamelFolderSummary *s, CamelMimeParser *mp, const gchar *uid)
 {
 	CamelMessageInfo *info;
 
@@ -1355,6 +1363,10 @@ camel_folder_summary_add_from_parser(CamelFolderSummary *s, CamelMimeParser *mp)
 	g_return_val_if_fail (CAMEL_IS_MIME_PARSER (mp), NULL);
 
 	info = camel_folder_summary_info_new_from_parser(s, mp);
+
+	if (info->uid)
+		g_free (info->uid);
+	info->uid = g_strdup (uid);
 
 	camel_folder_summary_add(s, info);
 
@@ -1375,6 +1387,9 @@ CamelMessageInfo *
 camel_folder_summary_add_from_message(CamelFolderSummary *s, CamelMimeMessage *msg)
 {
 	CamelMessageInfo *info = camel_folder_summary_info_new_from_message(s, msg);
+
+	if (!info->uid) 
+		info->uid = camel_folder_summary_next_uid_string (s);
 
 	camel_folder_summary_add(s, info);
 

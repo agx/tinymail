@@ -183,7 +183,7 @@ static int camel_mh_summary_add(CamelLocalSummary *cls, const char *name, int fo
 	camel_mime_parser_init_with_fd(mp, fd);
 
 	mhs->priv->current_uid = (char *)name;
-	camel_folder_summary_add_from_parser((CamelFolderSummary *)mhs, mp);
+	camel_folder_summary_add_from_parser((CamelFolderSummary *)mhs, mp, name);
 	camel_object_unref((CamelObject *)mp);
 	mhs->priv->current_uid = NULL;
 	g_free(filename);

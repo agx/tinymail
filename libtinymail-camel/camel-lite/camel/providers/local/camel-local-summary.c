@@ -143,6 +143,7 @@ camel_local_summary_construct(CamelLocalSummary *new, const char *filename, cons
 	new->index = index;
 	if (index)
 		camel_object_ref((CamelObject *)index);
+	camel_folder_summary_load ((CamelFolderSummary *) new);
 }
 
 static int
@@ -440,6 +441,7 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 	if (mi) {
 		d(printf("Added, uid = %s\n", mi->uid));
 		if (info) {
+
 #ifdef NON_TINYMAIL_FEATURES
 
 			const CamelTag *tag = camel_message_info_user_tags(info);
