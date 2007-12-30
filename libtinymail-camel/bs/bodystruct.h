@@ -49,10 +49,10 @@ struct _bodystruct {
 };
 
 
-bodystruct_t * bodystruct_parse (guchar *inbuf, guint inlen, GError **err);
+bodystruct_t* bodystruct_parse (guchar *inbuf, guint inlen, GError **err);
 void bodystruct_free (bodystruct_t *node);
 
-const gchar * mimeparam_get_value_for (mimeparam_t *mp, const gchar *key);
+const gchar* mimeparam_get_value_for (mimeparam_t *mp, const gchar *key);
 
 void bodystruct_dump (bodystruct_t *part);
 

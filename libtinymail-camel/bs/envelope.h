@@ -20,7 +20,7 @@ struct _envelope {
 	gchar *message_id;
 };
 
-envelope_t * envelope_new (void);
+envelope_t* envelope_new (void);
 envelope_t* envelope_parse (guchar *inbuf, guint inlen, GError **err);
 void envelope_free (envelope_t *node);
 
