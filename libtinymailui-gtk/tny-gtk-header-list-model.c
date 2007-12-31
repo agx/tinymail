@@ -40,6 +40,7 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 #include <gdk/gdk.h>
+#include <gtk/gtk.h>
 
 #include <tny-gtk-header-list-model.h>
 #include <tny-gtk-header-list-iterator-priv.h>
@@ -550,6 +551,23 @@ notify_views_add_destroy (gpointer data)
 	return;
 }
 
+#if GTK_CHECK_VERSION (2,16,0)
+
+static inline GtkTreePath *
+gtk_tree_path_new_internal (gint index)
+{
+	GtkTreePath *path = gtk_tree_path_new ();
+	gtk_tree_path_append_index (path, index);
+	return path;
+}
+static inline void
+gtk_tree_path_free_internal (GtkTreePath *path_in)
+{
+	gtk_tree_path_free (path_in);
+}
+
+#else
+
 typedef struct 
 {
   gint depth;
@@ -573,6 +591,8 @@ gtk_tree_path_free_internal (GtkTreePath *path_in)
   g_slice_free1 (sizeof(gint), path->indices);
   g_slice_free (GtkTreePathInternal, path);
 }
+
+#endif
 
 static gboolean
 notify_views_add (gpointer data)
