@@ -634,7 +634,6 @@ notify_views_add (gpointer data)
 		iter.stamp = priv->stamp;
 		iter.user_data = (gpointer) i;
 		path = gtk_tree_path_new_internal (i);
-		// gtk_tree_path_append_index (path, i);
 		priv->cur_len = i+1;
 		gtk_tree_model_row_inserted ((GtkTreeModel *) data, path, &iter);
 		gtk_tree_path_free_internal (path);
