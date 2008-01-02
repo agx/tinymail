@@ -145,38 +145,10 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 		{
 			CamelImapSummary *imap_summary = CAMEL_IMAP_SUMMARY (folder->summary);
 
-
-			if (folder->summary->messages->len > 0)
-			{
-				GPtrArray *alluids = g_ptr_array_sized_new (folder->summary->messages->len);
-				gchar *uidset = NULL;
-				gint i;
-				gint lastuid;
-
-				for (i=0; i<folder->summary->messages->len; i++) {
-					CamelMessageInfo *info = folder->summary->messages->pdata[i];
-					g_ptr_array_add (alluids, g_strdup (info->uid));
-				}
-
-				qsort (alluids->pdata, alluids->len, sizeof (void *), uid_compar);
-				uidset = imap_uid_array_to_set (folder->summary, alluids, 0, UID_SET_LIMIT, &lastuid);
-
-				g_ptr_array_foreach (alluids, (GFunc)g_free, NULL);
-				g_ptr_array_free (alluids, TRUE);
-
-				cmd = imap_command_strdup_printf (store,
-					"SELECT %F (QRESYNC (%d %s %s))",
-					folder->full_name,
-					imap_summary->validity, modseq, uidset);
-
-				g_free (uidset);
-
-			} else {
-				cmd = imap_command_strdup_printf (store,
-					"SELECT %F (QRESYNC (%d %s))",
-					folder->full_name,
-					imap_summary->validity, modseq);
-			}
+			cmd = imap_command_strdup_printf (store,
+				"SELECT %F (QRESYNC (%d %s 1:*))",
+				folder->full_name,
+				imap_summary->validity, modseq);
 
 		} else if (folder) {
 			if (store->capabilities & IMAP_CAPABILITY_CONDSTORE)
