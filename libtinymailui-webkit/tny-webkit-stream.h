@@ -52,7 +52,7 @@ struct _TnyWebkitStreamClass
 };
 
 GType tny_webkit_stream_get_type (void);
-TnyStream* tny_webkit_stream_new (void);
+TnyStream* tny_webkit_stream_new (TnyMimePartView *part_view);
 
 
 G_END_DECLS

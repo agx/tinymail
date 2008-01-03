@@ -21,7 +21,8 @@
  */
 
 
-#include <gtk/gtk.h>
+#include <webkit-gtk/webkit.h>
+
 #include <glib-object.h>
 #include <tny-shared.h>
 
@@ -43,16 +44,16 @@ typedef struct _TnyWebkitHtmlMimePartViewClass TnyWebkitHtmlMimePartViewClass;
 
 struct _TnyWebkitHtmlMimePartView
 {
-	GObject parent;
+	WebKitWebView parent;
 };
 
 struct _TnyWebkitHtmlMimePartViewClass
 {
-	GObjectClass parent_class;
+	WebKitWebViewClass parent_class;
 };
 
 GType tny_webkit_html_mime_part_view_get_type (void);
-TnyMimePartView* tny_webkit_html_mime_part_view_new (void);
+TnyMimePartView* tny_webkit_html_mime_part_view_new (TnyStatusCallback status_callback, gpointer status_user_data);
 
 G_END_DECLS
 

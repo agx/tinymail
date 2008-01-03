@@ -37,9 +37,9 @@
 static GObjectClass *parent_class = NULL;
 
 
-struct _TnyWebkitStreamPriv
-{
-	GtkWebkit *embed;
+struct _TnyWebkitStreamPriv {
+	TnyMimePartView *part_view;
+	GString *buffer;
 };
 
 #define TNY_WEBKIT_STREAM_GET_PRIVATE(o) ((TnyWebkitStream*)(o))->priv
@@ -86,6 +86,8 @@ tny_webkit_stream_read  (TnyStream *self, char *data, size_t n)
 static gint
 tny_webkit_stream_reset (TnyStream *self)
 {
+	g_string_free (priv->buffer, TRUE);
+	priv->buffer = g_string_new ();
 	return 0;
 }
 
@@ -93,7 +95,9 @@ static ssize_t
 tny_webkit_stream_write (TnyStream *self, const char *data, size_t n)
 {
 	TnyWebkitStreamPriv *priv = TNY_WEBKIT_STREAM_GET_PRIVATE (self);
-
+	g_string_append (priv->buffer, data);
+	webkit_web_view_load_html_string (WEBKIT_WEB_VIEW (priv->part_view), 
+		(const gchar *) priv->buffer->str, "");
 	return (ssize_t) n;
 }
 
@@ -108,13 +112,11 @@ tny_webkit_stream_close (TnyStream *self)
 {
 	TnyWebkitStreamPriv *priv = TNY_WEBKIT_STREAM_GET_PRIVATE (self);
 
-
-
 	return 0;
 }
 
 static gboolean
-tny_webkit_stream_is_eos   (TnyStream *self)
+tny_webkit_stream_is_eos (TnyStream *self)
 {
 	return TRUE;
 }
@@ -129,10 +131,11 @@ tny_webkit_stream_is_eos   (TnyStream *self)
  * Return value: a new #TnyStream instance
  **/
 TnyStream*
-tny_webkit_stream_new (void)
+tny_webkit_stream_new (TnyMimePartView *part_view)
 {
 	TnyWebkitStream *self = g_object_new (TNY_TYPE_WEBKIT_STREAM, NULL);
-
+	TnyWebkitStreamPriv *priv = TNY_WEBKIT_STREAM_GET_PRIVATE (self);
+	priv->part_view = (TnyMimePartView *) g_object_ref (part_view);
 	return TNY_STREAM (self);
 }
 
@@ -141,9 +144,8 @@ tny_webkit_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyWebkitStream *self = (TnyWebkitStream *)instance;
 	TnyWebkitStreamPriv *priv = g_slice_new (TnyWebkitStreamPriv);
-
 	self->priv = priv;
-
+	priv->buffer = g_string_new ();
 	return;
 }
 
@@ -152,14 +154,11 @@ tny_webkit_stream_finalize (GObject *object)
 {
 	TnyWebkitStream *self = (TnyWebkitStream *)object;
 	TnyWebkitStreamPriv *priv = TNY_WEBKIT_STREAM_GET_PRIVATE (self);
-
-	if (priv->embed)
-		g_object_unref (G_OBJECT (priv->embed));
-
+	if (priv->part_view)
+		g_object_unref (priv->part_view);
+	g_string_free (priv->buffer, TRUE);
 	g_slice_free (TnyWebkitStreamPriv, priv);
-
 	(*parent_class->finalize) (object);
-
 	return;
 }
 

@@ -48,9 +48,10 @@ static GObjectClass *parent_class = NULL;
 
 typedef struct _TnyWebkitHtmlMimePartViewPriv TnyWebkitHtmlMimePartViewPriv;
 
-struct _TnyWebkitHtmlMimePartViewPriv
-{
+struct _TnyWebkitHtmlMimePartViewPriv {
 	TnyMimePart *part;
+	TnyStatusCallback status_callback;
+	gpointer status_user_data;
 };
 
 #define TNY_WEBKIT_HTML_MIME_PART_VIEW_GET_PRIVATE(o) \
@@ -79,20 +80,18 @@ tny_webkit_html_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *par
 {
 	TnyWebkitHtmlMimePartViewPriv *priv = TNY_WEBKIT_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
 
-	if (G_LIKELY (priv->part))
-		g_object_unref (G_OBJECT (priv->part));
+	if (priv->part)
+		g_object_unref (priv->part);
 
-	if (part)
-	{
+	if (part) {
 		TnyStream *dest;
 
-		dest = tny_webkit_stream_new (GTK_WEBKIT (self));
+		dest = tny_webkit_stream_new (self);
 		tny_stream_reset (dest);
-		tny_mime_part_decode_to_stream (part, dest, NULL);
-		g_object_unref (G_OBJECT (dest));
-
-		g_object_ref (G_OBJECT (part));
-		priv->part = part;
+		tny_mime_part_decode_to_stream_async (part, dest, NULL, 
+			priv->status_callback, priv->status_user_data);
+		g_object_unref (dest);
+		priv->part = (TnyMimePart *) g_object_ref (part);
 	}
 
 	return;
@@ -102,7 +101,7 @@ static void
 tny_webkit_html_mime_part_view_clear (TnyMimePartView *self)
 {
 
-	gtk_webkit_render_data (GTK_WEBKIT (self), "",  0, "file:///", "text/html");
+	webkit_web_view_load_html_string (WEBKIT_WEB_VIEW (self), "", "");
 
 	return;
 }
@@ -115,9 +114,13 @@ tny_webkit_html_mime_part_view_clear (TnyMimePartView *self)
  * Return value: a new #TnyMimePartView instance implemented for Gtk+
  **/
 TnyMimePartView*
-tny_webkit_html_mime_part_view_new (void)
+tny_webkit_html_mime_part_view_new (TnyStatusCallback status_callback, gpointer status_user_data)
 {
 	TnyWebkitHtmlMimePartView *self = g_object_new (TNY_TYPE_WEBKIT_HTML_MIME_PART_VIEW, NULL);
+	TnyWebkitHtmlMimePartViewPriv *priv = TNY_WEBKIT_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
+
+	priv->status_callback = status_callback;
+	priv->status_user_data = status_user_data;
 
 	return TNY_MIME_PART_VIEW (self);
 }
@@ -127,9 +130,7 @@ tny_webkit_html_mime_part_view_instance_init (GTypeInstance *instance, gpointer 
 {
 	TnyWebkitHtmlMimePartView *self  = (TnyWebkitHtmlMimePartView*) instance;
 	TnyWebkitHtmlMimePartViewPriv *priv = TNY_WEBKIT_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
-
 	priv->part = NULL;
-
 	return;
 }
 
@@ -138,12 +139,9 @@ tny_webkit_html_mime_part_view_finalize (GObject *object)
 {
 	TnyWebkitHtmlMimePartView *self = (TnyWebkitHtmlMimePartView *)object;	
 	TnyWebkitHtmlMimePartViewPriv *priv = TNY_WEBKIT_HTML_MIME_PART_VIEW_GET_PRIVATE (self);
-
-	if (G_LIKELY (priv->part))
-		g_object_unref (G_OBJECT (priv->part));
-
+	if (priv->part)
+		g_object_unref (priv->part);
 	(*parent_class->finalize) (object);
-
 	return;
 }
 
