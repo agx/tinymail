@@ -146,8 +146,7 @@ handle_connect (TnyMaemoConicDevice *self, int con_err, int con_state)
 {
 	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
-	if (priv->connect_slot) 
-	{
+	if (priv->connect_slot) {
 		GError *err = NULL;
 		gboolean canceled = FALSE;
 		ConnectInfo *info = priv->connect_slot;
@@ -186,7 +185,7 @@ handle_connect (TnyMaemoConicDevice *self, int con_err, int con_state)
 			g_error_free (err);
 
 		g_object_unref (info->self);
-		g_free (info->self);
+		g_free (info->iap_id);
 		g_slice_free (ConnectInfo, info);
 	}
 
