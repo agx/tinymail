@@ -949,12 +949,35 @@ creater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *in_iter, gpointer 
 		found = TRUE;
 
 	if (!found) {
-		if (fol && TNY_IS_FOLDER (fol))
+		TnyAccount *maccount = NULL, *saccount = NULL;
+		const gchar *ma_id = NULL, *sa_id = NULL;
+
+		if (fol && TNY_IS_FOLDER (fol)) {
 			mid = tny_folder_get_id (TNY_FOLDER (fol));
-		if (parent_store && TNY_IS_FOLDER (parent_store))
+			if (!TNY_IS_MERGE_FOLDER (fol))
+				maccount = tny_folder_get_account (TNY_FOLDER (fol));
+			if (maccount)
+				ma_id = tny_account_get_id (maccount);
+		}
+		if (parent_store && TNY_IS_FOLDER (parent_store)) {
 			sid = tny_folder_get_id (TNY_FOLDER (parent_store));
-		if (sid && mid && !strcmp (sid, mid))
-			found = TRUE;
+			if (!TNY_IS_MERGE_FOLDER (parent_store))
+				saccount = tny_folder_get_account (TNY_FOLDER (parent_store));
+			if (saccount)
+				sa_id = tny_account_get_id (saccount);
+		}
+		if (sid && mid && !strcmp (sid, mid)) {
+			if (ma_id && sa_id) {
+				if (!strcmp (ma_id, sa_id))
+					found = TRUE;
+			} else {
+				found = TRUE;
+			}
+		}
+		if (maccount)
+			g_object_unref (maccount);
+		if (saccount)
+			g_object_unref (saccount);
 	}
 
 	if (found) 
