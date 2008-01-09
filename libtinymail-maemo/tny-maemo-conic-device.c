@@ -79,7 +79,11 @@ dnsmasq_has_resolv (void)
 static gboolean
 conic_emit_status_idle (gpointer user_data)
 {
-	EmitStatusInfo *info = (EmitStatusInfo *) user_data;
+	EmitStatusInfo *info;
+
+	g_return_val_if_fail (user_data, FALSE);
+	
+	info  = (EmitStatusInfo *) user_data;
 
 	/* We lock the gdk thread because tinymail wants implementations to do
 	 * this before emitting signals from within a g_idle_add_full callback.
@@ -96,19 +100,29 @@ conic_emit_status_idle (gpointer user_data)
 static void
 conic_emit_status_destroy (gpointer user_data)
 {
-	EmitStatusInfo *info = (EmitStatusInfo *) user_data;
-	g_object_unref (info->self);
+	EmitStatusInfo *info;
+
+	g_return_if_fail (user_data);
+
+	info = (EmitStatusInfo *) user_data;
+	
+	if (G_IS_OBJECT(info->self))
+		g_object_unref (info->self);
+
 	g_slice_free (EmitStatusInfo, info);
-	return;
 }
 
 static void 
 conic_emit_status (TnyDevice *self, gboolean status)
 {
-	/* Emit it in an idle handler: */
-	EmitStatusInfo *info = g_slice_new (EmitStatusInfo);
+	EmitStatusInfo *info;
 	guint time = 1000;
 
+	g_return_if_fail (TNY_IS_DEVICE(self));
+	
+	/* Emit it in an idle handler: */
+	info = g_slice_new (EmitStatusInfo);
+	
 	info->self = g_object_ref (self);
 	info->status = status;
 
@@ -117,8 +131,6 @@ conic_emit_status (TnyDevice *self, gboolean status)
 
 	g_timeout_add_full (G_PRIORITY_DEFAULT, time, conic_emit_status_idle,
 		info, conic_emit_status_destroy);
-
-	return;
 }
 
 static void 
@@ -129,6 +141,7 @@ tny_maemo_conic_device_reset (TnyDevice *device)
 	gboolean status_before = FALSE;
 
 	g_return_if_fail (TNY_IS_DEVICE(device));
+	
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
@@ -137,14 +150,16 @@ tny_maemo_conic_device_reset (TnyDevice *device)
 
 	if (status_before != tny_maemo_conic_device_is_online (device))
 		conic_emit_status (device, !status_before);
-
-	return;
 }
 
 static void
 handle_connect (TnyMaemoConicDevice *self, int con_err, int con_state)
 {
-	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+	TnyMaemoConicDevicePriv *priv;
+
+	g_return_if_fail (TNY_IS_MAEMO_CONIC_DEVICE (self));
+	
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
 	if (priv->connect_slot) {
 		GError *err = NULL;
@@ -188,8 +203,6 @@ handle_connect (TnyMaemoConicDevice *self, int con_err, int con_state)
 		g_free (info->iap_id);
 		g_slice_free (ConnectInfo, info);
 	}
-
-	return;
 }
 
 typedef struct {
@@ -198,19 +211,31 @@ typedef struct {
 	int con_state;
 } HandleConnInfo;
 
-static gboolean
+static gboolean /* FIXME: this function will always return FALSE, is that correct? */
 handle_con_idle (gpointer data)
 {
-	HandleConnInfo *info = (HandleConnInfo *) data;
+	HandleConnInfo *info;
+
+	g_return_val_if_fail (data, FALSE);
+	
+	info = (HandleConnInfo *) data;
 	handle_connect (info->self, info->con_err, info->con_state);
+
 	return FALSE;
 }
 
 static void 
 handle_con_idle_destroy (gpointer data) 
-{ 
-	HandleConnInfo *info = (HandleConnInfo *) data;
-	g_object_unref (info->self);
+{
+	HandleConnInfo *info;
+	
+	g_return_if_fail (data);
+	
+	info = (HandleConnInfo *) data;
+
+	if (G_IS_OBJECT(info->self))
+		g_object_unref (info->self);
+	
 	g_slice_free (HandleConnInfo, data); 
 }
 
@@ -218,12 +243,19 @@ handle_con_idle_destroy (gpointer data)
 static void
 on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer user_data)
 {
-	TnyMaemoConicDevice *device = TNY_MAEMO_CONIC_DEVICE (user_data);
-	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (device);
+	TnyMaemoConicDevice *device;
+	TnyMaemoConicDevicePriv *priv;
 	gboolean is_online = FALSE;
 	gboolean emit = FALSE;
 	HandleConnInfo *iinfo;
 	int con_err, con_state;
+	
+	/* we don't need cnx in this function */
+	g_return_if_fail (user_data && TNY_MAEMO_IS_CONIC_DEVICE(user_data));
+	g_return_if_fail (event && CON_IC_IS_CONNECTION_EVENT(event));
+	
+	device = TNY_MAEMO_CONIC_DEVICE (user_data);
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (device);
 
 	/* Don't emit nor make any changes in case of forced state */
 
@@ -251,8 +283,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 	switch (con_state) {
 		case CON_IC_STATUS_CONNECTED:
-			if (priv->iap)
-				g_free (priv->iap);
+			g_free (priv->iap);
 			priv->iap = g_strdup (con_ic_event_get_iap_id ((ConIcEvent*)(event)));
 			if (!priv->is_online)
 				emit = TRUE;
@@ -262,6 +293,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 			break;
 
 		case CON_IC_STATUS_DISCONNECTED:
+			g_free (priv->iap);
 			priv->iap = NULL;
 			if (priv->is_online)
 				emit = TRUE;
@@ -297,8 +329,6 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 	if (emit)
 		conic_emit_status (TNY_DEVICE (device), is_online);
-
-	return;
 }
 
 
@@ -336,7 +366,7 @@ tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self,
 	info->self = (TnyMaemoConicDevice *) g_object_ref (self);
 	info->callback = callback;
 	info->user_data = user_data;
-	info->iap_id = g_strdup (iap_id);
+	info->iap_id = iap_id ? g_strdup (iap_id) : NULL; /* iap_id can be NULL */
 
 	priv->connect_slot = info;
 
@@ -368,8 +398,6 @@ tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self,
 		g_object_unref (info->self);
 		g_slice_free (ConnectInfo, info);
 	}
- 
-	return;
 }
 
 
@@ -388,7 +416,7 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 {
 	TnyMaemoConicDevicePriv *priv = NULL;
 
-	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), FALSE);
+	g_return_val_if_fail (self && TNY_IS_MAEMO_CONIC_DEVICE(self), FALSE);
 
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, FALSE);
@@ -448,9 +476,10 @@ tny_maemo_conic_device_get_current_iap_id (TnyMaemoConicDevice *self)
 ConIcIap*
 tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 {
-	TnyMaemoConicDevicePriv *priv = NULL;
+	TnyMaemoConicDevicePriv *priv;
 	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 	g_return_val_if_fail (iap_id, NULL);
+
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
 
@@ -476,7 +505,9 @@ tny_maemo_conic_device_get_iap (TnyMaemoConicDevice *self, const gchar *iap_id)
 GSList*
 tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 {
-	TnyMaemoConicDevicePriv *priv = NULL;
+	TnyMaemoConicDevicePriv *priv;
+	
+	g_return_val_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(self), NULL);
 
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 	g_return_val_if_fail (priv->cnx, NULL);
@@ -495,13 +526,8 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 void
 tny_maemo_conic_device_free_iap_list (TnyMaemoConicDevice *self, GSList* cnx_list)
 {
-	GSList *cur = cnx_list;
-	while (cur) {
-		g_object_unref (G_OBJECT(cur->data));
-		cur = g_slist_next (cur);
-	}
+	g_slist_foreach (cnx_list, (GFunc)g_object_unref, NULL);
 	g_slist_free (cnx_list);
-	return;
 }
 
 
@@ -511,10 +537,12 @@ tny_maemo_conic_device_force_online (TnyDevice *device)
 	TnyMaemoConicDevice *self;
 	TnyMaemoConicDevicePriv *priv;
 	gboolean already_online = FALSE;
+
 	g_return_if_fail (TNY_IS_DEVICE(device));
+
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
-
+	
 	already_online = tny_maemo_conic_device_is_online (device);
 
 	priv->forced = TRUE;
@@ -534,6 +562,7 @@ tny_maemo_conic_device_force_offline (TnyDevice *device)
 	gboolean already_offline = FALSE;
 
 	g_return_if_fail (TNY_IS_DEVICE(device));
+
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
@@ -544,8 +573,6 @@ tny_maemo_conic_device_force_offline (TnyDevice *device)
 	/* Signal if it changed: */
 	if (!already_offline)
 		conic_emit_status (device, FALSE);
-
-	return;
 }
 
 static gboolean
@@ -600,16 +627,17 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 TnyDevice*
 tny_maemo_conic_device_new (void)
 {
-	TnyMaemoConicDevice *self = g_object_new (TNY_TYPE_MAEMO_CONIC_DEVICE, NULL);
-
-	return TNY_DEVICE (self);
+	return TNY_DEVICE(g_object_new (TNY_TYPE_MAEMO_CONIC_DEVICE, NULL));
 }
 
 static void
 tny_maemo_conic_device_finalize (GObject *obj)
 {
-	TnyMaemoConicDevicePriv *priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
+	TnyMaemoConicDevicePriv *priv;
 
+	g_return_if_fail (obj && G_IS_OBJECT(obj));
+	
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
 	g_signal_handler_disconnect (obj, priv->signal1);
 
 	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {

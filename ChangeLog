@@ -1,3 +1,7 @@
+2008-01-09  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+	
+	* small fixes / cleanups for tny-maemo-conic-device
+
 2008-01-08  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c: fixed an invalid g_free
