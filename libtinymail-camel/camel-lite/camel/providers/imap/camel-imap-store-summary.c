@@ -102,7 +102,7 @@ camel_imap_store_summary_finalise (CamelObject *obj)
 {
 	/*struct _CamelImapStoreSummaryPrivate *p;*/
 	CamelImapStoreSummary *is = (CamelImapStoreSummary *)obj;
-	CamelStoreSummary *s = (CamelStoreSummary *) s;
+	CamelStoreSummary *s = (CamelStoreSummary *) is;
 
 	if (is->namespaces)
 		namespace_clear (s);

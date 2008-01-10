@@ -1,3 +1,8 @@
+2008-01-10 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+	
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store-summary:
+	fix typo in camel-imap-store-summary.c which caused valgrind errors
+
 2008-01-09  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c:
