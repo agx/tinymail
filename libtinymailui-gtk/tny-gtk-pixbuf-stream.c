@@ -105,8 +105,6 @@ tny_gtk_pixbuf_stream_read (TnyStream *self, char *buffer, gsize n)
 static gssize
 tny_gtk_pixbuf_stream_read_default (TnyStream *self, char *buffer, gsize n)
 {
-	TnyGtkPixbufStreamPriv *priv = TNY_GTK_PIXBUF_STREAM_GET_PRIVATE (self);
-
 	return (gssize) n;
 }
 
@@ -122,7 +120,7 @@ tny_gtk_pixbuf_stream_write_default (TnyStream *self, const char *buffer, gsize 
 	TnyGtkPixbufStreamPriv *priv = TNY_GTK_PIXBUF_STREAM_GET_PRIVATE (self);
 	gssize wr = (gssize) n;
 
-	if (!gdk_pixbuf_loader_write (priv->loader, buffer, n, NULL))
+	if (!gdk_pixbuf_loader_write (priv->loader, (const guchar *) buffer, n, NULL))
 		wr = -1;
 
 	return (gssize) wr;
@@ -173,8 +171,6 @@ tny_gtk_pixbuf_stream_reset (TnyStream *self)
 static gint
 tny_gtk_pixbuf_stream_reset_default (TnyStream *self)
 {
-	TnyGtkPixbufStreamPriv *priv = TNY_GTK_PIXBUF_STREAM_GET_PRIVATE (self);
-
 	return 0;
 }
 

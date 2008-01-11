@@ -290,7 +290,6 @@ libcamel_liteinclude_HEADERS =			\
 libcamel_lite_1_2_la_LDFLAGS = -version-info 0:0:0 $(NO_UNDEFINED)
 
 libcamel_lite_1_2_la_LIBADD =				\
-	$(top_builddir)/summary/libsummary.la		\
 	$(top_builddir)/libedataserver/libedataserver-${API_VERSION}.la \
 	$(top_builddir)/summary/libsummary.la				\
 	$(CAMEL_LIBS)							\
