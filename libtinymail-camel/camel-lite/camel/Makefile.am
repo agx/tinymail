@@ -142,7 +142,7 @@ libcamel_lite_providerinclude_HEADERS =		\
 libcamel_lite_provider_1_2_la_LDFLAGS = -version-info $(LIBCAMEL_CURRENT):$(LIBCAMEL_REVISION):$(LIBCAMEL_AGE) $(NO_UNDEFINED)
 
 libcamel_lite_provider_1_2_la_LIBADD =		\
-	$(top_builddir)/libedataserver/libedataserver-${API_VERSION}.a 	\
+	$(top_builddir)/libedataserver/libedataserver-${API_VERSION}.la \
 	libcamel-lite-1.2.la			\
 	$(CAMEL_LIBS)				\
 	$(SOCKET_LIBS)				\
@@ -290,7 +290,9 @@ libcamel_liteinclude_HEADERS =			\
 libcamel_lite_1_2_la_LDFLAGS = -version-info 0:0:0 $(NO_UNDEFINED)
 
 libcamel_lite_1_2_la_LIBADD =				\
-	$(top_builddir)/libedataserver/libedataserver-${API_VERSION}.a  \
+	$(top_builddir)/summary/libsummary.la		\
+	$(top_builddir)/libedataserver/libedataserver-${API_VERSION}.la \
+	$(top_builddir)/summary/libsummary.la				\
 	$(CAMEL_LIBS)							\
 	$(SOCKET_LIBS)							\
 	$(REGEX_LIBS)							\

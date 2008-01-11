@@ -1,5 +1,3 @@
-AM_CFLAGS = -fPIC
-
 INCLUDES =								\
 	-I$(top_srcdir)							\
 	-DG_LOG_DOMAIN=\"e-data-server\"				\
@@ -11,9 +9,9 @@ INCLUDES =								\
 	-DE_DATA_SERVER_UI_GLADEDIR=\""$(gladedir)"\"			\
 	$(E_DATA_SERVER_CFLAGS)
 
-noinst_LIBRARIES = libedataserver-1.2.a
+noinst_LTLIBRARIES = libedataserver-1.2.la
 
-libedataserver_1_2_a_SOURCES =		\
+libedataserver_1_2_la_SOURCES =		\
 	e-trie.c			\
 	e-iconv.c			\
 	e-memory.c			\

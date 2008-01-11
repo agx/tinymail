@@ -1,3 +1,8 @@
+2008-01-11  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Preparations for the new summary store
+	* Made all remaining static libraries LTLIBRARIES
+
 2008-01-11 Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
