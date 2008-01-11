@@ -251,7 +251,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	int con_err, con_state;
 	
 	/* we don't need cnx in this function */
-	g_return_if_fail (user_data && TNY_MAEMO_IS_CONIC_DEVICE(user_data));
+	g_return_if_fail (user_data && TNY_IS_MAEMO_CONIC_DEVICE(user_data));
 	g_return_if_fail (event && CON_IC_IS_CONNECTION_EVENT(event));
 	
 	device = TNY_MAEMO_CONIC_DEVICE (user_data);

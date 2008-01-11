@@ -1,3 +1,8 @@
+2008-01-11 Alberto Garcia Gonzalez <agarcia@igalia.com>
+
+	* libtinymail-maemo/tny-maemo-conic-device.c:
+	fix typo that caused a compilation error
+
 2008-01-10 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store-summary:
