@@ -1122,7 +1122,7 @@ inline static GList*
 g_hash_table_get_values (GHashTable *hash)
 {
 	GList *values = NULL;
-	g_hash_table_for_each (hash, (GHFunc)list_values, &values);
+	g_hash_table_foreach (hash, (GHFunc)list_values, &values);
 	return values;
 }
 #endif
