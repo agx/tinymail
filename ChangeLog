@@ -2,6 +2,7 @@
 
 	* Preparations for the new summary store
 	* Made all remaining static libraries LTLIBRARIES
+	* Fixed compiler warnings
 
 2008-01-11 Alberto Garcia Gonzalez <agarcia@igalia.com>
 

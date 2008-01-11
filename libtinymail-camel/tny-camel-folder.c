@@ -2479,7 +2479,7 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 		g_set_error (err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_GET_MSG,
 			"Folder not ready for getting messages");
-		return;
+		return NULL;
 	}
 
 	g_assert (TNY_IS_HEADER (header));
@@ -2545,7 +2545,7 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 		g_set_error (err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_GET_MSG,
 			"Folder not ready for finding messages");
-		return;
+		return NULL;
 	}
 
 	if (!priv->receive_strat) {
@@ -3221,7 +3221,7 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		g_set_error (err, TNY_FOLDER_ERROR, 
 			TNY_FOLDER_ERROR_COPY,
 			"Folder not ready for copy");
-		return;
+		return NULL;
 	}
 
 	orig_store = tny_folder_get_folder_store (self);

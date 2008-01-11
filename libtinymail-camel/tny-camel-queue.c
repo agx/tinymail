@@ -263,7 +263,7 @@ thread_main_func (gpointer user_data)
 void 
 _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags)
 {
-	GList *copy = NULL, *rem = NULL;
+	GList *copy = NULL;
 
 	g_static_rec_mutex_lock (queue->lock);
 	copy = queue->list;

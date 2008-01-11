@@ -21,6 +21,7 @@
 
 #include <glib/gi18n-lib.h>
 
+#include <ctype.h>
 #include <glib.h>
 #include <string.h>
 

@@ -49,6 +49,7 @@
 #include "camel-imap-summary.h"
 
 #include "camel-string-utils.h"
+#include "camel-stream-buffer.h"
 
 extern int camel_verbose_debug;
 
@@ -65,7 +66,7 @@ static char *imap_command_strdup_vprintf (CamelImapStore *store,
 static char *imap_command_strdup_printf (CamelImapStore *store,
 					 const char *fmt, ...);
 
-
+#ifdef NOTUSED
 static int
 uid_compar (const void *va, const void *vb)
 {
@@ -81,6 +82,8 @@ uid_compar (const void *va, const void *vb)
 	else
 		return 1;
 }
+
+#endif
 
 /**
  * camel_imap_command:

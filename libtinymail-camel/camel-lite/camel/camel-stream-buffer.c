@@ -34,6 +34,8 @@
 #include "camel-stream-buffer.h"
 #include "camel-tcp-stream.h"
 
+#include "camel-operation.h"
+
 static CamelStreamClass *parent_class = NULL;
 
 enum {

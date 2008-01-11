@@ -1843,7 +1843,7 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	CamelImapStore *store = CAMEL_IMAP_STORE (service);
 	CamelImapResponse *response;
 	/*struct _namespaces *namespaces;*/
-	char *result, *name;
+	char *result;
 	size_t len;
 	CamelImapStoreNamespace *ns;
 
@@ -2323,6 +2323,7 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 	return items;
 }
 
+#ifdef NOT_USED
 static void
 camel_imap_store_set_status_for (CamelImapStore *imap_store, const char *folder_name, guint32 messages, guint32 unseen, guint32 uidnext)
 {
@@ -2470,6 +2471,7 @@ parse_message_header (char *response)
 	return (CamelMessageInfo *) mi;
 }
 
+#endif
 
 static void
 imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen, int *messages, int *uidnext)
@@ -3494,7 +3496,7 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 		 **/
 
  		/* We'll start with SELECT context */
-		prefix = g_strdup_printf ("");
+		prefix = g_strdup ("");
 
  		/* We'll start with % if we know that there are other namespaces.
 		 * The reason is that otherwise we'd ask for LIST "" * here:
@@ -3699,7 +3701,7 @@ get_folders_sync_ns_only_lsub (CamelImapStore *imap_store, struct _namespace *na
 	CamelImapResponse *response;
 	CamelFolderInfo *fi, *hfi;
 	char *list;
-	int i, count, j;
+	int i, count;
 	GHashTable *present;
 	CamelStoreInfo *si;
 	present = g_hash_table_new(folder_hash, folder_eq);
@@ -4222,77 +4224,6 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 }
 
 
-
-/* FIXME: please god, when will the hurting stop? Thus function is so
-   fucking broken it's not even funny. */
-ssize_t
-camel_imap_store_readline_idle (CamelImapStore *store, char **dest, CamelException *ex)
-{
-	CamelStreamBuffer *stream;
-	char linebuf[1024] = {0};
-	GByteArray *ba;
-	ssize_t nread;
-
-	g_return_val_if_fail (CAMEL_IS_IMAP_STORE (store), -1);
-	g_return_val_if_fail (dest, -1);
-
-	*dest = NULL;
-
-	/* Check for connectedness. Failed (or cancelled) operations will
-	 * close the connection. We can't expect a read to have any
-	 * meaning if we reconnect, so always set an exception.
-	 */
-
-	if (!camel_disco_store_check_online((CamelDiscoStore *)store, ex))
-		return -1;
-
-	camel_imap_store_restore_stream_buffer (store);
-	stream = CAMEL_STREAM_BUFFER (store->istream);
-
-	ba = g_byte_array_new ();
-	while ((nread = camel_stream_buffer_gets_idle (stream, linebuf, sizeof (linebuf))) > 0) {
-		g_byte_array_append (ba, (const guchar*) linebuf, nread);
-		if (linebuf[nread - 1] == '\n')
-			break;
-	}
-
-	if (nread <= 0) {
-		if (errno == EINTR)
-		{
-			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
-			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
-			camel_imap_recon (store, &mex);
-			imap_debug ("Recon in idle: %s\n", camel_exception_get_description (&mex));
-		} else {
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-					      _("Server unexpectedly disconnected: %s"),
-					      g_strerror (errno));
-			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
-		}
-
-		g_byte_array_free (ba, TRUE);
-		return -1;
-	}
-
-	if (camel_verbose_debug) {
-		fprintf (stderr, "received: ");
-		fwrite (ba->data, 1, ba->len, stderr);
-	}
-
-	/* camel-imap-command.c:imap_read_untagged expects the CRLFs
-           to be stripped off and be nul-terminated *sigh* */
-	nread = ba->len - 1;
-	ba->data[nread] = '\0';
-	if (ba->data[nread - 1] == '\r') {
-		ba->data[nread - 1] = '\0';
-		nread--;
-	}
-
-	*dest = (char *) ba->data;
-	g_byte_array_free (ba, FALSE);
-
-	return nread;
-}
 
 ssize_t
 camel_imap_store_readline_nl (CamelImapStore *store, char **dest, CamelException *ex)

@@ -186,7 +186,7 @@ camel_imap_message_cache_new (const char *path, CamelFolderSummary *summary,
 		p = strchr (dname, '.');
 		if (p)
 			uid = g_strndup (dname, p - dname);
-		else if (p = strchr (dname, '_'))
+		else if ((p = strchr (dname, '_')))
 			uid = g_strndup (dname, p - dname);
 		else
 			uid = g_strdup (dname);

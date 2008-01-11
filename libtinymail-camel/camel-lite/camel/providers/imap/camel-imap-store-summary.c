@@ -548,7 +548,7 @@ namespace_load(CamelStoreSummary *s, FILE *in)
 	if (is->namespaces)
 		namespace_clear (s);
 
-	if (camel_file_util_decode_uint32(in, &count) == -1)
+	if (camel_file_util_decode_uint32(in, (guint32 *) &count) == -1)
 		goto nserror;
 
 	for (i=0 ; i< count; i++) {
@@ -616,7 +616,7 @@ static int
 summary_header_load(CamelStoreSummary *s, FILE *in)
 {
 	CamelImapStoreSummary *is = (CamelImapStoreSummary *)s;
-	gint32 version, capabilities, count;
+	gint32 version, capabilities;
 
 	namespace_clear(s);
 
@@ -644,7 +644,6 @@ static int
 summary_header_save(CamelStoreSummary *s, FILE *out)
 {
 	CamelImapStoreSummary *is = (CamelImapStoreSummary *)s;
-	guint32 count;
 
 	/* always write as latest version */
 	if (camel_imap_store_summary_parent->summary_header_save((CamelStoreSummary *)s, out) == -1

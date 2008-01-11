@@ -676,7 +676,7 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 		g_error (_("Mime part does not yet have a source stream, use "
 			"tny_mime_part_construct_from_stream first"));
 		camel_object_unref (CAMEL_OBJECT (cstream));
-		return;
+		return -1;
 	}
 
 	gssize bytes = -1;

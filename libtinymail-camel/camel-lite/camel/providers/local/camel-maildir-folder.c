@@ -238,8 +238,7 @@ maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveT
 	CamelStream *message_stream = NULL;
 	CamelMimeMessage *message = NULL;
 	CamelMessageInfo *info;
-	char *name, *filen; 
-	gboolean nfree = FALSE;
+	char *name; 
 	CamelMaildirMessageInfo *mdi;
 
 	d(printf("getting message: %s\n", uid));

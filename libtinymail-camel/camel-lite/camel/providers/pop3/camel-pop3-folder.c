@@ -271,10 +271,8 @@ static void
 pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 {
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
-	CamelPOP3Folder *pop3_folder = (CamelPOP3Folder *) folder;
 	CamelPOP3Command *pcl, *pcu = NULL;
 	int i, hcnt = 0, lcnt = 0;
-	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 	CamelFolderChangeInfo *changes = NULL;
 	GList *deleted = NULL;
 	gint max;
@@ -521,7 +519,6 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	CamelPOP3Store *pop3_store;
 	int i, max;
 	CamelMessageInfoBase *info;
-	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 	GList *deleted = NULL;
 	CamelFolderChangeInfo *changes = NULL;
 
@@ -815,12 +812,12 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 			continue;
 
 		/* heuristics */
-		if (camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
+		if (camel_strstrcase ((const char *) buffer, "Content-Disposition: attachment") != NULL)
 			fi->has_attachments = TRUE;
-		else if (camel_strstrcase (buffer, "filename=") != NULL &&
-			 strchr (buffer, '.'))
+		else if (camel_strstrcase ((const char *) buffer, "filename=") != NULL &&
+			 strchr ((const char *) buffer, '.'))
 			fi->has_attachments = TRUE;
-		else if (camel_strstrcase (buffer, "Content-Type: message/rfc822") != NULL)
+		else if (camel_strstrcase ((const char *) buffer, "Content-Type: message/rfc822") != NULL)
 			fi->has_attachments = TRUE;
 
 		if (boundary == NULL)
@@ -924,7 +921,6 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelStream *stream = NULL;
 	CamelFolderSummary *summary = folder->summary;
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
-	CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 	gint retry = 0;
 	gboolean had_attachment = FALSE;
 
@@ -1264,7 +1260,6 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 {
 	CamelMimeMessage *message = NULL;
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
-	CamelPOP3Folder *pop3_folder = (CamelPOP3Folder *)folder;
 	CamelPOP3Command *pcr;
 	CamelPOP3FolderInfo *fi;
 	char buffer[1]; int i;
@@ -1459,7 +1454,6 @@ fail:
 static gboolean
 pop3_set_message_flags (CamelFolder *folder, const char *uid, guint32 flags, guint32 set)
 {
-	CamelPOP3Folder *pop3_folder = CAMEL_POP3_FOLDER (folder);
 	CamelPOP3FolderInfo *fi;
 	gboolean res = FALSE;
 	CamelMessageInfo *info;

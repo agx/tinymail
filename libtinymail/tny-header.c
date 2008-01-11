@@ -566,7 +566,7 @@ void
 tny_header_set_priority (TnyHeader *self, TnyHeaderFlags priority)
 {
 	TnyHeaderFlags flags;
-	g_return_if_fail  (priority & TNY_HEADER_FLAG_PRIORITY_MASK != priority);
+	g_return_if_fail  ((priority & TNY_HEADER_FLAG_PRIORITY_MASK) != priority);
 
 	/* Is this necessary? */
 	flags = tny_header_get_flags (self);

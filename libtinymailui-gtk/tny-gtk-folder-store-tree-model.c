@@ -42,6 +42,7 @@
  **/
 
 #include <config.h>
+#include <string.h>
 
 #include <glib.h>
 #include <gtk/gtk.h>
@@ -112,7 +113,6 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 {
 	TnyIterator *iter;
 	TnyList *folders = tny_simple_list_new ();
-	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
 
 	/* TODO add error checking and reporting here */
 	tny_folder_store_get_folders (store, folders, self->query, NULL);
@@ -523,7 +523,6 @@ static void
 tny_gtk_folder_store_tree_model_finalize (GObject *object)
 {
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) object;
-	GList *copy = me->fol_obs;
 /*
 	if (me->signal1 != -1)
 		g_signal_handler_disconnect (me, me->signal1);
@@ -922,7 +921,6 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 static gboolean
 creater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *in_iter, gpointer user_data)
 {
-	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) model;
 	TnyGtkFolderStoreTreeModel *self = (TnyGtkFolderStoreTreeModel*) model;
 	TnyFolderStore *fol = NULL;
 	gboolean found = FALSE;
@@ -1069,7 +1067,6 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 {
 	TnyFolderStoreChangeChanged changed = tny_folder_store_change_get_changed (change);
 	GtkTreeModel *model = GTK_TREE_MODEL (self);
-	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) self;
 
 	if (changed & TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS) {
 		/* TnyList *created = tny_simple_list_new ();

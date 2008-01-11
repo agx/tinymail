@@ -465,7 +465,7 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 		retval = TNY_MIME_PART_VIEW (tny_msg_view_create_new_inline_viewer (self));
 
 	/* Attachments */
-	} else if (priv->display_attachments && tny_mime_part_is_attachment (part) || 
+	} else if ((priv->display_attachments && tny_mime_part_is_attachment (part)) || 
 		(priv->display_rfc822 && (tny_mime_part_content_type_is (part, "message/rfc822"))))
 	{
 		GtkTreeModel *model;

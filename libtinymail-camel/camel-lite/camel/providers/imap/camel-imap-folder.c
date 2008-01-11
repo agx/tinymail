@@ -60,7 +60,7 @@
 #include <libedataserver/e-time-utils.h>
 
 #include "camel-stream-fs.h"
-
+#include "camel-utf8.h"
 #include "camel-data-wrapper.h"
 #include "camel-debug.h"
 #include "camel-disco-diary.h"
@@ -4483,7 +4483,6 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 {
   CamelImapFolder *imap_folder = (CamelImapFolder *) folder;
   gchar *path = g_strdup_printf ("%s/%s_%s_CONVERTED", imap_folder->cache->path, uid, spec);
-  gboolean retry = TRUE;
   gint ex_id;
   gboolean err = FALSE, found = FALSE;
   gchar *err_message;
@@ -4505,7 +4504,6 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 		found = FALSE;
 
 	} else {
-		CamelStreamBuffer *server_stream;
 		int fd;
 
 		store = create_gmsgstore (imap_folder, &ctchecker, ex);
@@ -4749,9 +4747,6 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 
 	} else {
 
-		char *tag, line[MAX_LINE_LEN];
-		int taglen;
-		CamelStreamBuffer *server_stream;
 		int fd;
 
 		store = create_gmsgstore (imap_folder, &ctchecker, ex);
@@ -5159,7 +5154,6 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 			GString *bodyst = g_string_new ("");
 			CamelImapResponse *response;
 			gint i = 0; gchar *resp;
-			gboolean cont = FALSE;
 			gboolean hdr_bin=FALSE;
 
 			gchar *mpstr = camel_folder_fetch (folder, uid, "HEADER", &hdr_bin, ex);
@@ -5472,7 +5466,7 @@ Received: from nic.funet.fi
 						} else
 							line += 7;
 
-						body = imap_parse_nstring ((const char **) &line, &body_len);
+						body = imap_parse_nstring ((const char **) &line, (size_t *) &body_len);
 						if (body) {
 							done = TRUE;
 							break;

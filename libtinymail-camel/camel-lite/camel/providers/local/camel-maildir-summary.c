@@ -203,7 +203,6 @@ static struct {
 char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 {
 	const char *uid;
-	guint32 priority_flag = 0;	/* 2 bits flags */
 	char *p, *buf;
 	int i;
 
@@ -231,7 +230,6 @@ char *camel_maildir_summary_info_to_name(const CamelMaildirMessageInfo *info)
 int camel_maildir_summary_name_to_info(CamelMaildirMessageInfo *info, const char *name)
 {
 	char *p, c;
-	guint32 priority_flag = 0;	/* 2 bits flags */
 	guint32 set = 0;	/* what we set */
 	int i;
 

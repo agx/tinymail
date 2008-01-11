@@ -1978,7 +1978,7 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 			&info->cancelled, info, sizeof (GetSupportedAuthInfo),
 			__FUNCTION__);
 	} else {
-		TnyCamelQueue *temp_queue = _tny_camel_queue_new (self);
+		/* TnyCamelQueue *temp_queue = _tny_camel_queue_new (self); */
 		g_thread_create (tny_camel_account_get_supported_secure_authentication_async_thread,
 			info, FALSE, NULL);
 	}

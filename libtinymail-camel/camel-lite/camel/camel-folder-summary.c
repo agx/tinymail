@@ -861,6 +861,8 @@ perform_content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentI
  *
  * Returns %0 on success or %-1 on fail
  **/
+
+#ifdef SAVE_APPEND
 static int
 camel_folder_summary_save_append (CamelFolderSummary *s, CamelException *ex)
 {
@@ -1003,6 +1005,7 @@ exception:
 
 	return -1;
 }
+#endif
 
 static int
 camel_folder_summary_save_rewrite (CamelFolderSummary *s, CamelException *ex)
@@ -1155,11 +1158,14 @@ int
 camel_folder_summary_save (CamelFolderSummary *s, CamelException *ex)
 {
 	int retval;
-
-	//if (s->had_expunges)
+#ifdef SAVE_APPEND
+	if (s->had_expunges)
+#endif
 		retval = camel_folder_summary_save_rewrite (s, ex);
-	//else
-	//	retval = camel_folder_summary_save_append (s, ex);
+#ifdef SAVE_APPEND
+	else
+		retval = camel_folder_summary_save_append (s, ex);
+#endif
 
 	s->had_expunges = FALSE;
 

@@ -544,7 +544,6 @@ decode_async_thread (gpointer user_data)
 {
 	DecodeAsyncInfo *info = (DecodeAsyncInfo *) user_data;
 	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (info->self);
-	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->folder);
 	CamelOperation *cancel;
 
 	/* To disable parallel getting of messages while summary is being retreived,
@@ -643,7 +642,6 @@ tny_camel_bs_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stre
 static gint
 tny_camel_bs_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream *stream, const gchar *type)
 {
-	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
 	return -1;
 }
 

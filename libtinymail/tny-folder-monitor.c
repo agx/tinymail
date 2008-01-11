@@ -196,8 +196,6 @@ foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header, gint len
 static void 
 remove_headers_from_list (TnyList *list, GPtrArray *array)
 {
-	TnyIterator *iter;
-	TnyHeader *header = NULL;
 	gint i=0;
 
 	for (i=0; i<array->len; i++)

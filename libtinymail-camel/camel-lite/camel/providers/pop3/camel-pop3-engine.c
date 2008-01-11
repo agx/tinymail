@@ -35,6 +35,7 @@
 #include "camel-pop3-stream.h"
 #include "camel-sasl.h"
 #include "camel-service.h"
+#include "camel-string-utils.h"
 
 /* max 'outstanding' bytes in output stream, so we can't deadlock waiting
    for the server to accept our data when pipelining */
@@ -247,7 +248,7 @@ cmd_capa(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 			} if (camel_strstrcase ((char *) line, "LOGIN-DELAY")) {
 				char *delay;
 				pe->capa |= CAMEL_POP3_CAP_LOGIN_DELAY;
-				delay = strchr (line, ' ');
+				delay = strchr ((const char *) line, ' ');
 				if (delay) {
 					delay++;
 					pe->login_delay = strtoul (delay, &delay, 10);

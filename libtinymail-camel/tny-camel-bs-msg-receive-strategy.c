@@ -69,7 +69,6 @@ TnyStream *
 tny_camel_bs_msg_receive_strategy_start_receiving_part (TnyCamelBsMsgReceiveStrategy *self, TnyFolder *folder, TnyCamelBsMimePart *part, gboolean *binary, GError **err)
 {
 	TnyCamelBsMimePartPriv *ppriv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (part);
-	TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 	gchar *uid = ppriv->uid;
 	bodystruct_t *bodystruct = ppriv->bodystructure;
 	gchar *part_spec = bodystruct->part_spec;
@@ -113,8 +112,7 @@ static TnyMsg *
 tny_camel_bs_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)
 {
 	TnyMsg *message = NULL;
-	gchar *filename, *uid;
-	FILE *file;
+	gchar *uid;
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 	bodystruct_t *bodystructure = NULL;
 	gchar *structure_str;
@@ -135,7 +133,7 @@ tny_camel_bs_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrategy
 	}
 
 	if (structure_str) {
-		bodystructure = bodystruct_parse (structure_str, strlen (structure_str),
+		bodystructure = bodystruct_parse ((guchar *) structure_str, strlen (structure_str),
 			&parse_err);
 		if (parse_err) {
 			g_propagate_error (err, parse_err);

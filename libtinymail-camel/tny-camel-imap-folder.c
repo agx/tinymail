@@ -90,9 +90,8 @@ tny_camel_imap_folder_class_init (TnyCamelIMAPFolderClass *class)
 static void
 tny_camel_imap_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (instance);
-
 #ifdef IMAP_PART_FETCH
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (instance);
 
 	/* By default disabled until after the first release */
 

@@ -931,6 +931,7 @@ summary_thaw (Summary *s)
 	g_static_rec_mutex_unlock (s->lock);
 }
 
+#ifdef DONT
 static void
 summary_dump (Summary *summary)
 {
@@ -947,6 +948,7 @@ summary_dump (Summary *summary)
 
 	return;
 }
+#endif
 
 static inline void
 foreach_item_free (gpointer key, gpointer value, gpointer user_data)
@@ -1105,6 +1107,7 @@ summary_create_item (const char *uid, int seq, int flags, size_t size, const cha
 	return item;
 }
 
+#ifdef DONT
 static void 
 foreach_item_print_it (gpointer key, gpointer value, gpointer user_data)
 {
@@ -1133,7 +1136,6 @@ print_summary (Summary *summary)
 	}
 }
 
-#ifdef DONT
 
 int 
 main (int argc, char **argv)

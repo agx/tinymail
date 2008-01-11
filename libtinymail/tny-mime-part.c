@@ -599,7 +599,7 @@ tny_mime_part_get_content_location (TnyMimePart *self)
  * API has mostly the same effect as the tny_mime_part_decode_to_stream(): You 
  * will get a non-encoded version of the data. A small difference will be that
  * the tny_mime_part_decode_to_stream() will decode certain special characters in
- * TEXT/* mime parts (character set encoding) to UTF-8.
+ * TEXT mime parts (character set encoding) to UTF-8.
  *
  * However. A larger difference happens with binary mime parts that where not
  * retrieved using BINARY. For those this API will give you the encoded data
@@ -651,7 +651,7 @@ tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream, GError **er
  * with your data (it will be streamed to you the way it got received). If we
  * received using FETCH BODY and the data is encoded in a known encoding
  * (like BASE 64, QUOTED-PRINTED, UUENCODED, etc), the data will be decoded
- * before delivered to @stream. TEXT/* mime parts will also enjoy character set
+ * before delivered to @stream. TEXT mime parts will also enjoy character set
  * decoding.
  *
  * In short will this API prepare the cookie and deliver it to your @stream.
