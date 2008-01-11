@@ -1107,6 +1107,27 @@ summary_create_item (const char *uid, int seq, int flags, size_t size, const cha
 	return item;
 }
 
+
+
+#if GLIB_CHECK_VERSION (2,14,0)
+	/* Nothing */
+#else
+inline static void
+list_values (gpointer key, gpointer value, GList **values)
+{
+	*values = g_list_append (*values, value);
+}
+
+inline static GList*
+g_hash_table_get_values (GHashTable *hash)
+{
+	GList *values = NULL;
+	g_hash_table_for_each (hash, (GHFunc)list_values, &values);
+	return values;
+}
+#endif
+
+
 #ifdef DONT
 static void 
 foreach_item_print_it (gpointer key, gpointer value, gpointer user_data)
