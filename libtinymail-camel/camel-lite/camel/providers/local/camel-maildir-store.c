@@ -373,6 +373,7 @@ fill_fi(CamelStore *store, CamelFolderInfo *fi, guint32 flags)
 		camel_file_util_read_counts (path, fi);
 	}
 
+
 	if (folderpath) {
 		fi->local_size = 0;
 		camel_du (folderpath, (int *) &fi->local_size);
@@ -440,6 +441,8 @@ static CamelFolderInfo *scan_fi(CamelStore *store, guint32 flags, CamelURL *url,
 	      && stat(cur, &st) == 0 && S_ISDIR(st.st_mode)
 	      && stat(new, &st) == 0 && S_ISDIR(st.st_mode)))
 		fi->flags |= CAMEL_FOLDER_NOSELECT;
+
+	fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
 
 	g_free(new);
 	g_free(cur);

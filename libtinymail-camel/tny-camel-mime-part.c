@@ -718,6 +718,11 @@ tny_camel_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream 
 	cstream = tny_stream_camel_new (stream);
 
 	g_mutex_lock (priv->part_lock);
+
+	if (type && g_ascii_strncasecmp (type, "text", 4) != 0 && g_ascii_strcasecmp (type, "message/rfc822") != 0)
+		camel_mime_part_set_encoding (priv->part, 
+			CAMEL_TRANSFER_ENCODING_BASE64);
+
 	medium = CAMEL_MEDIUM (priv->part);
 	camel_object_ref (CAMEL_OBJECT (medium));
 	g_mutex_unlock (priv->part_lock);
@@ -727,9 +732,9 @@ tny_camel_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream 
 	if (wrapper)
 		camel_object_unref (CAMEL_OBJECT (wrapper));
 
-	if (type && !g_ascii_strcasecmp (type, "message/rfc822"))
+	if (type && g_ascii_strcasecmp (type, "message/rfc822") == 0)
 		wrapper = (CamelDataWrapper *) camel_mime_message_new ();
-	else 
+	else
 		wrapper = camel_data_wrapper_new ();
 
 	retval = camel_data_wrapper_construct_from_stream (wrapper, cstream);

@@ -4,6 +4,8 @@
 	* Added an extra check around a strcmp that seems to have caused a 
 	crash once
 	* Size determining when adding items to a local maildir folder
+	* Content-Transfer-Encoding when adding MIME parts
+	* Maildir folders are always subscribed
 
 2008-01-11  Philip Van Hoof <pvanhoof@gnome.org>
 
