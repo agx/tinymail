@@ -41,6 +41,7 @@
 #include "camel-mime-message.h"
 #include "camel-operation.h"
 #include "camel-private.h"
+#include "camel-stream-null.h"
 
 #include "camel-maildir-summary.h"
 
@@ -355,18 +356,25 @@ static CamelMessageInfo *maildir_summary_add(CamelLocalSummary *cls, CamelMimeMe
 	if (mi) {
 		if (camel_message_info_uid(mi))
 		{
-			struct stat sbuf;
+			/* struct stat sbuf; */
 			CamelMessageInfoBase *mii = (CamelMessageInfoBase *)mi;
-			gchar *name = NULL;
+			/* gchar *name = NULL; */
 
 			camel_maildir_info_set_filename(mi, camel_maildir_summary_info_to_name(mi));
 			d(printf("Setting filename to %s\n", camel_maildir_info_filename(mi)));
 
-			name = g_strdup_printf("%s/cur/%s", cls->folder_path, camel_maildir_info_filename (mi));
+
+			if (mii->size == 0) {
+				CamelStreamNull *sn = (CamelStreamNull *)camel_stream_null_new();
+				camel_data_wrapper_write_to_stream((CamelDataWrapper *)msg, (CamelStream *)sn);
+				mii->size = (sn->written);
+				camel_object_unref((CamelObject *)sn);
+			} 
+
+			/* name = g_strdup_printf("%s/cur/%s", cls->folder_path, camel_maildir_info_filename (mi));
 			if (stat (name, &sbuf) == 0)
 				mii->size = sbuf.st_size;
-			g_free (name);
-
+			g_free (name); */
 		}
 	}
 

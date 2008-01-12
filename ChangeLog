@@ -3,6 +3,7 @@
 	* Merged camel-lite with Camel upstream rev. 835
 	* Added an extra check around a strcmp that seems to have caused a 
 	crash once
+	* Size determining when adding items to a local maildir folder
 
 2008-01-11  Philip Van Hoof <pvanhoof@gnome.org>
 
