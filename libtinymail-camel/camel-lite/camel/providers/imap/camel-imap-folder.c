@@ -5342,10 +5342,16 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 				if (*line != '*' || *(line + 1) != ' ')
 				{
-					err = TRUE;
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-					errmessage = g_strdup_printf ("Read from service failed: Line doesn't start "
-						" with \"* \" for uid=%s (in stead it started with %s)", uid, line);
+					if (camel_strstrcase (line, "OK")) {
+						err = TRUE;
+						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
+						errmessage = errmessage = g_strdup_printf ("Message with UID %s does not exists", uid);
+					} else{
+						err = TRUE;
+						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
+						errmessage = g_strdup_printf ("Read from service failed: Line doesn't start "
+							" with \"* \" for uid=%s (in stead it started with %s)", uid, line);
+					}
 					goto berrorhander;
 				}
 
