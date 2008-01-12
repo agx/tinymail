@@ -5444,6 +5444,11 @@ Received: from nic.funet.fi
 			if (!response)
 				err = TRUE;
 
+			if (response && response->untagged && response->untagged->len <= 0) {
+				errmessage = g_strdup_printf ("Message with UID %s does not exists", uid);
+				err = TRUE;
+			}
+
 			if (response) {
 			  for (i = 0; i < response->untagged->len; i++) {
 				char *line = response->untagged->pdata[i];

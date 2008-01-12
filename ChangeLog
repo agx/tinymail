@@ -6,6 +6,7 @@
 	* Size determining when adding items to a local maildir folder
 	* Content-Transfer-Encoding when adding MIME parts
 	* Maildir folders are always subscribed
+	* Non existing UIDs when BODY.PEEK-ing
 
 2008-01-11  Philip Van Hoof <pvanhoof@gnome.org>
 
