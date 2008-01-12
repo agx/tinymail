@@ -111,6 +111,9 @@ camel_pop3_logbook_is_registered (CamelPOP3Logbook *book, const gchar *uid)
 {
 	gboolean truth = FALSE;
 
+	if (!uid)
+		return FALSE;
+
 	g_static_rec_mutex_lock (book->lock);
 
 	if (!book->registered)
