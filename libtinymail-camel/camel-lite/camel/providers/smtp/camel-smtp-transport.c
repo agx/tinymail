@@ -314,8 +314,12 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		/* Fall back to HELO */
 		camel_exception_clear (ex);
 		transport->flags &= ~CAMEL_SMTP_TRANSPORT_IS_ESMTP;
-		if (!smtp_helo (transport, ex) && !transport->connected)
+
+		if (!smtp_helo (transport, ex)) {
+			camel_service_disconnect ((CamelService *) transport, TRUE, NULL);
+
 			return FALSE;
+		}
 	}
 
 	/* clear any EHLO/HELO exception and assume that any SMTP errors encountered were non-fatal */
@@ -380,8 +384,11 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 
 	/* We are supposed to re-EHLO after a successful STARTTLS to
            re-fetch any supported extensions. */
-	if (!smtp_helo (transport, ex) && !transport->connected)
+	if (!smtp_helo (transport, ex)) {
+		camel_service_disconnect ((CamelService *) transport, TRUE, NULL);
+
 		return FALSE;
+	}
 
 	return TRUE;
 
