@@ -134,7 +134,7 @@ camel_pop3_logbook_is_registered (CamelPOP3Logbook *book, const gchar *uid)
 	} else {
 		GList *copy = book->registered;
 		while (copy && !truth) {
-			if (!strcmp ((const char *) copy->data, uid))
+			if (copy->data && uid && (!strcmp ((const char *) copy->data, uid)))
 				truth = TRUE;
 			copy = g_list_next (copy);
 		}
