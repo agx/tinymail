@@ -52,7 +52,7 @@ struct _TnyCamelBsMimePartClass
 	TnyStream* (*get_stream_func) (TnyMimePart *self);
 	gssize (*decode_to_stream_func) (TnyMimePart *self, TnyStream *stream, GError **err);
 	gssize (*write_to_stream_func) (TnyMimePart *self, TnyStream *stream, GError **err);
-	gint (*construct_from_stream_func) (TnyMimePart *self, TnyStream *stream, const gchar *type);
+	gint (*construct_func) (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding);
 	const gchar* (*get_filename_func) (TnyMimePart *self);
 	const gchar* (*get_content_id_func) (TnyMimePart *self);
 	const gchar* (*get_description_func) (TnyMimePart *self);
@@ -71,6 +71,7 @@ struct _TnyCamelBsMimePartClass
 	void (*get_header_pairs_func) (TnyMimePart *self, TnyList *list);
 	void (*set_header_pair_func) (TnyMimePart *self, const gchar *name, const gchar *value);
 	void (*decode_to_stream_async_func) (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	const gchar* (*get_transfer_encoding_func) (TnyMimePart *self);
 };
 
 

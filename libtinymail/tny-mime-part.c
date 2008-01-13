@@ -744,12 +744,16 @@ tny_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyM
 
 
 /**
- * tny_mime_part_construct_from_stream:
+ * tny_mime_part_construct:
  * @self: a #TnyMimePart
  * @stream: a #TnyStream
- * @type: the MIME type like "text/plain"
+ * @mime_type: the MIME type like "text/plain"
+ * @transfer_encoding: the Content-Transfer-Encoding
  * 
  * Set the stream from which the part will read its content
+ *
+ * Valid values for @transfer_encoding are "7bit", "8bit", "base64",
+ * "quoted-printable", "binary" and "x-uuencode"
  *
  * Example:
  * <informalexample><programlisting>
@@ -758,7 +762,7 @@ tny_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyM
  * if (fd != -1)
  * {
  *      TnyFsStream *stream = tny_fs_stream_new (fd);
- *      tny_mime_part_construct_from_stream (part, TNY_STREAM (stream));
+ *      tny_mime_part_construct (part, TNY_STREAM (stream), "text/html", "base64");
  * }
  * </programlisting></informalexample>
  *
@@ -767,23 +771,45 @@ tny_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyM
  * audience: application-developer
  **/
 gint
-tny_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream, const gchar *type)
+tny_mime_part_construct (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding)
 {
 	gint retval;
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (TNY_IS_STREAM (stream));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->construct_from_stream_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->construct_func != NULL);
 #endif
 
-	retval = TNY_MIME_PART_GET_IFACE (self)->construct_from_stream_func (self, stream, type);
+	retval = TNY_MIME_PART_GET_IFACE (self)->construct_func (self, stream, mime_type, transfer_encoding);
 
 #ifdef DBC /* ensure */
 	g_assert (retval == 0 || retval == -1);
 #endif
 
 	return retval;
+}
+
+
+/**
+ * tny_mime_part_get_transfer_encoding:
+ * @self: a #TnyMimePart
+ * 
+ * Get the transfer encoding of @self or NULL if default transfer encoding 7bit.
+ * 
+ * returns (null-ok): transfer encoding
+ * since: 1.0
+ * audience: application-developer
+ **/
+const gchar* 
+tny_mime_part_get_transfer_encoding (TnyMimePart *self)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_transfer_encoding_func != NULL);
+#endif
+
+	return TNY_MIME_PART_GET_IFACE (self)->get_transfer_encoding_func (self);
 }
 
 

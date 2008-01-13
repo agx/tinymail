@@ -634,16 +634,30 @@ tny_camel_bs_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *s
 }
 
 static gint
-tny_camel_bs_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream, const gchar *type)
+tny_camel_bs_mime_part_construct (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->construct_from_stream_func (self, stream, type);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->construct_func (self, stream, mime_type, transfer_encoding);
 }
 
 static gint
-tny_camel_bs_mime_part_construct_from_stream_default (TnyMimePart *self, TnyStream *stream, const gchar *type)
+tny_camel_bs_mime_part_construct_default (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar* transfer_encoding)
 {
 	return -1;
 }
+
+static const gchar* 
+tny_camel_bs_mime_part_get_transfer_encoding (TnyMimePart *self)
+{
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_transfer_encoding_func (self);
+}
+
+static const gchar* 
+tny_camel_bs_mime_part_get_transfer_encoding_default (TnyMimePart *self)
+{
+	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
+	return priv->bodystructure->encoding;
+}
+
 
 static TnyStream* 
 tny_camel_bs_mime_part_get_stream (TnyMimePart *self)
@@ -994,7 +1008,7 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->get_content_type_func = tny_camel_bs_mime_part_get_content_type;
 	klass->get_stream_func = tny_camel_bs_mime_part_get_stream;
 	klass->write_to_stream_func = tny_camel_bs_mime_part_write_to_stream;
-	klass->construct_from_stream_func = tny_camel_bs_mime_part_construct_from_stream;
+	klass->construct_func = tny_camel_bs_mime_part_construct;
 	klass->get_filename_func = tny_camel_bs_mime_part_get_filename;
 	klass->get_content_id_func = tny_camel_bs_mime_part_get_content_id;
 	klass->get_description_func = tny_camel_bs_mime_part_get_description;
@@ -1014,7 +1028,7 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->get_header_pairs_func = tny_camel_bs_mime_part_get_header_pairs;
 	klass->set_header_pair_func = tny_camel_bs_mime_part_set_header_pair;
 	klass->decode_to_stream_async_func = tny_camel_bs_mime_part_decode_to_stream_async;
-
+	klass->get_transfer_encoding_func = tny_camel_bs_mime_part_get_transfer_encoding;
 	return;
 }
 
@@ -1031,7 +1045,7 @@ tny_camel_bs_mime_part_class_init (TnyCamelBsMimePartClass *class)
 	class->get_content_type_func = tny_camel_bs_mime_part_get_content_type_default;
 	class->get_stream_func = tny_camel_bs_mime_part_get_stream_default;
 	class->write_to_stream_func = tny_camel_bs_mime_part_write_to_stream_default;
-	class->construct_from_stream_func = tny_camel_bs_mime_part_construct_from_stream_default;
+	class->construct_func = tny_camel_bs_mime_part_construct_default;
 	class->get_filename_func = tny_camel_bs_mime_part_get_filename_default;
 	class->get_content_id_func = tny_camel_bs_mime_part_get_content_id_default;
 	class->get_description_func = tny_camel_bs_mime_part_get_description_default;
@@ -1051,6 +1065,7 @@ tny_camel_bs_mime_part_class_init (TnyCamelBsMimePartClass *class)
 	class->get_header_pairs_func = tny_camel_bs_mime_part_get_header_pairs_default;
 	class->set_header_pair_func = tny_camel_bs_mime_part_set_header_pair_default;
 	class->decode_to_stream_async_func = tny_camel_bs_mime_part_decode_to_stream_async_default;
+	class->get_transfer_encoding_func = tny_camel_bs_mime_part_get_transfer_encoding_default;
 
 	object_class->finalize = tny_camel_bs_mime_part_finalize;
 

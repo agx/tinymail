@@ -48,7 +48,7 @@ struct _TnyMimePartIface
 	TnyStream* (*get_stream_func) (TnyMimePart *self);
 	gssize (*decode_to_stream_func) (TnyMimePart *self, TnyStream *stream, GError **err);
 	gssize (*write_to_stream_func) (TnyMimePart *self, TnyStream *stream, GError **err);
-	gint (*construct_from_stream_func) (TnyMimePart *self, TnyStream *stream, const gchar *type);
+	gint (*construct_func) (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding);
 	const gchar* (*get_filename_func) (TnyMimePart *self);
 	const gchar* (*get_content_id_func) (TnyMimePart *self);
 	const gchar* (*get_description_func) (TnyMimePart *self);
@@ -68,6 +68,8 @@ struct _TnyMimePartIface
 	void (*get_header_pairs_func) (TnyMimePart *self, TnyList *list);
 	void (*set_header_pair_func) (TnyMimePart *self, const gchar *name, const gchar *value);
 	void (*decode_to_stream_async_func) (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	const gchar* (*get_transfer_encoding_func) (TnyMimePart *self);
+
 };
 
 GType tny_mime_part_get_type (void);
@@ -76,7 +78,7 @@ const gchar* tny_mime_part_get_content_type (TnyMimePart *self);
 gboolean tny_mime_part_content_type_is (TnyMimePart *self, const gchar *type);
 TnyStream* tny_mime_part_get_stream (TnyMimePart *self);
 gssize tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream, GError **err);
-gint tny_mime_part_construct_from_stream (TnyMimePart *self, TnyStream *stream, const gchar *type);
+gint tny_mime_part_construct (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding);
 const gchar* tny_mime_part_get_filename (TnyMimePart *self);
 const gchar* tny_mime_part_get_content_id (TnyMimePart *self);
 const gchar* tny_mime_part_get_description (TnyMimePart *self);
@@ -96,6 +98,7 @@ void tny_mime_part_del_part (TnyMimePart *self, TnyMimePart *part);
 void tny_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list);
 void tny_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value);
 void tny_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+const gchar* tny_mime_part_get_transfer_encoding (TnyMimePart *self);
 
 G_END_DECLS
 

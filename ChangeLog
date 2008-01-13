@@ -1,3 +1,11 @@
+2008-01-13  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Changed tny_mime_part_construct_from_stream to
+	tny_mime_part_construct, added a parameter for the
+	content-transfer-encoding too
+
+	* This was a major API change
+
 2008-01-12  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Merged camel-lite with Camel upstream rev. 8360
