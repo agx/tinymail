@@ -218,9 +218,9 @@ tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->nm_ctx = libnm_glib_init ();
 #ifndef IMMEDIATE_ONLINE_TEST
 	priv->current_state = tny_gnome_device_is_online (TNY_DEVICE (self));
-	//if (priv->nm_ctx)
-	//	priv->callback_id = libnm_glib_register_callback 
-	//		(priv->nm_ctx, nm_callback, self, NULL);
+	if (priv->nm_ctx)
+		priv->callback_id = libnm_glib_register_callback 
+			(priv->nm_ctx, nm_callback, self, NULL);
 #endif
 #endif
 
