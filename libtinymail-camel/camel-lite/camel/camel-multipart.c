@@ -105,6 +105,7 @@ camel_multipart_init (gpointer object, gpointer klass)
 
 	camel_data_wrapper_set_mime_type (CAMEL_DATA_WRAPPER (multipart),
 					  "multipart/mixed");
+	multipart->parts = NULL;
 	multipart->preface = NULL;
 	multipart->postface = NULL;
 }
