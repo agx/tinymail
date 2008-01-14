@@ -1481,12 +1481,15 @@ _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
 				_tny_camel_account_get_tny_error_code_for_camel_exception_id (priv->ex),
 				camel_exception_get_description (priv->ex));
+
+				camel_exception_clear (&ex);
 		} else {
 			g_set_error (err, TNY_ACCOUNT_ERROR, 
 				TNY_ACCOUNT_ERROR_TRY_CONNECT,
 				"Account not yet fully configured. "
 				"This problem indicates a bug in the software.");
 		}
+
 
 		return;
 	}
@@ -1515,7 +1518,7 @@ _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **
 				if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
 					camel_store_restore (CAMEL_STORE (priv->service)); 
 				set_online_happened (priv->session, self, TRUE);
-			}
+			} 
 
 			goto done;
 
@@ -1591,7 +1594,6 @@ _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **
 
 		if (!camel_exception_is_set (&ex))
 			set_online_happened (priv->session, self, FALSE);
-
 	}
 
 done:
@@ -1601,6 +1603,8 @@ done:
 		g_set_error (err, TNY_ACCOUNT_ERROR, 
 			_tny_camel_account_get_tny_error_code_for_camel_exception_id (&ex),
 			camel_exception_get_description (&ex));
+
+		camel_exception_clear (&ex);
 	}
 
 	camel_object_unref (priv->service);
