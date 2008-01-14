@@ -669,6 +669,7 @@ camel_operation_end (CamelOperation *cc)
 	char *msg = NULL;
 	int sofar = 0;
 	int oftotal = 100;
+	GSList *item;
 
 	if (cc == NULL)
 		cc = co_getcc();
@@ -720,7 +721,10 @@ camel_operation_end (CamelOperation *cc)
 		cc->lastreport = s;
 	}
 	g_free(s);
-	cc->status_stack = g_slist_remove_link(cc->status_stack, cc->status_stack);
+
+	item = cc->status_stack;
+	cc->status_stack = g_slist_remove_link(cc->status_stack, item);
+	g_slist_free (item);
 
 	UNLOCK();
 
