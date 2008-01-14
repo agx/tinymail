@@ -50,6 +50,8 @@
 
 static void namespace_clear(CamelStoreSummary *s);
 
+static void namespace_free(CamelStoreSummary *s, CamelImapStoreNamespace *ns);
+
 static int summary_header_load(CamelStoreSummary *, FILE *);
 static int summary_header_save(CamelStoreSummary *, FILE *);
 
@@ -438,24 +440,29 @@ CamelImapStoreNamespace *camel_imap_store_summary_namespace_new(CamelImapStoreSu
 	return ns;
 }
 
-void camel_imap_store_summary_namespace_add(CamelImapStoreSummary *s, CamelImapStoreNamespace *ns)
+CamelImapStoreNamespace * camel_imap_store_summary_namespace_add(CamelImapStoreSummary *s, CamelImapStoreNamespace *ns)
 {
 	gboolean add = TRUE;
 	GList *lst = s->namespaces;
+	CamelImapStoreNamespace *ret = NULL;
 
 	while (lst) {
 		CamelImapStoreNamespace *n = lst->data;
 		if (n->full_name && ns->full_name && !strcmp (n->full_name, ns->full_name)) {
 			add = FALSE;
+			ret = n;
 			break;
 		}
 		lst = lst->next;
 	}
 
-	if (add)
+	if (add) {
 		s->namespaces = g_list_prepend (s->namespaces, ns);
+		ret = ns;
+	} else
+		namespace_free((CamelStoreSummary*)s, ns);
 
-	return;
+	return ret;
 }
 
 void camel_imap_store_summary_namespace_set(CamelImapStoreSummary *s, CamelImapStoreNamespace *ns)

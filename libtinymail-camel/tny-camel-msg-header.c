@@ -76,8 +76,15 @@ decode_it (CamelMimeMessage *msg, const char *str, gboolean is_addr)
 		} else {
 			ret = g_strdup (str);
 		}
+
+		if (ct)
+			camel_content_type_unref (ct);
+
 		return ret;
 	}
+
+	if (ct)
+		camel_content_type_unref (ct);
 
 	return camel_header_decode_string (str, charset);
 }

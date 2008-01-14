@@ -1898,18 +1898,18 @@ imap_connect_online (CamelService *service, CamelException *ex)
 
 		if (namespaces && namespaces->personal) {
 			ns = camel_imap_store_summary_namespace_new(store->summary, namespaces->personal->prefix, namespaces->personal->delim);
-			camel_imap_store_summary_namespace_add(store->summary,ns);
+			ns = camel_imap_store_summary_namespace_add(store->summary,ns);
 			camel_imap_store_summary_namespace_set(store->summary, ns);
 		}
 
 		if (namespaces && namespaces->other) {
 			ns = camel_imap_store_summary_namespace_new(store->summary, namespaces->other->prefix, namespaces->other->delim);
-			camel_imap_store_summary_namespace_add(store->summary,ns);
+			ns = camel_imap_store_summary_namespace_add(store->summary,ns);
 		}
 
 		if (namespaces && namespaces->shared) {
 			ns = camel_imap_store_summary_namespace_new(store->summary, namespaces->shared->prefix, namespaces->shared->delim);
-			camel_imap_store_summary_namespace_add(store->summary,ns);
+			ns = camel_imap_store_summary_namespace_add(store->summary,ns);
 		}
 
 
@@ -3585,6 +3585,7 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 					} else {
 						hfi->unread = fi->unread;
 						hfi->total = fi->total;
+						camel_folder_info_free(fi);
 					}
 				}
 				camel_imap_response_free (imap_store, response);
@@ -3650,6 +3651,7 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 							hfi->unread = fi->unread;
 							hfi->total = fi->total;
 						}
+						camel_folder_info_free(fi);
 					}
 				}
 			}
@@ -3724,7 +3726,8 @@ get_folders_sync_ns_only_lsub (CamelImapStore *imap_store, struct _namespace *na
 		if (hfi == NULL) {
 			fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
 			g_hash_table_insert(present, fi->full_name, fi);
-		}
+		} else 
+			camel_folder_info_free(fi);
 	}
 
 	camel_imap_response_free (imap_store, response);
@@ -4192,6 +4195,7 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
 			camel_imap_recon (store, &mex);
 			imap_debug ("Recon: %s\n", camel_exception_get_description (&mex));
+			camel_exception_clear (&mex);
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					      _("Server unexpectedly disconnected: %s"),
@@ -4267,6 +4271,7 @@ camel_imap_store_readline_nl (CamelImapStore *store, char **dest, CamelException
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
 			camel_imap_recon (store, &mex);
 			imap_debug ("Recon in nl: %s\n", camel_exception_get_description (&mex));
+			camel_exception_clear (&mex);
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					      _("Server unexpectedly disconnected: %s"),

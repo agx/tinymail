@@ -3298,6 +3298,13 @@ imap_update_summary (CamelFolder *folder, int exists,
 				camel_folder_summary_kill_hash (folder->summary);
 				store->dontdistridlehack = FALSE;
 
+				if (mchanges) {
+					if (camel_folder_change_info_changed (mchanges))
+						camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", mchanges);
+					camel_folder_change_info_free (mchanges);
+					mchanges = NULL;
+				}
+
 				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 
 				return;
@@ -3397,6 +3404,13 @@ imap_update_summary (CamelFolder *folder, int exists,
 							camel_folder_summary_kill_hash (folder->summary);
 							store->dontdistridlehack = FALSE;
 
+							if (mchanges) {
+								if (camel_folder_change_info_changed (mchanges))
+									camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", mchanges);
+								camel_folder_change_info_free (mchanges);
+								mchanges = NULL;
+							}
+
 							camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 
 							return;
@@ -3422,6 +3436,13 @@ imap_update_summary (CamelFolder *folder, int exists,
 				more = FALSE;
 				camel_folder_summary_kill_hash (folder->summary);
 				store->dontdistridlehack = FALSE;
+
+				if (mchanges) {
+					if (camel_folder_change_info_changed (mchanges))
+						camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", mchanges);
+					camel_folder_change_info_free (mchanges);
+					mchanges = NULL;
+				}
 
 				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 
@@ -5345,7 +5366,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 					if (camel_strstrcase (line, "OK")) {
 						err = TRUE;
 						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-						errmessage = errmessage = g_strdup_printf ("Message with UID %s does not exists", uid);
+						errmessage = g_strdup_printf ("Message with UID %s does not exists", uid);
 					} else{
 						err = TRUE;
 						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;

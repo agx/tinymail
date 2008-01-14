@@ -1,3 +1,12 @@
+2008-01-14  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Some aggresive memory checking revealed a few interesting memory
+	leaks. This commit fixes those. The fixes are experimental, although
+	most of them double checked.
+
+	CamelOperation holds one more significant memory leak at its
+	status_hack linked list. That one is not yet fixed.
+
 2008-01-13  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Changed tny_mime_part_construct_from_stream to

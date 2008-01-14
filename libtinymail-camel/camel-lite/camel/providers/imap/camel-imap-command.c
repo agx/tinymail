@@ -372,6 +372,7 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		camel_imap_recon (store, &mex);
 		imap_debug ("Recon in start: %s\n", camel_exception_get_description (&mex));
 
+		camel_exception_clear (&mex);
 		return FALSE;
 	}
 
@@ -413,6 +414,7 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 			camel_imap_recon (store, &mex);
 			imap_debug ("Recon in cont: %s\n", camel_exception_get_description (&mex));
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+			camel_exception_clear (&mex);
 			return NULL;
 		} else
 			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
@@ -710,6 +712,7 @@ imap_read_untagged_opp (CamelImapStore *store, char *line, CamelException *ex, i
 							     _("Operation cancelled"));
 					camel_imap_recon (store, &mex);
 					imap_debug ("Recon in untagged: %s\n", camel_exception_get_description (&mex));
+					camel_exception_clear (&mex);
 				} else {
 					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 							     g_strerror (errno));
@@ -729,6 +732,7 @@ imap_read_untagged_opp (CamelImapStore *store, char *line, CamelException *ex, i
 						     _("Operation cancelled"));
 				camel_imap_recon (store, &mex);
 				imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
+				camel_exception_clear (&mex);
 			} else {
 				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     _("Server response ended too soon."));
@@ -873,6 +877,7 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 							     _("Operation cancelled"));
 					camel_imap_recon (store, &mex);
 					imap_debug ("Recon in untagged: %s\n", camel_exception_get_description (&mex));
+					camel_exception_clear (&mex);
 				} else {
 					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 							     g_strerror (errno));
@@ -892,6 +897,7 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 						     _("Operation cancelled"));
 				camel_imap_recon (store, &mex);
 				imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
+				camel_exception_clear (&mex);
 			} else {
 				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 					     _("Server response ended too soon."));
