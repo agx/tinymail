@@ -2906,7 +2906,7 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
-		recurse_evt (cur, TNY_FOLDER_STORE (folder), list, func, rem);
+		list = recurse_evt (cur, TNY_FOLDER_STORE (folder), list, func, rem);
 		g_object_unref (cur);
 		tny_iterator_next (iter);
 	}
@@ -4602,11 +4602,12 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
 	if (!info || camel_exception_is_set (&ex) || !priv->account) {
-		if (camel_exception_is_set (&ex))
+		if (camel_exception_is_set (&ex)) {
 			g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				camel_exception_get_description (&ex));
-		else
+			camel_exception_clear (&ex);
+		} else
 			g_set_error (err, TNY_FOLDER_STORE_ERROR, 
 				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
 				"Unknown error while trying to create folder");

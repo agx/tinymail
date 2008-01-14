@@ -6,6 +6,8 @@
 
 	CamelOperation holds one more significant memory leak at its
 	status_hack linked list. That one is not yet fixed.
+	* Flag setting to 0xffff must be 0x1fff as bit 13 and 14 are system
+	bits that should not be altered like that.
 
 2008-01-13  Philip Van Hoof <pvanhoof@gnome.org>
 

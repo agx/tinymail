@@ -233,9 +233,9 @@ mbox_summary_encode_x_evolution (CamelLocalSummary *cls, const CamelLocalMessage
 		p++;
 
 	if (*p == 0 && sscanf(uidstr, "%u", &uid) == 1) {
-		return g_strdup_printf("%08x-%04x", uid, mi->info.flags & 0xffff);
+		return g_strdup_printf("%08x-%04x", uid, mi->info.flags & 0x1fff);
 	} else {
-		return g_strdup_printf("%s-%04x", uidstr, mi->info.flags & 0xffff);
+		return g_strdup_printf("%s-%04x", uidstr, mi->info.flags & 0x1fff);
 	}
 }
 
@@ -813,7 +813,7 @@ mbox_summary_sync_quick(CamelMboxSummary *mbs, gboolean expunge, CamelFolderChan
 		camel_mime_parser_drop_step(mp);
 		camel_mime_parser_drop_step(mp);
 
-		info->info.info.flags &= 0xffff;
+		info->info.info.flags &= 0x1fff;
 		camel_message_info_free((CamelMessageInfo *)info);
 	}
 
@@ -1031,7 +1031,7 @@ camel_mbox_summary_sync_mbox(CamelMboxSummary *cls, guint32 flags, CamelFolderCh
 						      g_strerror (errno));
 				goto error;
 			}
-			info->info.info.flags &= 0xffff;
+			info->info.info.flags &= 0x1fff;
 			g_free(xevnew);
 			xevnew = NULL;
 			camel_mime_parser_drop_step(mp);

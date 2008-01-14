@@ -316,7 +316,7 @@ adapted_local_summary_add (CamelLocalSummary *cls, CamelMimeMessage *msg, const 
 			}
 #endif
 			mi->info.flags = camel_message_info_flags(info);
-			/*mi->info.flags |= (camel_message_info_flags(info) & 0xffff);*/
+			/*mi->info.flags |= (camel_message_info_flags(info) & 0x1fff);*/
 			mi->info.size = ((CamelMessageInfoBase*)info)->size;
 		}
 
@@ -807,22 +807,24 @@ maildir_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChange
 			/* probably should all go in the filename? */
 
 			/* have our flags/ i.e. name changed? */
-			if (strcmp(newname, camel_maildir_info_filename (mdi))) {
+			if (newname && strcmp(newname, camel_maildir_info_filename (mdi))) {
 				name = g_strdup_printf("%s/cur/%s", cls->folder_path, camel_maildir_info_filename(mdi));
 				dest = g_strdup_printf("%s/cur/%s", cls->folder_path, newname);
 				rename(name, dest);
 				if (stat(dest, &st) == -1) {
 					/* we'll assume it didn't work, but dont change anything else */
 					g_free(newname);
+					newname = NULL;
 				}
 				g_free(name);
 				g_free(dest);
-			} else {
+			} 
+
+			if (newname)
 				g_free(newname);
-			}
 
 			/* strip FOLDER_MESSAGE_FLAGED, etc */
-			mdi->info.info.flags &= 0xffff;
+			mdi->info.info.flags &= 0x1fff;
 		}
 		camel_message_info_free(info);
 	}

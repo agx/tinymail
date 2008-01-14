@@ -441,6 +441,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 
+	imap_store->authtypes = NULL;
 	imap_store->got_online = FALSE;
 	imap_store->going_online = FALSE;
 	imap_store->courier_crap = FALSE;
@@ -784,6 +785,14 @@ imap_get_capability (CamelService *service, CamelException *ex)
 	/* Find out the IMAP capabilities */
 	/* We assume we have utf8 capable search until a failed search tells us otherwise */
 	store->capabilities = IMAP_CAPABILITY_utf8_search;
+
+	if (store->authtypes) {
+		g_hash_table_foreach_remove (store->authtypes,
+					     free_key, NULL);
+		g_hash_table_destroy (store->authtypes);
+		store->authtypes = NULL;
+	}
+
 	store->authtypes = g_hash_table_new (g_str_hash, g_str_equal);
 	response = camel_imap_command (store, NULL, ex, "CAPABILITY");
 	if (!response)

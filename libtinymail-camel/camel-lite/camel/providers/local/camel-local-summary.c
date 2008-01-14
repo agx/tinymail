@@ -457,7 +457,7 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 			}
 #endif
 			mi->info.flags = camel_message_info_flags(info);
-			/*mi->info.flags |= (camel_message_info_flags(info) & 0xffff);*/
+			/*mi->info.flags |= (camel_message_info_flags(info) & 0x1fff);*/
 			mi->info.size = ((CamelMessageInfoBase*)info)->size;
 		}
 
@@ -505,9 +505,9 @@ local_summary_encode_x_evolution(CamelLocalSummary *cls, const CamelLocalMessage
 	while (*p && isdigit(*p))
 		p++;
 	if (*p == 0 && sscanf (uidstr, "%u", &uid) == 1) {
-		g_string_printf (out, "%08x-%04x", uid, mi->info.flags & 0xffff);
+		g_string_printf (out, "%08x-%04x", uid, mi->info.flags & 0x1fff);
 	} else {
-		g_string_printf (out, "%s-%04x", uidstr, mi->info.flags & 0xffff);
+		g_string_printf (out, "%s-%04x", uidstr, mi->info.flags & 0x1fff);
 	}
 
 #ifdef NON_TINYMAIL_FEATURES

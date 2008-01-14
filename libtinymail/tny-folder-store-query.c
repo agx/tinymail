@@ -75,7 +75,7 @@ static void
 tny_folder_store_query_finalize (GObject *object)
 {
 	TnyFolderStoreQuery *self = (TnyFolderStoreQuery*) object;
-	g_object_unref (G_OBJECT (self->items));
+	g_object_unref (self->items);
 	parent_class->finalize (object);
 	return;
 }

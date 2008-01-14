@@ -336,7 +336,7 @@ mh_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChangeInfo 
 			}
 			g_free(name);
 		} else if (info->info.flags & (CAMEL_MESSAGE_FOLDER_NOXEV|CAMEL_MESSAGE_FOLDER_FLAGGED)) {
-			info->info.flags &= 0xffff;
+			info->info.flags &= 0x1fff;
 		}
 		camel_message_info_free(info);
 	}
