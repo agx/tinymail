@@ -5512,9 +5512,10 @@ Received: from nic.funet.fi
 			  camel_imap_response_free (store, response);
 			}
 
-			if (body)
+			if (body) {
 				camel_stream_write (stream, body, body_len);
-			else {
+				g_free (body); body = NULL;
+			} else {
 				ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
 				err = TRUE;
 			}

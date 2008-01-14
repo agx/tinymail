@@ -2253,16 +2253,20 @@ get_folder_status (CamelImapStore *imap_store, const char *folder_name, const ch
 	response = camel_imap_command (imap_store, NULL, &ex,
 			"STATUS %F (%s)", folder_name, type);
 
+	if (camel_exception_is_set (&ex))
+		camel_exception_clear (&ex);
+
 	if (!response) {
 		if (err_handle_on_fail) {
-			CamelException ex;
+			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 
-			camel_exception_init (&ex);
-			if (imap_check_folder_still_extant (imap_store, folder_name, &ex) == FALSE) {
-				imap_folder_effectively_unsubscribed (imap_store, folder_name, &ex);
-				imap_forget_folder (imap_store, folder_name, &ex);
+			if (imap_check_folder_still_extant (imap_store, folder_name, &mex) == FALSE) {
+				imap_folder_effectively_unsubscribed (imap_store, folder_name, &mex);
+				imap_forget_folder (imap_store, folder_name, &mex);
 			}
-			camel_exception_clear (&ex);
+
+			if (camel_exception_is_set (&mex))
+				camel_exception_clear (&mex);
 		}
 		return NULL;
 	}
