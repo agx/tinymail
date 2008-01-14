@@ -115,6 +115,8 @@ camel_multipart_finalize (CamelObject *object)
 	CamelMultipart *multipart = CAMEL_MULTIPART (object);
 
 	g_list_foreach (multipart->parts, unref_part, NULL);
+	g_list_free (multipart->parts);
+	multipart->parts = NULL;
 
 	/*if (multipart->boundary)
 	  g_free (multipart->boundary);*/

@@ -1649,6 +1649,8 @@ imap_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *
 
 		if (response)
 			camel_imap_response_free (store, response);
+
+		g_free (set);
 	}
 
 	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
