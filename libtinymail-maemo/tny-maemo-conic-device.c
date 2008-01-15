@@ -310,13 +310,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 	priv->is_online = is_online;
 
-	if (priv->connect_slot && 
-		(con_err != CON_IC_CONNECTION_ERROR_NONE || 
-		 con_state == CON_IC_STATUS_CONNECTED)) 
-	{
-
-		/* If there's an error or if we just connected, we call the
-		 * callback for tny_maemo_conic_device_connect, if any */
+	if (priv->connect_slot)	{
 
 		iinfo = g_slice_new (HandleConnInfo);
 		iinfo->self = (TnyMaemoConicDevice *) g_object_ref (device);
@@ -324,7 +318,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 		iinfo->con_state = con_state;
 
 		g_idle_add_full (G_PRIORITY_HIGH, handle_con_idle, iinfo, 
-			handle_con_idle_destroy);
+				 handle_con_idle_destroy);
 	}
 
 	if (emit)
