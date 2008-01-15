@@ -6,6 +6,7 @@
 2008-01-15  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Better error reporting on connection failures
+	* Fix in namespace parsing when the separator was NIL
 
 2008-01-15 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 

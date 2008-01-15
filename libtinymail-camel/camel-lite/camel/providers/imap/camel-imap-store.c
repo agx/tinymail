@@ -3821,7 +3821,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 	if (!camel_disco_store_check_online((CamelDiscoStore *)imap_store, ex))
 		goto fail;
 
-	if (imap_store->capabilities & IMAP_CAPABILITY_NAMESPACE) 
+	if (imap_store->namespaces && imap_store->capabilities & IMAP_CAPABILITY_NAMESPACE) 
 	{
 		struct _namespaces *ns = imap_store->namespaces;
 

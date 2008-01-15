@@ -139,7 +139,8 @@ imap_namespace_decode (const char **in, struct _namespace **namespace)
 			inptr = imap_next_word (inptr);
 
 			if (!g_ascii_strncasecmp (inptr, "NIL", 3)) {
-				inptr = imap_next_word (inptr);
+				inptr += 3;
+				/* inptr = imap_next_word (inptr); */
 				node->delim = '\0';
 			} else if (*inptr++ == '"') {
 				if (*inptr == '\\')
