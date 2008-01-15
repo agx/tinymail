@@ -1,3 +1,7 @@
+2008-01-15 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* initialize some priv-> member in TnyMaemoConicDevice
+
 2008-01-14  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Some aggresive memory checking revealed a few interesting memory

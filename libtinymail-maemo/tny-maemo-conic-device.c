@@ -108,7 +108,7 @@ conic_emit_status_destroy (gpointer user_data)
 	
 	if (G_IS_OBJECT(info->self))
 		g_object_unref (info->self);
-
+	
 	g_slice_free (EmitStatusInfo, info);
 }
 
@@ -595,7 +595,8 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->forced = FALSE;
 	priv->iap = NULL;
 	priv->is_online = dnsmasq_has_resolv ();
-
+	priv->connect_slot = NULL;
+	
 	priv->cnx = con_ic_connection_new ();
 
 	if (!priv->cnx)
