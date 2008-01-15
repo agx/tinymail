@@ -1358,7 +1358,7 @@ socket_connect(CamelTcpStream *stream, struct addrinfo *host)
 				}
 
 				if (poll[1].out_flags == PR_POLL_READ) {
-					errno = EINTR;
+					set_errno (PR_GetError ());
 					goto exception;
 				}
 
