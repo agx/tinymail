@@ -95,10 +95,10 @@ public class Tny.ValaMailWindow : Window {
 	private void on_folder_selected (TreeSelection treeselection) {
 		weak TreeModel model;
 		TreeIter iter;
-		treeselection.get_selected (out model, ref iter);
+		treeselection.get_selected (out model, out iter);
 		FolderType folder_type;
 		GLib.Object folder_instance;
-		model.get (ref iter, GtkFolderStoreTreeModelColumn.TYPE_COLUMN, out folder_type, GtkFolderStoreTreeModelColumn.INSTANCE_COLUMN, out folder_instance);
+		model.get (iter, GtkFolderStoreTreeModelColumn.TYPE_COLUMN, out folder_type, GtkFolderStoreTreeModelColumn.INSTANCE_COLUMN, out folder_instance);
 		if (folder_type != FolderType.ROOT) {
 			var folder = (Folder) folder_instance;
 			progressbar.show ();
@@ -109,9 +109,9 @@ public class Tny.ValaMailWindow : Window {
 	private void on_message_selected (TreeSelection treeselection) {
 		weak TreeModel model;
 		TreeIter iter;
-		if (treeselection.get_selected (out model, ref iter)) {
+		if (treeselection.get_selected (out model, out iter)) {
 			Header header;
-			model.get (ref iter, GtkHeaderListModelColumn.INSTANCE_COLUMN, out header);
+			model.get (iter, GtkHeaderListModelColumn.INSTANCE_COLUMN, out header);
 			var folder = header.get_folder ();
 			var msg = folder.get_msg (header);
 			msgview.set_msg (msg);

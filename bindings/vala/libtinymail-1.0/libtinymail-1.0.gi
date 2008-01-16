@@ -44,8 +44,18 @@
 			<return-type type="void"/>
 			<parameters>
 				<parameter name="self" type="TnyFolder*"/>
-				<parameter name="canceled" type="gboolean"/>
+				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="into" type="TnyFolderStore*"/>
+				<parameter name="new_folder" type="TnyFolder*"/>
+				<parameter name="err" type="GError*"/>
+				<parameter name="user_data" type="gpointer"/>
+			</parameters>
+		</callback>
+		<callback name="TnyCreateFolderCallback">
+			<return-type type="void"/>
+			<parameters>
+				<parameter name="self" type="TnyFolderStore*"/>
+				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="new_folder" type="TnyFolder*"/>
 				<parameter name="err" type="GError*"/>
 				<parameter name="user_data" type="gpointer"/>
@@ -55,7 +65,7 @@
 			<return-type type="void"/>
 			<parameters>
 				<parameter name="self" type="TnyFolder*"/>
-				<parameter name="canceled" type="gboolean"/>
+				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="err" type="GError*"/>
 				<parameter name="user_data" type="gpointer"/>
 			</parameters>
@@ -70,7 +80,7 @@
 			<return-type type="void"/>
 			<parameters>
 				<parameter name="self" type="TnyFolderStore*"/>
-				<parameter name="canceled" type="gboolean"/>
+				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="list" type="TnyList*"/>
 				<parameter name="err" type="GError*"/>
 				<parameter name="user_data" type="gpointer"/>
@@ -80,7 +90,7 @@
 			<return-type type="void"/>
 			<parameters>
 				<parameter name="self" type="TnyFolder*"/>
-				<parameter name="canceled" type="gboolean"/>
+				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="headers" type="TnyList*"/>
 				<parameter name="err" type="GError*"/>
 				<parameter name="user_data" type="gpointer"/>
@@ -90,7 +100,7 @@
 			<return-type type="void"/>
 			<parameters>
 				<parameter name="folder" type="TnyFolder*"/>
-				<parameter name="canceled" type="gboolean"/>
+				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="msg" type="TnyMsg*"/>
 				<parameter name="err" type="GError*"/>
 				<parameter name="user_data" type="gpointer"/>
@@ -116,8 +126,8 @@
 			<return-type type="void"/>
 			<parameters>
 				<parameter name="self" type="TnyMimePart*"/>
+				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="stream" type="TnyStream*"/>
-				<parameter name="canceled" type="gboolean"/>
 				<parameter name="err" type="GError*"/>
 				<parameter name="user_data" type="gpointer"/>
 			</parameters>
@@ -126,7 +136,7 @@
 			<return-type type="void"/>
 			<parameters>
 				<parameter name="self" type="TnySendQueue*"/>
-				<parameter name="canceled" type="gboolean"/>
+				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="msg" type="TnyMsg*"/>
 				<parameter name="err" type="GError*"/>
 				<parameter name="user_data" type="gpointer"/>
@@ -144,7 +154,7 @@
 			<return-type type="void"/>
 			<parameters>
 				<parameter name="folder" type="TnyFolder*"/>
-				<parameter name="canceled" type="gboolean"/>
+				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="err" type="GError*"/>
 				<parameter name="user_data" type="gpointer"/>
 			</parameters>
@@ -839,6 +849,12 @@
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</method>
+			<method name="get_connection_policy" symbol="tny_account_get_connection_policy">
+				<return-type type="TnyConnectionPolicy*"/>
+				<parameters>
+					<parameter name="self" type="TnyAccount*"/>
+				</parameters>
+			</method>
 			<method name="get_connection_status" symbol="tny_account_get_connection_status">
 				<return-type type="TnyConnectionStatus"/>
 				<parameters>
@@ -916,6 +932,13 @@
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="url_string" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="set_connection_policy" symbol="tny_account_set_connection_policy">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyAccount*"/>
+					<parameter name="policy" type="TnyConnectionPolicy*"/>
 				</parameters>
 			</method>
 			<method name="set_forget_pass_func" symbol="tny_account_set_forget_pass_func">
@@ -1002,7 +1025,7 @@
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
-					<parameter name="canceled" type="gboolean*"/>
+					<parameter name="cancelled" type="gboolean*"/>
 				</parameters>
 			</method>
 			<signal name="changed" when="FIRST">
@@ -1026,6 +1049,12 @@
 			</vfunc>
 			<vfunc name="get_account_type_func">
 				<return-type type="TnyAccountType"/>
+				<parameters>
+					<parameter name="self" type="TnyAccount*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_connection_policy_func">
+				<return-type type="TnyConnectionPolicy*"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
@@ -1107,6 +1136,13 @@
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="url_string" type="gchar*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="set_connection_policy_func">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyAccount*"/>
+					<parameter name="policy" type="TnyConnectionPolicy*"/>
 				</parameters>
 			</vfunc>
 			<vfunc name="set_forget_pass_func_func">
@@ -1193,7 +1229,7 @@
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
-					<parameter name="canceled" type="gboolean*"/>
+					<parameter name="cancelled" type="gboolean*"/>
 				</parameters>
 			</vfunc>
 		</interface>
@@ -1279,6 +1315,66 @@
 				<return-type type="TnyDevice*"/>
 				<parameters>
 					<parameter name="self" type="TnyAccountStore*"/>
+				</parameters>
+			</vfunc>
+		</interface>
+		<interface name="TnyConnectionPolicy" type-name="TnyConnectionPolicy" get-type="tny_connection_policy_get_type">
+			<method name="on_connect" symbol="tny_connection_policy_on_connect">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyConnectionPolicy*"/>
+					<parameter name="account" type="TnyAccount*"/>
+				</parameters>
+			</method>
+			<method name="on_connection_broken" symbol="tny_connection_policy_on_connection_broken">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyConnectionPolicy*"/>
+					<parameter name="account" type="TnyAccount*"/>
+				</parameters>
+			</method>
+			<method name="on_disconnect" symbol="tny_connection_policy_on_disconnect">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyConnectionPolicy*"/>
+					<parameter name="account" type="TnyAccount*"/>
+				</parameters>
+			</method>
+			<method name="set_current" symbol="tny_connection_policy_set_current">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyConnectionPolicy*"/>
+					<parameter name="account" type="TnyAccount*"/>
+					<parameter name="folder" type="TnyFolder*"/>
+				</parameters>
+			</method>
+			<vfunc name="on_connect_func">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyConnectionPolicy*"/>
+					<parameter name="account" type="TnyAccount*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="on_connection_broken_func">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyConnectionPolicy*"/>
+					<parameter name="account" type="TnyAccount*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="on_disconnect_func">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyConnectionPolicy*"/>
+					<parameter name="account" type="TnyAccount*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="set_current_func">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyConnectionPolicy*"/>
+					<parameter name="account" type="TnyAccount*"/>
+					<parameter name="folder" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
 		</interface>
@@ -1546,14 +1642,6 @@
 				</parameters>
 			</method>
 			<method name="remove_msg" symbol="tny_folder_remove_msg">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyFolder*"/>
-					<parameter name="header" type="TnyHeader*"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</method>
-			<method name="remove_msg_async" symbol="tny_folder_remove_msg_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -1939,6 +2027,16 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</method>
+			<method name="create_folder_async" symbol="tny_folder_store_create_folder_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="name" type="gchar*"/>
+					<parameter name="callback" type="TnyCreateFolderCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</method>
 			<method name="get_folders" symbol="tny_folder_store_get_folders">
 				<return-type type="void"/>
 				<parameters>
@@ -1953,8 +2051,8 @@
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
-					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="status_callback" type="TnyStatusCallback"/>
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
@@ -1981,6 +2079,16 @@
 					<parameter name="observer" type="TnyFolderStoreObserver*"/>
 				</parameters>
 			</vfunc>
+			<vfunc name="create_folder_async_func">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="name" type="gchar*"/>
+					<parameter name="callback" type="TnyCreateFolderCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
 			<vfunc name="create_folder_func">
 				<return-type type="TnyFolder*"/>
 				<parameters>
@@ -1994,8 +2102,8 @@
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
-					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="status_callback" type="TnyStatusCallback"/>
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
@@ -2561,12 +2669,13 @@
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</method>
-			<method name="construct_from_stream" symbol="tny_mime_part_construct_from_stream">
+			<method name="construct" symbol="tny_mime_part_construct">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
-					<parameter name="type" type="gchar*"/>
+					<parameter name="mime_type" type="gchar*"/>
+					<parameter name="transfer_encoding" type="gchar*"/>
 				</parameters>
 			</method>
 			<method name="content_type_is" symbol="tny_mime_part_content_type_is">
@@ -2577,10 +2686,11 @@
 				</parameters>
 			</method>
 			<method name="decode_to_stream" symbol="tny_mime_part_decode_to_stream">
-				<return-type type="void"/>
+				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
 				</parameters>
 			</method>
 			<method name="decode_to_stream_async" symbol="tny_mime_part_decode_to_stream_async">
@@ -2650,6 +2760,12 @@
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</method>
+			<method name="get_transfer_encoding" symbol="tny_mime_part_get_transfer_encoding">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</method>
 			<method name="is_attachment" symbol="tny_mime_part_is_attachment">
 				<return-type type="gboolean"/>
 				<parameters>
@@ -2712,10 +2828,11 @@
 				</parameters>
 			</method>
 			<method name="write_to_stream" symbol="tny_mime_part_write_to_stream">
-				<return-type type="void"/>
+				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
 				</parameters>
 			</method>
 			<vfunc name="add_part_func">
@@ -2725,12 +2842,13 @@
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="construct_from_stream_func">
+			<vfunc name="construct_func">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
-					<parameter name="type" type="gchar*"/>
+					<parameter name="mime_type" type="gchar*"/>
+					<parameter name="transfer_encoding" type="gchar*"/>
 				</parameters>
 			</vfunc>
 			<vfunc name="content_type_is_func">
@@ -2751,10 +2869,11 @@
 				</parameters>
 			</vfunc>
 			<vfunc name="decode_to_stream_func">
-				<return-type type="void"/>
+				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
 			<vfunc name="del_part_func">
@@ -2810,6 +2929,12 @@
 			</vfunc>
 			<vfunc name="get_stream_func">
 				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_transfer_encoding_func">
+				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
@@ -2876,10 +3001,11 @@
 				</parameters>
 			</vfunc>
 			<vfunc name="write_to_stream_func">
-				<return-type type="void"/>
+				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
 		</interface>
@@ -3302,5 +3428,6 @@
 			</vfunc>
 		</interface>
 		<constant name="TNY_HEADER_FLAG_PRIORITY_MASK" type="int" value="1536"/>
+		<constant name="TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS" type="int" value="30"/>
 	</namespace>
 </api>

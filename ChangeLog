@@ -1,3 +1,10 @@
+2008-01-16  Jürg Billeter  <j@bitron.ch>
+
+	* bindings/vala/: regenerate bindings
+
+	* tests/vala-demo/tinymail-vala-test.vala: update demo app to build
+	with Vala SVN
+
 2008-01-16 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* fix for use of unitialized variable in decode_it function,

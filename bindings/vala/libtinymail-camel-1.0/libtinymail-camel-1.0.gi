@@ -354,12 +354,13 @@
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="construct_from_stream_func">
+			<vfunc name="construct_func">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
-					<parameter name="type" type="gchar*"/>
+					<parameter name="mime_type" type="gchar*"/>
+					<parameter name="transfer_encoding" type="gchar*"/>
 				</parameters>
 			</vfunc>
 			<vfunc name="content_type_is_func">
@@ -380,10 +381,11 @@
 				</parameters>
 			</vfunc>
 			<vfunc name="decode_to_stream_func">
-				<return-type type="void"/>
+				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
 			<vfunc name="del_part_func">
@@ -439,6 +441,12 @@
 			</vfunc>
 			<vfunc name="get_stream_func">
 				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_transfer_encoding_func">
+				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
@@ -505,10 +513,11 @@
 				</parameters>
 			</vfunc>
 			<vfunc name="write_to_stream_func">
-				<return-type type="void"/>
+				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
 		</object>
@@ -575,6 +584,14 @@
 				</parameters>
 			</vfunc>
 		</object>
+		<object name="TnyCamelDefaultConnectionPolicy" parent="GObject" type-name="TnyCamelDefaultConnectionPolicy" get-type="tny_camel_default_connection_policy_get_type">
+			<implements>
+				<interface name="TnyConnectionPolicy"/>
+			</implements>
+			<constructor name="new" symbol="tny_camel_default_connection_policy_new">
+				<return-type type="TnyConnectionPolicy*"/>
+			</constructor>
+		</object>
 		<object name="TnyCamelFolder" parent="GObject" type-name="TnyCamelFolder" get-type="tny_camel_folder_get_type">
 			<implements>
 				<interface name="TnyFolderStore"/>
@@ -640,6 +657,16 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
+			<vfunc name="create_folder_async_func">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="name" type="gchar*"/>
+					<parameter name="callback" type="TnyCreateFolderCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
 			<vfunc name="create_folder_func">
 				<return-type type="TnyFolder*"/>
 				<parameters>
@@ -691,8 +718,8 @@
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
-					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="status_callback" type="TnyStatusCallback"/>
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
@@ -980,12 +1007,13 @@
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="construct_from_stream_func">
+			<vfunc name="construct_func">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
-					<parameter name="type" type="gchar*"/>
+					<parameter name="mime_type" type="gchar*"/>
+					<parameter name="transfer_encoding" type="gchar*"/>
 				</parameters>
 			</vfunc>
 			<vfunc name="content_type_is_func">
@@ -1006,10 +1034,11 @@
 				</parameters>
 			</vfunc>
 			<vfunc name="decode_to_stream_func">
-				<return-type type="void"/>
+				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
 			<vfunc name="del_part_func">
@@ -1065,6 +1094,12 @@
 			</vfunc>
 			<vfunc name="get_stream_func">
 				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_transfer_encoding_func">
+				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
@@ -1131,10 +1166,11 @@
 				</parameters>
 			</vfunc>
 			<vfunc name="write_to_stream_func">
-				<return-type type="void"/>
+				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
 		</object>
@@ -1279,10 +1315,32 @@
 				</parameters>
 			</vfunc>
 		</object>
+		<object name="TnyCamelRecoverConnectionPolicy" parent="GObject" type-name="TnyCamelRecoverConnectionPolicy" get-type="tny_camel_recover_connection_policy_get_type">
+			<implements>
+				<interface name="TnyConnectionPolicy"/>
+			</implements>
+			<constructor name="new" symbol="tny_camel_recover_connection_policy_new">
+				<return-type type="TnyConnectionPolicy*"/>
+			</constructor>
+			<method name="set_reconnect_delay" symbol="tny_camel_recover_connection_policy_set_reconnect_delay">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCamelRecoverConnectionPolicy*"/>
+					<parameter name="milliseconds" type="gint"/>
+				</parameters>
+			</method>
+			<method name="set_recover_active_folder" symbol="tny_camel_recover_connection_policy_set_recover_active_folder">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCamelRecoverConnectionPolicy*"/>
+					<parameter name="setting" type="gboolean"/>
+				</parameters>
+			</method>
+		</object>
 		<object name="TnyCamelSendQueue" parent="GObject" type-name="TnyCamelSendQueue" get-type="tny_camel_send_queue_get_type">
 			<implements>
-				<interface name="TnyFolderObserver"/>
 				<interface name="TnySendQueue"/>
+				<interface name="TnyFolderObserver"/>
 			</implements>
 			<method name="add_async" symbol="tny_camel_send_queue_add_async">
 				<return-type type="void"/>
@@ -1382,6 +1440,16 @@
 					<parameter name="observer" type="TnyFolderStoreObserver*"/>
 				</parameters>
 			</vfunc>
+			<vfunc name="create_folder_async_func">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="name" type="gchar*"/>
+					<parameter name="callback" type="TnyCreateFolderCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
 			<vfunc name="create_folder_func">
 				<return-type type="TnyFolder*"/>
 				<parameters>
@@ -1417,8 +1485,8 @@
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
-					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="status_callback" type="TnyStatusCallback"/>
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
