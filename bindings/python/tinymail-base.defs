@@ -2860,13 +2860,14 @@
   )
 )
 
-(define-method construct_from_stream
+(define-method construct
   (of-object "TnyMimePart")
-  (c-name "tny_mime_part_construct_from_stream")
+  (c-name "tny_mime_part_construct")
   (return-type "gint")
   (parameters
     '("TnyStream*" "stream")
-    '("const-gchar*" "type")
+    '("const-gchar*" "mime_type")
+    '("const-gchar*" "transfer_encoding")
   )
 )
 
@@ -3049,12 +3050,13 @@
   )
 )
 
-(define-virtual construct_from_stream_func
+(define-virtual construct_func
   (of-object "TnyMimePart")
   (return-type "gint")
   (parameters
     '("TnyStream*" "stream")
-    '("const-gchar*" "type")
+    '("const-gchar*" "mime_type")
+    '("const-gchar*" "transfer_encoding")
   )
 )
 
