@@ -53,7 +53,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
+@tnyaccountstore: the object which received the signal.
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -227,7 +227,7 @@ Shared include file with forward typedefs
 @get_stream_func: 
 @decode_to_stream_func: 
 @write_to_stream_func: 
-@construct_from_stream_func: 
+@construct_func: 
 @get_filename_func: 
 @get_content_id_func: 
 @get_description_func: 
@@ -246,6 +246,7 @@ Shared include file with forward typedefs
 @get_header_pairs_func: 
 @set_header_pair_func: 
 @decode_to_stream_async_func: 
+@get_transfer_encoding_func: 
 
 <!-- ##### STRUCT TnyAccount ##### -->
 <para>
@@ -258,7 +259,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccount: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
 <para>
@@ -317,8 +318,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
-@: 
+@tnydevice: the object which received the signal.
+@arg1: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -489,32 +490,32 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-@arg4: 
+@: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-@arg4: 
+@: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>

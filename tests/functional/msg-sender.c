@@ -97,8 +97,8 @@ create_test_msg (TnyPlatformFactory *platfact)
 		strlen (HTML_PRE TEST_STRING HTML_POST));
 	tny_stream_reset (html_stream);
 
-	tny_mime_part_construct_from_stream (plain_body, plain_stream, "text/plain; charset=utf-8"); 
-	tny_mime_part_construct_from_stream (html_body, html_stream, "text/html; charset=utf-8"); 
+	tny_mime_part_construct (plain_body, plain_stream, "text/plain; charset=utf-8", "7bit"); 
+	tny_mime_part_construct (html_body, html_stream, "text/html; charset=utf-8", "7bit"); 
 
 	tny_mime_part_add_part (TNY_MIME_PART (retval), html_body);
 	tny_mime_part_add_part (TNY_MIME_PART (retval), plain_body);
