@@ -5,5 +5,5 @@ INCLUDES =								\
 noinst_LTLIBRARIES = libsummary.la
 
 libsummary_la_SOURCES =			\
-	summary.c
+	summary.c summary.h
 
