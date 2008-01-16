@@ -49,7 +49,7 @@ static char*
 decode_it (CamelMimeMessage *msg, const char *str, gboolean is_addr)
 {
 	struct _camel_header_raw *h = ((CamelMimePart *)msg)->headers;
-	const char *content, *charset;
+	const char *content, *charset = NULL;
 	CamelContentType *ct = NULL;
 
 	if (!str)

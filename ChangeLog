@@ -1,3 +1,8 @@
+2008-01-16 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+
+	* fix for use of unitialized variable in decode_it function,
+	which caused crashes in some cases. 
+
 2008-01-15  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c: fixes a condition that
