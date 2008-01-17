@@ -402,9 +402,6 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 				{
 					TnyHeader *hdr = _tny_camel_header_new ();
 
-					if (info->push_email_event) 
-						priv->cached_length--;
-
 					if (!change)
 						change = tny_folder_change_new (self);
 
