@@ -1,3 +1,11 @@
+2008-01-16  Mark Doffman  <mark.doffman@codethink.co.uk>
+	* bindings/python/*.defs: Regenerate .defs files for updated API.
+
+	* bindings/python/*.override: Add missing headers and Gtk types.
+
+	* bindings/python/tinymail.override: Begin adding wrappers for
+	callbacks.
+
 2008-01-16  Jürg Billeter  <j@bitron.ch>
 
 	* bindings/vala/: regenerate bindings

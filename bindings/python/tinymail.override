@@ -307,6 +307,57 @@ _wrap_TnyList__proxy_do_foreach_func (TnyList* self,
     pyg_gil_state_release(state);
 }
 
+%%
+override tny_account_set_pass_func args 
+
+typedef struct {
+    PyObject* func;
+    PyObject* data;
+} PyTnyAccSetPassCaller;
+
+static void
+pytny_account_set_pass_func_marshal(GObject* obj, gpointer data)
+{
+    PyGILState_STATE state;
+    PyTnyAccSetPassCaller *call =  (PyTnyAccSetPassCaller*) data;
+    PyObject *pyobj, *retobj;
+
+    g_assert(call->func);
+
+    state = pyg_gil_state_ensure();
+
+    pyobj = pygobject_new(obj);
+    if (call->data)
+        retobj = PyEval_CallFunction(call->func, "(NO)",
+                                     pyobj, call->data);
+    else
+        retobj = PyEval_CallFunction(call->func, "(N)",
+                                     pyobj);
+
+    if (retobj == NULL) {
+        PyErr_Print();
+    }
+
+    Py_XDECREF(retobj);
+
+    pyg_gil_state_release(state);
+}
+    
+
+static PyObject *
+_wrap_tny_account_set_pass_func(PyGObject *self, PyObject *args)
+{
+    PyTnyAccSetPassCaller call;
+    call.data = NULL;
+
+    if (!PyArg_ParseTuple(args, "O|O", 
+                          &call.func, &call.data))
+         return NULL;
+
+    tny_list_foreach(TNY_LIST(self->obj), (GFunc) pytny_list_foreach_marshal, &call);
+    Py_RETURN_NONE;
+}
+
 
     
 

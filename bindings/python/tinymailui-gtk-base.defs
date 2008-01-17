@@ -26,6 +26,13 @@
   (gtype-id "TNY_TYPE_GTK_ATTACHMENT_MIME_PART_VIEW")
 )
 
+(define-object GtkExpanderMimePartView
+  (in-module "Tny")
+  (parent "GtkExpander")
+  (c-name "TnyGtkExpanderMimePartView")
+  (gtype-id "TNY_TYPE_GTK_EXPANDER_MIME_PART_VIEW")
+)
+
 (define-object GtkFolderStoreTreeModel
   (in-module "Tny")
   (parent "GtkTreeStore")
@@ -45,6 +52,13 @@
   (parent "GtkTable")
   (c-name "TnyGtkHeaderView")
   (gtype-id "TNY_TYPE_GTK_HEADER_VIEW")
+)
+
+(define-object GtkImageMimePartView
+  (in-module "Tny")
+  (parent "GtkImage")
+  (c-name "TnyGtkImageMimePartView")
+  (gtype-id "TNY_TYPE_GTK_IMAGE_MIME_PART_VIEW")
 )
 
 (define-object GtkLockable
@@ -80,6 +94,13 @@
   (parent "GObject")
   (c-name "TnyGtkPasswordDialog")
   (gtype-id "TNY_TYPE_GTK_PASSWORD_DIALOG")
+)
+
+(define-object GtkPixbufStream
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyGtkPixbufStream")
+  (gtype-id "TNY_TYPE_GTK_PIXBUF_STREAM")
 )
 
 (define-object GtkTextBufferStream
@@ -220,6 +241,33 @@
 
 
 
+;; From tny-gtk-expander-mime-part-view.h
+
+(define-function gtk_expander_mime_part_view_get_type
+  (c-name "tny_gtk_expander_mime_part_view_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_expander_mime_part_view_new
+  (c-name "tny_gtk_expander_mime_part_view_new")
+  (is-constructor-of "TnyGtkExpanderMimePartView")
+  (return-type "TnyMimePartView*")
+  (parameters
+    '("TnyMimePartView*" "view")
+  )
+)
+
+(define-method set_view
+  (of-object "TnyGtkExpanderMimePartView")
+  (c-name "tny_gtk_expander_mime_part_view_set_view")
+  (return-type "none")
+  (parameters
+    '("TnyMimePartView*" "view")
+  )
+)
+
+
+
 ;; From tny-gtk-folder-store-tree-model.h
 
 (define-function gtk_folder_store_tree_model_get_type
@@ -333,6 +381,25 @@
 
 
 
+;; From tny-gtk-image-mime-part-view.h
+
+(define-function gtk_image_mime_part_view_get_type
+  (c-name "tny_gtk_image_mime_part_view_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_image_mime_part_view_new
+  (c-name "tny_gtk_image_mime_part_view_new")
+  (is-constructor-of "TnyGtkImageMimePartView")
+  (return-type "TnyMimePartView*")
+  (parameters
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "status_user_data")
+  )
+)
+
+
+
 ;; From tny-gtk-lockable.h
 
 (define-function gtk_lockable_get_type
@@ -359,6 +426,10 @@
   (c-name "tny_gtk_mime_part_save_strategy_new")
   (is-constructor-of "TnyGtkMimePartSaveStrategy")
   (return-type "TnyMimePartSaveStrategy*")
+  (parameters
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "status_user_data")
+  )
 )
 
 
@@ -436,6 +507,35 @@
   (return-type "gboolean")
 )
 
+(define-method set_status_callback
+  (of-object "TnyGtkMsgView")
+  (c-name "tny_gtk_msg_view_set_status_callback")
+  (return-type "none")
+  (parameters
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "status_user_data")
+  )
+)
+
+(define-method get_status_callback
+  (of-object "TnyGtkMsgView")
+  (c-name "tny_gtk_msg_view_get_status_callback")
+  (return-type "none")
+  (parameters
+    '("TnyStatusCallback*" "status_callback")
+    '("gpointer*" "status_user_data")
+  )
+)
+
+(define-method set_parented
+  (of-object "TnyGtkMsgView")
+  (c-name "tny_gtk_msg_view_set_parented")
+  (return-type "none")
+  (parameters
+    '("gboolean" "parented")
+  )
+)
+
 
 
 ;; From tny-gtk-msg-window.h
@@ -454,6 +554,15 @@
   )
 )
 
+(define-method set_view
+  (of-object "TnyGtkMsgWindow")
+  (c-name "tny_gtk_msg_window_set_view")
+  (return-type "none")
+  (parameters
+    '("TnyMsgView*" "view")
+  )
+)
+
 
 
 ;; From tny-gtk-password-dialog.h
@@ -467,6 +576,30 @@
   (c-name "tny_gtk_password_dialog_new")
   (is-constructor-of "TnyGtkPasswordDialog")
   (return-type "TnyPasswordGetter*")
+)
+
+
+
+;; From tny-gtk-pixbuf-stream.h
+
+(define-function gtk_pixbuf_stream_get_type
+  (c-name "tny_gtk_pixbuf_stream_get_type")
+  (return-type "GType")
+)
+
+(define-function gtk_pixbuf_stream_new
+  (c-name "tny_gtk_pixbuf_stream_new")
+  (is-constructor-of "TnyGtkPixbufStream")
+  (return-type "TnyStream*")
+  (parameters
+    '("const-gchar*" "mime_type")
+  )
+)
+
+(define-method get_pixbuf
+  (of-object "TnyGtkPixbufStream")
+  (c-name "tny_gtk_pixbuf_stream_get_pixbuf")
+  (return-type "GdkPixbuf*")
 )
 
 
@@ -509,6 +642,10 @@
   (c-name "tny_gtk_text_mime_part_view_new")
   (is-constructor-of "TnyGtkTextMimePartView")
   (return-type "TnyMimePartView*")
+  (parameters
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "status_user_data")
+  )
 )
 
 

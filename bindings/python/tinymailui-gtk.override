@@ -12,11 +12,14 @@ headers
 #include <tny-gtk-folder-store-tree-model.h>
 #include <tny-gtk-attach-list-model.h>
 #include <tny-gtk-attachment-mime-part-view.h>
+#include <tny-gtk-expander-mime-part-view.h>
 #include <tny-gtk-header-list-model.h>
 #include <tny-gtk-header-view.h>
+#include <tny-gtk-image-mime-part-view.h>
 #include <tny-gtk-mime-part-save-strategy.h>
 #include <tny-gtk-msg-view.h>
 #include <tny-gtk-msg-window.h>
+#include <tny-gtk-pixbuf-stream.h>
 #include <tny-gtk-text-buffer-stream.h>
 #include <tny-gtk-text-mime-part-view.h>
 #include <tny-gtk-lockable.h>
@@ -29,17 +32,19 @@ ignore-glob
   *_get_type
 %%
 import gobject.GObject as PyGObject_Type
-import gtk.Table as PyGtkTable_Type
 import gtk.Bin as PyGtkBin_Type
-import gtk.VBox as PyGtkVBox_Type
-import gtk.ScrolledWindow as PyGtkScrolledWindow_Type
-import gtk.TextBuffer as PyGtkTextBuffer_Type
+import gtk.Expander as PyGtkExpander_Type
+import gtk.Image as PyGtkImage_Type
 import gtk.ListStore as PyGtkListStore_Type
-import gtk.Window as PyGtkWindow_Type
+import gtk.ListStore as PyGtkListStore_Type
+import gtk.ScrolledWindow as PyGtkScrolledWindow_Type
+import gtk.Table as PyGtkTable_Type
+import gtk.TextBuffer as PyGtkTextBuffer_Type
+import gtk.TextView as PyGtkTextView_Type
 import gtk.TreeStore as PyGtkTreeStore_Type
 import gtk.TreeModel as PyGtkTreeModel_Type
-import gtk.ListStore as PyGtkListStore_Type
-import gtk.TextView as PyGtkTextView_Type
+import gtk.VBox as PyGtkVBox_Type
+import gtk.Window as PyGtkWindow_Type
 
 import tinymail.Header as PyTnyHeader_Type
 import tinymail.Folder as PyTnyFolder_Type

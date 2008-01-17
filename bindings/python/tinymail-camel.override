@@ -24,6 +24,10 @@ headers
 #include <tny-send-queue.h>
 
 #include <tny-camel-account.h>
+#include <tny-camel-bs-mime-part.h>
+#include <tny-camel-bs-msg.h>
+#include <tny-camel-bs-msg-receive-strategy.h>
+#include <tny-camel-default-connection-policy.h>
 #include <tny-camel-folder.h>
 #include <tny-camel-header.h>
 #include <tny-camel-imap-folder.h>
@@ -35,6 +39,7 @@ headers
 #include <tny-camel-nntp-store-account.h>
 #include <tny-camel-pop-folder.h>
 #include <tny-camel-pop-store-account.h>
+#include <tny-camel-recover-connection-policy.h>
 #include <tny-camel-send-queue.h>
 #include <tny-camel-shared.h>
 #include <tny-camel-store-account.h>
