@@ -94,6 +94,18 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_mime_part_construct ##### -->
+<para>
+
+</para>
+
+@self: 
+@stream: 
+@mime_type: 
+@transfer_encoding: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_mime_part_get_filename ##### -->
 <para>
 
