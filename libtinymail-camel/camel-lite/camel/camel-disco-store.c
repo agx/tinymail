@@ -398,6 +398,10 @@ camel_disco_store_can_work_offline (CamelDiscoStore *store)
 gboolean
 camel_disco_store_check_online (CamelDiscoStore *store, CamelException *ex)
 {
+
+	if (camel_disco_store_status (store) == CAMEL_DISCO_STORE_RESYNCING)
+		return TRUE;
+
 	if (camel_disco_store_status (store) != CAMEL_DISCO_STORE_ONLINE) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
 				     _("You must be working online to "

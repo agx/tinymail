@@ -290,7 +290,8 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 
 	fseek (diary->file, 0, SEEK_END);
 	size = ftell (diary->file);
-	g_return_if_fail (size != 0);
+	if (size == 0)
+		return;
 	rewind (diary->file);
 
 	camel_operation_start (NULL, _("Resynchronizing with server"));
@@ -322,7 +323,7 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 		case CAMEL_DISCO_DIARY_FOLDER_APPEND:
 		{
 			CamelFolder *folder;
-			char *uid, *ret_uid;
+			char *uid, *ret_uid = NULL;
 			CamelMimeMessage *message;
 			CamelMessageInfo *info;
 
@@ -400,7 +401,7 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 	/* Close folders */
 	g_hash_table_foreach (diary->folders, close_folder, diary);
 	g_hash_table_destroy (diary->folders);
-	diary->folders = NULL;
+	diary->folders = g_hash_table_new (g_str_hash, g_str_equal);
 
 	/* Truncate the log */
 	ftruncate (fileno (diary->file), 0);

@@ -1977,7 +1977,7 @@ imap_append_online (CamelFolder *folder, CamelMimeMessage *message,
 {
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
 	CamelImapResponse *response;
-	char *uid;
+	char *uid = NULL;
 	int count;
 
 	count = camel_folder_summary_count (folder->summary);
@@ -2021,7 +2021,7 @@ imap_append_resyncing (CamelFolder *folder, CamelMimeMessage *message,
 {
 	CamelImapStore *store = CAMEL_IMAP_STORE (folder->parent_store);
 	CamelImapResponse *response;
-	char *uid;
+	char *uid = NULL;
 
 	response = do_append (folder, message, info, &uid, ex);
 	if (!response)
