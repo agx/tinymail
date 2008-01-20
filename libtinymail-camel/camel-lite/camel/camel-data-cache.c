@@ -335,7 +335,9 @@ data_cache_path(CamelDataCache *cdc, int create, const char *path, const char *k
 	if (dir && access (dir, F_OK) == -1) {
 #endif
 		if (create && dir)
-			g_mkdir_with_parents (dir, 0700);
+			if (g_mkdir_with_parents (dir, 0700) == -1) {
+				return NULL;
+			}
 	} else if (cdc->priv->expire_inc == hash
 		   && (cdc->expire_age != -1 || cdc->expire_access != -1)) {
 		time_t now;
@@ -383,6 +385,13 @@ camel_data_cache_add(CamelDataCache *cdc, const char *path, const char *key, Cam
 	CamelStream *stream;
 
 	real = data_cache_path(cdc, TRUE, path, key);
+
+	if (real == NULL) {
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
+			_("Write to cache failed: %s"), g_strerror (errno));
+		return NULL;
+	}
+
 	/* need to loop 'cause otherwise we can call bag_add/bag_abort
 	 * after bag_reserve returned a pointer, which is an invalid
 	 * sequence. */

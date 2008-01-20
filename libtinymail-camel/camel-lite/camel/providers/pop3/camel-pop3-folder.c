@@ -926,7 +926,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 	pop3_debug ("%s requested\n", uid);
 
-	stream = camel_data_cache_get(pop3_store->cache, "cache", uid, NULL);
+	stream = camel_data_cache_get (pop3_store->cache, "cache", uid, NULL);
 	if (stream)
 	{
 		message = camel_mime_message_new ();
@@ -946,6 +946,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 		return message;
 	}
+
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
@@ -1123,8 +1124,10 @@ rfail:
 
 		/* Initiate retrieval, if disk backing fails, use a memory backing */
 		if (pop3_store->cache == NULL
-		    || (stream = camel_data_cache_add(pop3_store->cache, "cache", fi->uid, NULL)) == NULL)
-			stream = camel_stream_mem_new();
+		    || (stream = camel_data_cache_add(pop3_store->cache, "cache", fi->uid, ex)) == NULL) {
+			/* stream = camel_stream_mem_new(); */
+			return NULL;
+		}
 
 		/* ref it, the cache storage routine unref's when done */
 		camel_object_ref((CamelObject *)stream);
@@ -1240,7 +1243,8 @@ rfail:
 	}
 
 done:
-	camel_object_unref((CamelObject *)stream);
+	if (stream)
+		camel_object_unref((CamelObject *)stream);
 fail:
 	camel_operation_end(NULL);
 
