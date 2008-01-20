@@ -565,7 +565,7 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 
 			if (!priv->folder || camel_exception_is_set (&priv->load_ex) || !CAMEL_IS_FOLDER (priv->folder))
 			{
-				g_critical ("Can't load folder: %s", camel_exception_get_description (&priv->load_ex));
+				/* g_critical ("Can't load folder: %s", camel_exception_get_description (&priv->load_ex)); */
 
 				priv->folder = NULL;
 				priv->folder = NULL;

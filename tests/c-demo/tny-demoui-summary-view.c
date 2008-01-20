@@ -856,6 +856,23 @@ refresh_current_folder (TnyFolder *folder, gboolean cancelled, GError *err, gpoi
 }
 
 
+static void 
+set_folder_cb (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data)
+{
+	if (err) {
+		TnySummaryView *self = user_data;
+		GtkWidget *edialog;
+		edialog = gtk_message_dialog_new (
+				  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+				  GTK_DIALOG_DESTROY_WITH_PARENT,
+				  GTK_MESSAGE_ERROR,
+				  GTK_BUTTONS_CLOSE,
+				  err->message);
+		g_signal_connect_swapped (edialog, "response",
+			G_CALLBACK (gtk_widget_destroy), edialog);
+		gtk_widget_show_all (edialog);
+	}
+}
 
 static void
 on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection, 
@@ -909,7 +926,7 @@ on_mailbox_view_tree_selection_changed (GtkTreeSelection *selection,
 
 			hmodel = tny_gtk_header_list_model_new ();
 			tny_gtk_header_list_model_set_folder (TNY_GTK_HEADER_LIST_MODEL (hmodel), 
-				folder, FALSE, NULL, status_update, self);
+				folder, FALSE, set_folder_cb, status_update, self);
 
 			g_mutex_lock (priv->monitor_lock);
 			{

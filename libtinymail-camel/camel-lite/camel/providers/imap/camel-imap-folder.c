@@ -4337,15 +4337,13 @@ imap_thaw (CamelFolder *folder)
 static void
 handle_freeup (CamelImapStore *store, gint nread, CamelException *ex)
 {
-	if (nread <= 0)
-	{
+	if (nread <= 0) {
 		if (errno == EINTR)
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
-		else
+		else if (!camel_exception_is_set (ex))
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 					      _("Server unexpectedly disconnected: %s"),
 					      g_strerror (errno));
-
 		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 	}
 }
