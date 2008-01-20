@@ -145,7 +145,7 @@ get_folder(CamelStore * store, const char *folder_name, guint32 flags, CamelExce
 			if (mkdir(tmp, 0700) != 0
 			    || mkdir(cur, 0700) != 0
 			    || mkdir(new, 0700) != 0) {
-				camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM,
+				camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 						     _("Cannot create folder `%s': %s"),
 						     folder_name, g_strerror(errno));
 				rmdir(tmp);
@@ -158,7 +158,7 @@ get_folder(CamelStore * store, const char *folder_name, guint32 flags, CamelExce
 	} else if (stat(name, &st) == -1) {
 		/* folder doesn't exist, see if we should create it */
 		if (errno != ENOENT) {
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_STORE_NO_FOLDER,
 					      _("Cannot get folder `%s': %s"),
 					      folder_name, g_strerror (errno));
 		} else if ((flags & CAMEL_STORE_FOLDER_CREATE) == 0) {
@@ -170,7 +170,7 @@ get_folder(CamelStore * store, const char *folder_name, guint32 flags, CamelExce
 			    || mkdir(tmp, 0700) != 0
 			    || mkdir(cur, 0700) != 0
 			    || mkdir(new, 0700) != 0) {
-				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 						      _("Cannot create folder `%s': %s"),
 						      folder_name, g_strerror (errno));
 				rmdir(tmp);
@@ -207,7 +207,7 @@ get_folder(CamelStore * store, const char *folder_name, guint32 flags, CamelExce
 		goto success_handler;
 
 err_handler:
-		camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				     _("Cannot create folder `%s': %s"),
 				     folder_name, g_strerror(errno));
 		rmdir(tmp);
@@ -219,7 +219,7 @@ success_handler:
 		folder = camel_maildir_folder_new(store, folder_name, flags, ex);
 
 	} else if (flags & CAMEL_STORE_FOLDER_EXCL) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_CREATE,
 				      _("Cannot create folder `%s': folder exists."),
 				      folder_name);
 	} else {
@@ -281,7 +281,7 @@ static void delete_folder(CamelStore * store, const char *folder_name, CamelExce
 	struct stat st;
 
 	if (strcmp(folder_name, ".") == 0) {
-		camel_exception_setv(ex, CAMEL_EXCEPTION_STORE_NO_FOLDER,
+		camel_exception_setv(ex, CAMEL_EXCEPTION_FOLDER_DELETE,
 				     _("Cannot delete folder: %s: Invalid operation"), _("Inbox"));
 		return;
 	}
@@ -296,7 +296,7 @@ static void delete_folder(CamelStore * store, const char *folder_name, CamelExce
 	    || stat(tmp, &st) == -1 || !S_ISDIR(st.st_mode)
 	    || stat(cur, &st) == -1 || !S_ISDIR(st.st_mode)
 	    || stat(new, &st) == -1 || !S_ISDIR(st.st_mode)) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Could not delete folder `%s': %s"),
 				      folder_name, errno ? g_strerror (errno) :
 				      _("not a maildir directory"));
@@ -317,7 +317,7 @@ static void delete_folder(CamelStore * store, const char *folder_name, CamelExce
 			mkdir(cur, 0700);
 			mkdir(new, 0700);
 			mkdir(tmp, 0700);
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 					      _("Could not delete folder `%s': %s"),
 					      folder_name, g_strerror (err));
 		} else {
@@ -336,8 +336,8 @@ static void
 maildir_rename_folder(CamelStore *store, const char *old, const char *new, CamelException *ex)
 {
 	if (strcmp(old, ".") == 0) {
-		camel_exception_setv(ex, CAMEL_EXCEPTION_STORE_NO_FOLDER,
-				     _("Cannot rename folder: %s: Invalid operation"), _("Inbox"));
+		camel_exception_setv(ex, CAMEL_EXCEPTION_FOLDER_RENAME,
+			_("Cannot rename folder: %s: Invalid operation"), _("Inbox"));
 		return;
 	}
 
@@ -489,7 +489,7 @@ scan_dirs(CamelStore *store, guint32 flags, CamelFolderInfo *topfi, CamelURL *ur
 		dir = opendir(name);
 		if (dir == NULL) {
 			g_free(name);
-			camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM,
+			camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM_IO_READ,
 					     _("Could not scan folder `%s', opendir(`%s') failed: %s"),
 					     root, name, g_strerror(errno));
 			goto fail;

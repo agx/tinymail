@@ -634,11 +634,11 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 
 		if (!outbox || !TNY_IS_FOLDER (outbox))
 		{
-			g_set_error (err, TNY_SEND_QUEUE_ERROR, 
-				TNY_SEND_QUEUE_ERROR_ADD,
-				"Operating can't continue: send queue not ready "
+			g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_ADD_MSG,
+				_("Operating can't continue: send queue not ready "
 				"because it does not have a valid outbox. "
-				"This problem indicates a bug in the software.");
+				"This problem indicates a bug in the software."));
 			g_object_unref (headers);
 			g_mutex_unlock (priv->todo_lock);
 			return;
@@ -697,11 +697,11 @@ tny_camel_send_queue_add_async_default (TnyCamelSendQueue *self, TnyMsg *msg, Tn
 
 		if (!outbox || !TNY_IS_FOLDER (outbox))
 		{
-			g_set_error (&err, TNY_SEND_QUEUE_ERROR, 
-				TNY_SEND_QUEUE_ERROR_ADD,
-				"Operating can't continue: send queue not ready "
+			g_set_error (&err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_ADD_MSG,
+				_("Operating can't continue: send queue not ready "
 				"because it does not have a valid outbox. "
-				"This problem indicates a bug in the software.");
+				"This problem indicates a bug in the software."));
 			g_object_unref (headers);
 			g_mutex_unlock (priv->todo_lock);
 			return;

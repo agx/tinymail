@@ -123,7 +123,7 @@ tny_gnome_keyring_password_getter_forget_password (TnyPasswordGetter *self, cons
 		"password", aid /* proto */, 
 		"PLAIN", 0, &list);
 
-	if (keyringret == GNOME_KEYRING_RESULT_OK)
+	if (keyringret == GNOME_KEYRING_RESULT_OK && list)
 	{
 		pwd_data = list->data;
 		gnome_keyring_item_delete_sync (keyring, pwd_data->item_id);

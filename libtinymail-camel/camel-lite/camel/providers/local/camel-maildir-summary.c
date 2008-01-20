@@ -339,7 +339,7 @@ adapted_local_summary_add (CamelLocalSummary *cls, CamelMimeMessage *msg, const 
 			camel_folder_change_info_add_uid(ci, camel_message_info_uid(mi));
 	} else {
 		d(printf("Failed!\n"));
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_MEMORY,
 				     _("Unable to add message to summary: unknown reason"));
 	}
 	return (CamelMessageInfo *)mi;
@@ -521,7 +521,7 @@ static int maildir_summary_load(CamelLocalSummary *cls, int forceindex, CamelExc
 
 	dir = opendir(cur);
 	if (dir == NULL) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_READ,
 			_("Cannot open maildir directory path: %s: %s"),
 			cls->folder_path, g_strerror (errno));
 		g_free(cur);
@@ -622,7 +622,7 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 	   no longer exist */
 	dir = opendir(cur);
 	if (dir == NULL) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_READ,
 			_("Cannot open maildir directory path: %s: %s"),
 			cls->folder_path, g_strerror (errno));
 		g_free(cur);

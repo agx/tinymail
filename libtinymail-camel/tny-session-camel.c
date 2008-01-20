@@ -48,6 +48,7 @@
 #include <tny-status.h>
 #define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-common-priv.h"
+#include "tny-camel-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
 
 #include "tny-session-camel-priv.h"
@@ -210,12 +211,14 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 
 	if (cancel || retval == NULL) 
 	{
-		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
+		if (account) {
+			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (account);
 
-		if (CAMEL_IS_DISCO_STORE (apriv->service)) {
-			CamelException tex = CAMEL_EXCEPTION_INITIALISER;
-			camel_disco_store_set_status (CAMEL_DISCO_STORE (apriv->service),
-					CAMEL_DISCO_STORE_OFFLINE, &tex);
+			if (CAMEL_IS_DISCO_STORE (apriv->service)) {
+				CamelException tex = CAMEL_EXCEPTION_INITIALISER;
+				camel_disco_store_set_status (CAMEL_DISCO_STORE (apriv->service),
+						CAMEL_DISCO_STORE_OFFLINE, &tex);
+			}
 		}
 
 		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
@@ -489,14 +492,7 @@ tny_session_camel_alert_user (CamelSession *session, CamelSessionAlertType type,
 			break;
 		}
 
-		if (ex->id == CAMEL_EXCEPTION_USER_CANCEL)
-			g_set_error (&err, TNY_ACCOUNT_STORE_ERROR, 
-				TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT, 
-				"The connecting was canceled");
-		else
-			g_set_error (&err, TNY_ACCOUNT_STORE_ERROR, 
-				_tny_camel_account_get_tny_error_code_for_camel_exception_id (ex), 
-				camel_exception_get_description (ex));
+		_tny_camel_exception_to_tny_error (ex, &err);
 
 		retval = tny_session_camel_do_an_error (self, account, tnytype, 
 			TRUE, err);

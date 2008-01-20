@@ -270,7 +270,7 @@ get_folder (CamelStore *store, const char *folder_name, guint32 flags, CamelExce
 	w(g_warning ("CamelStore::get_folder not implemented for `%s'",
 		     camel_type_to_name (CAMEL_OBJECT_GET_TYPE (store))));
 
-	camel_exception_setv (ex, CAMEL_EXCEPTION_STORE_INVALID,
+	camel_exception_setv (ex, CAMEL_EXCEPTION_STORE_NO_FOLDER,
 			      _("Cannot get folder: Invalid operation on this store"));
 
 	return NULL;
@@ -367,7 +367,7 @@ create_folder (CamelStore *store, const char *parent_name,
 	w(g_warning ("CamelStore::create_folder not implemented for `%s'",
 		     camel_type_to_name (CAMEL_OBJECT_GET_TYPE (store))));
 
-	camel_exception_setv (ex, CAMEL_EXCEPTION_STORE_INVALID,
+	camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_CREATE,
 			      _("Cannot create folder: Invalid operation on this store"));
 
 	return NULL;
@@ -395,7 +395,7 @@ camel_store_create_folder (CamelStore *store, const char *parent_name,
 	if ((parent_name == NULL || parent_name[0] == 0)
 	    && (((store->flags & CAMEL_STORE_VTRASH) && strcmp(folder_name, CAMEL_VTRASH_NAME) == 0)
 		|| ((store->flags & CAMEL_STORE_VJUNK) && strcmp(folder_name, CAMEL_VJUNK_NAME) == 0))) {
-		camel_exception_setv(ex, CAMEL_EXCEPTION_STORE_INVALID,
+		camel_exception_setv(ex, CAMEL_EXCEPTION_FOLDER_CREATE,
 				     _("Cannot create folder: %s: folder exists"), folder_name);
 		return NULL;
 	}

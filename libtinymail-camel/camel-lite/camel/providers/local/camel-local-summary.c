@@ -415,7 +415,7 @@ local_summary_sync(CamelLocalSummary *cls, gboolean expunge, CamelFolderChangeIn
 
 	ret = camel_folder_summary_save((CamelFolderSummary *)cls, ex);
 	if (ret == -1) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Could not save summary: %s: %s"),
 				      cls->folder_path, g_strerror (errno));
 
@@ -478,7 +478,7 @@ local_summary_add(CamelLocalSummary *cls, CamelMimeMessage *msg, const CamelMess
 			camel_folder_change_info_add_uid(ci, camel_message_info_uid(mi));
 	} else {
 		d(printf("Failed!\n"));
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_MEMORY,
 				     _("Unable to add message to summary: unknown reason"));
 	}
 	return (CamelMessageInfo *)mi;

@@ -42,6 +42,7 @@
 #include <tny-status.h>
 #define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-common-priv.h"
+#include "tny-camel-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
 
 #include "tny-camel-account-priv.h"
@@ -81,9 +82,7 @@ tny_camel_full_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrate
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_GET_MSG,
-			camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
 	} else 
 	{
 		if (camel_message && CAMEL_IS_OBJECT (camel_message))

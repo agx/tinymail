@@ -1,3 +1,18 @@
+2008-01-20  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Refactoring of all error reporting situations, errors and handling
+	of connection failures, reconnecting and getting messages in case of a
+	previous connection failure.
+	* Several bugfixes related to connection failures
+	* Several bugfixes related to connection problems when fetching
+	messages
+	* POP and IMAP now behave the same in case of connection problems
+	while fetching a message (they try to re-authenticate and re-connect)
+	* More finegrained error reporting (IO errors, SERVICE errors, SYSTEM
+	errors and unknown errors).
+
+	* This was a major API change for all modules
+
 2008-01-19  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed sync when offline transfers took place

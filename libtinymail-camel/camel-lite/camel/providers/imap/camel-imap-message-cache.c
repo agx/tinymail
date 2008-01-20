@@ -164,7 +164,7 @@ camel_imap_message_cache_new (const char *path, CamelFolderSummary *summary,
 
 	dir = g_dir_open (path, 0, &error);
 	if (!dir) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Could not open cache directory: %s"),
 				      error->message);
 		g_error_free (error);
@@ -276,7 +276,7 @@ insert_setup (CamelImapMessageCache *cache, const char *uid, const char *part_sp
 
 	fd = g_open (*path, O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0600);
 	if (fd == -1) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Failed to cache message %s: %s"),
 				      uid, g_strerror (errno));
 		g_free (*path);
@@ -333,7 +333,7 @@ camel_imap_message_cache_insert (CamelImapMessageCache *cache, const char *uid,
 		return NULL;
 
 	if (camel_stream_write (stream, data, len) == -1) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Failed to cache message %s: %s"),
 				      uid, g_strerror (errno));
 		return insert_abort (path, stream);
@@ -417,7 +417,7 @@ camel_imap_message_cache_insert_stream (CamelImapMessageCache *cache,
 		return;
 
 	if (camel_stream_write_to_stream (data_stream, stream) == -1) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Failed to cache message %s: %s"),
 				      uid, g_strerror (errno));
 		insert_abort (path, stream);
@@ -449,7 +449,7 @@ camel_imap_message_cache_insert_wrapper (CamelImapMessageCache *cache,
 		return;
 
 	if (camel_data_wrapper_write_to_stream (wrapper, stream) == -1) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Failed to cache message %s: %s"),
 				      uid, g_strerror (errno));
 		insert_abort (path, stream);
@@ -483,7 +483,7 @@ camel_imap_message_cache_replace_with_wrapper (CamelImapMessageCache *cache,
 		return;
 
 	if (camel_data_wrapper_write_to_stream (wrapper, stream) == -1) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Failed to cache message %s: %s"),
 				      uid, g_strerror (errno));
 	} else {
@@ -540,7 +540,7 @@ camel_imap_message_cache_get (CamelImapMessageCache *cache, const char *uid,
 	if (stream) {
 		cache_put (cache, uid, key, stream);
 	} else {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Failed to cache %s: %s"),
 				      part_spec, g_strerror (errno));
 	}

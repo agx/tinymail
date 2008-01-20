@@ -523,13 +523,11 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 	{
 		if (camel_exception_is_set (apriv->ex))
 		{
-			g_set_error (err, TNY_ACCOUNT_ERROR, 
-				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				camel_exception_get_description (apriv->ex));
+			_tny_camel_exception_to_tny_error (apriv->ex, err);
 			camel_exception_clear (apriv->ex);
 		} else {
-			g_set_error (err, TNY_ACCOUNT_ERROR, 
-				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+			g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_CONNECT,
 				"Account not yet fully configured. "
 				"This problem indicates a bug in the software.");
 		}
@@ -551,14 +549,12 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 		{
 			if (camel_exception_is_set (&ex))
 			{
-				g_set_error (err, TNY_ACCOUNT_ERROR, 
-					TNY_ACCOUNT_ERROR_TRY_CONNECT,
-					camel_exception_get_description (&ex));
+				_tny_camel_exception_to_tny_error (&ex, err);
 				camel_exception_clear (&ex);
 			} else {
-				g_set_error (err, TNY_ACCOUNT_ERROR, 
-					TNY_ACCOUNT_ERROR_TRY_CONNECT,
-					"Unknown error while connecting");
+				g_set_error (err, TNY_SERVICE_ERROR, 
+					TNY_SERVICE_ERROR_CONNECT,
+					_("Unknown error while connecting"));
 			}
 		} else {
 			tny_camel_store_account_do_emit (TNY_CAMEL_STORE_ACCOUNT (self));
@@ -567,10 +563,10 @@ tny_camel_store_account_try_connect (TnyAccount *self, GError **err)
 		g_static_rec_mutex_unlock (apriv->service_lock);
 
 	} else {
-			g_set_error (err, TNY_ACCOUNT_ERROR, 
-				TNY_ACCOUNT_ERROR_TRY_CONNECT,
-				"Get and Forget password functions not yet set. "
-				"This problem indicates a bug in the software.");
+			g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_CONNECT,
+				_("Get and Forget password functions not yet set. "
+				"This problem indicates a bug in the software."));
 	}
 
 	return;
@@ -838,9 +834,7 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
-				camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 		_tny_session_stop_operation (apriv->session);
 		return;
@@ -868,9 +862,7 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
-				camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 	} else 
 	{
@@ -1004,16 +996,15 @@ tny_camel_store_account_remove_folder_default (TnyFolderStore *self, TnyFolder *
 	GList *changes = NULL;
 
 	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err,
-			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER))
+			TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_FOLDER_REMOVE))
 		return;
 
 	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
-				"Account not ready for this operation (%s)."
-				"This problem indicates a bug in the software.",
-				camel_exception_get_description (apriv->ex));
+		g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_FOLDER_REMOVE,
+				_("Account not ready for this operation."
+				"This problem indicates a bug in the software"));
 		_tny_session_stop_operation (apriv->session);
 		return;
 	}
@@ -1053,14 +1044,14 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	gboolean was_new = FALSE;
 
 	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err,
-			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_CREATE_FOLDER))
+			TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_FOLDER_CREATE))
 		return NULL;
 
 	if (!name || strlen (name) <= 0)
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-				"Failed to create folder with no name");
+		g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_FOLDER_CREATE,
+				_("Failed to create folder with no name"));
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
@@ -1069,11 +1060,10 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-				"Account not ready for this operation (%s). "
-				"This problem indicates a bug in the softare.",
-				camel_exception_get_description (apriv->ex));
+		g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_FOLDER_CREATE,
+				_("Account not ready for this operation. "
+				"This problem indicates a bug in the softare."));
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
@@ -1082,9 +1072,7 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-				camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
@@ -1096,14 +1084,11 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 
 	if (camel_exception_is_set (&ex)) 
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
-				camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 
-		if (CAMEL_IS_OBJECT (store))
-		{
-			if (info && CAMEL_IS_STORE (store))
+		if (store && CAMEL_IS_OBJECT (store)) {
+			if (info && store && CAMEL_IS_STORE (store))
 				camel_store_free_folder_info (store, info);
 		}
 		_tny_session_stop_operation (apriv->session);
@@ -1324,7 +1309,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 
 	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err, 
-			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
+			TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_GET_FOLDERS))
 		return;
 
 	if (query != NULL)
@@ -1332,11 +1317,10 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-				"Account not ready for this operation (%s). "
-				"This problem indicates a bug in the software.",
-				camel_exception_get_description (apriv->ex));
+		g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_GET_FOLDERS,
+				_("Account not ready for this operation. "
+				"This problem indicates a bug in the software."));
 		_tny_session_stop_operation (apriv->session);
 		return;
 	}
@@ -1345,9 +1329,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-			camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 		_tny_session_stop_operation (apriv->session);
 		return;
@@ -1373,9 +1355,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-			camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 
 		_tny_session_stop_operation (apriv->session);
@@ -1706,16 +1686,15 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 
 	if (!_tny_session_check_operation (apriv->session, TNY_ACCOUNT (self), err, 
-			TNY_FOLDER_STORE_ERROR, TNY_FOLDER_STORE_ERROR_GET_FOLDERS))
+			TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_GET_FOLDERS))
 		return NULL;
 
 	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service))
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-				TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-				"Account not ready for this operation (%s)."
-				"This problem indicates a bug in the software.",
-				camel_exception_get_description (apriv->ex));
+		g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_GET_FOLDERS,
+				_("Account not ready for this operation."
+				"This problem indicates a bug in the software."));
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
 	}
@@ -1724,9 +1703,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-			camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 		_tny_session_stop_operation (apriv->session);
 		return NULL;
@@ -1793,9 +1770,9 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 			nnstr = NULL;
 		}
 	} else {
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-			"Invalid URL string");
+		g_set_error (err, TNY_SERVICE_ERROR, 
+			TNY_SERVICE_ERROR_GET_FOLDERS,
+			_("Invalid URL string"));
 		_tny_session_stop_operation (apriv->session);
 
 		if (nnstr) {
@@ -1809,9 +1786,7 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-			TNY_FOLDER_STORE_ERROR_GET_FOLDERS,
-			camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 
 		if (CAMEL_IS_OBJECT (store))

@@ -69,8 +69,8 @@ static GObjectClass *parent_class = NULL;
 static void 
 tny_camel_nntp_store_account_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
-	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-			TNY_FOLDER_STORE_ERROR_REMOVE_FOLDER,
+	g_set_error (err, TNY_SERVICE_ERROR, 
+			TNY_SERVICE_ERROR_UNSUPPORTED,
 			"You can't use the tny_folder_store_remove_folder API "
 			"on NNTP accounts. This problem indicates a bug in the "
 			"software.");
@@ -81,8 +81,8 @@ tny_camel_nntp_store_account_remove_folder (TnyFolderStore *self, TnyFolder *fol
 static TnyFolder* 
 tny_camel_nntp_store_account_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
 {
-	g_set_error (err, TNY_FOLDER_STORE_ERROR, 
-			TNY_FOLDER_STORE_ERROR_CREATE_FOLDER,
+	g_set_error (err, TNY_SERVICE_ERROR, 
+			TNY_SERVICE_ERROR_UNSUPPORTED,
 			"You can't use the tny_folder_store_create_folder "
 			"API on NNTP accounts. This problem indicates a "
 			"bug in the software.");

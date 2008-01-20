@@ -296,7 +296,7 @@ camel_imap_folder_new (CamelStore *parent, const char *folder_name,
 	char *summary_file, *state_file;
 
 	if (e_util_mkdir_hier (folder_dir, S_IRWXU) != 0) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Could not create directory %s: %s"),
 				      folder_dir, g_strerror (errno));
 		return NULL;
@@ -319,7 +319,7 @@ camel_imap_folder_new (CamelStore *parent, const char *folder_name,
 	g_free (summary_file);
 	if (!folder->summary) {
 		camel_object_unref (CAMEL_OBJECT (folder));
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_READ,
 				      _("Could not load summary for %s"),
 				      folder_name);
 		return NULL;
@@ -2684,7 +2684,7 @@ get_message_simple (CamelImapFolder *imap_folder, const char *uid,
 							stream);
 	camel_object_unref (CAMEL_OBJECT (stream));
 	if (ret == -1) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_MEMORY,
 				      _("Unable to retrieve message: %s"),
 				      g_strerror (errno));
 		camel_object_unref (CAMEL_OBJECT (msg));
@@ -2738,7 +2738,7 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (folder->parent_store)) == CAMEL_DISCO_STORE_OFFLINE)
 	{
-		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 			     _("This message is not currently available"));
 		goto fail;
 	}
@@ -2771,7 +2771,7 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 				CAMEL_SERVICE_REC_LOCK(store, connect_lock);
 				if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
 					CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
-					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+					camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 							     _("This message is not currently available"));
 					goto fail;
 				}
@@ -4342,7 +4342,7 @@ handle_freeup (CamelImapStore *store, gint nread, CamelException *ex)
 		if (errno == EINTR)
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
 		else
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 					      _("Server unexpectedly disconnected: %s"),
 					      g_strerror (errno));
 
@@ -4387,6 +4387,7 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 	CamelFolder *folder = (CamelFolder *) imap_folder;
 	gboolean amcon = FALSE;
 
+
 	g_static_mutex_lock (&gmsgstore_lock); /* A */
 
 	if (imap_folder->gmsgstore) {
@@ -4396,6 +4397,21 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 		*ctchecker=FALSE;
 	} else
 	{
+
+		if (CAMEL_SERVICE (folder->parent_store)->status == CAMEL_SERVICE_DISCONNECTED) {
+			CamelException tex = CAMEL_EXCEPTION_INITIALISER;
+			camel_service_connect (CAMEL_SERVICE (folder->parent_store), &tex);
+			if (camel_exception_is_set (&tex)) {
+				camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
+						_("This message is not currently available"
+						" and can't go online to fetch it: %s"),
+						camel_exception_get_description (&tex));
+				g_static_mutex_unlock (&gmsgstore_lock);
+				camel_exception_clear (&tex);
+				return NULL;
+			}
+		}
+
 		store = CAMEL_IMAP_STORE (camel_object_new (CAMEL_IMAP_STORE_TYPE));
 		imap_debug ("Get-Message service created\n");
 		camel_service_construct (CAMEL_SERVICE (store),
@@ -4415,20 +4431,16 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 
 		amcon = camel_service_connect (CAMEL_SERVICE (store), ex);
 
-		if (!amcon || camel_exception_is_set (ex) || !camel_disco_store_check_online (CAMEL_DISCO_STORE (store), ex))
-		{
+		if (!amcon || camel_exception_is_set (ex) || !camel_disco_store_check_online (CAMEL_DISCO_STORE (store), ex)) {
 			camel_object_unref (store);
 			if (!camel_exception_is_set (ex))
-				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+				camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 						_("This message is not currently available"
-						" (can't let a new connection go online)"));
+						" and can't go online to fetch it"));
 			else if (camel_strstrcase (camel_exception_get_description (ex), "summary") != NULL)
-			{
-				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
-						_("This message is not currently available"
-						" and can't be retrieved due to insufficient "
+				camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
+						_("This message can't be retrieved due to insufficient "
 						" storage space resources."));
-			}
 
 			CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 			g_static_mutex_unlock (&gmsgstore_lock);
@@ -4506,7 +4518,7 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 {
   CamelImapFolder *imap_folder = (CamelImapFolder *) folder;
   gchar *path = g_strdup_printf ("%s/%s_%s_CONVERTED", imap_folder->cache->path, uid, spec);
-  gint ex_id;
+  gint ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
   gboolean err = FALSE, found = FALSE;
   gchar *err_message;
   CamelImapStore *store = NULL;
@@ -4520,7 +4532,7 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
   {
 	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (folder->parent_store), ex)) {
 
-		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 				     _("This message is not currently available"));
 		g_free (path);
 		path = NULL;
@@ -4539,8 +4551,8 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 
 		if (!fil || fd == -1) {
 			err = TRUE;
-			ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-			err_message = g_strdup_printf ("Can't write %s", path);
+			ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+			err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 			goto convert_errorhandler;
 		}
 
@@ -4589,9 +4601,9 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 				/* The first line is very unlikely going to consume 1023 bytes */
 				if (f > 1023 || nread <= 0) {
 					err = TRUE;
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-					err_message = g_strdup_printf ("Read from service failed: Long "
-						" first line during binary fetch for uid=%s", uid);
+					ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+					err_message = g_strdup_printf (_("Read from service failed: Long "
+						" first line during binary fetch for uid=%s"), uid);
 					goto convert_berrorhander;
 				}
 
@@ -4601,9 +4613,9 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 					if (ptr)
 						ptr += 3;
 					err = TRUE;
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
+					ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
 					err_message = g_strdup_printf ("%s", 
-						ptr?ptr:"BAD from IMAP server while CONVERT");
+						ptr?ptr:_("BAD from IMAP server while CONVERT"));
 					store->capabilities &= ~IMAP_CAPABILITY_CONVERT;
 					goto convert_errorhandler;
 				}
@@ -4611,9 +4623,9 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 				if (*line != '*' || *(line + 1) != ' ')
 				{
 					err = TRUE;
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-					err_message = g_strdup_printf ("Read from service failed: Line doesn't start "
-						" with \"* \" for uid=%s (in stead it started with %s)", uid, line);
+					ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+					err_message = g_strdup_printf (_("Read from service failed: Line doesn't start "
+						" with \"* \" for uid=%s (in stead it started with %s)"), uid, line);
 					goto convert_berrorhander;
 				}
 
@@ -4639,9 +4651,9 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 			if (errno == ERANGE)
 			{
 				err = TRUE;
-				ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-				err_message = g_strdup_printf ("Read from service failed: "
-					"strtol failed for uid=%s (the line was: %s)", uid, line);
+				ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+				err_message = g_strdup_printf (_("Read from service failed: "
+					"strtol failed for uid=%s (the line was: %s)"), uid, line);
 				goto convert_berrorhander;
 			}
 
@@ -4658,7 +4670,8 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 					if (write (fd, t_str, hread) != hread)
 					{
 						err = TRUE;
-						err_message = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+						ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+						err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 						goto convert_berrorhander;
 					}
 					rec += hread;
@@ -4666,8 +4679,8 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 				} else {
 					if (hread != 0) {
 						err = TRUE;
-						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-						err_message = g_strdup_printf ("Read from service failed, UID=%s", uid);
+						ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+						err_message = g_strdup_printf (_("Read from service failed, UID=%s"), uid);
 						goto convert_berrorhander;
 					}
 				}
@@ -4687,8 +4700,8 @@ convert_berrorhander:
 				goto convert_errorhandler;
 		} else {
 			err = TRUE;
-			ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-			err_message = g_strdup_printf ("CONVERT not supported on this server");
+			ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+			err_message = g_strdup (_("CONVERT not supported on this server"));
 			goto convert_errorhandler;
 		}
 
@@ -4711,7 +4724,7 @@ convert_errorhandler:
 		fclose (fil);
 
 	if (!err_message)
-		camel_exception_setv (ex, ex_id, "Could not find message body in response.");
+		camel_exception_setv (ex, ex_id, _("Could not find message body in response"));
 	else {
 		camel_exception_setv (ex, ex_id, err_message);
 		g_free (err_message);
@@ -4731,7 +4744,7 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
   CamelImapFolder *imap_folder = (CamelImapFolder *) folder;
   gchar *path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
   gboolean retry = TRUE;
-  gint ex_id;
+  gint ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
   gboolean err = FALSE, found = FALSE;
   gchar *err_message;
   CamelImapStore *store = NULL;
@@ -4762,7 +4775,7 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
   {
 	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (folder->parent_store), ex)) {
 
-		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 				     _("This message is not currently available"));
 		g_free (path);
 		path = NULL;
@@ -4786,8 +4799,8 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 
 			if (!fil || fd == -1) {
 				err = TRUE;
-				ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-				err_message = g_strdup_printf ("Can't write %s", path);
+				ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+				err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 				goto fetch_errorhandler;
 			}
 
@@ -4839,9 +4852,9 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 					/* The first line is very unlikely going to consume 1023 bytes */
 					if (f > 1023 || nread <= 0) {
 						err = TRUE;
-						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-						err_message = g_strdup_printf ("Read from service failed: Long "
-							" first line during binary fetch for uid=%s", uid);
+						ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+						err_message = g_strdup_printf (_("Read from service failed: Long "
+							" first line during binary fetch for uid=%s"), uid);
 						goto fetch_berrorhander;
 					}
 
@@ -4863,9 +4876,9 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 					if (*line != '*' || *(line + 1) != ' ')
 					{
 						err = TRUE;
-						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-						err_message = g_strdup_printf ("Read from service failed: Line doesn't start "
-							" with \"* \" for uid=%s (in stead it started with %s)", uid, line);
+						ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+						err_message = g_strdup_printf (_("Read from service failed: Line doesn't start "
+							" with \"* \" for uid=%s (in stead it started with %s)"), uid, line);
 						goto fetch_berrorhander;
 					}
 
@@ -4891,9 +4904,9 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 				if (errno == ERANGE)
 				{
 					err = TRUE;
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-					err_message = g_strdup_printf ("Read from service failed: "
-						"strtol failed for uid=%s (the line was: %s)", uid, line);
+					ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+					err_message = g_strdup_printf (_("Read from service failed: "
+						"strtol failed for uid=%s (the line was: %s)"), uid, line);
 					goto fetch_berrorhander;
 				}
 
@@ -4910,7 +4923,8 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 						if (write (fd, t_str, hread) != hread)
 						{
 							err = TRUE;
-							err_message = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+							ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+							err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 							goto fetch_berrorhander;
 						}
 						rec += hread;
@@ -4918,8 +4932,8 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 					} else {
 						if (hread != 0) {
 							err = TRUE;
-							ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-							err_message = g_strdup_printf ("Read from service failed, UID=%s", uid);
+							ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+							err_message = g_strdup_printf (_("Read from service failed, UID=%s"), uid);
 							goto fetch_berrorhander;
 						}
 					}
@@ -4974,8 +4988,8 @@ fetch_berrorhander:
 
 				if (!server_stream) {
 					err = TRUE;
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-					err_message = g_strdup ("Read from service failed: Service unavailable");
+					ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+					err_message = g_strdup (_("Read from service failed: Service unavailable"));
 				} else
 					store->command++;
 
@@ -4999,8 +5013,8 @@ fetch_berrorhander:
 					/* It's the first line (or an unsolicited one) */
 					if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
 					{
-						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-						err_message = g_strdup ("Read from service failed: Unexpected result from service");
+						ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+						err_message = g_strdup (_("Read from service failed: Unexpected result from service"));
 						err=TRUE;
 						break;
 					} else if (linenum == 0)
@@ -5030,14 +5044,16 @@ fetch_berrorhander:
 							if (write (fd, ")\n", 2) != 2)
 							{
 								err = TRUE;
-								err_message = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+								ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+								err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 								break;
 							}
 						} else {
 							if (write (fd, ")\r\n", 3) != 3)
 							{
 								err = TRUE;
-								err_message = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+								ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+								err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 								break;
 							}
 						}
@@ -5049,7 +5065,8 @@ fetch_berrorhander:
 					llen = strlen (line);
 					if (write (fd, line, llen) != llen) {
 						err = TRUE;
-						err_message = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+						ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+						err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 						break;
 					}
 
@@ -5066,8 +5083,8 @@ fetch_berrorhander:
 
 				if (nread <= 0) {
 					err = TRUE;
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-					err_message = g_strdup_printf ("Read from service failed: %s", g_strerror (errno));
+					ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+					err_message = g_strdup_printf (_("Read from service failed: %s"), g_strerror (errno));
 				}
 
 				if (tag)
@@ -5106,7 +5123,7 @@ fetch_errorhandler:
 		fclose (fil);
 
 	if (!err_message)
-		camel_exception_setv (ex, ex_id, "Could not find message body in response.");
+		camel_exception_setv (ex, ex_id, _("Could not find message body in response"));
 	else {
 		camel_exception_setv (ex, ex_id, err_message);
 		g_free (err_message);
@@ -5169,7 +5186,7 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 	} else {
 
 		if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (folder->parent_store), ex)) {
-			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 					     _("This message is not currently available"));
 		} else {
 			gboolean ctchecker = FALSE;
@@ -5192,16 +5209,22 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 			response= camel_imap_command (store, folder, ex,
 				"UID FETCH %s BODYSTRUCTURE", uid);
 
-			for (i = 0; i < response->untagged->len; i++)
-			{
-				resp = ((char*)response->untagged->pdata[i]) + 2;
-				walk_the_string (resp, bodyst);
+			if (response) {
+				for (i = 0; i < response->untagged->len; i++) {
+					resp = ((char*)response->untagged->pdata[i]) + 2;
+					walk_the_string (resp, bodyst);
+				}
+
+				camel_imap_response_free (store, response);
+			
+				retval = bodyst->str;
+				g_string_free (bodyst, FALSE);
+			} else {
+				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
+					     _("Failure fetchting BODYSTRUCTURE from IMAP server"));
+				g_string_free (bodyst, TRUE);
+				retval = NULL;
 			}
-
-			camel_imap_response_free (store, response);
-
-			retval = bodyst->str;
-			g_string_free (bodyst, FALSE);
 
 			stop_gmsgstore (imap_folder, ctchecker, FALSE);
 
@@ -5213,6 +5236,10 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 			if (file) {
 				fputs (retval, file);
 				fclose (file);
+			} else {
+				gchar *mss = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
+				camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE, mss);
+				g_free (mss);
 			}
 		}
 	}
@@ -5265,17 +5292,24 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	if (!camel_disco_store_check_online (CAMEL_DISCO_STORE (folder->parent_store), ex))
 	{
-		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 				     _("This message is not currently available"));
 		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 		return NULL;
 	}
 	camel_exception_clear (ex);
 
-	store = create_gmsgstore (imap_folder, &ctchecker, ex);
+	camel_exception_clear (&tex);
+	store = create_gmsgstore (imap_folder, &ctchecker, &tex);
 
-	if (!store)
+	if (!store) {
+		const char *desc = camel_exception_get_description (&tex);
+		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
+			     _("This message is not currently available. Failure while connecting with the service to fetch it: %s"),
+				desc?desc:"Unknown");
+		camel_exception_clear (&tex);
 		return NULL;
+	}
 
 	camel_operation_start (NULL, _("Retrieving message"));
 
@@ -5292,7 +5326,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	if (stream == NULL)
 	{
-		errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+		errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 		goto errorhander;
 	}
 
@@ -5346,9 +5380,9 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 				/* The first line is very unlikely going to consume 1023 bytes */
 				if (f > 1023 || nread <= 0) {
 					err = TRUE;
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-					errmessage = g_strdup_printf ("Read from service failed: Long "
-						" first line during binary fetch for uid=%s", uid);
+					ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+					errmessage = g_strdup_printf (_("Read from service failed: Long "
+						" first line during binary fetch for uid=%s"), uid);
 					goto berrorhander;
 				}
 
@@ -5367,13 +5401,13 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 				{
 					if (camel_strstrcase (line, "OK")) {
 						err = TRUE;
-						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-						errmessage = g_strdup_printf ("Message with UID %s does not exists", uid);
+						ex_id = CAMEL_EXCEPTION_FOLDER_INVALID_UID;
+						errmessage = g_strdup_printf (_("Message with UID %s does not exists"), uid);
 					} else{
 						err = TRUE;
-						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-						errmessage = g_strdup_printf ("Read from service failed: Line doesn't start "
-							" with \"* \" for uid=%s (in stead it started with %s)", uid, line);
+						ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+						errmessage = g_strdup_printf (_("Read from service failed: Line doesn't start "
+							" with \"* \" for uid=%s (in stead it started with %s)"), uid, line);
 					}
 					goto berrorhander;
 				}
@@ -5400,9 +5434,9 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			if (errno == ERANGE)
 			{
 				err = TRUE;
-				ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-				errmessage = g_strdup_printf ("Read from service failed: "
-					"strtol failed for uid=%s (the line was: %s)", uid, line);
+				ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+				errmessage = g_strdup_printf (_("Read from service failed: "
+					"strtol failed for uid=%s (the line was: %s)"), uid, line);
 				goto berrorhander;
 			}
 
@@ -5419,15 +5453,16 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 					if (camel_stream_write (stream, t_str, hread) != hread)
 					{
 						err = TRUE;
-						errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+						ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+						errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 						goto berrorhander;
 					}
 					rec += hread;
 					camel_operation_progress (NULL, rec, length);
 				} else {
 					if (hread != 0) {
-						ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-						errmessage = g_strdup_printf ("Read from service failed, UID=%s", uid);
+						ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+						errmessage = g_strdup_printf (_("Read from service failed, UID=%s"), uid);
 						err = TRUE;
 						goto berrorhander;
 					}
@@ -5474,7 +5509,8 @@ Received: from nic.funet.fi
 				err = TRUE;
 
 			if (response && response->untagged && response->untagged->len <= 0) {
-				errmessage = g_strdup_printf ("Message with UID %s does not exists", uid);
+				ex_id = CAMEL_EXCEPTION_FOLDER_INVALID_UID;
+				errmessage = g_strdup_printf (_("Message with UID %s does not exists"), uid);
 				err = TRUE;
 			}
 
@@ -5492,7 +5528,8 @@ Received: from nic.funet.fi
 							line += 5;
 							p = strchr (line, ']');
 							if (!p || *(p + 1) != ' ') {
-								ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
+								errmessage = g_strdup (_("Protocol error while retrieving message"));
+								ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
 								err = TRUE;
 								break;
 							}
@@ -5513,10 +5550,15 @@ Received: from nic.funet.fi
 			}
 
 			if (body) {
-				camel_stream_write (stream, body, body_len);
+				if (camel_stream_write (stream, body, body_len) != body_len) {
+					errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
+					ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+					err = TRUE;
+				}
 				g_free (body); body = NULL;
 			} else {
-				ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
+				errmessage = g_strdup_printf (_("Message with UID %s does not exists"), uid);
+				ex_id = CAMEL_EXCEPTION_FOLDER_INVALID_UID;
 				err = TRUE;
 			}
 
@@ -5569,7 +5611,7 @@ Received: from nic.funet.fi
 			if (server_stream == NULL) {
 				err = TRUE;
 				ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-				errmessage = g_strdup ("Read from service failed: Service unavailable");
+				errmessage = g_strdup (_("Read from service failed: Service unavailable"));
 			} else
 				store->command++;
 
@@ -5585,8 +5627,8 @@ Received: from nic.funet.fi
 				/* It's the first line */
 				if (linenum == 0 && (line [0] != '*' || line[1] != ' '))
 				{
-					ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-					errmessage = g_strdup ("Read from service failed: Unexpected result from FETCH");
+					ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+					errmessage = g_strdup (_("Read from service failed: Unexpected result from FETCH"));
 					err=TRUE;
 					memset (line, 0, MAX_LINE_LEN);
 					break;
@@ -5618,21 +5660,24 @@ Received: from nic.funet.fi
 						if (camel_stream_write (stream, "\n--", 3) != 3)
 						{
 							err = TRUE;
-							errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+							ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+							errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 							memset (line, 0, MAX_LINE_LEN);
 							break;
 						}
 						if (camel_stream_write (stream, boundary, boundary_len) != boundary_len)
 						{
 							err = TRUE;
-							errmessage = g_strdup_printf ("Write to cache failed failed: %s", g_strerror (errno));
+							ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+							errmessage = g_strdup_printf (_("Write to cache failed failed: %s"), g_strerror (errno));
 							memset (line, 0, MAX_LINE_LEN);
 							break;
 						}
 						if (camel_stream_write (stream, "\n", 1) != 1)
 						{
 							err = TRUE;
-							errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+							ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+							errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 							memset (line, 0, MAX_LINE_LEN);
 							break;
 						}
@@ -5679,8 +5724,9 @@ Received: from nic.funet.fi
 				{
 					if (camel_stream_write (stream, ")\n", 2) != 2)
 					{
+						ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
 						err = TRUE;
-						errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+						errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 						memset (line, 0, MAX_LINE_LEN);
 						break;
 					}
@@ -5690,8 +5736,9 @@ Received: from nic.funet.fi
 				llen = strlen (line);
 				if (camel_stream_write (stream, line, llen) != llen)
 				{
+					ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
 					err = TRUE;
-					errmessage = g_strdup_printf ("Write to cache failed: %s", g_strerror (errno));
+					errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 					memset (line, 0, MAX_LINE_LEN);
 					break;
 				}
@@ -5707,8 +5754,8 @@ Received: from nic.funet.fi
 
 			if (nread <= 0) {
 				err = TRUE;
-				ex_id = CAMEL_EXCEPTION_SERVICE_UNAVAILABLE;
-				errmessage = g_strdup_printf ("Read from service failed: %s", g_strerror (errno));
+				ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
+				errmessage = g_strdup_printf (_("Read from service failed: %s"), g_strerror (errno));
 			}
 
 			if (tag)
@@ -5752,7 +5799,7 @@ errorhander:
 
 	if (ex && !camel_exception_is_set (ex)) {
 		if (!errmessage)
-			camel_exception_setv (ex, ex_id, "Could not find message body in response.");
+			camel_exception_setv (ex, ex_id, _("Message with UID %s does not exists"), uid);
 		else {
 			camel_exception_setv (ex, ex_id, errmessage);
 			g_free (errmessage);

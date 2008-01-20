@@ -379,7 +379,7 @@ static int xrename(const char *oldp, const char *newp, const char *prefix, const
 	}
 
 	if (ret == -1) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Could not rename folder %s to %s: %s"),
 				      old, new, g_strerror (err));
 	}
@@ -458,7 +458,7 @@ ibex_failed:
 #endif
 
 
-	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 			      _("Could not rename '%s': %s"),
 			      old, g_strerror (errno));
 
@@ -478,7 +478,7 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 	name = g_strdup_printf("%s%s", CAMEL_LOCAL_STORE(store)->toplevel_dir, folder_name);
 	str = g_strdup_printf("%s.ev-summary.mmap", name);
 	if (g_unlink(str) == -1 && errno != ENOENT) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Could not delete folder summary file `%s': %s"),
 				      str, g_strerror (errno));
 		g_free(str);
@@ -490,7 +490,7 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 #if 0
 	str = g_strdup_printf("%s.ibex", name);
 	if (camel_text_index_remove(str) == -1 && errno != ENOENT) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Could not delete folder index file `%s': %s"),
 				      str, g_strerror (errno));
 		g_free(str);
@@ -514,7 +514,7 @@ delete_folder(CamelStore *store, const char *folder_name, CamelException *ex)
 		str = g_strdup_printf ("%s.cmeta", name);
 
 	if (g_unlink (str) == -1 && errno != ENOENT) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Could not delete folder meta file `%s': %s"),
 				      str, g_strerror (errno));
 		g_free (name);

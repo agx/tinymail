@@ -29,72 +29,73 @@
 
 enum _TnyErrorDomain
 {
-	TNY_FOLDER_ERROR = 1,
+	TNY_SYSTEM_ERROR = 1,
+	TNY_IO_ERROR = 2,
+	TNY_SERVICE_ERROR = 3,
+	TNY_MIME_ERROR = 4,
+
+/*
+
+	TNY_CONNECTION_ERROR = 2,
+	TNY_PROTOCOL_ERROR = 3,
+	TNY
 	TNY_FOLDER_STORE_ERROR = 2,
 	TNY_TRANSPORT_ACCOUNT_ERROR = 3,
 	TNY_ACCOUNT_ERROR = 4,
 	TNY_ACCOUNT_STORE_ERROR = 5,
 	TNY_SEND_QUEUE_ERROR = 6
+*/
+
 };
 
 typedef enum _TnyErrorDomain TnyErrorDomain;
 
 #define TNY_TYPE_ERROR (tny_error_get_type())
 
-/* TODO: These should probably be split into separate enums, one for each 
- * error domain. Error codes from one error domain should not be used with 
- * a separate error domain. The hard-coding of the numbers should then not 
- * be necessary or useful.
- */
  
 /**
  * TnyError:
  *
- * An GError error code.
- * 
- * TODO: Ideally, we would have more error codes, one for each specific error, 
- * such as "hostname not accepted", so that the application can identify the 
- * exact error, and respond accordingly. However, these error codes are not 
- * yet present because the implementations do not yet provide such 
- * fine-grained information.
- * TODO: Document the other error codes.
- * 
- * TNY_ACCOUNT_ERROR_TRY_CONNECT: This can possibly indicate such errors as 
- * "hostname not resolved", "no network", or "password not accepted", 
- * though some implementations might return TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT 
- * (in the TNY_ACCOUNT_STORE_ERROR error domain) in these cases
- * Currently, the application must know whether it is using our camel 
- * implementation, in order to know whether it can expect to receive a 
- * TNY_ACCOUNT_ERROR_TRY_CONNECT (in the TNY_ACCOUNT_ERROR error domain) rather 
- * than a TNY_ACCOUNT_ERROR_UNKNOWN_ALERT (in the TNY_ACCOUNT_STORE_ERROR 
- * error domain) in these situations. If using our camel implementation then 
- * even this level of exact detection of the particular error is not currently 
- * possible, so a generic error dialog should probably be shown, though the 
- * application could choose to suggest possible causes for the error.
- *
- * TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED: The specified host name 
- * cannot be resolved to an IP address. It is probably incorrect.
- *
- * TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE: No connection could be 
- * made with the specified server. Maybe the server is not running on the 
- * specified host.
- *
- * TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED: The server reported 
- * that it does not support the specified secure authentication method. It might 
- * support a different method instead.
- *
- * TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE: There was a problem with an 
- * authentication or connection certificate. For instance, a bad certificate must 
- * be manually accepted.
- * 
- * TNY_ACCOUNT_STORE_ERROR_UNKNOWN_ALERT: This indicates that an unknown error 
- * has occurred. Depending on the implementation being used, and the server 
- * being used, this could have multiple possible causes. More exact error 
- * information is only possible with other servers, and/or othre implementations.
+ * A GError error code.
  */
 enum _TnyError 
 {
-	TNY_ERROR_UNSPEC = 1,
+	TNY_SYSTEM_ERROR_UNKNOWN,
+	TNY_SYSTEM_ERROR_MEMORY,
+	TNY_SYSTEM_ERROR_CANCEL,
+
+	TNY_IO_ERROR_WRITE,
+	TNY_IO_ERROR_READ,
+
+	TNY_SERVICE_ERROR_UNKNOWN,
+	TNY_SERVICE_ERROR_AUTHENTICATE,
+	TNY_SERVICE_ERROR_CONNECT,
+	TNY_SERVICE_ERROR_UNAVAILABLE,
+	TNY_SERVICE_ERROR_LOST_CONNECTION,
+	TNY_SERVICE_ERROR_CERTIFICATE,
+	TNY_SERVICE_ERROR_FOLDER_CREATE,
+	TNY_SERVICE_ERROR_FOLDER_REMOVE,
+	TNY_SERVICE_ERROR_FOLDER_RENAME,
+	TNY_SERVICE_ERROR_FOLDER_IS_UNKNOWN,
+	TNY_SERVICE_ERROR_PROTOCOL,
+	TNY_SERVICE_ERROR_UNSUPPORTED,
+	TNY_SERVICE_ERROR_NO_SUCH_MESSAGE,
+	TNY_SERVICE_ERROR_MESSAGE_NOT_AVAILABLE,
+	TNY_SERVICE_ERROR_STATE,
+
+	TNY_SERVICE_ERROR_ADD_MSG,
+	TNY_SERVICE_ERROR_REMOVE_MSG,
+	TNY_SERVICE_ERROR_GET_MSG,
+	TNY_SERVICE_ERROR_SYNC,
+	TNY_SERVICE_ERROR_REFRESH,
+	TNY_SERVICE_ERROR_COPY,
+	TNY_SERVICE_ERROR_TRANSFER,
+	TNY_SERVICE_ERROR_GET_FOLDERS,
+	TNY_SERVICE_ERROR_SEND,
+
+	TNY_MIME_ERROR_STATE,
+	TNY_MIME_ERROR_MALFORMED,
+/*
 
 	TNY_FOLDER_ERROR_SYNC = 2,
 	TNY_FOLDER_ERROR_REMOVE_MSG = 3,
@@ -131,6 +132,7 @@ enum _TnyError
 	TNY_ACCOUNT_STORE_ERROR_CANCEL_ALERT = 18,
 
 	TNY_FOLDER_ERROR_REMOVE_MSGS = 19
+*/
 };
 
 typedef enum _TnyError TnyError;

@@ -452,43 +452,6 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option
 	return;
 }
 
-TnyError
-_tny_camel_account_get_tny_error_code_for_camel_exception_id (CamelException* ex)
-{
-	/* printf ("DEBUG: %s: ex->id=%d, ex->desc=%s\n", __FUNCTION__, ex->id, ex->desc); */
-
-	if (!ex) {
-		g_warning ("%s: The exception was NULL.\n", __FUNCTION__);
-		return TNY_ACCOUNT_ERROR_TRY_CONNECT;
-	}
-
-	/* Try to provide a precise error code, 
-	 * as much as possible: */
-	switch (ex->id) 
-	{
-		case CAMEL_EXCEPTION_SYSTEM_HOST_LOOKUP_FAILED:
-			return TNY_ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED;
-		case CAMEL_EXCEPTION_SERVICE_UNAVAILABLE:
-			return TNY_ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE;
-		case CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE:
-			return TNY_ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED;
-		case CAMEL_EXCEPTION_SERVICE_CERTIFICATE:
-			return TNY_ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE;
-		case CAMEL_EXCEPTION_USER_CANCEL:
-			/* TODO: This really shouldn't be shown to the user: */
-			return TNY_ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL;
-		case CAMEL_EXCEPTION_SYSTEM:
-		default:
-			/* A generic exception. 
-			 * We should always try to provide a precise error code rather than this,
-			 * so we can show a more helpful (translated) error message to the user.
-			 */
-			return TNY_ACCOUNT_ERROR_TRY_CONNECT;
-	}
-
-	return TNY_ACCOUNT_ERROR_TRY_CONNECT;
-}
-
 void 
 _tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online, GError **err)
 {
@@ -496,12 +459,7 @@ _tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online, GErr
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare_func (TNY_CAMEL_ACCOUNT (self), for_online, TRUE);
 	if (camel_exception_is_set (priv->ex))
-	{
-		g_set_error (err, TNY_ACCOUNT_ERROR, 
-			_tny_camel_account_get_tny_error_code_for_camel_exception_id (priv->ex),
-			camel_exception_get_description (priv->ex));
-	}
-
+		_tny_camel_exception_to_tny_error (priv->ex, err);
 	return;
 }
 
@@ -1478,14 +1436,11 @@ _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **
 	{
 		if (camel_exception_is_set (priv->ex))
 		{
-			g_set_error (err, TNY_ACCOUNT_ERROR, 
-				_tny_camel_account_get_tny_error_code_for_camel_exception_id (priv->ex),
-				camel_exception_get_description (priv->ex));
-
-				camel_exception_clear (&ex);
+			_tny_camel_exception_to_tny_error (priv->ex, err);
+			camel_exception_clear (priv->ex);
 		} else {
-			g_set_error (err, TNY_ACCOUNT_ERROR, 
-				TNY_ACCOUNT_ERROR_TRY_CONNECT,
+			g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_CONNECT,
 				"Account not yet fully configured. "
 				"This problem indicates a bug in the software.");
 		}
@@ -1600,10 +1555,7 @@ done:
 
 	if (camel_exception_is_set (&ex))
 	{
-		g_set_error (err, TNY_ACCOUNT_ERROR, 
-			_tny_camel_account_get_tny_error_code_for_camel_exception_id (&ex),
-			camel_exception_get_description (&ex));
-
+		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 	}
 
@@ -1893,11 +1845,7 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 
 	info->err = NULL;
 	if (camel_exception_is_set (&ex))
-	{
-		g_set_error (&info->err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_REFRESH,
-			camel_exception_get_description (&ex));
-	}
+		_tny_camel_exception_to_tny_error (&ex, &info->err);
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
@@ -1939,7 +1887,7 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 	GError *err = NULL;
 
 	if (!_tny_session_check_operation (priv->session, TNY_ACCOUNT (self), &err, 
-			TNY_ACCOUNT_ERROR, TNY_ACCOUNT_ERROR_GET_SUPPORTED_AUTH))
+			TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_UNKNOWN))
 	{
 		if (callback) {
 			callback (self, TRUE /* cancelled */, NULL, err, user_data);

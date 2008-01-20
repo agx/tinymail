@@ -140,7 +140,7 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 
 	if (!folder->summary) {
 		camel_object_unref (CAMEL_OBJECT (folder));
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_READ,
 				      _("Could not load summary for INBOX"));
 		return NULL;
 	}
@@ -312,7 +312,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		if (errno == EINTR)
 			camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("User canceled"));
 		else
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 					      _("Cannot get POP summary: %s"),
 					      g_strerror (errno));
 	}
@@ -934,7 +934,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 			if (errno == EINTR)
 				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, "User canceled");
 			else
-				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
 						      "Cannot get message %s: %s",
 						      uid, g_strerror (errno));
 			if (message)
@@ -948,7 +948,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	}
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE) {
-		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 			     _("This message is not currently available"));
 		return NULL;
 	}
@@ -1009,7 +1009,7 @@ rfail:
 				camel_message_info_free (mi);
 			}
 
-			camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 			  "Message with UID %s is not currently available on the POP server. "
 			  "If you have a web E-mail account with POP access, make sure "
 			  "that you select to export all E-mails over POP for mail, "
@@ -1028,9 +1028,8 @@ rfail:
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 	{
-		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
-		  "Message with UID %s is not currently available and not online",
-		  uid);
+		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
+		  "Message with UID %s is not currently available", uid);
 
 		g_static_rec_mutex_unlock (pop3_store->uidl_lock);
 		return NULL;
@@ -1091,7 +1090,7 @@ rfail:
 				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL,
 					"User canceled message retrieval");
 			else
-				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 					"Failure while retrieving message %s from POP server: %s",
 					uid, g_strerror (fi->err));
 			goto fail;
@@ -1177,14 +1176,14 @@ rfail:
 				camel_exception_setv (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					"User canceled message retrieval");
 			else
-				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 					"Failure while retrieving message %s from POP server: %s",
 					uid, g_strerror (fi->err));
 			goto done;
 		}
 
 		if (camel_stream_read(stream, buffer, 1) != 1 || buffer[0] != '#') {
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 				"Failure while retrieving message %s from POP server.", uid);
 			goto done;
 		}
@@ -1196,7 +1195,7 @@ rfail:
 			camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL,
 				"User canceled message retrieval");
 		else
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 				"Failure while retrieving message %s from POP server: %s",
 				uid, g_strerror (errno));
 		camel_object_unref((CamelObject *)message);
@@ -1270,7 +1269,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 	{
-		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 			"No message with UID %s and not online while retrieving summary info", uid);
 		return NULL;
 	}
@@ -1289,7 +1288,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	fi = g_hash_table_lookup(pop3_store->uids_uid, uid);
 
 	if (fi == NULL) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 			"No message with UID %s while retrieving summary info", uid);
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		return NULL;
@@ -1349,7 +1348,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL,
 					"User canceled summary retreival");
 			else
-				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 					"Cannot get summary info for %s: %s",
 					uid, g_strerror (fi->err));
 			goto fail;
@@ -1406,14 +1405,14 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 				camel_exception_setv (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					"User canceled summary retrieval");
 			else
-				camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+				camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 					"Cannot get summary info for %s: %s",
 					uid, g_strerror (fi->err));
 			goto done;
 		}
 
 		if (camel_stream_read(stream, buffer, 1) != 1 || buffer[0] != '#') {
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 					"Cannot get summary info for %s.", uid);
 			goto done;
 		}
@@ -1425,7 +1424,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 			camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL,
 				"User canceled summary retrieval");
 		else
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 				"Cannot get summary info for %s: %s",
 				uid, g_strerror (errno));
 		camel_object_unref((CamelObject *)message);
@@ -1507,7 +1506,7 @@ pop3_sync_offline (CamelFolder *folder, CamelException *ex)
 static void
 pop3_sync_online (CamelFolder *folder, CamelException *ex)
 {
-	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+	camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_NOT_SUPPORTED, _("Not supported"));
 
 	pop3_sync_offline (folder, ex);
 
@@ -1517,7 +1516,7 @@ pop3_sync_online (CamelFolder *folder, CamelException *ex)
 static void
 pop3_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *ex)
 {
-	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+	camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_NOT_SUPPORTED, _("Not supported"));
 
 	return;
 }
@@ -1569,7 +1568,7 @@ pop3_expunge_uids_offline (CamelFolder *folder, GPtrArray *uids, CamelException 
 static void
 pop3_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelException *ex)
 {
-	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+	camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_NOT_SUPPORTED, _("Not supported"));
 
 	return;
 }
@@ -1580,7 +1579,7 @@ pop3_append_offline (CamelFolder *folder, CamelMimeMessage *message,
 		     const CamelMessageInfo *info, char **appended_uid,
 		     CamelException *ex)
 {
-	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+	camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_NOT_SUPPORTED, _("Not supported"));
 
 	return;
 }
@@ -1590,7 +1589,7 @@ pop3_transfer_offline (CamelFolder *source, GPtrArray *uids,
 		       CamelFolder *dest, GPtrArray **transferred_uids,
 		       gboolean delete_originals, CamelException *ex)
 {
-	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM, _("Not supported"));
+	camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_NOT_SUPPORTED, _("Not supported"));
 	return;
 }
 

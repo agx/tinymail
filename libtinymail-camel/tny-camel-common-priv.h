@@ -29,11 +29,13 @@
 #include <camel/camel-store.h>
 #include <tny-camel-folder.h>
 #include <tny-session-camel.h>
+#include <tny-error.h>
 
 void _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target);
 void _foreach_email_add_to_inet_addr (const gchar *emails, CamelInternetAddress *target);
 gboolean _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *finfo);
 gboolean _tny_session_check_operation (TnySessionCamel *session, TnyAccount *account, GError **err, GQuark domain, gint code);
 void _tny_session_stop_operation (TnySessionCamel *session);
+void _tny_camel_exception_to_tny_error (CamelException *ex, GError **err);
 
 #endif

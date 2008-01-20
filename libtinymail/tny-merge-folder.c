@@ -123,8 +123,8 @@ tny_merge_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback 
 
 	if (callback) {
 		GError *err = NULL;
-		g_set_error (&err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_ADD_MSG,
+		g_set_error (&err, TNY_SERVICE_ERROR, 
+			TNY_SERVICE_ERROR_UNSUPPORTED,
 			"tny_merge_folder_add_msg not implemented: add it to the mother "
 			"folder instead. This problem indicates a bug in the software.");
 		callback (self, TRUE, err, user_data);
@@ -139,8 +139,8 @@ tny_merge_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
 	g_warning ("tny_merge_folder_add_msg not implemented: "
 		   "add it to the mother folder instead\n");
 
-	g_set_error (err, TNY_FOLDER_ERROR, 
-		TNY_FOLDER_ERROR_ADD_MSG,
+	g_set_error (err, TNY_SERVICE_ERROR, 
+		TNY_SERVICE_ERROR_UNSUPPORTED,
 		"tny_merge_folder_add_msg not implemented: add it to the mother "
 		"folder instead. This problem indicates a bug in the software.");
 }
@@ -389,8 +389,8 @@ tny_merge_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **er
 
 
 	if (!retval)
-		g_set_error (err, TNY_FOLDER_ERROR, 
-				TNY_FOLDER_ERROR_GET_MSG,
+		g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_NO_SUCH_MESSAGE,
 				"Message not found");
 
 	return retval;

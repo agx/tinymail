@@ -43,6 +43,7 @@
 #include <tny-status.h>
 #define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-common-priv.h"
+#include "tny-camel-common-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
 
 #include <tny-camel-bs-msg.h>
@@ -85,16 +86,15 @@ tny_camel_bs_msg_receive_strategy_start_receiving_part (TnyCamelBsMsgReceiveStra
 		filename = camel_folder_fetch (cfolder, uid, part_spec?part_spec:"1", binary, &ex);
 
 		if (camel_exception_is_set (&ex)) {
-			g_set_error (err, TNY_FOLDER_ERROR, 
-				TNY_FOLDER_ERROR_GET_MSG,
-				camel_exception_get_description (&ex));
+			_tny_camel_exception_to_tny_error (&ex, err);
+			camel_exception_clear (&ex);
 			retval = NULL;
 		} else {
 			int fd = open (filename, 0);
 
 			if (fd == -1) {
-				g_set_error (err, TNY_FOLDER_ERROR, 
-					TNY_FOLDER_ERROR_GET_MSG,
+				g_set_error (err, TNY_IO_ERROR, 
+					TNY_IO_ERROR_READ,
 					"Can't open %s for reading", filename);
 				retval = NULL;
 			} else
@@ -123,9 +123,8 @@ tny_camel_bs_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrategy
 	structure_str = camel_folder_fetch_structure (cfolder, (const char *) uid, &ex);
 
 	if (camel_exception_is_set (&ex)) {
-		g_set_error (err, TNY_FOLDER_ERROR, 
-			TNY_FOLDER_ERROR_GET_MSG,
-			camel_exception_get_description (&ex));
+		_tny_camel_exception_to_tny_error (&ex, err);
+		camel_exception_clear (&ex);
 		if (structure_str)
 			g_free (structure_str);
 		g_free (uid);

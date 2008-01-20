@@ -365,7 +365,7 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					     _("Operation cancelled"));
 		} else
-			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 					     g_strerror (errno));
 
 
@@ -417,7 +417,7 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 			camel_exception_clear (&mex);
 			return NULL;
 		} else
-			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 					     g_strerror (errno));
 		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 
@@ -470,7 +470,7 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 		if (!g_ascii_strncasecmp (respbuf, "* BYE", 5)) {
 			/* Connection was lost, no more data to fetch */
 			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 					      _("Server unexpectedly disconnected: %s"),
 					      _("Unknown error")); /* g_strerror (104));  FIXME after 1.0 is released */
 			store->connected = FALSE;
@@ -539,7 +539,7 @@ camel_imap_command_response_idle (CamelImapStore *store, char **response,
 		if (!g_ascii_strncasecmp (respbuf, "* BYE", 5)) {
 			/* Connection was lost, no more data to fetch */
 			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 					      _("Server unexpectedly disconnected: %s"),
 					      _("Unknown error")); /* g_strerror (104));  FIXME after 1.0 is released */
 			store->connected = FALSE;
@@ -634,7 +634,7 @@ imap_read_response (CamelImapStore *store, CamelException *ex)
 	if (!p || (g_ascii_strncasecmp(p, " NO", 3) != 0 && g_ascii_strncasecmp(p, " BAD", 4)) ) {
 		g_warning ("Unexpected response from IMAP server: %s",
 			   respbuf);
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 				      _("Unexpected response from IMAP "
 					"server: %s"), respbuf);
 		camel_imap_response_free_without_processing (store, response);
@@ -644,7 +644,7 @@ imap_read_response (CamelImapStore *store, CamelException *ex)
 	p += 3;
 	if (!*p++)
 		p = NULL;
-	camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_INVALID,
+	camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 			      _("IMAP command failed: %s"),
 			      p ? p : _("Unknown error"));
 	camel_imap_response_free_without_processing (store, response);
@@ -714,7 +714,7 @@ imap_read_untagged_opp (CamelImapStore *store, char *line, CamelException *ex, i
 					imap_debug ("Recon in untagged: %s\n", camel_exception_get_description (&mex));
 					camel_exception_clear (&mex);
 				} else {
-					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 							     g_strerror (errno));
 					camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 				}
@@ -734,7 +734,7 @@ imap_read_untagged_opp (CamelImapStore *store, char *line, CamelException *ex, i
 				imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
 				camel_exception_clear (&mex);
 			} else {
-				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 					     _("Server response ended too soon."));
 				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 			}
@@ -879,7 +879,7 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 					imap_debug ("Recon in untagged: %s\n", camel_exception_get_description (&mex));
 					camel_exception_clear (&mex);
 				} else {
-					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+					camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 							     g_strerror (errno));
 					camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 				}
@@ -899,7 +899,7 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 				imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
 				camel_exception_clear (&mex);
 			} else {
-				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+				camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 					     _("Server response ended too soon."));
 				camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 			}
@@ -1115,7 +1115,7 @@ camel_imap_response_extract (CamelImapStore *store,
 		g_ptr_array_remove_index (response->untagged, i);
 	} else {
 		resp = NULL;
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 				      _("IMAP server response did not contain "
 					"%s information"), type);
 	}
@@ -1151,7 +1151,7 @@ camel_imap_response_extract_continuation (CamelImapStore *store,
 		return status;
 	}
 
-	camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+	camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 			      _("Unexpected OK response from IMAP server: %s"),
 			      response->status);
 	camel_imap_response_free (store, response);

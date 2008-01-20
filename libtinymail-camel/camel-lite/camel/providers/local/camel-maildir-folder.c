@@ -212,17 +212,18 @@ maildir_append_message (CamelFolder *folder, CamelMimeMessage *message, const Ca
 
  fail_write:
 
-	/* remove the summary info so we are not out-of-sync with the mh folder */
-	camel_folder_summary_remove_uid (CAMEL_FOLDER_SUMMARY (folder->summary),
-					 camel_message_info_uid (mi));
 
 	if (errno == EINTR)
 		camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 				     _("Maildir append message canceled"));
-	else
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+	else /* Most likely a IO error */
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 				      _("Cannot append message to maildir folder: %s: %s"),
 				      name, g_strerror (errno));
+
+	/* remove the summary info so we are not out-of-sync with the mh folder */
+	camel_folder_summary_remove_uid (CAMEL_FOLDER_SUMMARY (folder->summary),
+					 camel_message_info_uid (mi));
 
 	if (output_stream) {
 		camel_object_unref (CAMEL_OBJECT (output_stream));
@@ -265,7 +266,7 @@ maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveT
 	camel_message_info_free(info);
 
 	if ((message_stream = camel_stream_fs_new_with_name(name, O_RDONLY, 0)) == NULL) {
-		camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM_IO_READ,
 				     _("Cannot get message: %s from folder %s\n  %s"),
 				     uid, lf->folder_path, g_strerror(errno));
 		g_free(name);
@@ -274,7 +275,7 @@ maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveT
 
 	message = camel_mime_message_new();
 	if (camel_data_wrapper_construct_from_stream((CamelDataWrapper *)message, message_stream) == -1) {
-		camel_exception_setv(ex, (errno==EINTR)?CAMEL_EXCEPTION_USER_CANCEL:CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv(ex, (errno==EINTR)?CAMEL_EXCEPTION_USER_CANCEL:CAMEL_EXCEPTION_SYSTEM_IO_READ,
 				     _("Cannot get message: %s from folder %s\n  %s"),
 				     uid, lf->folder_path, _("Invalid message contents"));
 		g_free(name);
