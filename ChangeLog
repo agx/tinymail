@@ -11,8 +11,7 @@
 	(tny_send_queue_cancel): API change, now the cancel method receives a
 	flag specifying the action that should be performed on cancelations,
 	to remove the messages or just to suspend them
-	(emit_error): now the send queue waits until the callback of this
-	signal is properly processed by the user
+	(thread_main): make the tny_transport_account_send cancellable
 
 2008-01-20  Philip Van Hoof <pvanhoof@gnome.org>
 

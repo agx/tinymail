@@ -118,11 +118,11 @@ destroy_error_info (gpointer data)
 	if (info->error)
 		g_error_free (info->error);
 
-
-	g_mutex_lock (info->mutex);
-	g_cond_broadcast (info->condition);
-	info->had_callback = TRUE;
-	g_mutex_unlock (info->mutex);
+	g_slice_free (ErrorInfo, info);
+/* 	g_mutex_lock (info->mutex); */
+/* 	g_cond_broadcast (info->condition); */
+/* 	info->had_callback = TRUE; */
+/* 	g_mutex_unlock (info->mutex); */
 
 	return;
 }
@@ -142,22 +142,22 @@ emit_error (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *error, i
 		info->header = TNY_HEADER (g_object_ref (header));
 	info->i = i;
 	info->total = total;
-	info->had_callback = FALSE;
-	info->mutex = g_mutex_new ();
-	info->condition = g_cond_new ();
+/* 	info->had_callback = FALSE; */
+/* 	info->mutex = g_mutex_new (); */
+/* 	info->condition = g_cond_new (); */
 
 	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 		emit_error_on_mainloop, info, destroy_error_info);
 
-	g_mutex_lock (info->mutex);
-	if (!info->had_callback)
-		g_cond_wait (info->condition, info->mutex);
-	g_mutex_unlock (info->mutex);
+/* 	g_mutex_lock (info->mutex); */
+/* 	if (!info->had_callback) */
+/* 		g_cond_wait (info->condition, info->mutex); */
+/* 	g_mutex_unlock (info->mutex); */
 
-	g_mutex_free (info->mutex);
-	g_cond_free (info->condition);
+/* 	g_mutex_free (info->mutex); */
+/* 	g_cond_free (info->condition); */
 
-	g_slice_free (ErrorInfo, info);
+/* 	g_slice_free (ErrorInfo, info); */
 
 	return;
 }
@@ -446,7 +446,12 @@ thread_main (gpointer data)
 
 			if (err == NULL) 
 			{
+				_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->trans_account),
+									  NULL, NULL, "Sending message");
+
 				tny_transport_account_send (priv->trans_account, msg, &err);
+
+				_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->trans_account));
 
 				if (err != NULL) {
 					emit_error (self, header, msg, err, i, priv->total);
