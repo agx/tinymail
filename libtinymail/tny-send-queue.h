@@ -48,6 +48,12 @@ enum _TnySendQueueSignal
 	TNY_SEND_QUEUE_LAST_SIGNAL
 };
 
+typedef enum
+{
+	TNY_SEND_QUEUE_CANCEL_ACTION_SUSPEND,
+	TNY_SEND_QUEUE_CANCEL_ACTION_REMOVE
+} TnySendQueueCancelAction;
+
 extern guint tny_send_queue_signals[TNY_SEND_QUEUE_LAST_SIGNAL];
 
 
@@ -64,7 +70,7 @@ struct _TnySendQueueIface
 	void (*add_func) (TnySendQueue *self, TnyMsg *msg, GError **err);
 	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
 	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
-	void (*cancel_func) (TnySendQueue *self, gboolean remove, GError **err);
+	void (*cancel_func) (TnySendQueue *self, TnySendQueueCancelAction cancel_action, GError **err);
 
 };
 
@@ -73,7 +79,7 @@ GType tny_send_queue_get_type (void);
 void tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err);
 TnyFolder* tny_send_queue_get_sentbox (TnySendQueue *self);
 TnyFolder* tny_send_queue_get_outbox (TnySendQueue *self);
-void tny_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err);
+void tny_send_queue_cancel (TnySendQueue *self, TnySendQueueCancelAction cancel_action, GError **err);
 
 G_END_DECLS
 

@@ -38,7 +38,7 @@ guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
 /**
  * tny_send_queue_cancel:
  * @self: a #TnySendQueue
- * @remove: also remove queued messages
+ * @cancel_action: a #TnySendQueueCancelAction, it could remove messages or just mark them as suspended
  * @err: (null-ok): a #GError or NULL
  *
  * Cancels the current operation
@@ -47,14 +47,14 @@ guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
  * audience: application-developer
  **/
 void 
-tny_send_queue_cancel (TnySendQueue *self, gboolean remove, GError **err)
+tny_send_queue_cancel (TnySendQueue *self, TnySendQueueCancelAction cancel_action, GError **err)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_SEND_QUEUE (self));
 	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func != NULL);
 #endif
 
-	TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func (self, remove, err);
+	TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func (self, cancel_action, err);
 	return;
 }
 

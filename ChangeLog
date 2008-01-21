@@ -1,3 +1,15 @@
+2008-01-21  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail/tny-send-queue.c
+	libtinymail/tny-send-queue.h
+	libtinymail-camel/tny-camel-send-queue.c
+	libtinymail-camel/tny-camel-send-queue.c:
+	(tny_send_queue_cancel): API change, now the cancel method receives a
+	flag specifying the action that should be performed on cancelations,
+	to remove the messages or just to suspend them
+	(emit_error): now the send queue waits until the callback of this
+	signal is properly processed by the user
+
 2008-01-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Refactoring of all error reporting situations, errors and handling
