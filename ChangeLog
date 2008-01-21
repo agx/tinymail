@@ -1,3 +1,7 @@
+2008-01-21 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+	
+	* fix freeing uninitialized data in camel-imap-folder.c
+
 2008-01-21  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail/tny-send-queue.c

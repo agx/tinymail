@@ -5485,7 +5485,7 @@ berrorhander:
 		{
 			CamelImapResponse *response;
 			gboolean err = FALSE, done=FALSE;
-			char *body;
+			char *body = NULL;
 			int body_len = 0;
 			int i;
 /*
