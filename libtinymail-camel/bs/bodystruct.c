@@ -192,8 +192,10 @@ decode_estring (unsigned char **in, unsigned char *inend, GError **err)
 
 				inptr++; /* My '(' */
 
-				if (!first)
+				if (!first) {
 					g_string_append (str, ", ");
+					first = FALSE;
+				}
 
 				name = decode_qstring (&inptr, inend, err);
 				separator = decode_qstring (&inptr, inend, err);
@@ -340,6 +342,7 @@ decode_param (unsigned char **in, unsigned char *inend, GError **err)
 	val = decode_qstring (&inptr, inend, err);
 
 	if (!val) {
+		param = NULL;
 		*in = inptr;
 		g_free (name);
 	} else {

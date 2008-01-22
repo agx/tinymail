@@ -4547,7 +4547,7 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 
 		fil = fopen (path, "w");
 
-		if (!fil || fd == -1) {
+		if (!fil) {
 			err = TRUE;
 			ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
 			err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
@@ -4555,6 +4555,13 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 		}
 
 		fd = fileno (fil);
+
+		if (fd == -1) {
+			err = TRUE;
+			ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+			err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
+			goto convert_errorhandler;
+		}
 
 		if (store->capabilities & IMAP_CAPABILITY_CONVERT)
 		{
@@ -4795,7 +4802,7 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 
 			fil = fopen (path, "w");
 
-			if (!fil || fd == -1) {
+			if (!fil) {
 				err = TRUE;
 				ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
 				err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
@@ -4803,6 +4810,14 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 			}
 
 			fd = fileno (fil);
+
+			if (fd == -1) {
+				err = TRUE;
+				ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
+				err_message = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
+				goto fetch_errorhandler;
+			}
+
 
 			if (binary && *binary && store->capabilities & IMAP_CAPABILITY_BINARY)
 			{
@@ -5140,7 +5155,7 @@ walk_the_string (char *in, GString *str)
 {
 	char *ptr = in;
 	gboolean open = FALSE;
-	gint num;
+	gint num = 99;
 
 	while (*ptr) {
 		if (*ptr == '{') {

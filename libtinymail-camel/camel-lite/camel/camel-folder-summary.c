@@ -506,6 +506,7 @@ camel_folder_summary_index(CamelFolderSummary *s, int i)
 	return info;
 }
 
+#if 0
 void
 camel_folder_summary_move_up (CamelFolderSummary *s)
 {
@@ -517,9 +518,10 @@ camel_folder_summary_move_up (CamelFolderSummary *s)
 
 	for (i = s->messages->len; i > 0 ; i--)
 	{
-		if (first)
+		if (first) {
 			g_ptr_array_add (s->messages, s->messages->pdata[i-1]);
-		else
+			first = FALSE;
+		} else
 			s->messages->pdata[i+1] = s->messages->pdata[i];
 	}
 
@@ -528,6 +530,7 @@ camel_folder_summary_move_up (CamelFolderSummary *s)
 
 }
 
+#endif
 /**
  * camel_folder_summary_array:
  * @summary: a #CamelFolderSummary object

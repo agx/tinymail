@@ -497,7 +497,7 @@ camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path, cons
 
 		if (boundary == NULL)
 		{
-			   CamelContentType *ct = NULL;
+			   /* CamelContentType *ct = NULL; */
 			   const char *bound=NULL;
 			   char *pstr = (char*)camel_strstrcase ((const char *) buffer, "boundary");
 
@@ -515,12 +515,12 @@ camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path, cons
 				}
 			   }
 
-			   if (ct)
+			/*   if (ct)
 			   {
 				bound = camel_content_type_param(ct, "boundary");
 				if (bound && strlen (bound) > 0)
 					boundary = g_strdup (bound);
-			   }
+			   } */
 		} else if (strstr ((const char*) buffer, (const char*) boundary))
 		{
 			if (occurred)

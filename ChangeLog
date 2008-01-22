@@ -1,3 +1,11 @@
+2008-01-22  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added support for GtkHTML in libtinymailui-gtkhtml. This is highly
+	experimental and unfinished at this moment
+	* Fixed several compiler warnings, and cleaned up some code
+
+	* This was a minor API change
+
 2008-01-21 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	
 	* fix freeing uninitialized data in camel-imap-folder.c

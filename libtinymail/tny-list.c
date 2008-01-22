@@ -249,7 +249,7 @@ tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_d
 	if (TNY_LIST_GET_IFACE (self)->remove_matches_func)
 		TNY_LIST_GET_IFACE (self)->remove_matches_func (self, matcher, match_data);
 	else {
-		GList *to_remove = NULL;
+		GList *to_remove = NULL, *copy;
 		TnyIterator *iter = tny_list_create_iterator (self);
 
 		while (!tny_iterator_is_done (iter)) {
@@ -263,6 +263,7 @@ tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_d
 		}
 		g_object_unref (iter);
 
+		copy = to_remove;
 		while (to_remove) {
 			GObject *item = to_remove->data;
 			tny_list_remove (self, item);
@@ -270,8 +271,8 @@ tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_d
 			to_remove = g_list_next (to_remove);
 		}
 
-		if (to_remove)
-			g_list_free (to_remove);
+		if (copy)
+			g_list_free (copy);
 	}
 
 #ifdef DBC /* ensure */

@@ -274,7 +274,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 	CamelPOP3Command *pcl, *pcu = NULL;
 	int i, hcnt = 0, lcnt = 0;
 	CamelFolderChangeInfo *changes = NULL;
-	GList *deleted = NULL;
+	GList *deleted = NULL, *copy;
 	gint max;
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
@@ -471,6 +471,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		camel_message_info_free((CamelMessageInfo *)info);
 	}
 
+	copy = deleted;
 	while (deleted)
 	{
 		CamelMessageInfo *info = deleted->data;
@@ -484,8 +485,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		deleted = g_list_next (deleted);
 	}
 
-	if (deleted)
-		g_list_free (deleted);
+	if (copy)
+		g_list_free (copy);
 
 	if (changes && camel_folder_change_info_changed (changes)) {
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);

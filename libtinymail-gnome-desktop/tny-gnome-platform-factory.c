@@ -27,9 +27,13 @@
 
 #ifdef MOZEMBED
 #include <tny-moz-embed-msg-view.h>
-#else
-#include <tny-gtk-msg-view.h>
 #endif
+
+#ifdef GTKHTML
+#include <tny-gtk-html-msg-view.h>
+#endif
+
+#include <tny-gtk-msg-view.h>
 
 #ifdef GNOME
 #include <tny-gnome-keyring-password-getter.h>
@@ -86,13 +90,18 @@ tny_gnome_platform_factory_new_password_getter (TnyPlatformFactory *self)
 static TnyMsgView*
 tny_gnome_platform_factory_new_msg_view (TnyPlatformFactory *self)
 {
-	TnyMsgView *retval;
+	TnyMsgView *retval = NULL;
 		
 #ifdef MOZEMBED
 	retval = tny_moz_embed_msg_view_new ();
-#else
-	retval = tny_gtk_msg_view_new ();
 #endif
+
+#ifdef GTKHTML
+	retval = tny_gtk_html_msg_view_new ();
+#endif
+
+	if (!retval)
+		retval = tny_gtk_msg_view_new ();
 
 	return retval;
 }

@@ -12,6 +12,10 @@ if BUILD_MOZEMBED
 INCLUDES += -I$(top_srcdir)/libtinymailui-mozembed -DMOZEMBED
 endif
 
+if BUILD_GTKHTML
+INCLUDES += -I$(top_srcdir)/libtinymailui-gtkhtml -DGTKHTML
+endif
+
 if BUILD_GNOME
 INCLUDES += -I$(top_srcdir)/libtinymailui-gnome-keyring -DGNOME
 endif
@@ -46,6 +50,10 @@ endif
 
 if BUILD_MOZEMBED
 libtinymail_gnome_desktop_1_0_la_LIBADD += $(top_builddir)/libtinymailui-mozembed/libtinymailui-mozembed-$(API_VERSION).la
+endif
+
+if BUILD_GTKHTML
+libtinymail_gnome_desktop_1_0_la_LIBADD += $(top_builddir)/libtinymailui-gtkhtml/libtinymailui-gtkhtml-$(API_VERSION).la
 endif
 
 libtinymailgnomedesktopincludedir = $(includedir)/libtinymail-gnome-desktop-$(API_VERSION)

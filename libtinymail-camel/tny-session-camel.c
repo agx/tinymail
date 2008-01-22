@@ -534,12 +534,12 @@ mail_tool_uri_to_folder (CamelSession *session, const char *uri, guint32 flags, 
 	CamelURL *url;
 	CamelStore *store = NULL;
 	CamelFolder *folder = NULL;
-	int offset = 0;
+	/*int offset = 0;*/
 	char *curi = NULL;
 
 	g_return_val_if_fail (uri != NULL, NULL);
 	
-	url = camel_url_new (uri + offset, ex);
+	url = camel_url_new (uri /*+ offset*/, ex);
 
 	if (G_UNLIKELY (!url))
 	{
@@ -547,7 +547,7 @@ mail_tool_uri_to_folder (CamelSession *session, const char *uri, guint32 flags, 
 		return NULL;
 	}
 
-	store = (CamelStore *)camel_session_get_service(session, uri+offset, CAMEL_PROVIDER_STORE, ex);
+	store = (CamelStore *)camel_session_get_service(session, uri /* + offset */, CAMEL_PROVIDER_STORE, ex);
 	if (G_LIKELY (store))
 	{
 		const char *name;
@@ -562,7 +562,7 @@ mail_tool_uri_to_folder (CamelSession *session, const char *uri, guint32 flags, 
 				name = "";
 		}
 
-		if (offset) 
+		/*if (offset) 
 		{
 			if (offset == 7)
 				folder = (CamelFolder*)camel_store_get_trash (store, ex);
@@ -570,7 +570,7 @@ mail_tool_uri_to_folder (CamelSession *session, const char *uri, guint32 flags, 
 				folder = (CamelFolder*)camel_store_get_junk (store, ex);
 			else
 				g_assert (FALSE);
-		} else
+		} else*/
 			folder = (CamelFolder*)camel_store_get_folder (store, name, flags, ex);
 		camel_object_unref (store);
 	}

@@ -123,7 +123,7 @@ AC_SUBST(PLATFORM)
 dnl ### Select the html component ##
 AC_ARG_WITH(html-component,
 AC_HELP_STRING([--with-html-component],
-  [Set which html component to use (mozembed, gtkhtml, none)]),
+  [Set which html component to use (mozembed, gtkhtml, webkit, none)]),
 [case "$with_html_component" in
   webkit)
 	build_gtkhtml=false
@@ -139,7 +139,7 @@ AC_HELP_STRING([--with-html-component],
   gtkhtml)
 	build_webkit=false
 	build_mozembed=false
-	build_gtkhtml=false
+	build_gtkhtml=true
 	build_demoui=true
   ;;
   none)
@@ -381,6 +381,16 @@ else
 fi
 AC_SUBST([MOZILLA_HOME])
 
+dnl ### libtinymailui-gtkhtml, a library that wraps the GtkHtml widget ##
+if test x$build_gtkhtml = xtrue; then
+  extraplatpkgs="libgtkhtml-3.8"
+  extratnypkgs="$extratnypkgs $extraplatpkgs"
+  PKG_CHECK_MODULES(LIBTINYMAILUI_GTKHTML, $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
+else
+  LIBTINYMAILUI_GTKHTML_CFLAGS=
+  LIBTINYMAILUI_GTKHTML_LIBS=
+fi
+
 dnl ### libtinymail-gnome-desktop, a GNOME platform library implementation ##
 if test x$PLATFORMDIR = xlibtinymail-gnome-desktop; then
   PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, gconf-2.0 $extraplatpkgs libnm_glib glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
@@ -506,6 +516,8 @@ libtinymailui-gtk/Makefile
 libtinymailui-gtk/libtinymailui-gtk.pc
 libtinymailui-webkit/Makefile
 libtinymailui-webkit/libtinymailui-webkit.pc
+libtinymailui-gtkhtml/Makefile
+libtinymailui-gtkhtml/libtinymailui-gtkhtml.pc
 libtinymailui-mozembed/Makefile
 libtinymailui-mozembed/libtinymailui-mozembed.pc
 libtinymailui-gnome-keyring/Makefile

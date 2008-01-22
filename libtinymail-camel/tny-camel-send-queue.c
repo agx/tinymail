@@ -353,7 +353,7 @@ thread_main (gpointer data)
 			GError *ferror = NULL;
 			TnyIterator *hdriter = NULL;
 			TnyList *headers = tny_simple_list_new ();
-			GList *to_remove = NULL;
+			GList *to_remove = NULL, *copy;
 			TnyIterator *giter = NULL;
 
 			if (tny_device_is_online (device))
@@ -406,12 +406,15 @@ thread_main (gpointer data)
 			}
 			g_object_unref (giter);
 
+			copy = to_remove;
+
 			while (to_remove) {
 				tny_list_remove (headers, G_OBJECT (to_remove->data));
 				to_remove = g_list_next (to_remove);
 			}
-			if (to_remove)
-				g_list_free (to_remove);
+
+			if (copy)
+				g_list_free (copy);
 
 			length = tny_list_get_length (headers);
 			priv->total = length;

@@ -424,7 +424,7 @@ read_summary_block (int block_id, SummaryBlock *b_in)
 		if (fscanf (idx, "%d", &len) != EOF) 
 		{
 			SummaryItem *cur;
-			char *uid = (char *) malloc(len);
+			char *uid = (char *) malloc(len + 1);
 			gboolean do_add = FALSE;
 
 			memset (uid, 0, len);
@@ -1022,7 +1022,11 @@ summary_open (const char *folder_path)
 
 	g_static_rec_mutex_init (summary->lock);
 
-	fscanf (f, "%d", &items);
+	if (f) {
+		fscanf (f, "%d", &items);
+		fclose (f);
+	} else 
+		items = 0;
 
 	g_static_rec_mutex_lock (summary->lock);
 
