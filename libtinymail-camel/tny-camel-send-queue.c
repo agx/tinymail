@@ -512,7 +512,8 @@ errorhandler:
 
 	priv->is_running = FALSE;
 
-	g_hash_table_destroy (failed_headers);
+	if (failed_headers)
+		g_hash_table_destroy (failed_headers);
 
 	g_object_unref (sentbox);
 	g_object_unref (outbox);
