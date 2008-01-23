@@ -241,6 +241,37 @@ tny_send_queue_base_init (gpointer g_class)
 				      NULL, NULL,
 				      tny_marshal_VOID__OBJECT_OBJECT_POINTER,
 				      G_TYPE_NONE, 3, TNY_TYPE_HEADER, TNY_TYPE_MSG, G_TYPE_POINTER);
+
+/**
+ * TnySendQueue::queue-start
+ * @self: a #TnySendQueue, the object on which the signal is emitted
+ *
+ * Emitted when the queue starts to process messages
+ **/
+		tny_send_queue_signals[TNY_SEND_QUEUE_START] =
+			g_signal_new ("queue-start",
+				      TNY_TYPE_SEND_QUEUE,
+				      G_SIGNAL_RUN_FIRST,
+				      G_STRUCT_OFFSET (TnySendQueueIface, queue_start),
+				      NULL, NULL,
+				      g_cclosure_marshal_VOID__VOID,
+				      G_TYPE_NONE, 0);
+
+/**
+ * TnySendQueue::queue-stop
+ * @self: a #TnySendQueue, the object on which the signal is emitted
+ *
+ * Emitted when the queue stops to process messages
+ **/
+		tny_send_queue_signals[TNY_SEND_QUEUE_STOP] =
+			g_signal_new ("queue-stop",
+				      TNY_TYPE_SEND_QUEUE,
+				      G_SIGNAL_RUN_FIRST,
+				      G_STRUCT_OFFSET (TnySendQueueIface, queue_stop),
+				      NULL, NULL,
+				      g_cclosure_marshal_VOID__VOID,
+				      G_TYPE_NONE, 0);
+
 		
 		initialized = TRUE;
 	}

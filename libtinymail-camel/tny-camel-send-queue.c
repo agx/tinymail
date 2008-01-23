@@ -174,7 +174,7 @@ emit_control_signals_on_mainloop (gpointer data)
 	if (apriv)
 		tny_lockable_lock (apriv->session->priv->ui_lock);
 	g_signal_emit (info->self, tny_send_queue_signals [info->signal_id], 
-		0, info->header, info->msg, info->i, info->total);
+		       0, info->header, info->msg, info->i, info->total);	
 	if (apriv)
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
 
@@ -278,6 +278,40 @@ tny_camel_send_queue_update (TnyFolderObserver *self, TnyFolderChange *change)
 	g_object_unref (folder);
 	g_object_unref (sentbox);
 
+	return;
+}
+
+
+static gboolean
+emit_queue_control_signals_on_mainloop (gpointer data)
+{
+	ControlInfo *info = data;
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
+	TnyCamelAccountPriv *apriv = NULL;
+
+	if (priv && priv->trans_account)
+		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
+	if (apriv)
+		tny_lockable_lock (apriv->session->priv->ui_lock);
+	g_signal_emit (info->self, tny_send_queue_signals [info->signal_id], 0);	
+	if (apriv)
+		tny_lockable_unlock (apriv->session->priv->ui_lock);
+
+	return NULL;
+}
+
+static void
+emit_queue_control_signals (TnySendQueue *self, guint signal_id)
+{
+	ControlInfo *info = g_slice_new0 (ControlInfo);
+
+	info->self = g_object_ref (self);
+	info->signal_id = signal_id;
+
+	g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
+			 emit_queue_control_signals_on_mainloop, info, 
+			 destroy_control_info);
+	
 	return;
 }
 
@@ -527,6 +561,9 @@ errorhandler:
 	g_object_unref (info->self);
 	g_slice_free (MainThreadInfo, info);
 
+	/* Emit the queue-stop signal */
+	emit_queue_control_signals (self, TNY_SEND_QUEUE_STOP);
+
 	return NULL;
 }
 
@@ -541,10 +578,18 @@ create_worker (TnySendQueue *self)
 		TnySessionCamelPriv *spriv = ((TnySessionCamel *) apriv->session)->priv;
 
 		if (spriv->device && TNY_IS_DEVICE (spriv->device)) {
-			MainThreadInfo *info = g_slice_new0 (MainThreadInfo);
+			MainThreadInfo *info;
+
+			info = g_slice_new0 (MainThreadInfo);
 			info->self = g_object_ref (self);
 			info->device = g_object_ref (spriv->device);
+
+			emit_queue_control_signals (self, TNY_SEND_QUEUE_START);
+
 			priv->thread = g_thread_create (thread_main, info, FALSE, NULL);
+
+			if (priv->thread == NULL)
+				emit_queue_control_signals (self, TNY_SEND_QUEUE_STOP);
 		}
 	}
 

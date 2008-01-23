@@ -5,6 +5,9 @@
 	libtinymail-camel/tny-camel-send-queue.h
 	(tny_send_queue_add_async): added this method that was available in
 	the Camel implementation to the interface
+	(create_worker)
+	(thread_main): added the "queue-start" and "queue-stop" signals that
+	are emitted before and after the queue processes the messages
 
 2008-01-22  Philip Van Hoof <pvanhoof@gnome.org>
 
