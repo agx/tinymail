@@ -1057,6 +1057,7 @@ tny_send_queue_init (gpointer g, gpointer iface_data)
 	TnySendQueueIface *klass = (TnySendQueueIface *)g;
 
 	klass->add_func = tny_camel_send_queue_add;
+	klass->add_async_func = tny_camel_send_queue_add_async;
 	klass->get_outbox_func = tny_camel_send_queue_get_outbox;
 	klass->get_sentbox_func = tny_camel_send_queue_get_sentbox;
 	klass->cancel_func = tny_camel_send_queue_cancel;

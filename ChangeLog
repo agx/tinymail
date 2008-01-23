@@ -1,3 +1,11 @@
+2008-01-23  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail/tny-send-queue.c
+	libtinymail-camel/tny-camel-send-queue.c
+	libtinymail-camel/tny-camel-send-queue.h
+	(tny_send_queue_add_async): added this method that was available in
+	the Camel implementation to the interface
+
 2008-01-22  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Added support for GtkHTML in libtinymailui-gtkhtml. This is highly

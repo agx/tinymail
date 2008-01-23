@@ -68,6 +68,7 @@ struct _TnySendQueueIface
 
 	/* methods */
 	void (*add_func) (TnySendQueue *self, TnyMsg *msg, GError **err);
+	void (*add_async_func) (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
 	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
 	void (*cancel_func) (TnySendQueue *self, TnySendQueueCancelAction cancel_action, GError **err);
@@ -77,6 +78,7 @@ struct _TnySendQueueIface
 GType tny_send_queue_get_type (void);
 
 void tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err);
+void tny_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 TnyFolder* tny_send_queue_get_sentbox (TnySendQueue *self);
 TnyFolder* tny_send_queue_get_outbox (TnySendQueue *self);
 void tny_send_queue_cancel (TnySendQueue *self, TnySendQueueCancelAction cancel_action, GError **err);

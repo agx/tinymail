@@ -149,6 +149,35 @@ tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 	return;
 }
 
+/**
+ * tny_send_queue_add_async:
+ * @self: A #TnySendQueue
+ * @msg: a #TnyMsg
+ * @callback: (null-ok): a #TnySendQueueAddCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
+ *
+ * Add a message to the send queue, usually adding it to the outbox
+ * too. The caller will be notified in the callback function when the
+ * operation finishes.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+void 
+tny_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_SEND_QUEUE (self));
+	g_assert (msg);
+	g_assert (TNY_IS_MSG (msg));
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->add_async_func != NULL);
+#endif
+
+	TNY_SEND_QUEUE_GET_IFACE (self)->add_async_func (self, msg, callback, status_callback, user_data);
+	return;
+}
+
 
 static void
 tny_send_queue_base_init (gpointer g_class)
