@@ -330,7 +330,7 @@ thread_main (gpointer data)
 	guint i = 0, length = 0;
 	TnyList *list = NULL;
 	TnyDevice *device = info->device;
-	GHashTable *failed_headers;
+	GHashTable *failed_headers = NULL;
 
 	priv->is_running = TRUE;
 	list = tny_simple_list_new ();
