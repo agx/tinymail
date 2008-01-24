@@ -417,22 +417,10 @@ thread_main (gpointer data)
 				TnyHeader *curhdr = TNY_HEADER (tny_iterator_get_current (giter));
 				TnyHeaderFlags flags = tny_header_get_flags (curhdr);
 
-				if (flags & TNY_HEADER_FLAG_SUSPENDED)
-					to_remove = g_list_prepend (to_remove, curhdr);
-
-				g_object_unref (curhdr);
-				tny_iterator_next (giter);
-			}
-			g_object_unref (giter);
-
-			/* Some code to remove the previously failed items */
-			giter = tny_list_create_iterator (headers);
-			while (!tny_iterator_is_done (giter))
-			{
-				TnyHeader *curhdr = TNY_HEADER (tny_iterator_get_current (giter));
-
-				if (g_hash_table_lookup_extended (failed_headers, tny_header_get_uid (curhdr),
-								  NULL, NULL))
+				if ((flags & TNY_HEADER_FLAG_SUSPENDED) ||
+				    (g_hash_table_lookup_extended (failed_headers, 
+								   tny_header_get_uid (curhdr),
+								   NULL, NULL)))
 					to_remove = g_list_prepend (to_remove, curhdr);
 
 				g_object_unref (curhdr);
