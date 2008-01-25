@@ -176,6 +176,8 @@ static void imap_delete_attachments (CamelFolder *folder, const char *uid);
 static void imap_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
 
+static void stop_gmsgstore_from_idle (CamelImapFolder *imap_folder);
+
 #ifdef G_OS_WIN32
 /* The strtok() in Microsoft's C library is MT-safe (but still uses
  * only one buffer pointer per thread, but for the use of strtok_r()
@@ -4275,8 +4277,10 @@ camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 	}
 
 	len = camel_folder_summary_count (folder->summary);
-	if (exists_happened && (exists > len))
+	if (exists_happened && (exists > len)) {
+		stop_gmsgstore_from_idle (imap_folder);
 		imap_update_summary (folder, exists, changes, ex);
+	}
 	if (camel_folder_change_info_changed (changes))
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
 
@@ -4455,6 +4459,7 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 	return store;
 }
 
+
 static void 
 stop_gmsgstore (CamelImapFolder *imap_folder, gboolean ctchecker, gboolean quick)
 {
@@ -4474,6 +4479,21 @@ stop_gmsgstore (CamelImapFolder *imap_folder, gboolean ctchecker, gboolean quick
 		}
 	}
 
+	g_static_mutex_unlock (&gmsgstore_lock); /* A */
+}
+
+
+static void 
+stop_gmsgstore_from_idle (CamelImapFolder *imap_folder)
+{
+	g_static_mutex_lock (&gmsgstore_lock); /* A */
+	if (imap_folder->gmsgstore) {
+		imap_folder->gmsgstore->clean_exit = FALSE;
+		imap_folder->gmsgstore_ticks = 0;
+		camel_object_ref (imap_folder);
+		imap_folder->gmsgstore_signal = g_timeout_add (1,
+			check_gmsgstore_die, imap_folder);
+	}
 	g_static_mutex_unlock (&gmsgstore_lock); /* A */
 }
 
@@ -4538,9 +4558,16 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 
 	} else {
 		int fd;
+		CamelImapResponse *noop_response;
 
 		store = create_gmsgstore (imap_folder, &ctchecker, ex);
 		if (!store)
+			return NULL;
+
+		noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
+		if (noop_response)
+			camel_imap_response_free (store, noop_response);
+		else 
 			return NULL;
 
 		camel_operation_start (NULL, _("Retrieving converted message part"));
@@ -4789,9 +4816,16 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 	} else {
 
 		int fd;
+		CamelImapResponse *noop_response;
 
 		store = create_gmsgstore (imap_folder, &ctchecker, ex);
 		if (!store)
+			return NULL;
+
+		noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
+		if (noop_response)
+			camel_imap_response_free (store, noop_response);
+		else 
 			return NULL;
 
 		camel_operation_start (NULL, _("Retrieving message part"));
@@ -5205,7 +5239,7 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 			gboolean ctchecker = FALSE;
 			CamelImapStore *store;
 			GString *bodyst = g_string_new ("");
-			CamelImapResponse *response;
+			CamelImapResponse *response, *noop_response;
 			gint i = 0; gchar *resp;
 			gboolean hdr_bin=FALSE;
 
@@ -5216,6 +5250,14 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 
 			if (!store)
 				return NULL;
+
+
+			noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
+			if (noop_response)
+				camel_imap_response_free (store, noop_response);
+			else 
+				return NULL;
+
 
 			camel_operation_start (NULL, _("Retrieving message bodystructure"));
 
@@ -5274,6 +5316,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	gchar *errmessage = NULL;
 	gboolean retry = TRUE;
 	int ex_id = CAMEL_EXCEPTION_FOLDER_INVALID_STATE;
+	CamelImapResponse *noop_response;
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
@@ -5323,6 +5366,14 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		camel_exception_clear (&tex);
 		return NULL;
 	}
+
+
+	noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
+	if (noop_response)
+		camel_imap_response_free (store, noop_response);
+	else 
+		return NULL;
+
 
 	camel_operation_start (NULL, _("Retrieving message"));
 

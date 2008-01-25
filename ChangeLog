@@ -1,3 +1,22 @@
+2008-01-25  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Some IMAP servers don't instantly update sessions that where not in
+	IDLE when in monitoring service IDLE received an EXISTS. Tinymail
+	received that EXISTS, does a SEARCH to get the new UIDs, fetches the
+	envelope information and displays it to the user. If the user had
+	already received message recently, it will keep that message-receive
+	socket running (cached) for some time (optimalization). The IMAP
+	servers don't always bring that other session up-to-date about the new
+	information acquired in the first session in IDLE. For example GMail's
+	IMAP server and Exchange seem to not update the not-in-IDLE session.
+
+	This commit changed the behaviour in two ways: the get-message service
+	is early-killed in case an EXISTS line arrives in the in-IDLE session,
+	each message-fetch request in the get-message service is prepended
+	with a NOOP (some IMAP servers will sync the session upon NOOP).
+
+	Obviously, this is experimental behaviour. Please test this a lot!
+
 2008-01-23  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail/tny-send-queue.c
