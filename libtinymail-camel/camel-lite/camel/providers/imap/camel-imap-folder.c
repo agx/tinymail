@@ -1274,8 +1274,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 
 	camel_operation_end (NULL);
 
-	if (type == CAMEL_IMAP_RESPONSE_ERROR)
-	{
+	if (type == CAMEL_IMAP_RESPONSE_ERROR) {
 		for (i = 0; i < summary_len && new[i].uid; i++)
 			g_free (new[i].uid);
 		g_free (new);
@@ -1356,8 +1355,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 		g_free (new[i].uid);
 	}
 
-	if (changes)
-	{
+	if (changes) {
 		camel_object_trigger_event(CAMEL_OBJECT (folder), "folder_changed", changes);
 		camel_folder_change_info_free(changes);
 	}

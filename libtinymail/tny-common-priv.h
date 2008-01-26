@@ -47,6 +47,32 @@ void tny_idle_stopper_stop (TnyIdleStopper *stopper);
 void tny_idle_stopper_destroy(TnyIdleStopper *stopper);
 gboolean tny_idle_stopper_is_stopped (TnyIdleStopper* stopper);
 
+
+
+
+
+#define TNY_TYPE_EXPUNGED_HEADER             (tny_expunged_header_get_type ())
+#define TNY_EXPUNGED_HEADER(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_EXPUNGED_HEADER, TnyExpungedHeader))
+#define TNY_EXPUNGED_HEADER_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_EXPUNGED_HEADER, TnyExpungedHeaderClass))
+#define TNY_IS_EXPUNGED_HEADER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_EXPUNGED_HEADER))
+#define TNY_IS_EXPUNGED_HEADER_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_EXPUNGED_HEADER))
+#define TNY_EXPUNGED_HEADER_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_EXPUNGED_HEADER, TnyExpungedHeaderClass))
+
+typedef struct _TnyExpungedHeader TnyExpungedHeader;
+typedef struct _TnyExpungedHeaderClass TnyExpungedHeaderClass;
+
+struct _TnyExpungedHeader {
+	GObject parent;
+};
+
+struct _TnyExpungedHeaderClass {
+	GObjectClass parent;
+};
+
+GType tny_expunged_header_get_type (void);
+TnyHeader* tny_expunged_header_new (void);
+
+
 G_END_DECLS
 
 #endif 

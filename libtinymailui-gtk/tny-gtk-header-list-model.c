@@ -58,6 +58,10 @@ static GObjectClass *parent_class;
 
 #include "tny-gtk-header-list-iterator-priv.h"
 
+#define TINYMAIL_ENABLE_PRIVATE_API
+#include "tny-common-priv.h"
+#undef TINYMAIL_ENABLE_PRIVATE_API
+
 
 static gint 
 add_del_timeout (TnyGtkHeaderListModel *me, guint num)
@@ -300,6 +304,43 @@ tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter 
 	return (recv_a - recv_b);
 }
 
+
+static void 
+set_dummy (gint column, GValue *value)
+{
+	switch (column) 
+	{
+		case TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN:
+		case TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN:
+		case TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN:
+		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_COLUMN:
+		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
+		case TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN:
+			g_value_init (value, G_TYPE_STRING);
+			g_value_set_string (value, "Expunged");
+			break;
+		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_TIME_T_COLUMN:
+		case TNY_GTK_HEADER_LIST_MODEL_DATE_RECEIVED_TIME_T_COLUMN:
+		case TNY_GTK_HEADER_LIST_MODEL_MESSAGE_SIZE_COLUMN:
+			g_value_init (value, G_TYPE_INT);
+			g_value_set_int (value, -1);
+			break;
+		case TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN: {
+			static TnyHeader *header = NULL;
+			if (!header) 
+				header = tny_expunged_header_new ();
+			g_value_init (value, G_TYPE_OBJECT);
+			g_value_set_object (value, header);
+			} break;
+		case TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN:
+			g_value_init (value, G_TYPE_INT);
+			g_value_set_int (value, TNY_HEADER_FLAG_EXPUNGED);
+			break;
+		default:
+			break;
+	}
+}
+
 static void
 tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint column, GValue *value)
 {
@@ -309,8 +350,11 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	gchar *rdate = NULL;
 	gint i;
 
-	if (iter->stamp != priv->stamp)
+	if (iter->stamp != priv->stamp) {
+		g_warning ("GtkTreeModel in invalid state\n");
+		set_dummy (column, value);
 		return;
+	}
 
 	g_static_rec_mutex_lock (priv->iterator_lock);
 
@@ -325,13 +369,23 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	 * length, although in 99.999999% of the cases it's the same) */
 	if (i < 0 || i >= priv->items->len)
 	{
+		set_dummy (column, value);
 		g_warning ("GtkTreeModel in invalid state\n");
 		g_static_rec_mutex_unlock (priv->iterator_lock);
 		return;
 	}
 
-	if (priv->items->pdata[i] == NULL)
+	if (priv->items->pdata[i] == NULL) {
+		g_warning ("GtkTreeModel in invalid state\n");
+		set_dummy (column, value);
 		return;
+	}
+
+	if (!TNY_IS_HEADER (priv->items->pdata[i])) {
+		g_warning ("GtkTreeModel in invalid state\n");
+		set_dummy (column, value);
+		return;
+	}
 
 	switch (column) 
 	{

@@ -1,3 +1,12 @@
+2008-01-26  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Workaround for a known problem that ain't easy to solve right now:
+	expunged headers stay around for too long. When this is detected, a
+	dummy header is returned (with as flags TNY_HEADER_FLAG_EXPUNGED)
+	* Finished Sergio's API change
+
+	* This was a major API change
+
 2008-01-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Some IMAP servers don't instantly update sessions that where not in
@@ -27,6 +36,8 @@
 	(create_worker)
 	(thread_main): added the "queue-start" and "queue-stop" signals that
 	are emitted before and after the queue processes the messages
+
+	* This was a major API change
 
 2008-01-22  Philip Van Hoof <pvanhoof@gnome.org>
 

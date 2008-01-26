@@ -49,10 +49,11 @@ libtinymail_1_0_headers = \
 	tny-password-getter.h \
 	tny-merge-folder.h \
 	tny-combined-account.h \
-	tny-connection-policy.h
+	tny-connection-policy.h 
 
 libtinymail_1_0_la_SOURCES = \
 	$(libtinymail_1_0_headers) \
+	tny-expunged-header.c \
 	tny-signals-marshal.c \
 	tny-error.c \
 	tny-status.c \

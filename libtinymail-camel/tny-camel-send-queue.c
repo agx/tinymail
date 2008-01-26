@@ -293,11 +293,11 @@ emit_queue_control_signals_on_mainloop (gpointer data)
 		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 	if (apriv)
 		tny_lockable_lock (apriv->session->priv->ui_lock);
-	g_signal_emit (info->self, tny_send_queue_signals [info->signal_id], 0);	
+	g_signal_emit (info->self, tny_send_queue_signals [info->signal_id], 0);
 	if (apriv)
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
 
-	return NULL;
+	return FALSE;
 }
 
 static void
@@ -751,15 +751,15 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 }
 
 
-void
-tny_camel_send_queue_add_async (TnyCamelSendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+static void
+tny_camel_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_async_func (self, msg, callback, status_callback, user_data);
 }
 
 
 static void
-tny_camel_send_queue_add_async_default (TnyCamelSendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	GError *err = NULL;
