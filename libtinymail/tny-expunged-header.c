@@ -78,7 +78,7 @@ tny_expunged_header_get_message_id (TnyHeader *self)
 static guint
 tny_expunged_header_get_message_size (TnyHeader *self)
 {
-	return 0;
+	return -1;
 }
 
 static time_t
