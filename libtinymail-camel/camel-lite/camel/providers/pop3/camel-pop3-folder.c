@@ -341,6 +341,9 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		CamelPOP3FolderInfo *fi = pop3_store->uids->pdata[i];
 		CamelMessageInfoBase *mi = NULL;
 
+		if (!fi || !fi->uid)
+			continue;
+
 		mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
 
 		if (!mi && !camel_pop3_logbook_is_registered (pop3_store->book, fi->uid)) {
@@ -925,6 +928,9 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	gint retry = 0;
 	gboolean had_attachment = FALSE;
 
+	if (!uid)
+		return;
+
 	pop3_debug ("%s requested\n", uid);
 
 	stream = camel_data_cache_get (pop3_store->cache, "cache", uid, NULL);
@@ -957,7 +963,7 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 	g_static_rec_mutex_lock (pop3_store->uidl_lock);
 
-	if (pop3_store->uids_uid)
+	if (pop3_store->uids_uid && uid)
 		fi = g_hash_table_lookup(pop3_store->uids_uid, uid);
 	else 
 		fi = NULL;
