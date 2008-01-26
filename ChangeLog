@@ -1,5 +1,13 @@
 2008-01-26  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Experimental expunge handling. Less expunging from the local
+	summary will be needed, as we'll more carefully calculate which of the
+	sequence vs. uids got removed. Please keep an eye on this one and
+	revert in needed. This commit should reduce the "Expunged" labels that
+	you might have been seeing in tny E-mail clients too.
+
+2008-01-26  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Workaround for a known problem that ain't easy to solve right now:
 	expunged headers stay around for too long. When this is detected, a
 	dummy header is returned (with as flags TNY_HEADER_FLAG_EXPUNGED)

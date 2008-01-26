@@ -398,13 +398,11 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 				const char *uid = info->uid_removed->pdata[i];
 
 				CamelMessageInfo *minfo = camel_message_info_new_uid (NULL, uid);
-				if (minfo)
-				{
-					TnyHeader *hdr = _tny_camel_header_new ();
 
+				if (minfo) {
+					TnyHeader *hdr = _tny_camel_header_new ();
 					if (!change)
 						change = tny_folder_change_new (self);
-
 					/* This adds a reason to live to self */
 					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 						TNY_CAMEL_FOLDER (self), priv);

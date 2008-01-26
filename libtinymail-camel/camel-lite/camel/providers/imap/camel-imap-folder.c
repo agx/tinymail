@@ -1204,7 +1204,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 	} *new;
 	char *resp;
 	CamelImapResponseType type;
-	int i, seq, summary_len, summary_got;
+	int i, tr = 0, seq, summary_len, summary_got;
 	CamelMessageInfo *info;
 	CamelImapMessageInfo *iinfo;
 	GArray *removed;
@@ -1294,9 +1294,9 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 	 * from the summary. */
 
 	removed = g_array_new (FALSE, FALSE, sizeof (int));
-	for (i = 0; i < summary_len && new[i].uid; i++)
-	{
-		info = camel_folder_summary_index (folder->summary, i);
+
+	for (i = 0; i+tr < summary_len && new[i].uid; i++) {
+		info = camel_folder_summary_index (folder->summary, i + tr);
 		iinfo = (CamelImapMessageInfo *)info;
 
 		if (!info)
@@ -1316,22 +1316,15 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 		/* TODO: recalculating rather than marking a lot perfectly fine
 		 * material for removal */
 
-		if (strcmp (camel_message_info_uid (info), new[i].uid) != 0)
-		{
-			/* CamelFolderChangeInfo *nchanges = NULL;
-			nchanges = camel_folder_change_info_new();
-			camel_folder_change_info_remove_uid (nchanges, new[i].uid);
-			camel_object_trigger_event(CAMEL_OBJECT (folder),
-				"folder_changed", nchanges);
-			camel_folder_change_info_free (nchanges); */
-
+		if (strcmp (camel_message_info_uid (info), new[i].uid) != 0) {
+			tr++;
 			imap_folder->need_rescan = TRUE;
 
 			camel_message_info_free(info);
 			seq = i + 1;
 			g_array_append_val (removed, seq);
 			i--;
-			summary_len--;
+			//summary_len--;
 			continue;
 		}
 
@@ -1356,6 +1349,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 
 		camel_message_info_free(info);
 		g_free (new[i].uid);
+		new[i].uid = NULL;
 	}
 
 	if (changes) {
@@ -1366,6 +1360,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 	seq = i + 1;
 
 	/* Free remaining memory. */
+	i = 0;
 	while (i < summary_len && new[i].uid)
 		g_free (new[i++].uid);
 	g_free (new);
