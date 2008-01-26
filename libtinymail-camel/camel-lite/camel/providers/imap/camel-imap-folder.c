@@ -750,9 +750,11 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 			phighestmodseq = NULL;
 		}
 
-		if (imap_folder->need_rescan)
+		if (imap_folder->need_rescan) {
 			suc = imap_rescan (folder, exists, ex);
-		else if (exists > count)
+			if (imap_folder->need_rescan)
+				camel_imap_folder_changed (folder, exists, NULL, ex);
+		} else if (exists > count)
 			camel_imap_folder_changed (folder, exists, NULL, ex);
 	} else {
 		/* Wow, this IMAP server rocks! it has QRESYNC! Hi there Isode!*/
@@ -1213,8 +1215,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 
 	summary_len = camel_folder_summary_count (folder->summary);
 
-	if (summary_len == 0)
-	{
+	if (summary_len == 0) {
 		if (exists)
 			camel_imap_folder_changed (folder, exists, NULL, ex);
 		return TRUE;
@@ -1323,6 +1324,8 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 			camel_object_trigger_event(CAMEL_OBJECT (folder),
 				"folder_changed", nchanges);
 			camel_folder_change_info_free (nchanges); */
+
+			imap_folder->need_rescan = TRUE;
 
 			camel_message_info_free(info);
 			seq = i + 1;
