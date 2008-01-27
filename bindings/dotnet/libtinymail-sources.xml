@@ -1,0 +1,13 @@
+<gapi-parser-input>
+  <api filename="libtinymail-api.raw">
+    <library name="libtinymail-1.0.dll">
+      <namespace name="Tny">
+        <dir>../../libtinymail/</dir>
+        <dir>../../libtinymailui/</dir>
+        <exclude>../../libtinymail/tny-common-priv.h</exclude>
+	<exclude>../../libtinymail/tny-simple-list-iterator-priv.h</exclude>
+	<exclude>../../libtinymail/tny-simple-list-priv.h</exclude>
+      </namespace>
+    </library>
+  </api>
+</gapi-parser-input>

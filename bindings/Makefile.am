@@ -5,3 +5,7 @@ endif
 if BUILD_VALA_BINDINGS
 SUBDIRS = vala
 endif
+
+if BUILD_NET_BINDINGS
+SUBDIRS = dotnet
+endif

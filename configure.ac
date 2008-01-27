@@ -286,6 +286,21 @@ esac],[build_vala_bindings=false])
 AM_CONDITIONAL(BUILD_VALA_BINDINGS, test x$build_vala_bindings = xtrue)
 
 
+dnl ### Enable the .NET language bindings ##
+AC_ARG_ENABLE(dotnet-bindings,
+AC_HELP_STRING([--enable-dotnet-bindings],
+  [Build .NET bindings (no, yes)]),
+[case "${enableval}" in
+  yes) build_net_bindings=true ;;
+  no)  build_net_bindings=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-dotnet-bindings) ;;
+esac],[build_net_bindings=false])
+
+AC_TNY_DOTNET_CHECK
+
+AM_CONDITIONAL(BUILD_NET_BINDINGS, test x$build_net_bindings = xtrue)
+
+
 dnl ### doxygen
 AC_ARG_ENABLE(doxygen,
 AC_HELP_STRING([--enable-doxygen],
@@ -503,6 +518,9 @@ bindings/python/Makefile
 bindings/python/gendefs/Makefile
 bindings/python/tinymail.pth
 bindings/vala/Makefile
+bindings/dotnet/Makefile
+bindings/dotnet/AssemblyInfo.cs
+bindings/dotnet/libtinymail-1.0.dll.config
 libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile

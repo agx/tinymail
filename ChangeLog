@@ -1,3 +1,8 @@
+2008-01-28  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added skeleton for unfinished DotNet bindings. This wont work yet,
+	it seems gapi2 is generating a few *Implementor types incorrectly.
+
 2008-01-27  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Various code improvements 
