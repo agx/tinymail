@@ -730,6 +730,21 @@ summary_block_write_all (SummaryBlock *b)
 	data = fopen (data_filename_n, "w");
 	flags = fopen (flags_filename_n, "w");
 
+	if (!idx || !data || !flags) {
+		/* TODO: Error reporting */
+		if (idx) fclose (idx);
+		if (flags) fclose (flags);
+		if (data) fclose (data);
+		g_free (index_filename);
+		g_free (data_filename);
+		g_free (flags_filename);
+		g_free (index_filename_n);
+		g_free (data_filename_n);
+		g_free (flags_filename_n);
+		g_hash_table_destroy (strings);
+		g_static_rec_mutex_unlock (b->lock);
+		return;
+	}
 
 	while (items) {
 		SummaryItem *item = (SummaryItem *) items->data;

@@ -305,7 +305,8 @@ camel_data_cache_set_partial (CamelDataCache *cdc, const char *path,
 		if (!g_file_test (mpath, G_FILE_TEST_IS_REGULAR))
 		{
 		    fd = g_open (mpath, O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0600);
-		    if (fd) close (fd);
+		    if (fd != -1)
+			close (fd);
 		}
 	}
 

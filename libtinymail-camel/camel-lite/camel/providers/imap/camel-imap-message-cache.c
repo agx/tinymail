@@ -388,7 +388,8 @@ camel_imap_message_cache_set_partial (CamelImapMessageCache *cache, const char *
 		if (!g_file_test (path, G_FILE_TEST_IS_REGULAR))
 		{
 		    fd = g_open (path, O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0600);
-		    if (fd) close (fd);
+		    if (fd != -1)
+			close (fd);
 		}
 	}
 
