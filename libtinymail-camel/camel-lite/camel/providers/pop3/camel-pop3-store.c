@@ -728,19 +728,27 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 	service->url->authmech = g_strdup("LOGIN");*/
 
 	if (!service->url->passwd) {
-		char *prompt;
+		char *base_prompt;
+		char *full_prompt;
 		guint32 flags = CAMEL_SESSION_PASSWORD_SECRET;
 
 		if (reprompt)
 			flags |= CAMEL_SESSION_PASSWORD_REPROMPT;
 
-		prompt = g_strdup_printf (_("%sPlease enter the POP password for %s on host %s"),
-					  errmsg ? errmsg : "",
-					  service->url->user,
-					  service->url->host);
-		service->url->passwd = camel_session_get_password (camel_service_get_session (service), service, NULL,
-								   prompt, "password", flags, ex);
-		g_free (prompt);
+		base_prompt = camel_session_build_password_prompt (
+			"POP", service->url->user, service->url->host);
+
+		if (errmsg != NULL)
+			full_prompt = g_strconcat (errmsg, base_prompt, NULL);
+		else
+			full_prompt = g_strdup (base_prompt);
+
+		service->url->passwd = camel_session_get_password (
+			camel_service_get_session (service), service,
+			NULL, full_prompt, "password", flags, ex);
+
+		g_free (base_prompt);
+		g_free (full_prompt);
 		if (!service->url->passwd)
 			return FALSE;
 	}
@@ -889,7 +897,7 @@ pop3_connect (CamelService *service, CamelException *ex)
 
 		/* we only re-prompt if we failed to authenticate, any other error and we just abort */
 		if (status == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE) {
-			errbuf = g_strdup_printf ("%s\n\n", camel_exception_get_description (ex));
+			errbuf = g_markup_printf_escaped ("%s\n\n", camel_exception_get_description (ex));
 			g_free (service->url->passwd);
 			service->url->passwd = NULL;
 			reprompt = TRUE;

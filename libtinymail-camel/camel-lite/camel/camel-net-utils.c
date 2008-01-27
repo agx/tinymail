@@ -29,14 +29,14 @@
 #include <pthread.h>
 #include <stdio.h>
 
+#include <glib.h>
+#include <glib/gi18n-lib.h>
+
 #ifndef G_OS_WIN32
 #include <sys/poll.h>
 #endif
 
 #include <string.h>
-
-#include <glib.h>
-#include <glib/gi18n-lib.h>
 
 #include <libedataserver/e-msgport.h>
 

@@ -160,6 +160,9 @@ struct _CamelMessageInfoBase {
 
 	/* tree of content description - NULL if it is not available */
 	CamelMessageContentInfo *content;  /* 4 bytes */
+#ifdef NON_TINYMAIL_FEATURES
+	struct _camel_header_param *headers;
+#endif
 	CamelSummaryMessageID message_id;  /* 8 bytes */
 
 	guint32 flags;                     /* 4 bytes */

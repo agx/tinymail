@@ -79,6 +79,7 @@ camel_session_init (CamelSession *session)
 	session->priv->thread_id = 1;
 	session->priv->thread_active = g_hash_table_new(NULL, NULL);
 	session->priv->thread_pool = NULL;
+	session->priv->junk_headers = NULL;
 }
 
 static void
@@ -99,7 +100,10 @@ camel_session_finalise (CamelObject *o)
 
 	g_mutex_free(session->priv->lock);
 	g_mutex_free(session->priv->thread_lock);
-
+	if (session->priv->junk_headers) {
+		g_hash_table_remove_all (session->priv->junk_headers);
+		g_hash_table_destroy (session->priv->junk_headers);
+	}
 	g_free(session->priv);
 }
 
@@ -432,6 +436,14 @@ camel_session_alert_user (CamelSession *session, CamelSessionAlertType type,
 	return CS_CLASS (session)->alert_user (session, type, ex, cancel, service);
 }
 
+gboolean
+camel_session_lookup_addressbook (CamelSession *session, const char *name)
+{
+	g_return_val_if_fail (CAMEL_IS_SESSION (session), FALSE);
+	g_return_val_if_fail (name != NULL, FALSE);
+	return CS_CLASS (session)->lookup_addressbook (session, name);
+}
+
 /**
  * camel_session_alert_user_with_id:
  *
@@ -471,6 +483,49 @@ camel_session_alert_user_generic (CamelSession *session, CamelSessionAlertType t
 		CAMEL_EXCEPTION_SYSTEM, message, cancel, service);
 }
 
+/**
+ * camel_session_build_password_prompt:
+ * @type: account type (e.g. "IMAP")
+ * @user: user name for the account
+ * @host: host name for the account
+ *
+ * Constructs a localized password prompt from @type, @user and @host,
+ * suitable for passing to camel_session_get_password().  The resulting
+ * string contains markup tags.  Use g_free() to free it.
+ *
+ * Returns: a newly-allocated password prompt string
+ **/
+char *
+camel_session_build_password_prompt (const char *type,
+                                     const char *user,
+                                     const char *host)
+{
+	char *user_markup;
+	char *host_markup;
+	char *prompt;
+
+	g_return_val_if_fail (type != NULL, NULL);
+	g_return_val_if_fail (user != NULL, NULL);
+	g_return_val_if_fail (host != NULL, NULL);
+
+	/* Add bold tags to the "user" and "host" strings.  We use
+	 * separate strings here to avoid putting markup tags in the
+	 * translatable string below. */
+	user_markup = g_markup_printf_escaped ("<b>%s</b>", user);
+	host_markup = g_markup_printf_escaped ("<b>%s</b>", host);
+
+	/* Translators: The first argument is the account type
+	 * (e.g. "IMAP"), the second is the user name, and the
+	 * third is the host name. */
+	prompt = g_strdup_printf (
+		_("Please enter the %s password for %s on host %s."),
+		type, user_markup, host_markup);
+
+	g_free (user_markup);
+	g_free (host_markup);
+
+	return prompt;
+}
 
 /**
  * camel_session_is_online:
@@ -745,4 +800,27 @@ camel_session_set_network_state (CamelSession *session, gboolean network_state)
 	g_return_if_fail (CAMEL_IS_SESSION(session));
 
 	session->network_state = network_state;
+}
+
+void
+camel_session_set_junk_headers (CamelSession *session, const char **headers, const char **values, int len)
+{
+	int i;
+
+	if (session->priv->junk_headers) {
+		g_hash_table_remove_all (session->priv->junk_headers);
+		g_hash_table_destroy (session->priv->junk_headers);
+	}
+
+	session->priv->junk_headers = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+	for (i=0; i<len; i++) {
+		g_hash_table_insert (session->priv->junk_headers, g_strdup (headers[i]), g_strdup(values[i]));
+	}
+}
+
+const GHashTable *
+camel_session_get_junk_headers (CamelSession *session)
+{
+	return session->priv->junk_headers;
 }

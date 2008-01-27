@@ -109,6 +109,7 @@ typedef struct {
 	int (*thread_queue)(CamelSession *session, CamelSessionThreadMsg *msg, int flags);
 	void (*thread_wait)(CamelSession *session, int id);
 	void (*thread_status)(CamelSession *session, CamelSessionThreadMsg *msg, const char *text, int pc);
+	gboolean (*lookup_addressbook) (CamelSession *session, const char *name);
 } CamelSessionClass;
 
 
@@ -168,6 +169,11 @@ gboolean           camel_session_alert_user_with_id (CamelSession *session,
 						     gboolean cancel,
 						     CamelService *service);
 
+char *		   camel_session_build_password_prompt
+						    (const char *type,
+						     const char *user,
+						     const char *host);
+
 gboolean           camel_session_is_online          (CamelSession *session);
 void               camel_session_set_online         (CamelSession *session,
 						     gboolean online);
@@ -205,6 +211,9 @@ int camel_session_thread_queue(CamelSession *session, CamelSessionThreadMsg *msg
 void camel_session_thread_wait(CamelSession *session, int id);
 gboolean camel_session_get_network_state (CamelSession *session);
 void camel_session_set_network_state (CamelSession *session, gboolean network_state);
+const GHashTable * camel_session_get_junk_headers (CamelSession *session);
+void camel_session_set_junk_headers (CamelSession *session, const char **headers, const char **values, int len);
+gboolean camel_session_lookup_addressbook (CamelSession *session, const char *name);
 
 G_END_DECLS
 

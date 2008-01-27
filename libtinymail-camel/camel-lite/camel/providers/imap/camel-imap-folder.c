@@ -2165,8 +2165,10 @@ handle_copyuid (CamelImapResponse *response, CamelFolder *source,
 		return;
 	}
 
-	imap_uid_array_free (src);
-	imap_uid_array_free (dest);
+	if (src)
+		imap_uid_array_free (src);
+	if (dest)
+		imap_uid_array_free (dest);
  lose:
 	g_warning ("Bad COPYUID response from server");
 }
@@ -3045,6 +3047,53 @@ add_message_from_data (CamelFolder *folder, GPtrArray *messages,
 	messages->pdata[seq - first] = mi;
 
 	return;
+}
+
+#endif
+
+
+#ifdef NON_TINYMAIL_FEATURES
+
+struct _junk_data {
+	GData *data;
+	CamelMessageInfoBase *mi;
+};
+
+static void
+construct_junk_headers (char *header, char *value, struct _junk_data *jdata)
+{
+	char *bs, *es, *flag=NULL;
+	char *bdata = g_datalist_get_data (&(jdata->data), "BODY_PART_DATA");
+	struct _camel_header_param *node;
+
+	/* FIXME: This can be written in a much clever way.
+	* We can create HEADERS file or carry all headers till filtering so
+	* that header based filtering can be much faster. But all that later. */
+	bs = camel_strstrcase (bdata ? bdata:"", header);
+	if (bs) {
+		bs += strlen(header);
+		bs = strchr (bs, ':');
+		if (bs) {
+			bs++;
+			while (*bs == ' ')
+				bs++;
+			es = strchr (bs, '\n');
+			if (es)
+				flag = g_strndup (bs, es-bs);
+			else
+				bs = NULL;
+		}
+
+	}
+
+
+	if (bs) {
+		node = g_new (struct _camel_header_param, 1);
+		node->name = g_strdup (header);
+		node->value = flag;
+		node->next = jdata->mi->headers;
+		jdata->mi->headers = node;
+	}
 }
 
 #endif

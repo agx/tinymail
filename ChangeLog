@@ -1,6 +1,7 @@
 2008-01-27  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Various code improvements 
+	* Merged camel-lite with upstream camel revision 8428
 
 2008-01-26  Philip Van Hoof <pvanhoof@gnome.org>
 

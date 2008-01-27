@@ -2571,6 +2571,8 @@ destroy_possible_pstring_stuff(CamelFolderSummary *s, CamelMessageInfo *info, gb
 			camel_pstring_free(mi->mlist);
 		camel_flag_list_free(&mi->user_flags);
 		camel_tag_list_free(&mi->user_tags);
+		if (mi->headers)
+			camel_header_param_list_free (mi->headers);
 #endif
 
 		mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;

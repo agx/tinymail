@@ -42,16 +42,16 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+#include <glib.h>
+#include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
+
 #ifndef G_OS_WIN32
 #include <sys/ioctl.h>
 #include <sys/poll.h>
 #include <sys/wait.h>
 #include <termios.h>
 #endif
-
-#include <glib.h>
-#include <glib/gi18n-lib.h>
-#include <glib/gstdio.h>
 
 #include <libedataserver/e-iconv.h>
 
@@ -823,11 +823,13 @@ gpg_ctx_parse_status (struct _GpgCtx *gpg, CamelException *ex)
 			name = "";
 
 		if (!strncmp ((char *) status, "passphrase.pin.ask", 18)) {
-			prompt = g_strdup_printf (_("You need a PIN to unlock the key for your\n"
-						    "SmartCard: \"%s\""), name);
+			prompt = g_markup_printf_escaped (
+				_("You need a PIN to unlock the key for your\n"
+				  "SmartCard: \"%s\""), name);
 		} else if (!strncmp ((char *) status, "passphrase.enter", 16)) {
-			prompt = g_strdup_printf (_("You need a passphrase to unlock the key for\n"
-						    "user: \"%s\""), name);
+			prompt = g_markup_printf_escaped (
+				_("You need a passphrase to unlock the key for\n"
+				  "user: \"%s\""), name);
 		} else {
 			next_token ((char *) status, &prompt);
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,

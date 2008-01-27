@@ -38,12 +38,12 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <glib.h>
+#include <glib/gi18n-lib.h>
+
 #ifndef G_OS_WIN32
 #include <sys/wait.h>
 #endif
-
-#include <glib.h>
-#include <glib/gi18n-lib.h>
 
 #include <libedataserver/e-iconv.h>
 #include <libedataserver/e-sexp.h>
@@ -58,6 +58,7 @@
 #include "camel-session.h"
 #include "camel-stream-fs.h"
 #include "camel-stream-mem.h"
+#include "camel-string-utils.h"
 #include "camel-url.h"
 
 #define d(x)
@@ -93,7 +94,10 @@ static ESExpResult *get_current_date (struct _ESExp *f, int argc, struct _ESExpR
 static ESExpResult *header_source (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMessageSearch *fms);
 static ESExpResult *get_size (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMessageSearch *fms);
 static ESExpResult *pipe_message (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMessageSearch *fms);
+
+#ifdef NON_TINYMAIL_FEATURES
 static ESExpResult *junk_test (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMessageSearch *fms);
+#endif
 
 /* builtin functions */
 static struct {
@@ -122,7 +126,9 @@ static struct {
 	{ "header-source",      (ESExpFunc *) header_source,      0 },
 	{ "get-size",           (ESExpFunc *) get_size,           0 },
 	{ "pipe-message",       (ESExpFunc *) pipe_message,       0 },
+#ifdef NON_TINYMAIL_FEATURES
 	{ "junk-test",          (ESExpFunc *) junk_test,          0 },
+#endif
 };
 
 
@@ -644,14 +650,41 @@ pipe_message (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMess
 	return r;
 }
 
+#ifdef NON_TINYMAIL_FEATURES
 static ESExpResult *
 junk_test (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMessageSearch *fms)
 {
 	ESExpResult *r;
 	gboolean retval = FALSE;
-
+	
+	d(printf("doing junk test for message from '%s'\n", camel_message_info_from (fms->info)));
 	if (fms->session->junk_plugin != NULL) {
-		retval = camel_junk_plugin_check_junk (fms->session->junk_plugin, camel_filter_search_get_message (fms, f));
+		CamelMessageInfo *info = fms->info;
+		const GHashTable *ht = camel_session_get_junk_headers (fms->session);
+		struct _camel_header_param *node = ((CamelMessageInfoBase *)info)->headers;
+
+		while (node && !retval) {
+			if (node->name) {
+				char *value = (char *) g_hash_table_lookup ((GHashTable *) ht, node->name);
+				d(printf("JunkCheckMatch: %s %s %s\n", node->name, node->value, value));
+				if (value)
+					retval = camel_strstrcase(node->value, value) != NULL;
+		
+			}
+			node = node->next;
+		}
+		if (camel_debug ("junk"))
+			printf("filtered based on junk header ? %d\n", retval);
+		if (!retval) {
+			retval = camel_session_lookup_addressbook (fms->session, camel_message_info_from (info)) != TRUE;
+			if (camel_debug ("junk"))
+				printf("Sender '%s' in book? %d\n", camel_message_info_from (info), !retval);
+			
+			if (retval) /* Not in book. Could be spam. So check for it*/ {
+				d(printf("filtering message\n"));
+				retval = camel_junk_plugin_check_junk (fms->session->junk_plugin, camel_filter_search_get_message (fms, f));
+			}
+		}
 
 		if (camel_debug ("junk"))
 			printf("junk filter => %s\n", retval ? "*JUNK*" : "clean");
@@ -662,6 +695,7 @@ junk_test (struct _ESExp *f, int argc, struct _ESExpResult **argv, FilterMessage
 
 	return r;
 }
+#endif
 
 /**
  * camel_filter_search_match:
