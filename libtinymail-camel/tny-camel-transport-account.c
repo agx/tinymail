@@ -147,7 +147,7 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 static void
 tny_camel_transport_account_send (TnyTransportAccount *self, TnyMsg *msg, GError **err)
 {
-	TNY_CAMEL_TRANSPORT_ACCOUNT_GET_CLASS (self)->send_func (self, msg, err);
+	TNY_CAMEL_TRANSPORT_ACCOUNT_GET_CLASS (self)->send(self, msg, err);
 	return;
 }
 
@@ -305,7 +305,7 @@ tny_transport_account_init (gpointer g, gpointer iface_data)
 {
 	TnyTransportAccountIface *klass = (TnyTransportAccountIface *)g;
 
-	klass->send_func = tny_camel_transport_account_send;
+	klass->send= tny_camel_transport_account_send;
 
 	return;
 }
@@ -319,12 +319,12 @@ tny_camel_transport_account_class_init (TnyCamelTransportAccountClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->send_func = tny_camel_transport_account_send_default;
+	class->send= tny_camel_transport_account_send_default;
 
 	object_class->finalize = tny_camel_transport_account_finalize;
 
-	TNY_CAMEL_ACCOUNT_CLASS (class)->prepare_func = tny_camel_transport_account_prepare;
-	TNY_CAMEL_ACCOUNT_CLASS (class)->try_connect_func = tny_camel_transport_account_try_connect;
+	TNY_CAMEL_ACCOUNT_CLASS (class)->prepare= tny_camel_transport_account_prepare;
+	TNY_CAMEL_ACCOUNT_CLASS (class)->try_connect= tny_camel_transport_account_try_connect;
 
 	g_type_class_add_private (object_class, sizeof (TnyCamelTransportAccountPriv));
 

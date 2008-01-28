@@ -50,10 +50,10 @@ tny_transport_account_send (TnyTransportAccount *self, TnyMsg *msg, GError **err
 	g_assert (TNY_IS_TRANSPORT_ACCOUNT (self));
 	g_assert (msg);
 	g_assert (TNY_IS_MSG (msg));
-	g_assert (TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func  != NULL);
+	g_assert (TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send != NULL);
 #endif
 
-	TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send_func (self, msg, err);
+	TNY_TRANSPORT_ACCOUNT_GET_IFACE (self)->send(self, msg, err);
 
 	return;
 }

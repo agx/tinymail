@@ -62,10 +62,10 @@ tny_msg_receive_strategy_perform_get_msg (TnyMsgReceiveStrategy *self, TnyFolder
 	g_assert (TNY_IS_FOLDER (folder));
 	g_assert (header);
 	g_assert (TNY_IS_HEADER (header));
-	g_assert (TNY_MSG_RECEIVE_STRATEGY_GET_IFACE (self)->perform_get_msg_func != NULL);
+	g_assert (TNY_MSG_RECEIVE_STRATEGY_GET_IFACE (self)->perform_get_msg!= NULL);
 #endif
 
-	retval = TNY_MSG_RECEIVE_STRATEGY_GET_IFACE (self)->perform_get_msg_func (self, folder, header, err);
+	retval = TNY_MSG_RECEIVE_STRATEGY_GET_IFACE (self)->perform_get_msg(self, folder, header, err);
 
 #ifdef DBC /* ensure */
 	if (retval)

@@ -40,7 +40,7 @@ struct _TnyAccountStoreViewIface
 {
 	GTypeInterface parent;
 
-	void (*set_account_store_func) (TnyAccountStoreView *self, TnyAccountStore *account_store);
+	void (*set_account_store) (TnyAccountStoreView *self, TnyAccountStore *account_store);
 };
 
 GType tny_account_store_view_get_type (void);

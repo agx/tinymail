@@ -84,7 +84,7 @@ tny_webkit_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMime
 			widget->allocation.width>11?widget->allocation.width-10:1, 2500);
 
 	} else
-		retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for_func (self, part);
+		retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for(self, part);
 
 	return retval;
 }
@@ -92,7 +92,7 @@ tny_webkit_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMime
 static TnyMimePartView*
 tny_webkit_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 {
-	return TNY_WEBKIT_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_func (self, part);
+	return TNY_WEBKIT_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for(self, part);
 }
 
 
@@ -100,7 +100,7 @@ tny_webkit_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *pa
 static TnyMsgView*
 tny_webkit_msg_view_create_new_inline_viewer (TnyMsgView *self)
 {
-	return TNY_WEBKIT_MSG_VIEW_GET_CLASS (self)->create_new_inline_viewer_func (self);
+	return TNY_WEBKIT_MSG_VIEW_GET_CLASS (self)->create_new_inline_viewer(self);
 }
 
 /**
@@ -127,13 +127,13 @@ tny_webkit_msg_view_class_init (TnyWebkitMsgViewClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->create_mime_part_view_for_func = tny_webkit_msg_view_create_mime_part_view_for_default;
-	class->create_new_inline_viewer_func = tny_webkit_msg_view_create_new_inline_viewer_default;
+	class->create_mime_part_view_for= tny_webkit_msg_view_create_mime_part_view_for_default;
+	class->create_new_inline_viewer= tny_webkit_msg_view_create_new_inline_viewer_default;
 
 	object_class->finalize = tny_webkit_msg_view_finalize;
 
-	TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func = tny_webkit_msg_view_create_mime_part_view_for;
-	TNY_GTK_MSG_VIEW_CLASS (class)->create_new_inline_viewer_func = tny_webkit_msg_view_create_new_inline_viewer;
+	TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for= tny_webkit_msg_view_create_mime_part_view_for;
+	TNY_GTK_MSG_VIEW_CLASS (class)->create_new_inline_viewer= tny_webkit_msg_view_create_new_inline_viewer;
 
 	return;
 }

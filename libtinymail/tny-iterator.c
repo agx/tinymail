@@ -44,10 +44,10 @@ tny_iterator_next (TnyIterator *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ITERATOR (self));
-	g_assert (TNY_ITERATOR_GET_IFACE (self)->next_func != NULL);
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->next!= NULL);
 #endif
 
-	TNY_ITERATOR_GET_IFACE (self)->next_func (self);
+	TNY_ITERATOR_GET_IFACE (self)->next(self);
 
 	return;
 }
@@ -66,10 +66,10 @@ tny_iterator_prev (TnyIterator *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ITERATOR (self));
-	g_assert (TNY_ITERATOR_GET_IFACE (self)->prev_func != NULL);
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->prev!= NULL);
 #endif
 
-	TNY_ITERATOR_GET_IFACE (self)->prev_func (self);
+	TNY_ITERATOR_GET_IFACE (self)->prev(self);
 
 	return;
 }
@@ -89,10 +89,10 @@ tny_iterator_first (TnyIterator *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ITERATOR (self));
-	g_assert (TNY_ITERATOR_GET_IFACE (self)->first_func != NULL);
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->first!= NULL);
 #endif
 
-	TNY_ITERATOR_GET_IFACE (self)->first_func (self);
+	TNY_ITERATOR_GET_IFACE (self)->first(self);
 
 	return;
 }
@@ -112,10 +112,10 @@ tny_iterator_nth (TnyIterator *self, guint nth)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ITERATOR (self));
-	g_assert (TNY_ITERATOR_GET_IFACE (self)->nth_func != NULL);
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->nth!= NULL);
 #endif
 
-	TNY_ITERATOR_GET_IFACE (self)->nth_func (self, nth);
+	TNY_ITERATOR_GET_IFACE (self)->nth(self, nth);
 
 	return;
 }
@@ -140,10 +140,10 @@ tny_iterator_get_current (TnyIterator *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ITERATOR (self));
-	g_assert (TNY_ITERATOR_GET_IFACE (self)->get_current_func != NULL);
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->get_current!= NULL);
 #endif
 
-	retval = TNY_ITERATOR_GET_IFACE (self)->get_current_func (self);
+	retval = TNY_ITERATOR_GET_IFACE (self)->get_current(self);
 
 #ifdef DBC /* ensure */
 	if (retval)
@@ -212,10 +212,10 @@ tny_iterator_get_list (TnyIterator *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ITERATOR (self));
-	g_assert (TNY_ITERATOR_GET_IFACE (self)->get_list_func != NULL);
+	g_assert (TNY_ITERATOR_GET_IFACE (self)->get_list!= NULL);
 #endif
 
-	retval = TNY_ITERATOR_GET_IFACE (self)->get_list_func (self);
+	retval = TNY_ITERATOR_GET_IFACE (self)->get_list(self);
 
 #ifdef DBC /* ensure */
 	g_assert (TNY_IS_LIST (retval));

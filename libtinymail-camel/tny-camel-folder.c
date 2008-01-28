@@ -936,7 +936,7 @@ tny_camel_folder_add_msg_async_cancelled_callback (gpointer thr_user_data)
 static void 
 tny_camel_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_msg_async_func (self, msg, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_msg_async(self, msg, callback, status_callback, user_data);
 	return;
 }
 
@@ -981,7 +981,7 @@ tny_camel_folder_add_msg_async_default (TnyFolder *self, TnyMsg *msg, TnyFolderC
 static void 
 tny_camel_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_msg_func (self, msg, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_msg(self, msg, err);
 	return;
 }
 
@@ -1045,7 +1045,7 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 static void 
 tny_camel_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_msg_func (self, header, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_msg(self, header, err);
 	return;
 }
 
@@ -1108,7 +1108,7 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 static void 
 tny_camel_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_msgs_func (self, headers, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_msgs(self, headers, err);
 	return;
 }
 
@@ -1206,7 +1206,7 @@ _tny_camel_folder_get_camel_folder (TnyCamelFolder *self)
 static gboolean
 tny_camel_folder_is_subscribed (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->is_subscribed_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->is_subscribed(self);
 }
 
 static gboolean
@@ -1251,7 +1251,7 @@ _tny_camel_folder_set_subscribed (TnyCamelFolder *self, gboolean subscribed)
 static guint
 tny_camel_folder_get_local_size (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_local_size_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_local_size(self);
 }
 
 static guint
@@ -1264,7 +1264,7 @@ tny_camel_folder_get_local_size_default (TnyFolder *self)
 static guint
 tny_camel_folder_get_unread_count (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_unread_count_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_unread_count(self);
 }
 
 static guint
@@ -1313,7 +1313,7 @@ _tny_camel_folder_set_local_size (TnyCamelFolder *self, guint len)
 static guint
 tny_camel_folder_get_all_count (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_all_count_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_all_count(self);
 }
 
 static guint
@@ -1327,7 +1327,7 @@ tny_camel_folder_get_all_count_default (TnyFolder *self)
 static TnyAccount*  
 tny_camel_folder_get_account (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_account_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_account(self);
 }
 
 static TnyAccount*  
@@ -1379,7 +1379,7 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 static void 
 tny_camel_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->sync_func (self, expunge, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->sync(self, expunge, err);
 	return;
 }
 
@@ -1626,7 +1626,7 @@ tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnyFolde
 void 
 tny_camel_folder_sync_async (TnyFolder *self, gboolean expunge, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->sync_async_func (self, expunge, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->sync_async(self, expunge, callback, status_callback, user_data);
 	return;
 }
 
@@ -1775,7 +1775,7 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 static void
 tny_camel_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->refresh_async_func (self, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->refresh_async(self, callback, status_callback, user_data);
 	return;
 }
 
@@ -1866,7 +1866,7 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyFolderCallback callb
 static void 
 tny_camel_folder_refresh (TnyFolder *self, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->refresh_func (self, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->refresh(self, err);
 	return;
 }
 
@@ -2054,7 +2054,7 @@ tny_camel_folder_get_headers_async_cancelled_callback (gpointer thr_user_data)
 static void 
 tny_camel_folder_get_headers_async (TnyFolder *self, TnyList *headers, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_headers_async_func (self, headers, refresh, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_headers_async(self, headers, refresh, callback, status_callback, user_data);
 	return;
 }
 
@@ -2101,7 +2101,7 @@ tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, g
 static void
 tny_camel_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_headers_func (self, headers, refresh, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_headers(self, headers, refresh, err);
 	return;
 }
 
@@ -2349,7 +2349,7 @@ tny_camel_folder_get_msg_async_cancelled_callback (gpointer thr_user_data)
 static void
 tny_camel_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_async_func (self, header, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_async(self, header, callback, status_callback, user_data);
 	return;
 }
 
@@ -2398,7 +2398,7 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 static TnyMsgReceiveStrategy* 
 tny_camel_folder_get_msg_receive_strategy (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_receive_strategy_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_receive_strategy(self);
 }
 
 static TnyMsgReceiveStrategy* 
@@ -2412,7 +2412,7 @@ tny_camel_folder_get_msg_receive_strategy_default (TnyFolder *self)
 static void 
 tny_camel_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->set_msg_receive_strategy_func (self, st);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->set_msg_receive_strategy(self, st);
 	return;
 }
 
@@ -2432,7 +2432,7 @@ tny_camel_folder_set_msg_receive_strategy_default (TnyFolder *self, TnyMsgReceiv
 static TnyMsg*
 tny_camel_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_func (self, header, err);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg(self, header, err);
 }
 
 static TnyMsg*
@@ -2497,7 +2497,7 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 static TnyMsg*
 tny_camel_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->find_msg_func (self, url_string, err);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->find_msg(self, url_string, err);
 }
 
 static TnyMsg*
@@ -2584,7 +2584,7 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 static const gchar*
 tny_camel_folder_get_name (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_name_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_name(self);
 }
 
 static const gchar*
@@ -2607,7 +2607,7 @@ tny_camel_folder_get_name_default (TnyFolder *self)
 static TnyFolderType
 tny_camel_folder_get_folder_type (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folder_type_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folder_type(self);
 }
 
 static TnyFolderType
@@ -2621,7 +2621,7 @@ tny_camel_folder_get_folder_type_default (TnyFolder *self)
 static const gchar*
 tny_camel_folder_get_id (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_id_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_id(self);
 }
 
 static const gchar*
@@ -2636,7 +2636,7 @@ tny_camel_folder_get_id_default (TnyFolder *self)
 static TnyFolder*
 tny_camel_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, GError **err)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->copy_func (self, into, new_name, del, err);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->copy(self, into, new_name, del, err);
 }
 
 typedef struct {
@@ -3416,7 +3416,7 @@ tny_camel_folder_copy_async_cancelled_callback (gpointer thr_user_data)
 static void
 tny_camel_folder_copy_async (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->copy_async_func (self, into, new_name, del, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->copy_async(self, into, new_name, del, callback, status_callback, user_data);
 	return;
 }
 
@@ -4000,7 +4000,7 @@ tny_camel_folder_transfer_msgs_async_cancelled_callback (gpointer thr_user_data)
 static void
 tny_camel_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder *folder_dst, gboolean delete_originals, TnyTransferMsgsCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->transfer_msgs_async_func (self, header_list, folder_dst, delete_originals, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->transfer_msgs_async(self, header_list, folder_dst, delete_originals, callback, status_callback, user_data);
 	return;
 }
 
@@ -4052,7 +4052,7 @@ tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_l
 static void
 tny_camel_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->transfer_msgs(self, headers, folder_dst, delete_originals, err);
 	return;
 }
 
@@ -4225,7 +4225,7 @@ _tny_camel_folder_reason (TnyCamelFolderPriv *priv)
 static TnyMsgRemoveStrategy* 
 tny_camel_folder_get_msg_remove_strategy (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_remove_strategy_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_msg_remove_strategy(self);
 }
 
 static TnyMsgRemoveStrategy* 
@@ -4239,7 +4239,7 @@ tny_camel_folder_get_msg_remove_strategy_default (TnyFolder *self)
 static void 
 tny_camel_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->set_msg_remove_strategy_func (self, st);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->set_msg_remove_strategy(self, st);
 	return;
 }
 
@@ -4418,7 +4418,7 @@ exception:
 static void 
 tny_camel_folder_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_folder_func (self, folder, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_folder(self, folder, err);
 }
 
 static gboolean
@@ -4507,7 +4507,7 @@ _tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder,
 static TnyFolder*
 tny_camel_folder_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->create_folder_func (self, name, err);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->create_folder(self, name, err);
 }
 
 
@@ -4672,7 +4672,7 @@ tny_camel_folder_create_folder_async_destroyer (gpointer thr_user_data)
 static void
 tny_camel_folder_create_folder_async (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->create_folder_async_func (self, name, callback, status_callback, user_data);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->create_folder_async(self, name, callback, status_callback, user_data);
 }
 
 static void
@@ -4785,7 +4785,7 @@ _tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter)
 static void
 tny_camel_folder_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folders_func (self, list, query, err);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folders(self, list, query, err);
 }
 
 static void 
@@ -4971,7 +4971,7 @@ tny_camel_folder_get_folders_async_cancelled_callback (gpointer thr_user_data)
 static void 
 tny_camel_folder_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folders_async_func (self, list, query, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folders_async(self, list, query, callback, status_callback, user_data);
 }
 
 
@@ -5058,7 +5058,7 @@ _tny_camel_folder_get_folder (TnyCamelFolder *self)
 static void 
 tny_camel_folder_poke_status (TnyFolder *self)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->poke_status_func (self);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->poke_status(self);
 	return;
 }
 
@@ -5191,7 +5191,7 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 static TnyFolderStore*  
 tny_camel_folder_get_folder_store (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folder_store_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_folder_store(self);
 }
 
 static TnyFolderStore*  
@@ -5209,7 +5209,7 @@ tny_camel_folder_get_folder_store_default (TnyFolder *self)
 static void
 tny_camel_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_observer_func (self, observer);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_observer(self, observer);
 }
 
 static void 
@@ -5242,7 +5242,7 @@ tny_camel_folder_add_observer_default (TnyFolder *self, TnyFolderObserver *obser
 static void
 tny_camel_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_observer_func (self, observer);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_observer(self, observer);
 }
 
 static void
@@ -5276,7 +5276,7 @@ tny_camel_folder_remove_observer_default (TnyFolder *self, TnyFolderObserver *ob
 static TnyFolderStats *
 tny_camel_folder_get_stats (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_stats_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_stats(self);
 }
 
 static TnyFolderStats * 
@@ -5302,7 +5302,7 @@ tny_camel_folder_get_stats_default (TnyFolder *self)
 static void
 tny_camel_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_store_observer_func (self, observer);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->add_store_observer(self, observer);
 }
 
 
@@ -5336,7 +5336,7 @@ tny_camel_folder_store_add_observer_default (TnyFolderStore *self, TnyFolderStor
 static void
 tny_camel_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *observer)
 {
-	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_store_observer_func (self, observer);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_store_observer(self, observer);
 }
 
 static void
@@ -5370,7 +5370,7 @@ tny_camel_folder_store_remove_observer_default (TnyFolderStore *self, TnyFolderS
 static gchar* 
 tny_camel_folder_get_url_string (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_url_string_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_url_string(self);
 }
 
 static gchar* 
@@ -5411,7 +5411,7 @@ tny_camel_folder_get_url_string_default (TnyFolder *self)
 static TnyFolderCaps 
 tny_camel_folder_get_caps (TnyFolder *self)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_caps_func (self);
+	return TNY_CAMEL_FOLDER_GET_CLASS (self)->get_caps(self);
 }
 
 static TnyFolderCaps 
@@ -5566,42 +5566,42 @@ tny_folder_init (gpointer g, gpointer iface_data)
 {
 	TnyFolderIface *klass = (TnyFolderIface *)g;
 
-	klass->add_msg_async_func = tny_camel_folder_add_msg_async;
-	klass->get_msg_remove_strategy_func = tny_camel_folder_get_msg_remove_strategy;
-	klass->set_msg_remove_strategy_func = tny_camel_folder_set_msg_remove_strategy;
-	klass->get_msg_receive_strategy_func = tny_camel_folder_get_msg_receive_strategy;
-	klass->set_msg_receive_strategy_func = tny_camel_folder_set_msg_receive_strategy;
-	klass->get_headers_func = tny_camel_folder_get_headers;
-	klass->get_headers_async_func = tny_camel_folder_get_headers_async;
-	klass->get_msg_func = tny_camel_folder_get_msg;
-	klass->find_msg_func = tny_camel_folder_find_msg;
-	klass->get_msg_async_func = tny_camel_folder_get_msg_async;
-	klass->get_id_func = tny_camel_folder_get_id;
-	klass->get_name_func = tny_camel_folder_get_name;
-	klass->get_folder_type_func = tny_camel_folder_get_folder_type;
-	klass->get_unread_count_func = tny_camel_folder_get_unread_count;
-	klass->get_local_size_func = tny_camel_folder_get_local_size;
-	klass->get_all_count_func = tny_camel_folder_get_all_count;
-	klass->get_account_func = tny_camel_folder_get_account;
-	klass->is_subscribed_func = tny_camel_folder_is_subscribed;
-	klass->refresh_async_func = tny_camel_folder_refresh_async;
-	klass->refresh_func = tny_camel_folder_refresh;
-	klass->remove_msg_func = tny_camel_folder_remove_msg;
-	klass->remove_msgs_func = tny_camel_folder_remove_msgs;
-	klass->sync_func = tny_camel_folder_sync;
-	klass->sync_async_func = tny_camel_folder_sync_async;
-	klass->add_msg_func = tny_camel_folder_add_msg;
-	klass->transfer_msgs_func = tny_camel_folder_transfer_msgs;
-	klass->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async;
-	klass->copy_func = tny_camel_folder_copy;
-	klass->copy_async_func = tny_camel_folder_copy_async;
-	klass->poke_status_func = tny_camel_folder_poke_status;
-	klass->add_observer_func = tny_camel_folder_add_observer;
-	klass->remove_observer_func = tny_camel_folder_remove_observer;
-	klass->get_folder_store_func = tny_camel_folder_get_folder_store;
-	klass->get_stats_func = tny_camel_folder_get_stats;
-	klass->get_url_string_func = tny_camel_folder_get_url_string;
-	klass->get_caps_func = tny_camel_folder_get_caps;
+	klass->add_msg_async= tny_camel_folder_add_msg_async;
+	klass->get_msg_remove_strategy= tny_camel_folder_get_msg_remove_strategy;
+	klass->set_msg_remove_strategy= tny_camel_folder_set_msg_remove_strategy;
+	klass->get_msg_receive_strategy= tny_camel_folder_get_msg_receive_strategy;
+	klass->set_msg_receive_strategy= tny_camel_folder_set_msg_receive_strategy;
+	klass->get_headers= tny_camel_folder_get_headers;
+	klass->get_headers_async= tny_camel_folder_get_headers_async;
+	klass->get_msg= tny_camel_folder_get_msg;
+	klass->find_msg= tny_camel_folder_find_msg;
+	klass->get_msg_async= tny_camel_folder_get_msg_async;
+	klass->get_id= tny_camel_folder_get_id;
+	klass->get_name= tny_camel_folder_get_name;
+	klass->get_folder_type= tny_camel_folder_get_folder_type;
+	klass->get_unread_count= tny_camel_folder_get_unread_count;
+	klass->get_local_size= tny_camel_folder_get_local_size;
+	klass->get_all_count= tny_camel_folder_get_all_count;
+	klass->get_account= tny_camel_folder_get_account;
+	klass->is_subscribed= tny_camel_folder_is_subscribed;
+	klass->refresh_async= tny_camel_folder_refresh_async;
+	klass->refresh= tny_camel_folder_refresh;
+	klass->remove_msg= tny_camel_folder_remove_msg;
+	klass->remove_msgs= tny_camel_folder_remove_msgs;
+	klass->sync= tny_camel_folder_sync;
+	klass->sync_async= tny_camel_folder_sync_async;
+	klass->add_msg= tny_camel_folder_add_msg;
+	klass->transfer_msgs= tny_camel_folder_transfer_msgs;
+	klass->transfer_msgs_async= tny_camel_folder_transfer_msgs_async;
+	klass->copy= tny_camel_folder_copy;
+	klass->copy_async= tny_camel_folder_copy_async;
+	klass->poke_status= tny_camel_folder_poke_status;
+	klass->add_observer= tny_camel_folder_add_observer;
+	klass->remove_observer= tny_camel_folder_remove_observer;
+	klass->get_folder_store= tny_camel_folder_get_folder_store;
+	klass->get_stats= tny_camel_folder_get_stats;
+	klass->get_url_string= tny_camel_folder_get_url_string;
+	klass->get_caps= tny_camel_folder_get_caps;
 
 	return;
 }
@@ -5611,13 +5611,13 @@ tny_folder_store_init (gpointer g, gpointer iface_data)
 {
 	TnyFolderStoreIface *klass = (TnyFolderStoreIface *)g;
 
-	klass->remove_folder_func = tny_camel_folder_remove_folder;
-	klass->create_folder_func = tny_camel_folder_create_folder;
-	klass->create_folder_async_func = tny_camel_folder_create_folder_async;
-	klass->get_folders_func = tny_camel_folder_get_folders;
-	klass->get_folders_async_func = tny_camel_folder_get_folders_async;
-	klass->add_observer_func = tny_camel_folder_store_add_observer;
-	klass->remove_observer_func = tny_camel_folder_store_remove_observer;
+	klass->remove_folder= tny_camel_folder_remove_folder;
+	klass->create_folder= tny_camel_folder_create_folder;
+	klass->create_folder_async= tny_camel_folder_create_folder_async;
+	klass->get_folders= tny_camel_folder_get_folders;
+	klass->get_folders_async= tny_camel_folder_get_folders_async;
+	klass->add_observer= tny_camel_folder_store_add_observer;
+	klass->remove_observer= tny_camel_folder_store_remove_observer;
 
 	return;
 }
@@ -5631,50 +5631,50 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	object_class = (GObjectClass*) class;
 	object_class->finalize = tny_camel_folder_finalize;
 
-	class->add_msg_async_func = tny_camel_folder_add_msg_async_default;
-	class->get_msg_receive_strategy_func = tny_camel_folder_get_msg_receive_strategy_default;
-	class->set_msg_receive_strategy_func = tny_camel_folder_set_msg_receive_strategy_default;
-	class->get_msg_remove_strategy_func = tny_camel_folder_get_msg_remove_strategy_default;
-	class->set_msg_remove_strategy_func = tny_camel_folder_set_msg_remove_strategy_default;
-	class->get_headers_func = tny_camel_folder_get_headers_default;
-	class->get_headers_async_func = tny_camel_folder_get_headers_async_default;
-	class->get_msg_func = tny_camel_folder_get_msg_default;
-	class->find_msg_func = tny_camel_folder_find_msg_default;
-	class->get_msg_async_func = tny_camel_folder_get_msg_async_default;
-	class->get_id_func = tny_camel_folder_get_id_default;
-	class->get_name_func = tny_camel_folder_get_name_default;
-	class->get_folder_type_func = tny_camel_folder_get_folder_type_default;
-	class->get_unread_count_func = tny_camel_folder_get_unread_count_default;
-	class->get_local_size_func = tny_camel_folder_get_local_size_default;
-	class->get_all_count_func = tny_camel_folder_get_all_count_default;
-	class->get_account_func = tny_camel_folder_get_account_default;
-	class->is_subscribed_func = tny_camel_folder_is_subscribed_default;
-	class->refresh_async_func = tny_camel_folder_refresh_async_default;
-	class->refresh_func = tny_camel_folder_refresh_default;
-	class->remove_msg_func = tny_camel_folder_remove_msg_default;
-	class->remove_msgs_func = tny_camel_folder_remove_msgs_default;
-	class->add_msg_func = tny_camel_folder_add_msg_default;
-	class->sync_func = tny_camel_folder_sync_default;
-	class->sync_async_func = tny_camel_folder_sync_async_default;
-	class->transfer_msgs_func = tny_camel_folder_transfer_msgs_default;
-	class->transfer_msgs_async_func = tny_camel_folder_transfer_msgs_async_default;
-	class->copy_func = tny_camel_folder_copy_default;
-	class->copy_async_func = tny_camel_folder_copy_async_default;
-	class->poke_status_func = tny_camel_folder_poke_status_default;
-	class->add_observer_func = tny_camel_folder_add_observer_default;
-	class->remove_observer_func = tny_camel_folder_remove_observer_default;
-	class->get_folder_store_func = tny_camel_folder_get_folder_store_default;
-	class->get_stats_func = tny_camel_folder_get_stats_default;
-	class->get_url_string_func = tny_camel_folder_get_url_string_default;
-	class->get_caps_func = tny_camel_folder_get_caps_default;
+	class->add_msg_async= tny_camel_folder_add_msg_async_default;
+	class->get_msg_receive_strategy= tny_camel_folder_get_msg_receive_strategy_default;
+	class->set_msg_receive_strategy= tny_camel_folder_set_msg_receive_strategy_default;
+	class->get_msg_remove_strategy= tny_camel_folder_get_msg_remove_strategy_default;
+	class->set_msg_remove_strategy= tny_camel_folder_set_msg_remove_strategy_default;
+	class->get_headers= tny_camel_folder_get_headers_default;
+	class->get_headers_async= tny_camel_folder_get_headers_async_default;
+	class->get_msg= tny_camel_folder_get_msg_default;
+	class->find_msg= tny_camel_folder_find_msg_default;
+	class->get_msg_async= tny_camel_folder_get_msg_async_default;
+	class->get_id= tny_camel_folder_get_id_default;
+	class->get_name= tny_camel_folder_get_name_default;
+	class->get_folder_type= tny_camel_folder_get_folder_type_default;
+	class->get_unread_count= tny_camel_folder_get_unread_count_default;
+	class->get_local_size= tny_camel_folder_get_local_size_default;
+	class->get_all_count= tny_camel_folder_get_all_count_default;
+	class->get_account= tny_camel_folder_get_account_default;
+	class->is_subscribed= tny_camel_folder_is_subscribed_default;
+	class->refresh_async= tny_camel_folder_refresh_async_default;
+	class->refresh= tny_camel_folder_refresh_default;
+	class->remove_msg= tny_camel_folder_remove_msg_default;
+	class->remove_msgs= tny_camel_folder_remove_msgs_default;
+	class->add_msg= tny_camel_folder_add_msg_default;
+	class->sync= tny_camel_folder_sync_default;
+	class->sync_async= tny_camel_folder_sync_async_default;
+	class->transfer_msgs= tny_camel_folder_transfer_msgs_default;
+	class->transfer_msgs_async= tny_camel_folder_transfer_msgs_async_default;
+	class->copy= tny_camel_folder_copy_default;
+	class->copy_async= tny_camel_folder_copy_async_default;
+	class->poke_status= tny_camel_folder_poke_status_default;
+	class->add_observer= tny_camel_folder_add_observer_default;
+	class->remove_observer= tny_camel_folder_remove_observer_default;
+	class->get_folder_store= tny_camel_folder_get_folder_store_default;
+	class->get_stats= tny_camel_folder_get_stats_default;
+	class->get_url_string= tny_camel_folder_get_url_string_default;
+	class->get_caps= tny_camel_folder_get_caps_default;
 
-	class->get_folders_async_func = tny_camel_folder_get_folders_async_default;
-	class->get_folders_func = tny_camel_folder_get_folders_default;
-	class->create_folder_func = tny_camel_folder_create_folder_default;
-	class->create_folder_async_func = tny_camel_folder_create_folder_async_default;
-	class->remove_folder_func = tny_camel_folder_remove_folder_default;
-	class->add_store_observer_func = tny_camel_folder_store_add_observer_default;
-	class->remove_store_observer_func = tny_camel_folder_store_remove_observer_default;
+	class->get_folders_async= tny_camel_folder_get_folders_async_default;
+	class->get_folders= tny_camel_folder_get_folders_default;
+	class->create_folder= tny_camel_folder_create_folder_default;
+	class->create_folder_async= tny_camel_folder_create_folder_async_default;
+	class->remove_folder= tny_camel_folder_remove_folder_default;
+	class->add_store_observer= tny_camel_folder_store_add_observer_default;
+	class->remove_store_observer= tny_camel_folder_store_remove_observer_default;
 
 	g_type_class_add_private (object_class, sizeof (TnyCamelFolderPriv));
 

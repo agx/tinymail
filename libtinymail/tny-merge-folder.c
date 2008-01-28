@@ -1698,47 +1698,47 @@ tny_merge_folder_finalize (GObject *object)
 static void
 tny_folder_observer_init (TnyFolderObserverIface *klass)
 {
-	klass->update_func = tny_merge_folder_update;
+	klass->update= tny_merge_folder_update;
 }
 
 static void
 tny_folder_init (TnyFolderIface *klass)
 {
-	klass->remove_msg_func = tny_merge_folder_remove_msg;
-	klass->add_msg_func = tny_merge_folder_add_msg;
-	klass->add_msg_async_func = tny_merge_folder_add_msg_async;
-	klass->sync_func = tny_merge_folder_sync;
-	klass->get_msg_remove_strategy_func = tny_merge_folder_get_msg_remove_strategy;
-	klass->set_msg_remove_strategy_func = tny_merge_folder_set_msg_remove_strategy;
-	klass->get_msg_receive_strategy_func = tny_merge_folder_get_msg_receive_strategy;
-	klass->set_msg_receive_strategy_func = tny_merge_folder_set_msg_receive_strategy;
-	klass->get_msg_func = tny_merge_folder_get_msg;
-	klass->find_msg_func = tny_merge_folder_find_msg;
-	klass->get_msg_async_func = tny_merge_folder_get_msg_async;
-	klass->get_headers_func = tny_merge_folder_get_headers;
-	klass->get_headers_async_func = tny_merge_folder_get_headers_async;
-	klass->get_name_func = tny_merge_folder_get_name;
-	klass->get_id_func = tny_merge_folder_get_id;
-	klass->get_account_func = tny_merge_folder_get_account;
-	klass->get_folder_type_func = tny_merge_folder_get_folder_type;
-	klass->get_all_count_func = tny_merge_folder_get_all_count;
-	klass->get_unread_count_func = tny_merge_folder_get_unread_count;
-	klass->get_local_size_func = tny_merge_folder_get_local_size;
-	klass->is_subscribed_func = tny_merge_folder_is_subscribed;
-	klass->sync_async_func = tny_merge_folder_sync_async;
-	klass->refresh_async_func = tny_merge_folder_refresh_async;
-	klass->refresh_func = tny_merge_folder_refresh;
-	klass->transfer_msgs_func = tny_merge_folder_transfer_msgs;
-	klass->transfer_msgs_async_func = tny_merge_folder_transfer_msgs_async;
-	klass->copy_func = tny_merge_folder_copy;
-	klass->poke_status_func = tny_merge_folder_poke_status;
-	klass->add_observer_func = tny_merge_folder_add_observer;
-	klass->remove_observer_func = tny_merge_folder_remove_observer;
-	klass->get_folder_store_func = tny_merge_folder_get_folder_store;
-	klass->get_stats_func = tny_merge_folder_get_stats;
-	klass->get_url_string_func = tny_merge_folder_get_url_string;
-	klass->get_caps_func = tny_merge_folder_get_caps;
-	klass->remove_msgs_func = tny_merge_folder_remove_msgs;
+	klass->remove_msg= tny_merge_folder_remove_msg;
+	klass->add_msg= tny_merge_folder_add_msg;
+	klass->add_msg_async= tny_merge_folder_add_msg_async;
+	klass->sync= tny_merge_folder_sync;
+	klass->get_msg_remove_strategy= tny_merge_folder_get_msg_remove_strategy;
+	klass->set_msg_remove_strategy= tny_merge_folder_set_msg_remove_strategy;
+	klass->get_msg_receive_strategy= tny_merge_folder_get_msg_receive_strategy;
+	klass->set_msg_receive_strategy= tny_merge_folder_set_msg_receive_strategy;
+	klass->get_msg= tny_merge_folder_get_msg;
+	klass->find_msg= tny_merge_folder_find_msg;
+	klass->get_msg_async= tny_merge_folder_get_msg_async;
+	klass->get_headers= tny_merge_folder_get_headers;
+	klass->get_headers_async= tny_merge_folder_get_headers_async;
+	klass->get_name= tny_merge_folder_get_name;
+	klass->get_id= tny_merge_folder_get_id;
+	klass->get_account= tny_merge_folder_get_account;
+	klass->get_folder_type= tny_merge_folder_get_folder_type;
+	klass->get_all_count= tny_merge_folder_get_all_count;
+	klass->get_unread_count= tny_merge_folder_get_unread_count;
+	klass->get_local_size= tny_merge_folder_get_local_size;
+	klass->is_subscribed= tny_merge_folder_is_subscribed;
+	klass->sync_async= tny_merge_folder_sync_async;
+	klass->refresh_async= tny_merge_folder_refresh_async;
+	klass->refresh= tny_merge_folder_refresh;
+	klass->transfer_msgs= tny_merge_folder_transfer_msgs;
+	klass->transfer_msgs_async= tny_merge_folder_transfer_msgs_async;
+	klass->copy= tny_merge_folder_copy;
+	klass->poke_status= tny_merge_folder_poke_status;
+	klass->add_observer= tny_merge_folder_add_observer;
+	klass->remove_observer= tny_merge_folder_remove_observer;
+	klass->get_folder_store= tny_merge_folder_get_folder_store;
+	klass->get_stats= tny_merge_folder_get_stats;
+	klass->get_url_string= tny_merge_folder_get_url_string;
+	klass->get_caps= tny_merge_folder_get_caps;
+	klass->remove_msgs= tny_merge_folder_remove_msgs;
 }
 
 static void

@@ -38,7 +38,7 @@ struct _TnyMimePartSaveStrategyIface
 {
 	GTypeInterface parent;
 
-	void (*perform_save_func) (TnyMimePartSaveStrategy *self, TnyMimePart *part);
+	void (*perform_save) (TnyMimePartSaveStrategy *self, TnyMimePart *part);
 };
 
 GType tny_mime_part_save_strategy_get_type (void);

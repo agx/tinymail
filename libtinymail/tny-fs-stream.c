@@ -253,13 +253,13 @@ tny_stream_init (gpointer g, gpointer iface_data)
 {
 	TnyStreamIface *klass = (TnyStreamIface *)g;
 
-	klass->reset_func = tny_fs_reset;
-	klass->flush_func = tny_fs_flush;
-	klass->is_eos_func = tny_fs_is_eos;
-	klass->read_func = tny_fs_stream_read;
-	klass->write_func = tny_fs_stream_write;
-	klass->close_func = tny_fs_stream_close;
-	klass->write_to_stream_func = tny_fs_stream_write_to_stream;
+	klass->reset= tny_fs_reset;
+	klass->flush= tny_fs_flush;
+	klass->is_eos= tny_fs_is_eos;
+	klass->read= tny_fs_stream_read;
+	klass->write= tny_fs_stream_write;
+	klass->close= tny_fs_stream_close;
+	klass->write_to_stream= tny_fs_stream_write_to_stream;
 
 	return;
 }

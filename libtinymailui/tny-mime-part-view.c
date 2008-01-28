@@ -43,11 +43,11 @@ void
 tny_mime_part_view_clear (TnyMimePartView *self)
 {
 #ifdef DEBUG
-	if (!TNY_MIME_PART_VIEW_GET_IFACE (self)->clear_func)
+	if (!TNY_MIME_PART_VIEW_GET_IFACE (self)->clear)
 		g_critical ("You must implement tny_mime_part_view_clear\n");
 #endif
 
-	TNY_MIME_PART_VIEW_GET_IFACE (self)->clear_func (self);
+	TNY_MIME_PART_VIEW_GET_IFACE (self)->clear(self);
 	return;
 }
 
@@ -77,11 +77,11 @@ TnyMimePart*
 tny_mime_part_view_get_part (TnyMimePartView *self)
 {
 #ifdef DEBUG
-	if (!TNY_MIME_PART_VIEW_GET_IFACE (self)->get_part_func)
+	if (!TNY_MIME_PART_VIEW_GET_IFACE (self)->get_part)
 		g_critical ("You must implement tny_mime_part_view_get_part\n");
 #endif
 
-	return TNY_MIME_PART_VIEW_GET_IFACE (self)->get_part_func (self);
+	return TNY_MIME_PART_VIEW_GET_IFACE (self)->get_part(self);
 }
 
 /**
@@ -157,11 +157,11 @@ void
 tny_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *mime_part)
 {
 #ifdef DEBUG
-	if (!TNY_MIME_PART_VIEW_GET_IFACE (self)->set_part_func)
+	if (!TNY_MIME_PART_VIEW_GET_IFACE (self)->set_part)
 		g_critical ("You must implement tny_mime_part_view_set_part\n");
 #endif
 
-	TNY_MIME_PART_VIEW_GET_IFACE (self)->set_part_func (self, mime_part);
+	TNY_MIME_PART_VIEW_GET_IFACE (self)->set_part(self, mime_part);
 	return;
 }
 

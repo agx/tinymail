@@ -215,11 +215,11 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 {
 	TnyAccountStoreIface *klass = (TnyAccountStoreIface *)g;
 
-	klass->get_accounts_func = tny_acap_account_store_get_accounts;
-	klass->get_cache_dir_func = tny_acap_account_store_get_cache_dir;
-	klass->get_device_func = tny_acap_account_store_get_device;
-	klass->alert_func = tny_acap_account_store_alert;
-	klass->find_account_func = tny_acap_account_store_find_account;
+	klass->get_accounts= tny_acap_account_store_get_accounts;
+	klass->get_cache_dir= tny_acap_account_store_get_cache_dir;
+	klass->get_device= tny_acap_account_store_get_device;
+	klass->alert= tny_acap_account_store_alert;
+	klass->find_account= tny_acap_account_store_find_account;
 
 	return;
 }

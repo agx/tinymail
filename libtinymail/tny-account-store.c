@@ -65,10 +65,10 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0);
 	g_assert (strstr (url_string, ":"));
-	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account_func != NULL);
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account_func (self, url_string);
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->find_account(self, url_string);
 
 #ifdef DBC /* ensure */
 	if (retval) {
@@ -151,16 +151,16 @@ tny_account_store_find_account (TnyAccountStore *self, const gchar *url_string)
  * audience: platform-developer, application-developer, type-implementer
  **/
 gboolean 
-tny_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, gboolean question, const GError *error)
+tny_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, gboolean question, GError *error)
 {
 	gboolean retval;
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT_STORE (self));
-	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func != NULL);
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->alert!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->alert_func (self, account, type, question, error);
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->alert(self, account, type, question, error);
 
 #ifdef DBC /* ensure */
 #endif
@@ -186,10 +186,10 @@ tny_account_store_get_device (TnyAccountStore *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT_STORE (self));
-	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->get_device_func != NULL);
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->get_device!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->get_device_func (self);
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->get_device(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval);
@@ -218,10 +218,10 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT_STORE (self));
-	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->get_cache_dir_func != NULL);
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->get_cache_dir!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->get_cache_dir_func (self);
+	retval = TNY_ACCOUNT_STORE_GET_IFACE (self)->get_cache_dir(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval);
@@ -284,12 +284,12 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  * static TnyCamelSession *session = NULL;
  * static TnyList *accounts = NULL;
  * static gchar* 
- * account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
+ * account_get_pass(TnyAccount *account, const gchar *prompt, gboolean *cancel)
  * {
  *      return g_strdup ("the password");
  * }
  * static void
- * account_forget_pass_func (TnyAccount *account)
+ * account_forget_pass(TnyAccount *account)
  * {
  *      g_print ("Password was incorrect\n");
  * }
@@ -311,8 +311,8 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  *           tny_account_set_user (account, "user of account i");
  *           tny_account_set_hostname (account, "server.domain of account i");
  *           tny_account_set_id (account, "i");
- *           tny_account_set_forget_pass_func (account, account_forget_pass_func);
- *           tny_account_set_pass_func (account, account_get_pass_func);
+ *           tny_account_set_forget_pass_func (account, account_forget_pass);
+ *           tny_account_set_pass_func (account, account_get_pass);
  *           tny_list_prepend (accounts, account);
  *           g_object_unref (G_OBJECT (account));
  *        }
@@ -340,10 +340,10 @@ tny_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAcco
 	g_assert (TNY_IS_ACCOUNT_STORE (self));
 	g_assert (list);
 	g_assert (TNY_IS_LIST (list));
-	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->get_accounts_func != NULL);
+	g_assert (TNY_ACCOUNT_STORE_GET_IFACE (self)->get_accounts!= NULL);
 #endif
 
-	TNY_ACCOUNT_STORE_GET_IFACE (self)->get_accounts_func (self, list, types);
+	TNY_ACCOUNT_STORE_GET_IFACE (self)->get_accounts(self, list, types);
 
 #ifdef DBC /* ensure */
 #endif

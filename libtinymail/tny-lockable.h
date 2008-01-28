@@ -40,8 +40,8 @@ struct _TnyLockableIface
 {
 	GTypeInterface parent;
 
-	void (*lock_func) (TnyLockable *self);
-	void (*unlock_func) (TnyLockable *self);
+	void (*lock) (TnyLockable *self);
+	void (*unlock) (TnyLockable *self);
 };
 
 GType tny_lockable_get_type (void);

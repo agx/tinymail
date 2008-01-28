@@ -106,8 +106,8 @@ tny_camel_nntp_folder_class_init (TnyCamelNNTPFolderClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	TNY_CAMEL_FOLDER_CLASS (class)->remove_folder_func = tny_camel_nntp_folder_remove_folder;
-	TNY_CAMEL_FOLDER_CLASS (class)->create_folder_func = tny_camel_nntp_folder_create_folder;
+	TNY_CAMEL_FOLDER_CLASS (class)->remove_folder= tny_camel_nntp_folder_remove_folder;
+	TNY_CAMEL_FOLDER_CLASS (class)->create_folder= tny_camel_nntp_folder_create_folder;
 
 	object_class->finalize = tny_camel_nntp_folder_finalize;
 

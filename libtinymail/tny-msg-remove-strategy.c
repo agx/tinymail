@@ -79,10 +79,10 @@ tny_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *f
 	g_assert (TNY_IS_FOLDER (folder));
 	g_assert (header);
 	g_assert (TNY_IS_HEADER (header));
-	g_assert (TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func != NULL);
+	g_assert (TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove!= NULL);
 #endif
 
-	TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove_func (self, folder, header, err);
+	TNY_MSG_REMOVE_STRATEGY_GET_IFACE (self)->perform_remove(self, folder, header, err);
 	return;
 }
 

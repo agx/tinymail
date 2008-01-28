@@ -71,11 +71,11 @@ void
 tny_mime_part_saver_set_save_strategy (TnyMimePartSaver *self, TnyMimePartSaveStrategy *strategy)
 {
 #ifdef DEBUG
-	if (!TNY_MIME_PART_SAVER_GET_IFACE (self)->set_save_strategy_func)
+	if (!TNY_MIME_PART_SAVER_GET_IFACE (self)->set_save_strategy)
 		g_critical ("You must implement tny_mime_part_saver_set_save_strategy\n");
 #endif
 
-	TNY_MIME_PART_SAVER_GET_IFACE (self)->set_save_strategy_func (self, strategy);
+	TNY_MIME_PART_SAVER_GET_IFACE (self)->set_save_strategy(self, strategy);
 	return;
 }
 
@@ -110,11 +110,11 @@ TnyMimePartSaveStrategy*
 tny_mime_part_saver_get_save_strategy (TnyMimePartSaver *self)
 {
 #ifdef DEBUG
-	if (!TNY_MIME_PART_SAVER_GET_IFACE (self)->get_save_strategy_func)
+	if (!TNY_MIME_PART_SAVER_GET_IFACE (self)->get_save_strategy)
 		g_critical ("You must implement tny_mime_part_saver_get_save_strategy\n");
 #endif
 
-	return TNY_MIME_PART_SAVER_GET_IFACE (self)->get_save_strategy_func (self);
+	return TNY_MIME_PART_SAVER_GET_IFACE (self)->get_save_strategy(self);
 }
 
 
@@ -132,11 +132,11 @@ void
 tny_mime_part_saver_save (TnyMimePartSaver *self, TnyMimePart *part)
 {
 #ifdef DEBUG
-	if (!TNY_MIME_PART_SAVER_GET_IFACE (self)->save_func)
+	if (!TNY_MIME_PART_SAVER_GET_IFACE (self)->save)
 		g_critical ("You must implement tny_mime_part_saver_save\n");
 #endif
 
-	TNY_MIME_PART_SAVER_GET_IFACE (self)->save_func (self, part);
+	TNY_MIME_PART_SAVER_GET_IFACE (self)->save(self, part);
 	return;
 }
 

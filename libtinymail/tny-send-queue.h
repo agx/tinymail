@@ -71,11 +71,11 @@ struct _TnySendQueueIface
 	void (*queue_stop) (TnySendQueue *self, gpointer user_data);
 
 	/* methods */
-	void (*add_func) (TnySendQueue *self, TnyMsg *msg, GError **err);
-	void (*add_async_func) (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data);
-	TnyFolder* (*get_sentbox_func) (TnySendQueue *self);
-	TnyFolder* (*get_outbox_func) (TnySendQueue *self);
-	void (*cancel_func) (TnySendQueue *self, TnySendQueueCancelAction cancel_action, GError **err);
+	void (*add) (TnySendQueue *self, TnyMsg *msg, GError **err);
+	void (*add_async) (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	TnyFolder* (*get_sentbox) (TnySendQueue *self);
+	TnyFolder* (*get_outbox) (TnySendQueue *self);
+	void (*cancel) (TnySendQueue *self, TnySendQueueCancelAction cancel_action, GError **err);
 
 };
 

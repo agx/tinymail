@@ -41,12 +41,12 @@ struct _TnyMsgViewIface
 {
 	GTypeInterface parent;
 
-	TnyMsg* (*get_msg_func) (TnyMsgView *self);
-	void (*set_msg_func) (TnyMsgView *self, TnyMsg *msg);
-	void (*set_unavailable_func) (TnyMsgView *self);
-	void (*clear_func) (TnyMsgView *self);
-	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
-	TnyMsgView* (*create_new_inline_viewer_func) (TnyMsgView *self);
+	TnyMsg* (*get_msg) (TnyMsgView *self);
+	void (*set_msg) (TnyMsgView *self, TnyMsg *msg);
+	void (*set_unavailable) (TnyMsgView *self);
+	void (*clear) (TnyMsgView *self);
+	TnyMimePartView* (*create_mime_part_view_for) (TnyMsgView *self, TnyMimePart *part);
+	TnyMsgView* (*create_new_inline_viewer) (TnyMsgView *self);
 };
 
 GType tny_msg_view_get_type (void);

@@ -46,10 +46,10 @@ tny_account_store_view_set_account_store (TnyAccountStoreView *self, TnyAccountS
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT_STORE_VIEW (self));
-	g_assert (TNY_ACCOUNT_STORE_VIEW_GET_IFACE (self)->set_account_store_func != NULL);
+	g_assert (TNY_ACCOUNT_STORE_VIEW_GET_IFACE (self)->set_account_store!= NULL);
 #endif
 
-	TNY_ACCOUNT_STORE_VIEW_GET_IFACE (self)->set_account_store_func (self, account_store);
+	TNY_ACCOUNT_STORE_VIEW_GET_IFACE (self)->set_account_store(self, account_store);
 
 	return;
 }

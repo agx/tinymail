@@ -48,10 +48,10 @@ tny_folder_store_observer_update (TnyFolderStoreObserver *self, TnyFolderStoreCh
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (self));
 	g_assert (change);
 	g_assert (TNY_IS_FOLDER_STORE_CHANGE (change));
-	g_assert (TNY_FOLDER_STORE_OBSERVER_GET_IFACE (self)->update_func != NULL);
+	g_assert (TNY_FOLDER_STORE_OBSERVER_GET_IFACE (self)->update!= NULL);
 #endif
 
-	TNY_FOLDER_STORE_OBSERVER_GET_IFACE (self)->update_func (self, change);
+	TNY_FOLDER_STORE_OBSERVER_GET_IFACE (self)->update(self, change);
 
 #ifdef DBC /* ensure */
 #endif

@@ -67,7 +67,7 @@ _get_readable_date (time_t file_time_raw)
 static void 
 tny_gtk_header_view_set_header (TnyHeaderView *self, TnyHeader *header)
 {
-	TNY_GTK_HEADER_VIEW_GET_CLASS (self)->set_header_func (self, header);
+	TNY_GTK_HEADER_VIEW_GET_CLASS (self)->set_header(self, header);
 	return;
 }
 
@@ -120,7 +120,7 @@ tny_gtk_header_view_set_header_default (TnyHeaderView *self, TnyHeader *header)
 static void 
 tny_gtk_header_view_clear (TnyHeaderView *self)
 {
-	TNY_GTK_HEADER_VIEW_GET_CLASS (self)->clear_func (self);
+	TNY_GTK_HEADER_VIEW_GET_CLASS (self)->clear(self);
 	return;
 }
 
@@ -257,8 +257,8 @@ tny_header_view_init (gpointer g, gpointer iface_data)
 {
 	TnyHeaderViewIface *klass = (TnyHeaderViewIface *)g;
 
-	klass->set_header_func = tny_gtk_header_view_set_header;
-	klass->clear_func = tny_gtk_header_view_clear;
+	klass->set_header= tny_gtk_header_view_set_header;
+	klass->clear= tny_gtk_header_view_clear;
 
 	return;
 }
@@ -271,8 +271,8 @@ tny_gtk_header_view_class_init (TnyGtkHeaderViewClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->set_header_func = tny_gtk_header_view_set_header_default;
-	class->clear_func = tny_gtk_header_view_clear_default;
+	class->set_header= tny_gtk_header_view_set_header_default;
+	class->clear= tny_gtk_header_view_clear_default;
 
 	object_class->finalize = tny_gtk_header_view_finalize;
 

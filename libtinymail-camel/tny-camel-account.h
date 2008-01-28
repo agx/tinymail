@@ -60,42 +60,42 @@ struct _TnyCamelAccountClass
 	GObjectClass parent;
 
 	/* Virtual methods */
-	TnyConnectionStatus (*get_connection_status_func)(TnyAccount *self);
-	void (*set_id_func) (TnyAccount *self, const gchar *id);
-	void (*set_name_func) (TnyAccount *self, const gchar *name);
-	void (*set_secure_auth_mech_func) (TnyAccount *self, const gchar *name);
-	void (*set_proto_func) (TnyAccount *self, const gchar *proto);
-	void (*set_user_func) (TnyAccount *self, const gchar *user);
-	void (*set_hostname_func) (TnyAccount *self, const gchar *host);
-	void (*set_port_func) (TnyAccount *self, guint port);
-	void (*set_url_string_func) (TnyAccount *self, const gchar *url_string);
-	void (*set_pass_func_func) (TnyAccount *self, TnyGetPassFunc get_pass_func);
-	void (*set_forget_pass_func_func) (TnyAccount *self, TnyForgetPassFunc get_forget_pass_func);
-	TnyGetPassFunc (*get_pass_func_func) (TnyAccount *self);
-	TnyForgetPassFunc (*get_forget_pass_func_func) (TnyAccount *self);
-	const gchar* (*get_id_func) (TnyAccount *self);
-	const gchar* (*get_name_func) (TnyAccount *self);
-	const gchar* (*get_secure_auth_mech_func) (TnyAccount *self);
-	const gchar* (*get_proto_func) (TnyAccount *self);
-	const gchar* (*get_user_func) (TnyAccount *self);
-	const gchar* (*get_hostname_func) (TnyAccount *self);
-	guint (*get_port_func) (TnyAccount *self);
-	gchar* (*get_url_string_func) (TnyAccount *self);
-	TnyAccountType (*get_account_type_func) (TnyAccount *self);
-	void (*try_connect_func) (TnyAccount *self, GError **err);
-	void (*cancel_func) (TnyAccount *self);
-	gboolean (*matches_url_string_func) (TnyAccount *self, const gchar *url_string);
-	void (*start_operation_func) (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data);
-	void (*stop_operation_func) (TnyAccount *self, gboolean *canceled);
+	TnyConnectionStatus (*get_connection_status)(TnyAccount *self);
+	void (*set_id) (TnyAccount *self, const gchar *id);
+	void (*set_name) (TnyAccount *self, const gchar *name);
+	void (*set_secure_auth_mech) (TnyAccount *self, const gchar *name);
+	void (*set_proto) (TnyAccount *self, const gchar *proto);
+	void (*set_user) (TnyAccount *self, const gchar *user);
+	void (*set_hostname) (TnyAccount *self, const gchar *host);
+	void (*set_port) (TnyAccount *self, guint port);
+	void (*set_url_string) (TnyAccount *self, const gchar *url_string);
+	void (*set_pass_func) (TnyAccount *self, TnyGetPassFunc get_pass_func);
+	void (*set_forget_pass_func) (TnyAccount *self, TnyForgetPassFunc get_forget_pass_func);
+	TnyGetPassFunc (*get_pass_func) (TnyAccount *self);
+	TnyForgetPassFunc (*get_forget_pass_func) (TnyAccount *self);
+	const gchar* (*get_id) (TnyAccount *self);
+	const gchar* (*get_name) (TnyAccount *self);
+	const gchar* (*get_secure_auth_mech) (TnyAccount *self);
+	const gchar* (*get_proto) (TnyAccount *self);
+	const gchar* (*get_user) (TnyAccount *self);
+	const gchar* (*get_hostname) (TnyAccount *self);
+	guint (*get_port) (TnyAccount *self);
+	gchar* (*get_url_string) (TnyAccount *self);
+	TnyAccountType (*get_account_type) (TnyAccount *self);
+	void (*try_connect) (TnyAccount *self, GError **err);
+	void (*cancel) (TnyAccount *self);
+	gboolean (*matches_url_string) (TnyAccount *self, const gchar *url_string);
+	void (*start_operation) (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data);
+	void (*stop_operation) (TnyAccount *self, gboolean *canceled);
 
-	void (*add_option_func) (TnyCamelAccount *self, const gchar *option);
-	void (*set_online_func) (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data);
+	void (*add_option) (TnyCamelAccount *self, const gchar *option);
+	void (*set_online) (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data);
 
 	/* Abstract methods */
-	void (*prepare_func) (TnyCamelAccount *self, gboolean recon_if, gboolean reservice);
+	void (*prepare) (TnyCamelAccount *self, gboolean recon_if, gboolean reservice);
 
 	/* Signals */
-	void (*set_online_happened_func) (TnyCamelAccount *self, gboolean online);
+	void (*set_online_happened) (TnyCamelAccount *self, gboolean online);
 
 };
 

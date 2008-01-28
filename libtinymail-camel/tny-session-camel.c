@@ -119,7 +119,7 @@ get_password_idle_func (gpointer user_data)
 }
 
 static void
-get_password_destroy_func (gpointer user_data)
+get_password_destroy(gpointer user_data)
 {
 	HadToWaitForPasswordInfo *info = (HadToWaitForPasswordInfo *) user_data;
 
@@ -183,10 +183,10 @@ tny_session_camel_get_password (CamelSession *session, CamelService *service, co
 		if (g_main_depth () == 0) {
 			g_idle_add_full (G_PRIORITY_DEFAULT, 
 				get_password_idle_func, info, 
-				get_password_destroy_func);
+				get_password_destroy);
 		} else {
 			get_password_idle_func (info);
-			get_password_destroy_func (info);
+			get_password_destroy(info);
 		}
 
 		/* Wait on the queue for the mainloop callback to be finished */
@@ -275,7 +275,7 @@ forget_password_idle_func (gpointer user_data)
 }
 
 static void
-forget_password_destroy_func (gpointer user_data)
+forget_password_destroy(gpointer user_data)
 {
 	HadToWaitForForgetInfo *info = (HadToWaitForForgetInfo *) user_data;
 
@@ -322,10 +322,10 @@ tny_session_camel_forget_password (CamelSession *session, CamelService *service,
 		if (g_main_depth () == 0) {
 			g_idle_add_full (G_PRIORITY_DEFAULT, 
 				forget_password_idle_func, info, 
-				forget_password_destroy_func);
+				forget_password_destroy);
 		} else {
 			forget_password_idle_func (info); 
-			forget_password_destroy_func (info);
+			forget_password_destroy(info);
 		}
 
 		/* Wait on the queue for the mainloop callback to be finished */
@@ -382,7 +382,7 @@ alert_idle_func (gpointer user_data)
 }
 
 static void
-alert_destroy_func (gpointer user_data)
+alert_destroy(gpointer user_data)
 {
 	HadToWaitForAlertInfo *info = (HadToWaitForAlertInfo *) user_data;
 
@@ -421,10 +421,10 @@ tny_session_camel_do_an_error (TnySessionCamel *self, TnyAccount *account, TnyAl
 	if (g_main_depth () == 0) {
 		g_idle_add_full (G_PRIORITY_DEFAULT, 
 			alert_idle_func, info, 
-			alert_destroy_func);
+			alert_destroy);
 	} else {
 		alert_idle_func (info); 
-		alert_destroy_func (info);
+		alert_destroy(info);
 	}
 
 	/* Wait on the queue for the mainloop callback to be finished */
@@ -724,7 +724,7 @@ on_account_connect_done (TnyCamelAccount *account, gboolean canceled, GError *er
 		tny_account_store_alert (
 			(TnyAccountStore*) self->priv->account_store, 
 			TNY_ACCOUNT (account), TNY_ALERT_TYPE_ERROR, FALSE, 
-			(const GError *) err);
+			err);
 	}
 
 	camel_object_unref (self);

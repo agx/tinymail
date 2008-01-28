@@ -588,7 +588,7 @@ create_worker (TnySendQueue *self)
 static void
 tny_camel_send_queue_cancel (TnySendQueue *self, TnySendQueueCancelAction cancel_action, GError **err)
 {
-	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->cancel_func (self, cancel_action, err);
+	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->cancel(self, cancel_action, err);
 }
 
 static void
@@ -654,7 +654,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 static void
 tny_camel_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 {
-	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_func (self, msg, err);
+	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add(self, msg, err);
 }
 
 typedef struct {
@@ -754,7 +754,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 static void
 tny_camel_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_async_func (self, msg, callback, status_callback, user_data);
+	TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->add_async(self, msg, callback, status_callback, user_data);
 }
 
 
@@ -899,7 +899,7 @@ create_maildir (TnySendQueue *self, const gchar *name)
 static TnyFolder* 
 tny_camel_send_queue_get_sentbox (TnySendQueue *self)
 {
-	return TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->get_sentbox_func (self);
+	return TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->get_sentbox(self);
 }
 
 static TnyFolder* 
@@ -917,7 +917,7 @@ tny_camel_send_queue_get_sentbox_default (TnySendQueue *self)
 static TnyFolder* 
 tny_camel_send_queue_get_outbox (TnySendQueue *self)
 {
-	return TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->get_outbox_func (self);
+	return TNY_CAMEL_SEND_QUEUE_GET_CLASS (self)->get_outbox(self);
 }
 
 static TnyFolder* 
@@ -1089,11 +1089,11 @@ tny_send_queue_init (gpointer g, gpointer iface_data)
 {
 	TnySendQueueIface *klass = (TnySendQueueIface *)g;
 
-	klass->add_func = tny_camel_send_queue_add;
-	klass->add_async_func = tny_camel_send_queue_add_async;
-	klass->get_outbox_func = tny_camel_send_queue_get_outbox;
-	klass->get_sentbox_func = tny_camel_send_queue_get_sentbox;
-	klass->cancel_func = tny_camel_send_queue_cancel;
+	klass->add= tny_camel_send_queue_add;
+	klass->add_async= tny_camel_send_queue_add_async;
+	klass->get_outbox= tny_camel_send_queue_get_outbox;
+	klass->get_sentbox= tny_camel_send_queue_get_sentbox;
+	klass->cancel= tny_camel_send_queue_cancel;
 
 	return;
 }
@@ -1106,11 +1106,11 @@ tny_camel_send_queue_class_init (TnyCamelSendQueueClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->add_func = tny_camel_send_queue_add_default;
-	class->add_async_func = tny_camel_send_queue_add_async_default;
-	class->get_outbox_func = tny_camel_send_queue_get_outbox_default;
-	class->get_sentbox_func = tny_camel_send_queue_get_sentbox_default;
-	class->cancel_func = tny_camel_send_queue_cancel_default;
+	class->add= tny_camel_send_queue_add_default;
+	class->add_async= tny_camel_send_queue_add_async_default;
+	class->get_outbox= tny_camel_send_queue_get_outbox_default;
+	class->get_sentbox= tny_camel_send_queue_get_sentbox_default;
+	class->cancel= tny_camel_send_queue_cancel_default;
 
 	object_class->finalize = tny_camel_send_queue_finalize;
 
@@ -1141,7 +1141,7 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_folder_observer_init (TnyFolderObserverIface *klass)
 {
-	klass->update_func = tny_camel_send_queue_update;
+	klass->update= tny_camel_send_queue_update;
 }
 
 /**

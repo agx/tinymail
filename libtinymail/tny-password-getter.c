@@ -58,10 +58,10 @@ tny_password_getter_get_password (TnyPasswordGetter *self, const gchar *aid, con
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_PASSWORD_GETTER (self));
-	g_assert (TNY_PASSWORD_GETTER_GET_IFACE (self)->get_password_func != NULL);
+	g_assert (TNY_PASSWORD_GETTER_GET_IFACE (self)->get_password!= NULL);
 #endif
 
-	return TNY_PASSWORD_GETTER_GET_IFACE (self)->get_password_func (self, aid, prompt, cancel);
+	return TNY_PASSWORD_GETTER_GET_IFACE (self)->get_password(self, aid, prompt, cancel);
 }
 
 /**
@@ -81,10 +81,10 @@ tny_password_getter_forget_password (TnyPasswordGetter *self, const gchar *aid)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_PASSWORD_GETTER (self));
-	g_assert (TNY_PASSWORD_GETTER_GET_IFACE (self)->forget_password_func != NULL);
+	g_assert (TNY_PASSWORD_GETTER_GET_IFACE (self)->forget_password!= NULL);
 #endif
 
-	TNY_PASSWORD_GETTER_GET_IFACE (self)->forget_password_func (self, aid);
+	TNY_PASSWORD_GETTER_GET_IFACE (self)->forget_password(self, aid);
 
 	return;
 }

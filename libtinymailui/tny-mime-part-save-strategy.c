@@ -100,11 +100,11 @@ void
 tny_mime_part_save_strategy_perform_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)
 {
 #ifdef DEBUG
-	if (!TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->perform_save_func)
+	if (!TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->perform_save)
 		g_critical ("You must implement tny_mime_part_save_strategy_perform_save\n");
 #endif
 
-	TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->perform_save_func (self, part);
+	TNY_MIME_PART_SAVE_STRATEGY_GET_IFACE (self)->perform_save(self, part);
 	return;
 }
 

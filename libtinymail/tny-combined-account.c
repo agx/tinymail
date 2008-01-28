@@ -485,61 +485,61 @@ tny_combined_account_finalize (GObject *object)
 static void
 tny_store_account_init (TnyStoreAccountIface *klass)
 {
-	klass->subscribe_func = tny_combined_account_subscribe;
-	klass->unsubscribe_func = tny_combined_account_unsubscribe;
-	klass->find_folder_func = tny_combined_account_find_folder;
+	klass->subscribe= tny_combined_account_subscribe;
+	klass->unsubscribe= tny_combined_account_unsubscribe;
+	klass->find_folder= tny_combined_account_find_folder;
 }
 
 
 static void
 tny_transport_account_init (TnyTransportAccountIface *klass)
 {
-	klass->send_func = tny_combined_account_send;
+	klass->send= tny_combined_account_send;
 }
 
 
 static void
 tny_account_init (TnyAccountIface *klass)
 {
-	klass->get_connection_status_func = tny_combined_account_get_connection_status;
-	klass->set_id_func = tny_combined_account_set_id;
-	klass->set_name_func = tny_combined_account_set_name;
-	klass->set_secure_auth_mech_func = tny_combined_account_set_secure_auth_mech;
-	klass->set_proto_func = tny_combined_account_set_proto;
-	klass->set_user_func = tny_combined_account_set_user;
-	klass->set_hostname_func = tny_combined_account_set_hostname;
-	klass->set_port_func = tny_combined_account_set_port;
-	klass->set_url_string_func = tny_combined_account_set_url_string;
-	klass->set_pass_func_func = tny_combined_account_set_pass_func;
-	klass->set_forget_pass_func_func = tny_combined_account_set_forget_pass_func;
-	klass->get_pass_func_func = tny_combined_account_get_pass_func;
-	klass->get_forget_pass_func_func = tny_combined_account_get_forget_pass_func;
-	klass->get_id_func = tny_combined_account_get_id;
-	klass->get_name_func = tny_combined_account_get_name;
-	klass->get_secure_auth_mech_func = tny_combined_account_get_secure_auth_mech;
-	klass->get_proto_func = tny_combined_account_get_proto;
-	klass->get_user_func = tny_combined_account_get_user;
-	klass->get_hostname_func = tny_combined_account_get_hostname;
-	klass->get_port_func = tny_combined_account_get_port;
-	klass->get_url_string_func = tny_combined_account_get_url_string;
-	klass->get_account_type_func = tny_combined_account_get_account_type;
-	klass->cancel_func = tny_combined_account_cancel;
-	klass->matches_url_string_func = tny_combined_account_matches_url_string;
-	klass->start_operation_func = tny_combined_account_start_operation;
-	klass->stop_operation_func = tny_combined_account_stop_operation;
-	klass->is_ready_func = tny_combined_account_is_ready;
+	klass->get_connection_status= tny_combined_account_get_connection_status;
+	klass->set_id= tny_combined_account_set_id;
+	klass->set_name= tny_combined_account_set_name;
+	klass->set_secure_auth_mech= tny_combined_account_set_secure_auth_mech;
+	klass->set_proto= tny_combined_account_set_proto;
+	klass->set_user= tny_combined_account_set_user;
+	klass->set_hostname= tny_combined_account_set_hostname;
+	klass->set_port= tny_combined_account_set_port;
+	klass->set_url_string= tny_combined_account_set_url_string;
+	klass->set_pass_func= tny_combined_account_set_pass_func;
+	klass->set_forget_pass_func= tny_combined_account_set_forget_pass_func;
+	klass->get_pass_func= tny_combined_account_get_pass_func;
+	klass->get_forget_pass_func= tny_combined_account_get_forget_pass_func;
+	klass->get_id= tny_combined_account_get_id;
+	klass->get_name= tny_combined_account_get_name;
+	klass->get_secure_auth_mech= tny_combined_account_get_secure_auth_mech;
+	klass->get_proto= tny_combined_account_get_proto;
+	klass->get_user= tny_combined_account_get_user;
+	klass->get_hostname= tny_combined_account_get_hostname;
+	klass->get_port= tny_combined_account_get_port;
+	klass->get_url_string= tny_combined_account_get_url_string;
+	klass->get_account_type= tny_combined_account_get_account_type;
+	klass->cancel= tny_combined_account_cancel;
+	klass->matches_url_string= tny_combined_account_matches_url_string;
+	klass->start_operation= tny_combined_account_start_operation;
+	klass->stop_operation= tny_combined_account_stop_operation;
+	klass->is_ready= tny_combined_account_is_ready;
 }
 
 
 static void
 tny_folder_store_init (TnyFolderStoreIface *klass)
 {
-	klass->remove_folder_func = tny_combined_account_remove_folder;
-	klass->create_folder_func = tny_combined_account_create_folder;
-	klass->get_folders_func = tny_combined_account_get_folders;
-	klass->get_folders_async_func = tny_combined_account_get_folders_async;
-	klass->add_observer_func = tny_combined_account_add_observer;
-	klass->remove_observer_func = tny_combined_account_remove_observer;
+	klass->remove_folder= tny_combined_account_remove_folder;
+	klass->create_folder= tny_combined_account_create_folder;
+	klass->get_folders= tny_combined_account_get_folders;
+	klass->get_folders_async= tny_combined_account_get_folders_async;
+	klass->add_observer= tny_combined_account_add_observer;
+	klass->remove_observer= tny_combined_account_remove_observer;
 }
 
 static void

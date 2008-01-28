@@ -54,16 +54,16 @@ struct _TnyGtkMsgViewClass
 	GtkBinClass parent_class;
 
 	/* virtual methods */
-	TnyMimePart* (*get_part_func) (TnyMimePartView *self);
-	void (*set_part_func) (TnyMimePartView *self, TnyMimePart *part);
-	TnyMsg* (*get_msg_func) (TnyMsgView *self);
-	void (*set_msg_func) (TnyMsgView *self, TnyMsg *msg);
-	void (*set_unavailable_func) (TnyMsgView *self);
-	void (*clear_func) (TnyMsgView *self);
-	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
-	TnyMsgView* (*create_new_inline_viewer_func) (TnyMsgView *self);
+	TnyMimePart* (*get_part) (TnyMimePartView *self);
+	void (*set_part) (TnyMimePartView *self, TnyMimePart *part);
+	TnyMsg* (*get_msg) (TnyMsgView *self);
+	void (*set_msg) (TnyMsgView *self, TnyMsg *msg);
+	void (*set_unavailable) (TnyMsgView *self);
+	void (*clear) (TnyMsgView *self);
+	TnyMimePartView* (*create_mime_part_view_for) (TnyMsgView *self, TnyMimePart *part);
+	TnyMsgView* (*create_new_inline_viewer) (TnyMsgView *self);
 
-	TnyHeaderView* (*create_header_view_func) (TnyGtkMsgView *self);
+	TnyHeaderView* (*create_header_view) (TnyGtkMsgView *self);
 };
 
 GType tny_gtk_msg_view_get_type (void);

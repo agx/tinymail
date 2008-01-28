@@ -147,10 +147,10 @@ tny_camel_recover_connection_policy_instance_init (GTypeInstance *instance, gpoi
 static void
 tny_connection_policy_init (TnyConnectionPolicyIface *klass)
 {
-	klass->on_connect_func = tny_camel_recover_connection_policy_on_connect;
-	klass->on_connection_broken_func = tny_camel_recover_connection_policy_on_connection_broken;
-	klass->on_disconnect_func = tny_camel_recover_connection_policy_on_disconnect;
-	klass->set_current_func = tny_camel_recover_connection_policy_set_current;
+	klass->on_connect= tny_camel_recover_connection_policy_on_connect;
+	klass->on_connection_broken= tny_camel_recover_connection_policy_on_connection_broken;
+	klass->on_disconnect= tny_camel_recover_connection_policy_on_disconnect;
+	klass->set_current= tny_camel_recover_connection_policy_set_current;
 }
 
 static void

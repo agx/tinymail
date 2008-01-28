@@ -58,10 +58,10 @@ tny_folder_get_caps (TnyFolder *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_caps_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_caps!= NULL);
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->get_caps_func (self);
+	return TNY_FOLDER_GET_IFACE (self)->get_caps(self);
 }
 
 /**
@@ -86,10 +86,10 @@ tny_folder_get_url_string (TnyFolder *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_url_string_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_url_string!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->get_url_string_func (self);
+	retval = TNY_FOLDER_GET_IFACE (self)->get_url_string(self);
 
 #ifdef DBC /* ensure */
 	if (retval) {
@@ -125,10 +125,10 @@ tny_folder_get_stats (TnyFolder *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_stats_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_stats!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->get_stats_func (self);
+	retval = TNY_FOLDER_GET_IFACE (self)->get_stats(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -160,10 +160,10 @@ tny_folder_add_observer (TnyFolder *self, TnyFolderObserver *observer)
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (observer);
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->add_observer_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->add_observer!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->add_observer_func (self, observer);
+	TNY_FOLDER_GET_IFACE (self)->add_observer(self, observer);
 	return;
 }
 
@@ -188,10 +188,10 @@ tny_folder_remove_observer (TnyFolder *self, TnyFolderObserver *observer)
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (observer);
 	g_assert (TNY_IS_FOLDER_OBSERVER (observer));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->remove_observer_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->remove_observer!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->remove_observer_func (self, observer);
+	TNY_FOLDER_GET_IFACE (self)->remove_observer(self, observer);
 	return;
 
 }
@@ -215,10 +215,10 @@ tny_folder_poke_status (TnyFolder *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->poke_status_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->poke_status!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->poke_status_func (self);
+	TNY_FOLDER_GET_IFACE (self)->poke_status(self);
 	return;
 }
 
@@ -241,10 +241,10 @@ tny_folder_get_msg_receive_strategy (TnyFolder *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_receive_strategy_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_receive_strategy!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->get_msg_receive_strategy_func (self);
+	retval = TNY_FOLDER_GET_IFACE (self)->get_msg_receive_strategy(self);
 
 #ifdef DBC /* ensure */
 	g_assert (TNY_IS_MSG_RECEIVE_STRATEGY (retval));
@@ -281,10 +281,10 @@ tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (st);
 	g_assert (TNY_IS_MSG_RECEIVE_STRATEGY (st));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->set_msg_receive_strategy_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->set_msg_receive_strategy!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->set_msg_receive_strategy_func (self, st);
+	TNY_FOLDER_GET_IFACE (self)->set_msg_receive_strategy(self, st);
 
 #ifdef DBC /* ensure */
 	test = tny_folder_get_msg_receive_strategy (self);
@@ -354,10 +354,10 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
 	g_assert (TNY_IS_FOLDER_STORE (into));
 	g_assert (new_name);
 	g_assert (strlen (new_name) > 0);
-	g_assert (TNY_FOLDER_GET_IFACE (self)->copy_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->copy!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->copy_func (self, into, new_name, del, err);
+	retval = TNY_FOLDER_GET_IFACE (self)->copy(self, into, new_name, del, err);
 
 #ifdef DBC /* ensure */
 	if (retval) {
@@ -468,10 +468,10 @@ tny_folder_copy_async (TnyFolder *self, TnyFolderStore *into, const gchar *new_n
 	g_assert (TNY_IS_FOLDER_STORE (into));
 	g_assert (new_name);
 	g_assert (strlen (new_name) > 0);
-	g_assert (TNY_FOLDER_GET_IFACE (self)->copy_async_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->copy_async!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->copy_async_func (self, into, new_name, del, callback, status_callback, user_data);
+	TNY_FOLDER_GET_IFACE (self)->copy_async(self, into, new_name, del, callback, status_callback, user_data);
 
 #ifdef DBC /* ensure */
 #endif
@@ -497,10 +497,10 @@ tny_folder_get_msg_remove_strategy (TnyFolder *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_remove_strategy_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_remove_strategy!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->get_msg_remove_strategy_func (self);
+	retval = TNY_FOLDER_GET_IFACE (self)->get_msg_remove_strategy(self);
 
 #ifdef DBC /* ensure */
 	g_assert (TNY_IS_MSG_REMOVE_STRATEGY (retval));
@@ -530,10 +530,10 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (st);
 	g_assert (TNY_IS_MSG_REMOVE_STRATEGY (st));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->set_msg_remove_strategy_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->set_msg_remove_strategy!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->set_msg_remove_strategy_func (self, st);
+	TNY_FOLDER_GET_IFACE (self)->set_msg_remove_strategy(self, st);
 
 #ifdef DBC /* ensure */
 	test = tny_folder_get_msg_remove_strategy (self);
@@ -575,10 +575,10 @@ tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->sync_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->sync!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->sync_func (self, expunge, err);
+	TNY_FOLDER_GET_IFACE (self)->sync(self, expunge, err);
 	return;
 }
 
@@ -607,10 +607,10 @@ tny_folder_sync_async (TnyFolder *self, gboolean expunge, TnyFolderCallback call
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->sync_async_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->sync_async!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->sync_async_func (self, expunge, callback, status_callback, user_data);
+	TNY_FOLDER_GET_IFACE (self)->sync_async(self, expunge, callback, status_callback, user_data);
 	return;
 }
 
@@ -655,9 +655,9 @@ tny_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callba
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (msg);
 	g_assert (TNY_IS_MSG (msg));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->add_msg_async_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->add_msg_async!= NULL);
 #endif
-	TNY_FOLDER_GET_IFACE (self)->add_msg_async_func (self, msg, callback, status_callback, user_data);
+	TNY_FOLDER_GET_IFACE (self)->add_msg_async(self, msg, callback, status_callback, user_data);
 	return;
 }
 
@@ -685,9 +685,9 @@ tny_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (msg);
 	g_assert (TNY_IS_MSG (msg));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->add_msg_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->add_msg!= NULL);
 #endif
-	TNY_FOLDER_GET_IFACE (self)->add_msg_func (self, msg, err);
+	TNY_FOLDER_GET_IFACE (self)->add_msg(self, msg, err);
 	return;
 }
 
@@ -741,10 +741,10 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (header);
 	g_assert (TNY_IS_HEADER (header));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->remove_msg_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->remove_msg!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->remove_msg_func (self, header, err);
+	TNY_FOLDER_GET_IFACE (self)->remove_msg(self, header, err);
 	return;
 }
 
@@ -772,10 +772,10 @@ tny_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err)
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (headers);
 	g_assert (TNY_IS_LIST (headers));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->remove_msgs_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->remove_msgs!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->remove_msgs_func (self, headers, err);
+	TNY_FOLDER_GET_IFACE (self)->remove_msgs(self, headers, err);
 	return;
 }
 
@@ -841,11 +841,11 @@ tny_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, TnyStatus
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->refresh_async_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->refresh_async!= NULL);
 #endif
 
 
-	TNY_FOLDER_GET_IFACE (self)->refresh_async_func (self, callback, status_callback, user_data);
+	TNY_FOLDER_GET_IFACE (self)->refresh_async(self, callback, status_callback, user_data);
 	return;
 }
 
@@ -878,10 +878,10 @@ tny_folder_refresh (TnyFolder *self, GError **err)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->refresh_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->refresh!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->refresh_func (self, err);
+	TNY_FOLDER_GET_IFACE (self)->refresh(self, err);
 	return;
 }
 
@@ -901,10 +901,10 @@ tny_folder_is_subscribed (TnyFolder *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->is_subscribed_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->is_subscribed!= NULL);
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->is_subscribed_func (self);
+	return TNY_FOLDER_GET_IFACE (self)->is_subscribed(self);
 }
 
 /**
@@ -924,10 +924,10 @@ tny_folder_get_unread_count (TnyFolder *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_unread_count_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_unread_count!= NULL);
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->get_unread_count_func (self);
+	return TNY_FOLDER_GET_IFACE (self)->get_unread_count(self);
 }
 
 
@@ -947,10 +947,10 @@ tny_folder_get_local_size (TnyFolder *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_local_size_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_local_size!= NULL);
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->get_local_size_func (self);
+	return TNY_FOLDER_GET_IFACE (self)->get_local_size(self);
 }
 
 /**
@@ -970,10 +970,10 @@ tny_folder_get_all_count (TnyFolder *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_all_count_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_all_count!= NULL);
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->get_all_count_func (self);
+	return TNY_FOLDER_GET_IFACE (self)->get_all_count(self);
 }
 
 /**
@@ -994,10 +994,10 @@ tny_folder_get_account (TnyFolder *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_account_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_account!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->get_account_func (self);
+	retval = TNY_FOLDER_GET_IFACE (self)->get_account(self);
 
 
 #ifdef DBC /* ensure */
@@ -1036,10 +1036,10 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
 	g_assert (TNY_IS_LIST (headers));
 	g_assert (folder_dst);
 	g_assert  (TNY_IS_FOLDER (folder_dst));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->transfer_msgs_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->transfer_msgs!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->transfer_msgs_func (self, headers, folder_dst, delete_originals, err);
+	TNY_FOLDER_GET_IFACE (self)->transfer_msgs(self, headers, folder_dst, delete_originals, err);
 	return;
 }
 
@@ -1091,10 +1091,10 @@ tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder
 	g_assert (TNY_IS_LIST (header_list));
 	g_assert (folder_dst);
 	g_assert (TNY_IS_FOLDER (folder_dst));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async_func (self, header_list, folder_dst, delete_originals, callback, status_callback, user_data);
+	TNY_FOLDER_GET_IFACE (self)->transfer_msgs_async(self, header_list, folder_dst, delete_originals, callback, status_callback, user_data);
 	return;
 }
 
@@ -1139,10 +1139,10 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (header);
 	g_assert (TNY_IS_HEADER (header));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->get_msg_func (self, header, err);
+	retval = TNY_FOLDER_GET_IFACE (self)->get_msg(self, header, err);
 
 #ifdef DBC /* ensure */
 	if (retval)
@@ -1187,10 +1187,10 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0);
 	g_assert (strstr (url_string, "://") != NULL);
-	g_assert (TNY_FOLDER_GET_IFACE (self)->find_msg_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->find_msg!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->find_msg_func (self, url_string, err);
+	retval = TNY_FOLDER_GET_IFACE (self)->find_msg(self, url_string, err);
 
 #ifdef DBC /* ensure */
 	if (retval)
@@ -1261,10 +1261,10 @@ tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback 
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (header);
 	g_assert (TNY_IS_HEADER (header));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_async_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_async!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->get_msg_async_func (self, header, callback, status_callback, user_data);
+	TNY_FOLDER_GET_IFACE (self)->get_msg_async(self, header, callback, status_callback, user_data);
 
 	return;
 }
@@ -1311,10 +1311,10 @@ tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GEr
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (headers);
 	g_assert (TNY_IS_LIST (headers));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_headers_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_headers!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->get_headers_func (self, headers, refresh, err);
+	TNY_FOLDER_GET_IFACE (self)->get_headers(self, headers, refresh, err);
 	return;
 }
 
@@ -1364,10 +1364,10 @@ tny_folder_get_headers_async (TnyFolder *self, TnyList *headers, gboolean refres
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (headers);
 	g_assert (TNY_IS_LIST (headers));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_headers_async_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_headers_async!= NULL);
 #endif
 
-	TNY_FOLDER_GET_IFACE (self)->get_headers_async_func (self, headers, refresh, callback, status_callback, user_data);
+	TNY_FOLDER_GET_IFACE (self)->get_headers_async(self, headers, refresh, callback, status_callback, user_data);
 	return;
 }
 
@@ -1395,10 +1395,10 @@ tny_folder_get_id (TnyFolder *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_id_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_id!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->get_id_func (self);
+	retval = TNY_FOLDER_GET_IFACE (self)->get_id(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval);
@@ -1425,10 +1425,10 @@ tny_folder_get_name (TnyFolder *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_name_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_name!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->get_name_func (self);
+	retval = TNY_FOLDER_GET_IFACE (self)->get_name(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval);
@@ -1458,10 +1458,10 @@ tny_folder_get_folder_type  (TnyFolder *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_folder_type_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_folder_type!= NULL);
 #endif
 
-	return TNY_FOLDER_GET_IFACE (self)->get_folder_type_func (self);
+	return TNY_FOLDER_GET_IFACE (self)->get_folder_type(self);
 }
 
 
@@ -1485,10 +1485,10 @@ tny_folder_get_folder_store (TnyFolder *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER (self));
-	g_assert (TNY_FOLDER_GET_IFACE (self)->get_folder_store_func != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_folder_store!= NULL);
 #endif
 
-	retval = TNY_FOLDER_GET_IFACE (self)->get_folder_store_func (self);
+	retval = TNY_FOLDER_GET_IFACE (self)->get_folder_store(self);
 
 #ifdef DBC /* require */
 	if (retval)

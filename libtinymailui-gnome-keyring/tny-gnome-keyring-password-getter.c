@@ -141,8 +141,8 @@ tny_gnome_keyring_password_getter_finalize (GObject *object)
 static void
 tny_password_getter_init (TnyPasswordGetterIface *klass)
 {
-	klass->get_password_func = tny_gnome_keyring_password_getter_get_password;
-	klass->forget_password_func = tny_gnome_keyring_password_getter_forget_password;
+	klass->get_password= tny_gnome_keyring_password_getter_get_password;
+	klass->forget_password= tny_gnome_keyring_password_getter_forget_password;
 }
 
 static void

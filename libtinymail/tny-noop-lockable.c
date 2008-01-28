@@ -55,8 +55,8 @@ tny_noop_lockable_finalize (GObject *object)
 static void
 tny_lockable_init (TnyLockableIface *klass)
 {
-	klass->lock_func = tny_noop_lockable_lock;
-	klass->unlock_func = tny_noop_lockable_unlock;
+	klass->lock= tny_noop_lockable_lock;
+	klass->unlock= tny_noop_lockable_unlock;
 }
 
 static void

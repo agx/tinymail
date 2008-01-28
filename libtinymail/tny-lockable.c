@@ -43,10 +43,10 @@ tny_lockable_lock (TnyLockable *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_LOCKABLE (self));
-	g_assert (TNY_LOCKABLE_GET_IFACE (self)->lock_func != NULL);
+	g_assert (TNY_LOCKABLE_GET_IFACE (self)->lock!= NULL);
 #endif
 
-	TNY_LOCKABLE_GET_IFACE (self)->lock_func (self);
+	TNY_LOCKABLE_GET_IFACE (self)->lock(self);
 	return;
 }
 
@@ -64,10 +64,10 @@ tny_lockable_unlock (TnyLockable *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_LOCKABLE (self));
-	g_assert (TNY_LOCKABLE_GET_IFACE (self)->unlock_func != NULL);
+	g_assert (TNY_LOCKABLE_GET_IFACE (self)->unlock!= NULL);
 #endif
 
-	TNY_LOCKABLE_GET_IFACE (self)->unlock_func (self);
+	TNY_LOCKABLE_GET_IFACE (self)->unlock(self);
 	return;
 }
 

@@ -54,14 +54,14 @@ struct _TnyGtkMsgWindowClass
 	GtkWindowClass parent_class;
 
 	/* virtual methods */
-	TnyMsg* (*get_msg_func) (TnyMsgView *self);
-	void (*set_msg_func) (TnyMsgView *self, TnyMsg *msg);
-	void (*set_unavailable_func) (TnyMsgView *self);
-	void (*clear_func) (TnyMsgView *self);
-	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
-	TnyMsgView* (*create_new_inline_viewer_func) (TnyMsgView *self);
-	TnyMimePart* (*get_part_func) (TnyMimePartView *self);
-	void (*set_part_func) (TnyMimePartView *self, TnyMimePart *part);
+	TnyMsg* (*get_msg) (TnyMsgView *self);
+	void (*set_msg) (TnyMsgView *self, TnyMsg *msg);
+	void (*set_unavailable) (TnyMsgView *self);
+	void (*clear) (TnyMsgView *self);
+	TnyMimePartView* (*create_mime_part_view_for) (TnyMsgView *self, TnyMimePart *part);
+	TnyMsgView* (*create_new_inline_viewer) (TnyMsgView *self);
+	TnyMimePart* (*get_part) (TnyMimePartView *self);
+	void (*set_part) (TnyMimePartView *self, TnyMimePart *part);
 };
 
 GType tny_gtk_msg_window_get_type (void);

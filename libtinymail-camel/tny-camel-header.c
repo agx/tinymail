@@ -353,27 +353,27 @@ tny_header_init (gpointer g, gpointer iface_data)
 {
 	TnyHeaderIface *klass = (TnyHeaderIface *)g;
 
-	klass->get_from_func = tny_camel_header_get_from;
-	klass->get_message_id_func = tny_camel_header_get_message_id;
-	klass->get_message_size_func = tny_camel_header_get_message_size;
-	klass->get_to_func = tny_camel_header_get_to;
-	klass->get_subject_func = tny_camel_header_get_subject;
-	klass->get_date_received_func = tny_camel_header_get_date_received;
-	klass->get_date_sent_func = tny_camel_header_get_date_sent;
-	klass->get_cc_func = tny_camel_header_get_cc;
-	klass->get_bcc_func = tny_camel_header_get_bcc;
-	klass->get_replyto_func = tny_camel_header_get_replyto;
-	klass->get_uid_func = tny_camel_header_get_uid;
-	klass->get_folder_func = tny_camel_header_get_folder;
-	klass->set_bcc_func = tny_camel_header_set_bcc;
-	klass->set_cc_func = tny_camel_header_set_cc;
-	klass->set_to_func = tny_camel_header_set_to;
-	klass->set_from_func = tny_camel_header_set_from;
-	klass->set_subject_func = tny_camel_header_set_subject;
-	klass->set_replyto_func = tny_camel_header_set_replyto;
-	klass->set_flag_func = tny_camel_header_set_flag;
-	klass->unset_flag_func = tny_camel_header_unset_flag;
-	klass->get_flags_func = tny_camel_header_get_flags;
+	klass->get_from= tny_camel_header_get_from;
+	klass->get_message_id= tny_camel_header_get_message_id;
+	klass->get_message_size= tny_camel_header_get_message_size;
+	klass->get_to= tny_camel_header_get_to;
+	klass->get_subject= tny_camel_header_get_subject;
+	klass->get_date_received= tny_camel_header_get_date_received;
+	klass->get_date_sent= tny_camel_header_get_date_sent;
+	klass->get_cc= tny_camel_header_get_cc;
+	klass->get_bcc= tny_camel_header_get_bcc;
+	klass->get_replyto= tny_camel_header_get_replyto;
+	klass->get_uid= tny_camel_header_get_uid;
+	klass->get_folder= tny_camel_header_get_folder;
+	klass->set_bcc= tny_camel_header_set_bcc;
+	klass->set_cc= tny_camel_header_set_cc;
+	klass->set_to= tny_camel_header_set_to;
+	klass->set_from= tny_camel_header_set_from;
+	klass->set_subject= tny_camel_header_set_subject;
+	klass->set_replyto= tny_camel_header_set_replyto;
+	klass->set_flag= tny_camel_header_set_flag;
+	klass->unset_flag= tny_camel_header_unset_flag;
+	klass->get_flags= tny_camel_header_get_flags;
 
 	return;
 }

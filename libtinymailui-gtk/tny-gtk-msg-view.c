@@ -292,7 +292,7 @@ tny_gtk_msg_view_set_display_plain (TnyGtkMsgView *self, gboolean setting)
 static void
 tny_gtk_msg_view_set_unavailable (TnyMsgView *self)
 {
-	TNY_GTK_MSG_VIEW_GET_CLASS (self)->set_unavailable_func (self);
+	TNY_GTK_MSG_VIEW_GET_CLASS (self)->set_unavailable(self);
 }
 
 static void
@@ -312,7 +312,7 @@ tny_gtk_msg_view_set_unavailable_default (TnyMsgView *self)
 static TnyMsg*
 tny_gtk_msg_view_get_msg (TnyMsgView *self)
 {
-	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->get_msg_func (self);
+	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->get_msg(self);
 }
 
 static TnyMsg* 
@@ -327,7 +327,7 @@ tny_gtk_msg_view_get_msg_default (TnyMsgView *self)
 static TnyMsgView*
 tny_gtk_msg_view_create_new_inline_viewer (TnyMsgView *self)
 {
-	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_new_inline_viewer_func (self);
+	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_new_inline_viewer(self);
 }
 
 /**
@@ -405,7 +405,7 @@ tny_gtk_msg_view_create_new_inline_viewer_default (TnyMsgView *self)
 static TnyMimePartView*
 tny_gtk_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 {
-	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_func (self, part);
+	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for(self, part);
 }
 
 
@@ -634,7 +634,7 @@ tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts, gboolean alter
 static void
 tny_gtk_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg)
 {
-	TNY_GTK_MSG_VIEW_GET_CLASS (self)->set_msg_func (self, msg);
+	TNY_GTK_MSG_VIEW_GET_CLASS (self)->set_msg(self, msg);
 }
 
 static void 
@@ -656,7 +656,7 @@ remove_mime_part_viewer (TnyMimePartView *mpview, GtkContainer *mpviewers)
 static void
 tny_gtk_msg_view_clear (TnyMsgView *self)
 {
-	TNY_GTK_MSG_VIEW_GET_CLASS (self)->clear_func (self);
+	TNY_GTK_MSG_VIEW_GET_CLASS (self)->clear(self);
 }
 
 static void
@@ -696,7 +696,7 @@ tny_gtk_msg_view_clear_default (TnyMsgView *self)
 static void 
 tny_gtk_msg_view_mp_set_part (TnyMimePartView *self, TnyMimePart *part)
 {
-	TNY_GTK_MSG_VIEW_GET_CLASS (self)->set_part_func (self, part);
+	TNY_GTK_MSG_VIEW_GET_CLASS (self)->set_part(self, part);
 	return;
 }
 
@@ -758,7 +758,7 @@ tny_gtk_msg_view_mp_set_part_default (TnyMimePartView *self, TnyMimePart *part)
 static TnyMimePart* 
 tny_gtk_msg_view_mp_get_part (TnyMimePartView *self)
 {
-	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->get_part_func (self);
+	return TNY_GTK_MSG_VIEW_GET_CLASS (self)->get_part(self);
 }
 
 
@@ -822,7 +822,7 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->part = NULL;
 
 
-	priv->headerview = TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_header_view_func (self);
+	priv->headerview = TNY_GTK_MSG_VIEW_GET_CLASS (self)->create_header_view(self);
 
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
 
@@ -897,12 +897,12 @@ tny_msg_view_init (gpointer g, gpointer iface_data)
 {
 	TnyMsgViewIface *klass = (TnyMsgViewIface *)g;
 
-	klass->get_msg_func = tny_gtk_msg_view_get_msg;
-	klass->set_msg_func = tny_gtk_msg_view_set_msg;
-	klass->set_unavailable_func = tny_gtk_msg_view_set_unavailable;
-	klass->clear_func = tny_gtk_msg_view_clear;
-	klass->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for;
-	klass->create_new_inline_viewer_func = tny_gtk_msg_view_create_new_inline_viewer;
+	klass->get_msg= tny_gtk_msg_view_get_msg;
+	klass->set_msg= tny_gtk_msg_view_set_msg;
+	klass->set_unavailable= tny_gtk_msg_view_set_unavailable;
+	klass->clear= tny_gtk_msg_view_clear;
+	klass->create_mime_part_view_for= tny_gtk_msg_view_create_mime_part_view_for;
+	klass->create_new_inline_viewer= tny_gtk_msg_view_create_new_inline_viewer;
 
 	return;
 }
@@ -913,9 +913,9 @@ tny_mime_part_view_init (gpointer g, gpointer iface_data)
 {
 	TnyMimePartViewIface *klass = (TnyMimePartViewIface *)g;
 
-	klass->get_part_func = tny_gtk_msg_view_mp_get_part;
-	klass->set_part_func = tny_gtk_msg_view_mp_set_part;
-	klass->clear_func = tny_gtk_msg_view_mp_clear;
+	klass->get_part= tny_gtk_msg_view_mp_get_part;
+	klass->set_part= tny_gtk_msg_view_mp_set_part;
+	klass->clear= tny_gtk_msg_view_mp_clear;
 
 	return;
 }
@@ -936,16 +936,16 @@ tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 
 	object_class->finalize = tny_gtk_msg_view_finalize;
 
-	class->get_part_func = tny_gtk_msg_view_mp_get_part_default;
-	class->set_part_func = tny_gtk_msg_view_mp_set_part_default;
-	class->get_msg_func = tny_gtk_msg_view_get_msg_default;
-	class->set_msg_func = tny_gtk_msg_view_set_msg_default;
-	class->set_unavailable_func = tny_gtk_msg_view_set_unavailable_default;
-	class->clear_func = tny_gtk_msg_view_clear_default;
-	class->create_mime_part_view_for_func = tny_gtk_msg_view_create_mime_part_view_for_default;
-	class->create_new_inline_viewer_func = tny_gtk_msg_view_create_new_inline_viewer_default;
+	class->get_part= tny_gtk_msg_view_mp_get_part_default;
+	class->set_part= tny_gtk_msg_view_mp_set_part_default;
+	class->get_msg= tny_gtk_msg_view_get_msg_default;
+	class->set_msg= tny_gtk_msg_view_set_msg_default;
+	class->set_unavailable= tny_gtk_msg_view_set_unavailable_default;
+	class->clear= tny_gtk_msg_view_clear_default;
+	class->create_mime_part_view_for= tny_gtk_msg_view_create_mime_part_view_for_default;
+	class->create_new_inline_viewer= tny_gtk_msg_view_create_new_inline_viewer_default;
 
-	class->create_header_view_func = tny_gtk_msg_view_create_header_view_default;
+	class->create_header_view= tny_gtk_msg_view_create_header_view_default;
 
 	g_type_class_add_private (object_class, sizeof (TnyGtkMsgViewPriv));
 

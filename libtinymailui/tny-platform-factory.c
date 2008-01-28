@@ -48,11 +48,11 @@ TnyMsg*
 tny_platform_factory_new_msg (TnyPlatformFactory *self)
 {
 #ifdef DEBUG
-	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg_func)
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg)
 		g_critical ("You must implement tny_platform_factory_new_msg\n");
 #endif
 
-	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg_func (self);
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg(self);
 
 }
 
@@ -71,11 +71,11 @@ TnyPasswordGetter*
 tny_platform_factory_new_password_getter (TnyPlatformFactory *self)
 {
 #ifdef DEBUG
-	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_password_getter_func)
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_password_getter)
 		g_critical ("You must implement tny_platform_factory_new_password_getter\n");
 #endif
 
-	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_password_getter_func (self);
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_password_getter(self);
 }
 
 /**
@@ -93,11 +93,11 @@ TnyMimePart*
 tny_platform_factory_new_mime_part (TnyPlatformFactory *self)
 {
 #ifdef DEBUG
-	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_mime_part_func)
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_mime_part)
 		g_critical ("You must implement tny_platform_factory_new_mime_part\n");
 #endif
 
-	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_mime_part_func (self);
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_mime_part(self);
 }
 
 
@@ -120,11 +120,11 @@ TnyAccountStore*
 tny_platform_factory_new_account_store (TnyPlatformFactory *self)
 {
 #ifdef DEBUG
-	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_account_store_func)
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_account_store)
 		g_critical ("You must implement tny_platform_factory_new_account_store\n");
 #endif
 
-	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_account_store_func (self);
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_account_store(self);
 }
 
 /**
@@ -145,11 +145,11 @@ TnyDevice*
 tny_platform_factory_new_device (TnyPlatformFactory *self)
 {
 #ifdef DEBUG
-	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_device_func)
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_device)
 		g_critical ("You must implement tny_platform_factory_new_device\n");
 #endif
 
-	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_device_func (self);
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_device(self);
 }
 
 /**
@@ -170,11 +170,11 @@ TnyMsgView*
 tny_platform_factory_new_msg_view (TnyPlatformFactory *self)
 {
 #ifdef DEBUG
-	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg_view_func)
+	if (!TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg_view)
 		g_warning ("You must implement tny_platform_factory_new_msg_view\n");
 #endif
 
-	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg_view_func (self);
+	return TNY_PLATFORM_FACTORY_GET_IFACE (self)->new_msg_view(self);
 }
 
 

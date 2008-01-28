@@ -160,8 +160,8 @@ static void
 tny_password_getter_init (gpointer g, gpointer iface_data)
 {
 	TnyPasswordGetterIface *klass = (TnyPasswordGetterIface *)g;
-	klass->forget_password_func = tny_gtk_password_dialog_forget_password;
-	klass->get_password_func = tny_gtk_password_dialog_get_password;
+	klass->forget_password= tny_gtk_password_dialog_forget_password;
+	klass->get_password= tny_gtk_password_dialog_get_password;
 }
 
 

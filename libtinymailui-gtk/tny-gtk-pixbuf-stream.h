@@ -48,13 +48,13 @@ struct _TnyGtkPixbufStreamClass
 	GObjectClass parent;
 
 	/* virtual methods */
-	gssize (*read_func) (TnyStream *self, char *buffer, gsize n);
-	gssize (*write_func) (TnyStream *self, const char *buffer, gsize n);
-	gint (*flush_func) (TnyStream *self);
-	gint (*close_func) (TnyStream *self);
-	gboolean (*is_eos_func) (TnyStream *self);
-	gint (*reset_func) (TnyStream *self);
-	gssize (*write_to_stream_func) (TnyStream *self, TnyStream *output);
+	gssize (*read) (TnyStream *self, char *buffer, gsize n);
+	gssize (*write) (TnyStream *self, const char *buffer, gsize n);
+	gint (*flush) (TnyStream *self);
+	gint (*close) (TnyStream *self);
+	gboolean (*is_eos) (TnyStream *self);
+	gint (*reset) (TnyStream *self);
+	gssize (*write_to_stream) (TnyStream *self, TnyStream *output);
 };
 
 GType tny_gtk_pixbuf_stream_get_type (void);

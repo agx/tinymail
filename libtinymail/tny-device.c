@@ -57,10 +57,10 @@ tny_device_reset (TnyDevice *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_DEVICE (self));
-	g_assert (TNY_DEVICE_GET_IFACE (self)->reset_func != NULL);
+	g_assert (TNY_DEVICE_GET_IFACE (self)->reset!= NULL);
 #endif
 
-	TNY_DEVICE_GET_IFACE (self)->reset_func (self);
+	TNY_DEVICE_GET_IFACE (self)->reset(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -90,10 +90,10 @@ tny_device_force_online (TnyDevice *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_DEVICE (self));
-	g_assert (TNY_DEVICE_GET_IFACE (self)->force_online_func != NULL);
+	g_assert (TNY_DEVICE_GET_IFACE (self)->force_online!= NULL);
 #endif
 
-	TNY_DEVICE_GET_IFACE (self)->force_online_func (self);
+	TNY_DEVICE_GET_IFACE (self)->force_online(self);
 
 #ifdef DBC /* ensure */
 	g_assert (tny_device_is_online (self) == TRUE);
@@ -136,10 +136,10 @@ tny_device_force_offline (TnyDevice *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_DEVICE (self));
-	g_assert (TNY_DEVICE_GET_IFACE (self)->force_offline_func != NULL);
+	g_assert (TNY_DEVICE_GET_IFACE (self)->force_offline!= NULL);
 #endif
 
-	TNY_DEVICE_GET_IFACE (self)->force_offline_func (self);
+	TNY_DEVICE_GET_IFACE (self)->force_offline(self);
 
 #ifdef DBC /* ensure */
 	g_assert (tny_device_is_online (self) == FALSE);
@@ -177,10 +177,10 @@ tny_device_is_online (TnyDevice *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_DEVICE (self));
-	g_assert (TNY_DEVICE_GET_IFACE (self)->is_online_func != NULL);
+	g_assert (TNY_DEVICE_GET_IFACE (self)->is_online!= NULL);
 #endif
 
-	retval = TNY_DEVICE_GET_IFACE (self)->is_online_func (self);
+	retval = TNY_DEVICE_GET_IFACE (self)->is_online(self);
 
 #ifdef DBC /* ensure */
 #endif

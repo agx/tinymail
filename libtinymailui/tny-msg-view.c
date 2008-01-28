@@ -55,11 +55,11 @@ TnyMsgView*
 tny_msg_view_create_new_inline_viewer (TnyMsgView *self)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_new_inline_viewer_func)
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_new_inline_viewer)
 		g_critical ("You must implement tny_msg_view_create_new_inline_viewer\n");
 #endif
 
-	return TNY_MSG_VIEW_GET_IFACE (self)->create_new_inline_viewer_func (self);
+	return TNY_MSG_VIEW_GET_IFACE (self)->create_new_inline_viewer(self);
 }
 
 /**
@@ -82,7 +82,7 @@ tny_msg_view_create_new_inline_viewer (TnyMsgView *self)
  *        GtkWidget *widget = (GtkWidget *) self;
  *        retval = tny_my_html_mime_part_view_new ();
  *    } else
- *        retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for_func (self, part);
+ *        retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for(self, part);
  *    return retval;
  * }
  * </programlisting></informalexample>
@@ -98,11 +98,11 @@ TnyMimePartView*
 tny_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_mime_part_view_for_func)
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->create_mime_part_view_for)
 		g_critical ("You must implement tny_msg_view_create_mime_part_view_for\n");
 #endif
 
-	return TNY_MSG_VIEW_GET_IFACE (self)->create_mime_part_view_for_func (self, part);
+	return TNY_MSG_VIEW_GET_IFACE (self)->create_mime_part_view_for(self, part);
 }
 
 /**
@@ -118,11 +118,11 @@ void
 tny_msg_view_clear (TnyMsgView *self)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_VIEW_GET_IFACE (self)->clear_func)
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->clear)
 		g_critical ("You must implement tny_msg_view_clear\n");
 #endif
 
-	TNY_MSG_VIEW_GET_IFACE (self)->clear_func (self);
+	TNY_MSG_VIEW_GET_IFACE (self)->clear(self);
 	return;
 }
 
@@ -141,11 +141,11 @@ void
 tny_msg_view_set_unavailable (TnyMsgView *self)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_VIEW_GET_IFACE (self)->set_unavailable_func)
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->set_unavailable)
 		g_critical ("You must implement tny_msg_view_set_unavailable\n");
 #endif
 
-	TNY_MSG_VIEW_GET_IFACE (self)->set_unavailable_func (self);
+	TNY_MSG_VIEW_GET_IFACE (self)->set_unavailable(self);
 	return;
 }
 
@@ -170,11 +170,11 @@ TnyMsg*
 tny_msg_view_get_msg (TnyMsgView *self)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_VIEW_GET_IFACE (self)->get_msg_func)
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->get_msg)
 		g_critical ("You must implement tny_msg_view_get_msg\n");
 #endif
 
-	return TNY_MSG_VIEW_GET_IFACE (self)->get_msg_func (self);
+	return TNY_MSG_VIEW_GET_IFACE (self)->get_msg(self);
 }
 
 /**
@@ -231,11 +231,11 @@ void
 tny_msg_view_set_msg (TnyMsgView *self, TnyMsg *msg)
 {
 #ifdef DEBUG
-	if (!TNY_MSG_VIEW_GET_IFACE (self)->set_msg_func)
+	if (!TNY_MSG_VIEW_GET_IFACE (self)->set_msg)
 		g_critical ("You must implement tny_msg_view_set_msg\n");
 #endif
 
-	TNY_MSG_VIEW_GET_IFACE (self)->set_msg_func (self, msg);
+	TNY_MSG_VIEW_GET_IFACE (self)->set_msg(self, msg);
 	return;
 }
 

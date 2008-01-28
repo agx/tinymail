@@ -47,7 +47,7 @@ struct _TnyCamelPartialMsgReceiveStrategyClass
 	GObjectClass parent_class;
 
 	/* virtual methods */
-	TnyMsg * (*perform_get_msg_func) (TnyMsgReceiveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err);
+	TnyMsg * (*perform_get_msg) (TnyMsgReceiveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err);
 };
 
 GType tny_camel_partial_msg_receive_strategy_get_type (void);

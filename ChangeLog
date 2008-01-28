@@ -1,5 +1,13 @@
 2008-01-28  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Removed the _func from all the interfaces and virtual function
+	pointers in the classes. This should not be an ABI but is an API
+	change.
+
+	* This was a major API change
+
+2008-01-28  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Added skeleton for unfinished DotNet bindings. This wont work yet,
 	it seems gapi2 is generating a few *Implementor types incorrectly.
 
@@ -1148,7 +1156,7 @@
 	* libtinymail-camel/tny-camel-account.h: Change the 
 	TnyCamelGetSupportedSecureAuthCallback callback to provide a
 	GError* instead of a GError**, because it is not an output parameter.
-	* libtinymail-camel/tny-camel-account.c: (on_supauth_idle_func),
+	* libtinymail-camel/tny-camel-account.c: (on_supauth_idle),
 	(tny_camel_account_get_supported_secure_authentication_async_thread
 	), (tny_camel_account_get_supported_secure_authentication):
 	Adapt to the change, propagating GErrors up to the callback.
@@ -1357,7 +1365,7 @@
 	* libtinymail-camel/tny-camel-account.c:
 	(_tny_camel_account_refresh),
 	(_tny_camel_account_start_camel_operation_n),
-	(_tny_camel_account_actual_cancel), (on_supauth_idle_func):
+	(_tny_camel_account_actual_cancel), (on_supauth_idle):
 	* libtinymail-camel/tny-camel-folder.c: (load_folder_no_lock),
 	(tny_camel_folder_add_msg_async_thread),
 	(tny_camel_folder_add_msg_async_default),
@@ -1373,7 +1381,7 @@
 	(tny_camel_folder_transfer_msgs_async_default),
 	(tny_camel_folder_get_folders_async_thread),
 	(tny_camel_folder_get_folders_async_default):
-	* libtinymail-camel/tny-camel-queue.c: (thread_main_func):
+	* libtinymail-camel/tny-camel-queue.c: (thread_main):
 	* libtinymail-camel/tny-camel-store-account.c:
 	(tny_camel_store_account_get_folders_async_thread),
 	(tny_camel_store_account_get_folders_async_default),
@@ -2955,7 +2963,7 @@
 	* libtinymail-camel/tny-camel-folder.c:
 	(tny_camel_folder_refresh_async_destroyer),
 	(tny_camel_folder_refresh_async_callback), (destroy_progress_idle),
-	(progress_func), (tny_camel_folder_refresh_async_status),
+	(progress), (tny_camel_folder_refresh_async_status),
 	(tny_camel_folder_refresh_async_default): Use shared TnyIdleHandler 
 	instances, so that the main idle callback can stop the progress idle 
 	callback from calling the status callback after the main callback, 

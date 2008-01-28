@@ -48,8 +48,8 @@ struct _TnyWebkitMsgViewClass
 	TnyGtkMsgViewClass parent_class;
 
 	/* virtual methods */
-	TnyMimePartView* (*create_mime_part_view_for_func) (TnyMsgView *self, TnyMimePart *part);
-	TnyMsgView* (*create_new_inline_viewer_func) (TnyMsgView *self);
+	TnyMimePartView* (*create_mime_part_view_for) (TnyMsgView *self, TnyMimePart *part);
+	TnyMsgView* (*create_new_inline_viewer) (TnyMsgView *self);
 };
 
 GType tny_webkit_msg_view_get_type (void);

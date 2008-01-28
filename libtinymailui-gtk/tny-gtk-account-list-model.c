@@ -268,13 +268,13 @@ tny_gtk_account_list_model_copy_the_list (TnyList *self)
 static void
 tny_list_init (TnyListIface *klass)
 {
-	klass->get_length_func = tny_gtk_account_list_model_get_length;
-	klass->prepend_func = tny_gtk_account_list_model_prepend;
-	klass->append_func = tny_gtk_account_list_model_append;
-	klass->remove_func = tny_gtk_account_list_model_remove;
-	klass->create_iterator_func = tny_gtk_account_list_model_create_iterator;
-	klass->copy_func = tny_gtk_account_list_model_copy_the_list;
-	klass->foreach_func = tny_gtk_account_list_model_foreach_in_the_list;
+	klass->get_length= tny_gtk_account_list_model_get_length;
+	klass->prepend= tny_gtk_account_list_model_prepend;
+	klass->append= tny_gtk_account_list_model_append;
+	klass->remove= tny_gtk_account_list_model_remove;
+	klass->create_iterator= tny_gtk_account_list_model_create_iterator;
+	klass->copy= tny_gtk_account_list_model_copy_the_list;
+	klass->foreach= tny_gtk_account_list_model_foreach_in_the_list;
 
 	return;
 }

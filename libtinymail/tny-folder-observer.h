@@ -42,7 +42,7 @@ struct _TnyFolderObserverIface
 {
 	GTypeInterface parent;
 
-	void (*update_func) (TnyFolderObserver *self, TnyFolderChange *change);
+	void (*update) (TnyFolderObserver *self, TnyFolderChange *change);
 
 };
 

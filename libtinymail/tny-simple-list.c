@@ -136,13 +136,13 @@ tny_simple_list_foreach_in_the_simple_list (TnyList *self, GFunc func, gpointer 
 static void
 tny_list_init (TnyListIface *klass)
 {
-	klass->get_length_func = tny_simple_list_get_length;
-	klass->prepend_func = tny_simple_list_prepend;
-	klass->append_func = tny_simple_list_append;
-	klass->remove_func = tny_simple_list_remove;
-	klass->create_iterator_func = tny_simple_list_create_iterator;
-	klass->copy_func = tny_simple_list_copy_the_simple_list;
-	klass->foreach_func = tny_simple_list_foreach_in_the_simple_list;
+	klass->get_length= tny_simple_list_get_length;
+	klass->prepend= tny_simple_list_prepend;
+	klass->append= tny_simple_list_append;
+	klass->remove= tny_simple_list_remove;
+	klass->create_iterator= tny_simple_list_create_iterator;
+	klass->copy= tny_simple_list_copy_the_simple_list;
+	klass->foreach= tny_simple_list_foreach_in_the_simple_list;
 
 	return;
 }

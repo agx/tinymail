@@ -54,10 +54,10 @@ tny_store_account_delete_cache (TnyStoreAccount *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_STORE_ACCOUNT (self));
-	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->delete_cache_func != NULL);
+	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->delete_cache!= NULL);
 #endif
 
-	TNY_STORE_ACCOUNT_GET_IFACE (self)->delete_cache_func (self);
+	TNY_STORE_ACCOUNT_GET_IFACE (self)->delete_cache(self);
 
 	return;
 }
@@ -90,10 +90,10 @@ tny_store_account_find_folder (TnyStoreAccount *self, const gchar *url_string, G
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0);
 	g_assert (strstr (url_string, ":/"));
-	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->find_folder_func != NULL);
+	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->find_folder!= NULL);
 #endif
 
-	retval = TNY_STORE_ACCOUNT_GET_IFACE (self)->find_folder_func (self, url_string, err);
+	retval = TNY_STORE_ACCOUNT_GET_IFACE (self)->find_folder(self, url_string, err);
 
 #ifdef DBC /* ensure */
 	if (retval)
@@ -122,10 +122,10 @@ tny_store_account_unsubscribe (TnyStoreAccount *self, TnyFolder *folder)
 	g_assert (TNY_IS_STORE_ACCOUNT (self));
 	g_assert (folder);
 	g_assert (TNY_IS_FOLDER (folder));
-	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->unsubscribe_func != NULL);
+	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->unsubscribe!= NULL);
 #endif
 
-	TNY_STORE_ACCOUNT_GET_IFACE (self)->unsubscribe_func (self, folder);
+	TNY_STORE_ACCOUNT_GET_IFACE (self)->unsubscribe(self, folder);
 	return;
 }
 
@@ -148,10 +148,10 @@ tny_store_account_subscribe (TnyStoreAccount *self, TnyFolder *folder)
 	g_assert (TNY_IS_STORE_ACCOUNT (self));
 	g_assert (folder);
 	g_assert (TNY_IS_FOLDER (folder));
-	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->subscribe_func != NULL);
+	g_assert (TNY_STORE_ACCOUNT_GET_IFACE (self)->subscribe!= NULL);
 #endif
 
-	TNY_STORE_ACCOUNT_GET_IFACE (self)->subscribe_func (self, folder);
+	TNY_STORE_ACCOUNT_GET_IFACE (self)->subscribe(self, folder);
 	return;
 }
 

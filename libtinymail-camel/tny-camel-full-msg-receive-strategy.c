@@ -56,7 +56,7 @@ static GObjectClass *parent_class = NULL;
 static TnyMsg *
 tny_camel_full_msg_receive_strategy_perform_get_msg (TnyMsgReceiveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)
 {
-	return TNY_CAMEL_FULL_MSG_RECEIVE_STRATEGY_GET_CLASS (self)->perform_get_msg_func (self, folder, header, err);
+	return TNY_CAMEL_FULL_MSG_RECEIVE_STRATEGY_GET_CLASS (self)->perform_get_msg(self, folder, header, err);
 }
 
 static TnyMsg *
@@ -124,7 +124,7 @@ tny_camel_full_msg_receive_strategy_finalize (GObject *object)
 static void
 tny_msg_receive_strategy_init (TnyMsgReceiveStrategyIface *klass)
 {
-	klass->perform_get_msg_func = tny_camel_full_msg_receive_strategy_perform_get_msg;
+	klass->perform_get_msg= tny_camel_full_msg_receive_strategy_perform_get_msg;
 }
 
 
@@ -152,7 +152,7 @@ tny_camel_full_msg_receive_strategy_class_init (TnyCamelFullMsgReceiveStrategyCl
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 
-	klass->perform_get_msg_func = tny_camel_full_msg_receive_strategy_perform_get_msg_default;
+	klass->perform_get_msg= tny_camel_full_msg_receive_strategy_perform_get_msg_default;
 
 	object_class->finalize = tny_camel_full_msg_receive_strategy_finalize;
 }

@@ -45,10 +45,10 @@ tny_list_get_length (TnyList *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_LIST (self));
-	g_assert (TNY_LIST_GET_IFACE (self)->get_length_func != NULL);
+	g_assert (TNY_LIST_GET_IFACE (self)->get_length!= NULL);
 #endif
 
-	return TNY_LIST_GET_IFACE (self)->get_length_func (self);
+	return TNY_LIST_GET_IFACE (self)->get_length(self);
 }
 
 /**
@@ -83,10 +83,10 @@ tny_list_prepend (TnyList *self, GObject* item)
 	g_assert (TNY_IS_LIST (self));
 	g_assert (item);
 	g_assert (G_IS_OBJECT (item));
-	g_assert (TNY_LIST_GET_IFACE (self)->prepend_func != NULL);
+	g_assert (TNY_LIST_GET_IFACE (self)->prepend!= NULL);
 #endif
 
-	TNY_LIST_GET_IFACE (self)->prepend_func (self, item);
+	TNY_LIST_GET_IFACE (self)->prepend(self, item);
 
 #ifdef DBC /* ensure */
 	g_assert (tny_list_get_length (self) == length + 1);
@@ -127,10 +127,10 @@ tny_list_append (TnyList *self, GObject* item)
 	g_assert (TNY_IS_LIST (self));
 	g_assert (item);
 	g_assert (G_IS_OBJECT (item));
-	g_assert (TNY_LIST_GET_IFACE (self)->append_func != NULL);
+	g_assert (TNY_LIST_GET_IFACE (self)->append!= NULL);
 #endif
 
-	TNY_LIST_GET_IFACE (self)->append_func (self, item); 
+	TNY_LIST_GET_IFACE (self)->append(self, item); 
 
 #ifdef DBC /* ensure */
 	g_assert (tny_list_get_length (self) == length + 1);
@@ -195,10 +195,10 @@ tny_list_remove (TnyList *self, GObject* item)
 	g_assert (TNY_IS_LIST (self));
 	g_assert (item);
 	g_assert (G_IS_OBJECT (item));
-	g_assert (TNY_LIST_GET_IFACE (self)->remove_func != NULL);
+	g_assert (TNY_LIST_GET_IFACE (self)->remove!= NULL);
 #endif
 
-	TNY_LIST_GET_IFACE (self)->remove_func (self, item);
+	TNY_LIST_GET_IFACE (self)->remove(self, item);
 
 #ifdef DBC /* ensure */
 #endif
@@ -246,8 +246,8 @@ tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_d
 	g_assert (matcher);
 #endif
 
-	if (TNY_LIST_GET_IFACE (self)->remove_matches_func)
-		TNY_LIST_GET_IFACE (self)->remove_matches_func (self, matcher, match_data);
+	if (TNY_LIST_GET_IFACE (self)->remove_matches)
+		TNY_LIST_GET_IFACE (self)->remove_matches(self, matcher, match_data);
 	else {
 		GList *to_remove = NULL, *copy;
 		TnyIterator *iter = tny_list_create_iterator (self);
@@ -325,10 +325,10 @@ tny_list_create_iterator (TnyList *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_LIST (self));
-	g_assert (TNY_LIST_GET_IFACE (self)->create_iterator_func != NULL);
+	g_assert (TNY_LIST_GET_IFACE (self)->create_iterator!= NULL);
 #endif
 
-	retval = TNY_LIST_GET_IFACE (self)->create_iterator_func (self);
+	retval = TNY_LIST_GET_IFACE (self)->create_iterator(self);
 
 #ifdef DBC /* ensure */
 	g_assert (TNY_IS_ITERATOR (retval));
@@ -382,10 +382,10 @@ tny_list_foreach (TnyList *self, GFunc func, gpointer user_data)
 #ifdef DBC /* require */
 	g_assert (TNY_IS_LIST (self));
 	g_assert (func);
-	g_assert (TNY_LIST_GET_IFACE (self)->foreach_func != NULL);
+	g_assert (TNY_LIST_GET_IFACE (self)->foreach!= NULL);
 #endif
 
-	TNY_LIST_GET_IFACE (self)->foreach_func (self, func, user_data);
+	TNY_LIST_GET_IFACE (self)->foreach(self, func, user_data);
 	return;
 }
 
@@ -411,10 +411,10 @@ tny_list_copy (TnyList *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_LIST (self));
-	g_assert (TNY_LIST_GET_IFACE (self)->copy_func != NULL);
+	g_assert (TNY_LIST_GET_IFACE (self)->copy!= NULL);
 #endif
 
-	retval = TNY_LIST_GET_IFACE (self)->copy_func (self);
+	retval = TNY_LIST_GET_IFACE (self)->copy(self);
 
 #ifdef DBC /* ensure */
 	g_assert (TNY_IS_LIST (retval));

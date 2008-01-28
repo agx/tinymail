@@ -51,7 +51,7 @@
  *         tny_progress_info_destroy);
  *      return;
  *   }
- *   tny_progress_info_idle_func (info);
+ *   tny_progress_info_idle(info);
  *   tny_progress_info_destroy (info);
  * }
  *

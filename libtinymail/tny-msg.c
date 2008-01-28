@@ -52,10 +52,10 @@ tny_msg_uncache_attachments (TnyMsg *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MSG (self));
-	g_assert (TNY_MSG_GET_IFACE (self)->uncache_attachments_func != NULL);
+	g_assert (TNY_MSG_GET_IFACE (self)->uncache_attachments!= NULL);
 #endif
 
-	TNY_MSG_GET_IFACE (self)->uncache_attachments_func (self);
+	TNY_MSG_GET_IFACE (self)->uncache_attachments(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -79,10 +79,10 @@ tny_msg_rewrite_cache (TnyMsg *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MSG (self));
-	g_assert (TNY_MSG_GET_IFACE (self)->rewrite_cache_func != NULL);
+	g_assert (TNY_MSG_GET_IFACE (self)->rewrite_cache!= NULL);
 #endif
 
-	TNY_MSG_GET_IFACE (self)->rewrite_cache_func (self);
+	TNY_MSG_GET_IFACE (self)->rewrite_cache(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -113,10 +113,10 @@ tny_msg_get_url_string (TnyMsg *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MSG (self));
-	g_assert (TNY_MSG_GET_IFACE (self)->get_url_string_func != NULL);
+	g_assert (TNY_MSG_GET_IFACE (self)->get_url_string!= NULL);
 #endif
 
-	retval = TNY_MSG_GET_IFACE (self)->get_url_string_func (self);
+	retval = TNY_MSG_GET_IFACE (self)->get_url_string(self);
 
 #ifdef DBC /* ensure */
 	if (retval) {
@@ -146,10 +146,10 @@ tny_msg_get_folder (TnyMsg *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MSG (self));
-	g_assert (TNY_MSG_GET_IFACE (self)->get_folder_func != NULL);
+	g_assert (TNY_MSG_GET_IFACE (self)->get_folder!= NULL);
 #endif
 
-	retval = TNY_MSG_GET_IFACE (self)->get_folder_func (self);
+	retval = TNY_MSG_GET_IFACE (self)->get_folder(self);
 
 #ifdef DBC /* ensure */
 	if (retval)
@@ -184,10 +184,10 @@ tny_msg_get_header (TnyMsg *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MSG (self));
-	g_assert (TNY_MSG_GET_IFACE (self)->get_header_func != NULL);
+	g_assert (TNY_MSG_GET_IFACE (self)->get_header!= NULL);
 #endif
 
-	retval = TNY_MSG_GET_IFACE (self)->get_header_func (self);
+	retval = TNY_MSG_GET_IFACE (self)->get_header(self);
 
 
 #ifdef DBC /* ensure */

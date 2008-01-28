@@ -58,10 +58,10 @@ tny_account_get_connection_policy (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_connection_policy_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_connection_policy!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_connection_policy_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_connection_policy(self);
 
 #ifdef DBC /* ensure*/
 	g_assert (TNY_IS_CONNECTION_POLICY (retval));
@@ -86,10 +86,10 @@ tny_account_set_connection_policy (TnyAccount *self, TnyConnectionPolicy *policy
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (TNY_IS_CONNECTION_POLICY (policy));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_connection_policy_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_connection_policy!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_connection_policy_func (self, policy);
+	TNY_ACCOUNT_GET_IFACE (self)->set_connection_policy(self, policy);
 
 #ifdef DBC /* ensure*/
 #endif
@@ -118,10 +118,10 @@ tny_account_is_ready (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->is_ready_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->is_ready!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->is_ready_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->is_ready(self);
 
 #ifdef DBC /* ensure*/
 #endif
@@ -147,10 +147,10 @@ tny_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatus
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->start_operation_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->start_operation!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->start_operation_func (self, domain, code, status_callback, status_user_data);
+	TNY_ACCOUNT_GET_IFACE (self)->start_operation(self, domain, code, status_callback, status_user_data);
 
 #ifdef DBC /* ensure*/
 #endif
@@ -174,10 +174,10 @@ tny_account_stop_operation (TnyAccount *self, gboolean *cancelled)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->stop_operation_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->stop_operation!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->stop_operation_func (self, cancelled);
+	TNY_ACCOUNT_GET_IFACE (self)->stop_operation(self, cancelled);
 
 #ifdef DBC /* ensure*/
 #endif
@@ -214,10 +214,10 @@ tny_account_matches_url_string (TnyAccount *self, const gchar *url_string)
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0);
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->matches_url_string_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->matches_url_string!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->matches_url_string_func (self, url_string);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->matches_url_string(self, url_string);
 
 #ifdef DBC /* ensure*/
 #endif
@@ -242,10 +242,10 @@ tny_account_cancel (TnyAccount *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->cancel_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->cancel!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->cancel_func (self);
+	TNY_ACCOUNT_GET_IFACE (self)->cancel(self);
 
 #ifdef BDC /* ensure */
 #endif
@@ -277,10 +277,10 @@ tny_account_get_account_type (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_account_type_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_account_type!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_account_type_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_account_type(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -307,10 +307,10 @@ tny_account_get_connection_status (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_connection_status_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_connection_status!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_connection_status_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_connection_status(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -344,10 +344,10 @@ tny_account_get_id (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_id_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_id!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_id_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_id(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval);
@@ -374,10 +374,10 @@ tny_account_set_name (TnyAccount *self, const gchar *name)
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (name);
 	g_assert (strlen (name) > 0);
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_name_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_name!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_name_func (self, name);
+	TNY_ACCOUNT_GET_IFACE (self)->set_name(self, name);
 
 #ifdef DBC /* require */
 	g_assert (!strcmp (tny_account_get_name (self), name));
@@ -430,10 +430,10 @@ tny_account_set_secure_auth_mech (TnyAccount *self, const gchar *mech)
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (mech);
 	g_assert (strlen (mech) > 0);
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_secure_auth_mech_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_secure_auth_mech!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_secure_auth_mech_func (self, mech);
+	TNY_ACCOUNT_GET_IFACE (self)->set_secure_auth_mech(self, mech);
 
 #ifdef DBC /* require */
 	g_assert (!strcmp (tny_account_get_secure_auth_mech (self), mech));
@@ -461,10 +461,10 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (id);
 	g_assert (strlen (id) > 0);
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_id_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_id!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_id_func (self, id);
+	TNY_ACCOUNT_GET_IFACE (self)->set_id(self, id);
 
 #ifdef DBC /* require */
 	g_assert (!strcmp (tny_account_get_id (self), id));
@@ -490,7 +490,7 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
  * <informalexample><programlisting>
  * static GHashTable *passwords;
  * static void
- * per_account_forget_pass_func (TnyAccount *account)
+ * per_account_forget_pass(TnyAccount *account)
  * {
  *    TnyPlatformFactory *platfact = tny_my_platform_factory_get_instance ();
  *    TnyPasswordGetter *pwdgetter;
@@ -504,8 +504,8 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
  * {
  *     TnyAccount *account = ...
  *     ...
- *     tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
- *     tny_account_set_pass_func (account, per_account_get_pass_func);
+ *     tny_account_set_forget_pass_func (account, per_account_forget_pass);
+ *     tny_account_set_pass_func (account, per_account_get_pass);
  *     tny_list_prepend (list, (GObject*)account);
  *     g_object_unref (G_OBJECT (account));
  *     ...
@@ -520,10 +520,10 @@ tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pas
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_forget_pass_func_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_forget_pass_func!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_forget_pass_func_func (self, forget_pass_func);
+	TNY_ACCOUNT_GET_IFACE (self)->set_forget_pass_func (self, forget_pass_func);
 
 #ifdef DBC /* ensure */
 	g_assert (tny_account_get_forget_pass_func (self) == forget_pass_func);
@@ -547,10 +547,10 @@ tny_account_get_forget_pass_func (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_forget_pass_func_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_forget_pass_func != NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_forget_pass_func_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_forget_pass_func (self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -583,10 +583,10 @@ tny_account_set_url_string (TnyAccount *self, const gchar *url_string)
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0); 
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_url_string_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_url_string!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_url_string_func (self, url_string);
+	TNY_ACCOUNT_GET_IFACE (self)->set_url_string(self, url_string);
 
 #ifdef DBC /* ensure */
 
@@ -619,10 +619,10 @@ tny_account_set_proto (TnyAccount *self, const gchar *proto)
 	g_assert (TNY_IS_ACCOUNT (self));
 	g_assert (proto);
 	g_assert (strlen (proto) > 0);
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_proto_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_proto!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_proto_func (self, proto);
+	TNY_ACCOUNT_GET_IFACE (self)->set_proto(self, proto);
 
 #ifdef DBC /* ensure */
 	g_assert (!strcmp (tny_account_get_proto (self), proto));
@@ -651,10 +651,10 @@ tny_account_set_user (TnyAccount *self, const gchar *user)
 	g_assert (TNY_IS_ACCOUNT (self));
 	if (user)
 		g_assert (strlen (user) > 0);
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_user_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_user!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_user_func (self, user);
+	TNY_ACCOUNT_GET_IFACE (self)->set_user(self, user);
 
 #ifdef DBC /* ensure */
 	if (user)
@@ -683,10 +683,10 @@ tny_account_set_hostname (TnyAccount *self, const gchar *host)
 	g_assert (TNY_IS_ACCOUNT (self));
 	if (host)
 		g_assert (strlen (host) > 0);
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_hostname_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_hostname!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_hostname_func (self, host);
+	TNY_ACCOUNT_GET_IFACE (self)->set_hostname(self, host);
 
 #ifdef DBC /* ensure */
 	if (host)
@@ -714,10 +714,10 @@ tny_account_set_port (TnyAccount *self, guint port)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_port_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_port!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_port_func (self, port);
+	TNY_ACCOUNT_GET_IFACE (self)->set_port(self, port);
 
 #ifdef DBC /* ensure */
 	g_assert (tny_account_get_port (self) == port);
@@ -748,7 +748,7 @@ tny_account_set_port (TnyAccount *self, guint port)
  * <informalexample><programlisting>
  * static GHashTable *passwords;
  * static gchar* 
- * per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
+ * per_account_get_pass(TnyAccount *account, const gchar *prompt, gboolean *cancel)
  * {
  *    TnyPlatformFactory *platfact = tny_my_platform_factory_get_instance ();
  *    TnyPasswordGetter *pwdgetter;
@@ -765,8 +765,8 @@ tny_account_set_port (TnyAccount *self, guint port)
  * {
  *     TnyAccount *account = ...
  *     ...
- *     tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
- *     tny_account_set_pass_func (account, per_account_get_pass_func);
+ *     tny_account_set_forget_pass_func (account, per_account_forget_pass);
+ *     tny_account_set_pass_func (account, per_account_get_pass);
  *     tny_list_prepend (list, (GObject*)account);
  *     g_object_unref (account);
  *     ...
@@ -781,10 +781,10 @@ tny_account_set_pass_func (TnyAccount *self, TnyGetPassFunc get_pass_func)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_pass_func_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->set_pass_func!= NULL);
 #endif
 
-	TNY_ACCOUNT_GET_IFACE (self)->set_pass_func_func (self, get_pass_func);
+	TNY_ACCOUNT_GET_IFACE (self)->set_pass_func(self, get_pass_func);
 
 #ifdef DBC /* ensure */
 	g_assert (tny_account_get_pass_func (self) == get_pass_func);
@@ -810,10 +810,10 @@ tny_account_get_proto (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_proto_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_proto!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_proto_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_proto(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -845,10 +845,10 @@ tny_account_get_url_string (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_url_string_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_url_string!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_url_string_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_url_string(self);
 
 #ifdef DBC /* ensure */
 	if (retval)
@@ -877,10 +877,10 @@ tny_account_get_user (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_user_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_user!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_user_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_user(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -906,10 +906,10 @@ tny_account_get_name (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_name_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_name!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_name_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_name(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -937,10 +937,10 @@ tny_account_get_secure_auth_mech (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_secure_auth_mech_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_secure_auth_mech!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_secure_auth_mech_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_secure_auth_mech(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -968,10 +968,10 @@ tny_account_get_hostname (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_hostname_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_hostname!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_hostname_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_hostname(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -997,10 +997,10 @@ tny_account_get_port (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_port_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_port!= NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_port_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_port(self);
 
 #ifdef DBC /* ensure */
 #endif
@@ -1024,10 +1024,10 @@ tny_account_get_pass_func (TnyAccount *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_port_func != NULL);
+	g_assert (TNY_ACCOUNT_GET_IFACE (self)->get_pass_func != NULL);
 #endif
 
-	retval = TNY_ACCOUNT_GET_IFACE (self)->get_pass_func_func (self);
+	retval = TNY_ACCOUNT_GET_IFACE (self)->get_pass_func(self);
 
 #ifdef DBC /* ensure */
 #endif

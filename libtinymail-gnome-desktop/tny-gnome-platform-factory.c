@@ -136,12 +136,12 @@ tny_platform_factory_init (gpointer g, gpointer iface_data)
 {
 	TnyPlatformFactoryIface *klass = (TnyPlatformFactoryIface *)g;
 
-	klass->new_account_store_func = tny_gnome_platform_factory_new_account_store;
-	klass->new_device_func = tny_gnome_platform_factory_new_device;
-	klass->new_msg_view_func = tny_gnome_platform_factory_new_msg_view;
-	klass->new_msg_func = tny_gnome_platform_factory_new_msg;
-	klass->new_mime_part_func = tny_gnome_platform_factory_new_mime_part;
-	klass->new_password_getter_func = tny_gnome_platform_factory_new_password_getter;
+	klass->new_account_store= tny_gnome_platform_factory_new_account_store;
+	klass->new_device= tny_gnome_platform_factory_new_device;
+	klass->new_msg_view= tny_gnome_platform_factory_new_msg_view;
+	klass->new_msg= tny_gnome_platform_factory_new_msg;
+	klass->new_mime_part= tny_gnome_platform_factory_new_mime_part;
+	klass->new_password_getter= tny_gnome_platform_factory_new_password_getter;
 
 	return;
 }

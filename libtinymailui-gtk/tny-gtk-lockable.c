@@ -55,8 +55,8 @@ tny_gtk_lockable_finalize (GObject *object)
 static void
 tny_lockable_init (TnyLockableIface *klass)
 {
-	klass->lock_func = tny_gtk_lockable_lock;
-	klass->unlock_func = tny_gtk_lockable_unlock;
+	klass->lock= tny_gtk_lockable_lock;
+	klass->unlock= tny_gtk_lockable_unlock;
 }
 
 static void

@@ -242,7 +242,7 @@ fetch_part (TnyMimePart *self, TnyStream *stream, gboolean decode_text)
 static void 
 tny_camel_bs_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_header_pair_func (self, name, value);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_header_pair(self, name, value);
 	return;
 }
 
@@ -255,7 +255,7 @@ tny_camel_bs_mime_part_set_header_pair_default (TnyMimePart *self, const gchar *
 static void 
 tny_camel_bs_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_header_pairs_func (self, list);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_header_pairs(self, list);
 	return;
 }
 
@@ -300,7 +300,7 @@ tny_camel_bs_mime_part_get_header_pairs_default (TnyMimePart *self, TnyList *lis
 static void
 tny_camel_bs_mime_part_get_parts (TnyMimePart *self, TnyList *list)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_parts_func (self, list);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_parts(self, list);
 	return;
 }
 
@@ -345,7 +345,7 @@ tny_camel_bs_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 static gint
 tny_camel_bs_mime_part_add_part (TnyMimePart *self, TnyMimePart *part)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->add_part_func (self, part);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->add_part(self, part);
 }
 
 static gint
@@ -359,7 +359,7 @@ tny_camel_bs_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 static void 
 tny_camel_bs_mime_part_del_part (TnyMimePart *self,  TnyMimePart *part)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->del_part_func (self, part);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->del_part(self, part);
 	return;
 }
 
@@ -375,7 +375,7 @@ tny_camel_bs_mime_part_del_part_default (TnyMimePart *self, TnyMimePart *part)
 static gboolean 
 tny_camel_bs_mime_part_is_attachment (TnyMimePart *self)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->is_attachment_func (self);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->is_attachment(self);
 }
 
 
@@ -410,7 +410,7 @@ tny_camel_bs_mime_part_is_attachment_default (TnyMimePart *self)
 static gssize
 tny_camel_bs_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream, GError **err)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->write_to_stream_func (self, stream, err);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->write_to_stream(self, stream, err);
 }
 
 static gssize
@@ -584,7 +584,7 @@ decode_async_thread (gpointer user_data)
 static void
 tny_camel_bs_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->decode_to_stream_async_func (self, stream, callback, status_callback, user_data);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->decode_to_stream_async(self, stream, callback, status_callback, user_data);
 	return;
 }
 
@@ -624,7 +624,7 @@ tny_camel_bs_mime_part_decode_to_stream_async_default (TnyMimePart *self, TnyStr
 static gssize
 tny_camel_bs_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream, GError **err)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->decode_to_stream_func (self, stream, err);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->decode_to_stream(self, stream, err);
 }
 
 static gssize
@@ -636,7 +636,7 @@ tny_camel_bs_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *s
 static gint
 tny_camel_bs_mime_part_construct (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->construct_func (self, stream, mime_type, transfer_encoding);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->construct(self, stream, mime_type, transfer_encoding);
 }
 
 static gint
@@ -648,7 +648,7 @@ tny_camel_bs_mime_part_construct_default (TnyMimePart *self, TnyStream *stream, 
 static const gchar* 
 tny_camel_bs_mime_part_get_transfer_encoding (TnyMimePart *self)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_transfer_encoding_func (self);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_transfer_encoding(self);
 }
 
 static const gchar* 
@@ -662,7 +662,7 @@ tny_camel_bs_mime_part_get_transfer_encoding_default (TnyMimePart *self)
 static TnyStream* 
 tny_camel_bs_mime_part_get_stream (TnyMimePart *self)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_stream_func (self);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_stream(self);
 }
 
 static TnyStream* 
@@ -676,7 +676,7 @@ tny_camel_bs_mime_part_get_stream_default (TnyMimePart *self)
 static const gchar* 
 tny_camel_bs_mime_part_get_content_type (TnyMimePart *self)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_content_type_func (self);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_content_type(self);
 }
 
 static const gchar* 
@@ -698,7 +698,7 @@ tny_camel_bs_mime_part_get_content_type_default (TnyMimePart *self)
 static gboolean
 tny_camel_bs_mime_part_is_purged (TnyMimePart *self)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->is_purged_func (self);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->is_purged(self);
 }
 
 static gboolean
@@ -722,7 +722,7 @@ tny_camel_bs_mime_part_is_purged_default (TnyMimePart *self)
 static gboolean 
 tny_camel_bs_mime_part_content_type_is (TnyMimePart *self, const gchar *type)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->content_type_is_func (self, type);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->content_type_is(self, type);
 }
 
 static gboolean 
@@ -760,7 +760,7 @@ tny_camel_bs_mime_part_content_type_is_default (TnyMimePart *self, const gchar *
 static const gchar*
 tny_camel_bs_mime_part_get_filename (TnyMimePart *self)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_filename_func (self);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_filename(self);
 }
 
 static const gchar*
@@ -779,7 +779,7 @@ tny_camel_bs_mime_part_get_filename_default (TnyMimePart *self)
 static const gchar*
 tny_camel_bs_mime_part_get_content_id (TnyMimePart *self)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_content_id_func (self);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_content_id(self);
 }
 
 static const gchar*
@@ -798,7 +798,7 @@ tny_camel_bs_mime_part_get_content_id_default (TnyMimePart *self)
 static const gchar*
 tny_camel_bs_mime_part_get_description (TnyMimePart *self)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_description_func (self);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_description(self);
 }
 
 static const gchar*
@@ -817,7 +817,7 @@ tny_camel_bs_mime_part_get_description_default (TnyMimePart *self)
 static const gchar*
 tny_camel_bs_mime_part_get_content_location (TnyMimePart *self)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_content_location_func (self);
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_content_location(self);
 }
 
 static const gchar*
@@ -837,7 +837,7 @@ tny_camel_bs_mime_part_get_content_location_default (TnyMimePart *self)
 static void 
 tny_camel_bs_mime_part_set_content_location (TnyMimePart *self, const gchar *content_location)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_content_location_func (self, content_location);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_content_location(self, content_location);
 	return;
 }
 
@@ -850,7 +850,7 @@ tny_camel_bs_mime_part_set_content_location_default (TnyMimePart *self, const gc
 static void 
 tny_camel_bs_mime_part_set_description (TnyMimePart *self, const gchar *description)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_description_func (self, description);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_description(self, description);
 	return;
 }
 
@@ -863,7 +863,7 @@ tny_camel_bs_mime_part_set_description_default (TnyMimePart *self, const gchar *
 static void 
 tny_camel_bs_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_content_id_func (self, content_id);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_content_id(self, content_id);
 	return;
 }
 
@@ -876,7 +876,7 @@ tny_camel_bs_mime_part_set_content_id_default (TnyMimePart *self, const gchar *c
 static void 
 tny_camel_bs_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_filename_func (self, filename);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_filename(self, filename);
 	return;
 }
 
@@ -890,7 +890,7 @@ tny_camel_bs_mime_part_set_filename_default (TnyMimePart *self, const gchar *fil
 static void 
 tny_camel_bs_mime_part_set_content_type (TnyMimePart *self, const gchar *content_type)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_content_type_func (self, content_type);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_content_type(self, content_type);
 	return;
 }
 
@@ -914,7 +914,7 @@ tny_camel_bs_mime_part_set_purged_default (TnyMimePart *self)
 static void
 tny_camel_bs_mime_part_set_purged (TnyMimePart *self)
 {
-	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_purged_func (self);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_purged(self);
 	return;
 }
 
@@ -1004,31 +1004,31 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 {
 	TnyMimePartIface *klass = (TnyMimePartIface *)g;
 
-	klass->content_type_is_func = tny_camel_bs_mime_part_content_type_is;
-	klass->get_content_type_func = tny_camel_bs_mime_part_get_content_type;
-	klass->get_stream_func = tny_camel_bs_mime_part_get_stream;
-	klass->write_to_stream_func = tny_camel_bs_mime_part_write_to_stream;
-	klass->construct_func = tny_camel_bs_mime_part_construct;
-	klass->get_filename_func = tny_camel_bs_mime_part_get_filename;
-	klass->get_content_id_func = tny_camel_bs_mime_part_get_content_id;
-	klass->get_description_func = tny_camel_bs_mime_part_get_description;
-	klass->get_content_location_func = tny_camel_bs_mime_part_get_content_location;
-	klass->is_purged_func = tny_camel_bs_mime_part_is_purged;
-	klass->set_content_location_func = tny_camel_bs_mime_part_set_content_location;
-	klass->set_description_func = tny_camel_bs_mime_part_set_description;
-	klass->set_purged_func = tny_camel_bs_mime_part_set_purged;
-	klass->set_content_id_func = tny_camel_bs_mime_part_set_content_id;
-	klass->set_filename_func = tny_camel_bs_mime_part_set_filename;
-	klass->set_content_type_func = tny_camel_bs_mime_part_set_content_type;
-	klass->is_attachment_func = tny_camel_bs_mime_part_is_attachment;
-	klass->decode_to_stream_func = tny_camel_bs_mime_part_decode_to_stream;
-	klass->get_parts_func = tny_camel_bs_mime_part_get_parts;
-	klass->add_part_func = tny_camel_bs_mime_part_add_part;
-	klass->del_part_func = tny_camel_bs_mime_part_del_part;
-	klass->get_header_pairs_func = tny_camel_bs_mime_part_get_header_pairs;
-	klass->set_header_pair_func = tny_camel_bs_mime_part_set_header_pair;
-	klass->decode_to_stream_async_func = tny_camel_bs_mime_part_decode_to_stream_async;
-	klass->get_transfer_encoding_func = tny_camel_bs_mime_part_get_transfer_encoding;
+	klass->content_type_is= tny_camel_bs_mime_part_content_type_is;
+	klass->get_content_type= tny_camel_bs_mime_part_get_content_type;
+	klass->get_stream= tny_camel_bs_mime_part_get_stream;
+	klass->write_to_stream= tny_camel_bs_mime_part_write_to_stream;
+	klass->construct= tny_camel_bs_mime_part_construct;
+	klass->get_filename= tny_camel_bs_mime_part_get_filename;
+	klass->get_content_id= tny_camel_bs_mime_part_get_content_id;
+	klass->get_description= tny_camel_bs_mime_part_get_description;
+	klass->get_content_location= tny_camel_bs_mime_part_get_content_location;
+	klass->is_purged= tny_camel_bs_mime_part_is_purged;
+	klass->set_content_location= tny_camel_bs_mime_part_set_content_location;
+	klass->set_description= tny_camel_bs_mime_part_set_description;
+	klass->set_purged= tny_camel_bs_mime_part_set_purged;
+	klass->set_content_id= tny_camel_bs_mime_part_set_content_id;
+	klass->set_filename= tny_camel_bs_mime_part_set_filename;
+	klass->set_content_type= tny_camel_bs_mime_part_set_content_type;
+	klass->is_attachment= tny_camel_bs_mime_part_is_attachment;
+	klass->decode_to_stream= tny_camel_bs_mime_part_decode_to_stream;
+	klass->get_parts= tny_camel_bs_mime_part_get_parts;
+	klass->add_part= tny_camel_bs_mime_part_add_part;
+	klass->del_part= tny_camel_bs_mime_part_del_part;
+	klass->get_header_pairs= tny_camel_bs_mime_part_get_header_pairs;
+	klass->set_header_pair= tny_camel_bs_mime_part_set_header_pair;
+	klass->decode_to_stream_async= tny_camel_bs_mime_part_decode_to_stream_async;
+	klass->get_transfer_encoding= tny_camel_bs_mime_part_get_transfer_encoding;
 	return;
 }
 
@@ -1041,31 +1041,31 @@ tny_camel_bs_mime_part_class_init (TnyCamelBsMimePartClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->content_type_is_func = tny_camel_bs_mime_part_content_type_is_default;
-	class->get_content_type_func = tny_camel_bs_mime_part_get_content_type_default;
-	class->get_stream_func = tny_camel_bs_mime_part_get_stream_default;
-	class->write_to_stream_func = tny_camel_bs_mime_part_write_to_stream_default;
-	class->construct_func = tny_camel_bs_mime_part_construct_default;
-	class->get_filename_func = tny_camel_bs_mime_part_get_filename_default;
-	class->get_content_id_func = tny_camel_bs_mime_part_get_content_id_default;
-	class->get_description_func = tny_camel_bs_mime_part_get_description_default;
-	class->get_content_location_func = tny_camel_bs_mime_part_get_content_location_default;
-	class->is_purged_func = tny_camel_bs_mime_part_is_purged_default;
-	class->set_purged_func = tny_camel_bs_mime_part_set_purged_default;
-	class->set_content_location_func = tny_camel_bs_mime_part_set_content_location_default;
-	class->set_description_func = tny_camel_bs_mime_part_set_description_default;
-	class->set_content_id_func = tny_camel_bs_mime_part_set_content_id_default;
-	class->set_filename_func = tny_camel_bs_mime_part_set_filename_default;
-	class->set_content_type_func = tny_camel_bs_mime_part_set_content_type_default;
-	class->is_attachment_func = tny_camel_bs_mime_part_is_attachment_default;
-	class->decode_to_stream_func = tny_camel_bs_mime_part_decode_to_stream_default;
-	class->get_parts_func = tny_camel_bs_mime_part_get_parts_default;
-	class->add_part_func = tny_camel_bs_mime_part_add_part_default;
-	class->del_part_func = tny_camel_bs_mime_part_del_part_default;
-	class->get_header_pairs_func = tny_camel_bs_mime_part_get_header_pairs_default;
-	class->set_header_pair_func = tny_camel_bs_mime_part_set_header_pair_default;
-	class->decode_to_stream_async_func = tny_camel_bs_mime_part_decode_to_stream_async_default;
-	class->get_transfer_encoding_func = tny_camel_bs_mime_part_get_transfer_encoding_default;
+	class->content_type_is= tny_camel_bs_mime_part_content_type_is_default;
+	class->get_content_type= tny_camel_bs_mime_part_get_content_type_default;
+	class->get_stream= tny_camel_bs_mime_part_get_stream_default;
+	class->write_to_stream= tny_camel_bs_mime_part_write_to_stream_default;
+	class->construct= tny_camel_bs_mime_part_construct_default;
+	class->get_filename= tny_camel_bs_mime_part_get_filename_default;
+	class->get_content_id= tny_camel_bs_mime_part_get_content_id_default;
+	class->get_description= tny_camel_bs_mime_part_get_description_default;
+	class->get_content_location= tny_camel_bs_mime_part_get_content_location_default;
+	class->is_purged= tny_camel_bs_mime_part_is_purged_default;
+	class->set_purged= tny_camel_bs_mime_part_set_purged_default;
+	class->set_content_location= tny_camel_bs_mime_part_set_content_location_default;
+	class->set_description= tny_camel_bs_mime_part_set_description_default;
+	class->set_content_id= tny_camel_bs_mime_part_set_content_id_default;
+	class->set_filename= tny_camel_bs_mime_part_set_filename_default;
+	class->set_content_type= tny_camel_bs_mime_part_set_content_type_default;
+	class->is_attachment= tny_camel_bs_mime_part_is_attachment_default;
+	class->decode_to_stream= tny_camel_bs_mime_part_decode_to_stream_default;
+	class->get_parts= tny_camel_bs_mime_part_get_parts_default;
+	class->add_part= tny_camel_bs_mime_part_add_part_default;
+	class->del_part= tny_camel_bs_mime_part_del_part_default;
+	class->get_header_pairs= tny_camel_bs_mime_part_get_header_pairs_default;
+	class->set_header_pair= tny_camel_bs_mime_part_set_header_pair_default;
+	class->decode_to_stream_async= tny_camel_bs_mime_part_decode_to_stream_async_default;
+	class->get_transfer_encoding= tny_camel_bs_mime_part_get_transfer_encoding_default;
 
 	object_class->finalize = tny_camel_bs_mime_part_finalize;
 

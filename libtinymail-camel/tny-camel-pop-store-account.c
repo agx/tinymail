@@ -197,11 +197,11 @@ tny_camel_pop_store_account_class_init (TnyCamelPOPStoreAccountClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->remove_folder_func = tny_camel_pop_store_account_remove_folder;
-	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->create_folder_func = tny_camel_pop_store_account_create_folder;
+	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->remove_folder= tny_camel_pop_store_account_remove_folder;
+	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->create_folder= tny_camel_pop_store_account_create_folder;
 
 	/* Protected override */
-	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->factor_folder_func = tny_camel_pop_store_account_factor_folder;
+	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->factor_folder= tny_camel_pop_store_account_factor_folder;
 
 	object_class->finalize = tny_camel_pop_store_account_finalize;
 

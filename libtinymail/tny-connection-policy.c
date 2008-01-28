@@ -59,10 +59,10 @@ tny_connection_policy_set_current (TnyConnectionPolicy *self, TnyAccount *accoun
 	g_assert (TNY_IS_ACCOUNT (account));
 	g_assert (TNY_IS_FOLDER (folder));
 
-	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->set_current_func != NULL);
+	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->set_current!= NULL);
 #endif
 
-	TNY_CONNECTION_POLICY_GET_IFACE (self)->set_current_func (self, account, folder);
+	TNY_CONNECTION_POLICY_GET_IFACE (self)->set_current(self, account, folder);
 
 	return;
 }
@@ -84,10 +84,10 @@ tny_connection_policy_on_connect (TnyConnectionPolicy *self, TnyAccount *account
 	g_assert (TNY_IS_CONNECTION_POLICY (self));
 	g_assert (TNY_IS_ACCOUNT (account));
 
-	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connect_func != NULL);
+	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connect!= NULL);
 #endif
 
-	TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connect_func (self, account);
+	TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connect(self, account);
 
 	return;
 }
@@ -109,10 +109,10 @@ tny_connection_policy_on_disconnect (TnyConnectionPolicy *self, TnyAccount *acco
 	g_assert (TNY_IS_CONNECTION_POLICY (self));
 	g_assert (TNY_IS_ACCOUNT (account));
 
-	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->on_disconnect_func != NULL);
+	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->on_disconnect!= NULL);
 #endif
 
-	TNY_CONNECTION_POLICY_GET_IFACE (self)->on_disconnect_func (self, account);
+	TNY_CONNECTION_POLICY_GET_IFACE (self)->on_disconnect(self, account);
 
 	return;
 }
@@ -135,10 +135,10 @@ tny_connection_policy_on_connection_broken (TnyConnectionPolicy *self, TnyAccoun
 	g_assert (TNY_IS_CONNECTION_POLICY (self));
 	g_assert (TNY_IS_ACCOUNT (account));
 
-	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connection_broken_func != NULL);
+	g_assert (TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connection_broken!= NULL);
 #endif
 
-	TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connection_broken_func (self, account);
+	TNY_CONNECTION_POLICY_GET_IFACE (self)->on_connection_broken(self, account);
 
 	return;
 }

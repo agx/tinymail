@@ -44,14 +44,14 @@ struct _TnyListIface
 {
 	GTypeInterface parent;
 
-	guint (*get_length_func) (TnyList *self);
-	void (*prepend_func) (TnyList *self, GObject* item);
-	void (*append_func) (TnyList *self, GObject* item);
-	void (*remove_func) (TnyList *self, GObject* item);
-	void (*foreach_func) (TnyList *self, GFunc func, gpointer user_data);
-	TnyList* (*copy_func) (TnyList *self);
-	TnyIterator* (*create_iterator_func) (TnyList *self);
-	void (*remove_matches_func) (TnyList *self, TnyListMatcher matcher, gpointer match_data);
+	guint (*get_length) (TnyList *self);
+	void (*prepend) (TnyList *self, GObject* item);
+	void (*append) (TnyList *self, GObject* item);
+	void (*remove) (TnyList *self, GObject* item);
+	void (*foreach) (TnyList *self, GFunc func, gpointer user_data);
+	TnyList* (*copy) (TnyList *self);
+	TnyIterator* (*create_iterator) (TnyList *self);
+	void (*remove_matches) (TnyList *self, TnyListMatcher matcher, gpointer match_data);
 };
 
 

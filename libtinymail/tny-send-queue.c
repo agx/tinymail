@@ -51,10 +51,10 @@ tny_send_queue_cancel (TnySendQueue *self, TnySendQueueCancelAction cancel_actio
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_SEND_QUEUE (self));
-	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func != NULL);
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->cancel!= NULL);
 #endif
 
-	TNY_SEND_QUEUE_GET_IFACE (self)->cancel_func (self, cancel_action, err);
+	TNY_SEND_QUEUE_GET_IFACE (self)->cancel(self, cancel_action, err);
 	return;
 }
 
@@ -76,10 +76,10 @@ tny_send_queue_get_sentbox (TnySendQueue *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_SEND_QUEUE (self));
-	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox_func != NULL);
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox!= NULL);
 #endif
 
-	retval = TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox_func (self);
+	retval = TNY_SEND_QUEUE_GET_IFACE (self)->get_sentbox(self);
 
 #ifdef DBC /* ensure */
 	g_assert (TNY_IS_FOLDER (retval));
@@ -112,10 +112,10 @@ tny_send_queue_get_outbox (TnySendQueue *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_SEND_QUEUE (self));
-	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox_func != NULL);
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox!= NULL);
 #endif
 
-	retval = TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox_func (self);
+	retval = TNY_SEND_QUEUE_GET_IFACE (self)->get_outbox(self);
 
 #ifdef DBC /* ensure */
 	g_assert (TNY_IS_FOLDER (retval));
@@ -142,10 +142,10 @@ tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
 	g_assert (TNY_IS_SEND_QUEUE (self));
 	g_assert (msg);
 	g_assert (TNY_IS_MSG (msg));
-	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->add_func != NULL);
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->add!= NULL);
 #endif
 
-	TNY_SEND_QUEUE_GET_IFACE (self)->add_func (self, msg, err);
+	TNY_SEND_QUEUE_GET_IFACE (self)->add(self, msg, err);
 	return;
 }
 
@@ -171,10 +171,10 @@ tny_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallba
 	g_assert (TNY_IS_SEND_QUEUE (self));
 	g_assert (msg);
 	g_assert (TNY_IS_MSG (msg));
-	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->add_async_func != NULL);
+	g_assert (TNY_SEND_QUEUE_GET_IFACE (self)->add_async!= NULL);
 #endif
 
-	TNY_SEND_QUEUE_GET_IFACE (self)->add_async_func (self, msg, callback, status_callback, user_data);
+	TNY_SEND_QUEUE_GET_IFACE (self)->add_async(self, msg, callback, status_callback, user_data);
 	return;
 }
 

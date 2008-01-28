@@ -48,10 +48,10 @@ tny_stream_write_to_stream (TnyStream *self, TnyStream *output)
 	g_assert (TNY_IS_STREAM (self));
 	g_assert (output);
 	g_assert (TNY_IS_STREAM (output));
-	g_assert (TNY_STREAM_GET_IFACE (self)->write_to_stream_func != NULL);
+	g_assert (TNY_STREAM_GET_IFACE (self)->write_to_stream!= NULL);
 #endif
 
-	return TNY_STREAM_GET_IFACE (self)->write_to_stream_func (self, output);
+	return TNY_STREAM_GET_IFACE (self)->write_to_stream(self, output);
 }
 
 /**
@@ -72,10 +72,10 @@ tny_stream_read  (TnyStream *self, char *buffer, gsize n)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_STREAM (self));
-	g_assert (TNY_STREAM_GET_IFACE (self)->read_func  != NULL);
+	g_assert (TNY_STREAM_GET_IFACE (self)->read != NULL);
 #endif
 
-	return TNY_STREAM_GET_IFACE (self)->read_func (self, buffer, n);
+	return TNY_STREAM_GET_IFACE (self)->read(self, buffer, n);
 }
 
 /**
@@ -96,10 +96,10 @@ tny_stream_write (TnyStream *self, const char *buffer, gsize n)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_STREAM (self));
-	g_assert (TNY_STREAM_GET_IFACE (self)->write_func  != NULL);
+	g_assert (TNY_STREAM_GET_IFACE (self)->write != NULL);
 #endif
 
-	return TNY_STREAM_GET_IFACE (self)->write_func (self, buffer, n);
+	return TNY_STREAM_GET_IFACE (self)->write(self, buffer, n);
 }
 
 
@@ -118,10 +118,10 @@ tny_stream_flush (TnyStream *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_STREAM (self));
-	g_assert (TNY_STREAM_GET_IFACE (self)->flush_func  != NULL);
+	g_assert (TNY_STREAM_GET_IFACE (self)->flush != NULL);
 #endif
 
-	return TNY_STREAM_GET_IFACE (self)->flush_func (self);
+	return TNY_STREAM_GET_IFACE (self)->flush(self);
 }
 
 /**
@@ -139,10 +139,10 @@ tny_stream_close (TnyStream *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_STREAM (self));
-	g_assert (TNY_STREAM_GET_IFACE (self)->close_func  != NULL);
+	g_assert (TNY_STREAM_GET_IFACE (self)->close != NULL);
 #endif
 
-	return TNY_STREAM_GET_IFACE (self)->close_func (self);
+	return TNY_STREAM_GET_IFACE (self)->close(self);
 }
 
 
@@ -161,10 +161,10 @@ tny_stream_is_eos   (TnyStream *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_STREAM (self));
-	g_assert (TNY_STREAM_GET_IFACE (self)->is_eos_func  != NULL);
+	g_assert (TNY_STREAM_GET_IFACE (self)->is_eos != NULL);
 #endif
 
-	return TNY_STREAM_GET_IFACE (self)->is_eos_func (self);
+	return TNY_STREAM_GET_IFACE (self)->is_eos(self);
 }
 
 /**
@@ -183,10 +183,10 @@ tny_stream_reset (TnyStream *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_STREAM (self));
-	g_assert (TNY_STREAM_GET_IFACE (self)->reset_func  != NULL);
+	g_assert (TNY_STREAM_GET_IFACE (self)->reset != NULL);
 #endif
 
-	return TNY_STREAM_GET_IFACE (self)->reset_func (self);
+	return TNY_STREAM_GET_IFACE (self)->reset(self);
 }
 
 static void

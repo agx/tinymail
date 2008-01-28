@@ -68,7 +68,7 @@ struct _TnyGpeAccountStorePriv
 
 
 static gchar* 
-per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
+per_account_get_pass(TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
 	TnyPlatformFactory *platfact = tny_gpe_platform_factory_get_instance ();
 	TnyPasswordGetter *pwdgetter;
@@ -84,7 +84,7 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 
 
 static void
-per_account_forget_pass_func (TnyAccount *account)
+per_account_forget_pass(TnyAccount *account)
 {
 	TnyPlatformFactory *platfact = tny_gpe_platform_factory_get_instance ();
 	TnyPasswordGetter *pwdgetter;
@@ -305,10 +305,10 @@ load_accounts (TnyAccountStore *self)
 			g_free (key);
 
 			tny_account_set_forget_pass_func (TNY_ACCOUNT (account),
-				per_account_forget_pass_func);
+				per_account_forget_pass);
 
 			tny_account_set_pass_func (TNY_ACCOUNT (account),
-				per_account_get_pass_func);
+				per_account_get_pass);
 
 			priv->accounts = g_list_prepend (priv->accounts, account);
 		}
@@ -593,11 +593,11 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 {
 	TnyAccountStoreIface *klass = (TnyAccountStoreIface *)g;
 
-	klass->get_accounts_func = tny_gpe_account_store_get_accounts;
-	klass->get_cache_dir_func = tny_gpe_account_store_get_cache_dir;
-	klass->get_device_func = tny_gpe_account_store_get_device;
-	klass->alert_func = tny_gpe_account_store_alert;
-	klass->find_account_func = tny_gpe_account_store_find_account;
+	klass->get_accounts= tny_gpe_account_store_get_accounts;
+	klass->get_cache_dir= tny_gpe_account_store_get_cache_dir;
+	klass->get_device= tny_gpe_account_store_get_device;
+	klass->alert= tny_gpe_account_store_alert;
+	klass->find_account= tny_gpe_account_store_find_account;
 
 	return;
 }

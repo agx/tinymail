@@ -41,14 +41,14 @@ struct _TnyIteratorIface
 {
 	GTypeInterface parent;
 
-	void (*next_func) (TnyIterator *self);
-	void (*prev_func) (TnyIterator *self);
-	void (*first_func) (TnyIterator *self);
-	void (*nth_func) (TnyIterator *self, guint nth);
-	GObject* (*get_current_func) (TnyIterator *self);
+	void (*next) (TnyIterator *self);
+	void (*prev) (TnyIterator *self);
+	void (*first) (TnyIterator *self);
+	void (*nth) (TnyIterator *self, guint nth);
+	GObject* (*get_current) (TnyIterator *self);
 
 	gboolean (*is_done) (TnyIterator *self);
-	TnyList* (*get_list_func) (TnyIterator *self);
+	TnyList* (*get_list) (TnyIterator *self);
 };
 
 GType tny_iterator_get_type (void);

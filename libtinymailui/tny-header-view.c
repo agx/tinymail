@@ -43,11 +43,11 @@ void
 tny_header_view_clear (TnyHeaderView *self)
 {
 #ifdef DEBUG
-	if (!TNY_HEADER_VIEW_GET_IFACE (self)->clear_func)
+	if (!TNY_HEADER_VIEW_GET_IFACE (self)->clear)
 		g_critical ("You must implement tny_header_view_clear\n");
 #endif
 
-	TNY_HEADER_VIEW_GET_IFACE (self)->clear_func (self);
+	TNY_HEADER_VIEW_GET_IFACE (self)->clear(self);
 	return;    
 }
 
@@ -70,11 +70,11 @@ void
 tny_header_view_set_header (TnyHeaderView *self, TnyHeader *header)
 {
 #ifdef DEBUG
-	if (!TNY_HEADER_VIEW_GET_IFACE (self)->set_header_func)
+	if (!TNY_HEADER_VIEW_GET_IFACE (self)->set_header)
 		g_critical ("You must implement tny_header_view_set_header\n");
 #endif
 
-	TNY_HEADER_VIEW_GET_IFACE (self)->set_header_func (self, header);
+	TNY_HEADER_VIEW_GET_IFACE (self)->set_header(self, header);
 	return;
 }
 

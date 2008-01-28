@@ -197,12 +197,12 @@ tny_gtk_folder_store_tree_model_iterator_get_list (TnyIterator *self)
 static void
 tny_iterator_init (TnyIteratorIface *klass)
 {
-	klass->next_func = tny_gtk_folder_store_tree_model_iterator_next;
-	klass->prev_func = tny_gtk_folder_store_tree_model_iterator_prev;
-	klass->first_func = tny_gtk_folder_store_tree_model_iterator_first;
-	klass->nth_func = tny_gtk_folder_store_tree_model_iterator_nth;
-	klass->get_current_func = tny_gtk_folder_store_tree_model_iterator_get_current;
-	klass->get_list_func = tny_gtk_folder_store_tree_model_iterator_get_list;
+	klass->next= tny_gtk_folder_store_tree_model_iterator_next;
+	klass->prev= tny_gtk_folder_store_tree_model_iterator_prev;
+	klass->first= tny_gtk_folder_store_tree_model_iterator_first;
+	klass->nth= tny_gtk_folder_store_tree_model_iterator_nth;
+	klass->get_current= tny_gtk_folder_store_tree_model_iterator_get_current;
+	klass->get_list= tny_gtk_folder_store_tree_model_iterator_get_list;
 	klass->is_done  = tny_gtk_folder_store_tree_model_iterator_is_done;
 	
 	return;

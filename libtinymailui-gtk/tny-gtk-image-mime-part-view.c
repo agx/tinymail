@@ -70,7 +70,7 @@ struct _TnyGtkImageMimePartViewPriv
 static TnyMimePart*
 tny_gtk_image_mime_part_view_get_part (TnyMimePartView *self)
 {
-	return TNY_GTK_IMAGE_MIME_PART_VIEW_GET_CLASS (self)->get_part_func (self);
+	return TNY_GTK_IMAGE_MIME_PART_VIEW_GET_CLASS (self)->get_part(self);
 }
 
 static TnyMimePart*
@@ -83,7 +83,7 @@ tny_gtk_image_mime_part_view_get_part_default (TnyMimePartView *self)
 static void 
 tny_gtk_image_mime_part_view_set_part (TnyMimePartView *self, TnyMimePart *part)
 {
-	TNY_GTK_IMAGE_MIME_PART_VIEW_GET_CLASS (self)->set_part_func (self, part);
+	TNY_GTK_IMAGE_MIME_PART_VIEW_GET_CLASS (self)->set_part(self, part);
 	return;
 }
 
@@ -133,7 +133,7 @@ tny_gtk_image_mime_part_view_set_part_default (TnyMimePartView *self, TnyMimePar
 static void
 tny_gtk_image_mime_part_view_clear (TnyMimePartView *self)
 {
-	TNY_GTK_IMAGE_MIME_PART_VIEW_GET_CLASS (self)->clear_func (self);
+	TNY_GTK_IMAGE_MIME_PART_VIEW_GET_CLASS (self)->clear(self);
 	return;
 }
 
@@ -202,9 +202,9 @@ tny_mime_part_view_init (gpointer g, gpointer iface_data)
 {
 	TnyMimePartViewIface *klass = (TnyMimePartViewIface *)g;
 
-	klass->get_part_func = tny_gtk_image_mime_part_view_get_part;
-	klass->set_part_func = tny_gtk_image_mime_part_view_set_part;
-	klass->clear_func = tny_gtk_image_mime_part_view_clear;
+	klass->get_part= tny_gtk_image_mime_part_view_get_part;
+	klass->set_part= tny_gtk_image_mime_part_view_set_part;
+	klass->clear= tny_gtk_image_mime_part_view_clear;
 
 	return;
 }
@@ -217,9 +217,9 @@ tny_gtk_image_mime_part_view_class_init (TnyGtkImageMimePartViewClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->get_part_func = tny_gtk_image_mime_part_view_get_part_default;
-	class->set_part_func = tny_gtk_image_mime_part_view_set_part_default;
-	class->clear_func = tny_gtk_image_mime_part_view_clear_default;
+	class->get_part= tny_gtk_image_mime_part_view_get_part_default;
+	class->set_part= tny_gtk_image_mime_part_view_set_part_default;
+	class->clear= tny_gtk_image_mime_part_view_clear_default;
 
 	object_class->finalize = tny_gtk_image_mime_part_view_finalize;
 

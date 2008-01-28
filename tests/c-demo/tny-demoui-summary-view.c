@@ -2024,7 +2024,7 @@ tny_account_store_view_init (gpointer g, gpointer iface_data)
 {
 	TnyAccountStoreViewIface *klass = (TnyAccountStoreViewIface *)g;
 
-	klass->set_account_store_func = tny_demoui_summary_view_set_account_store;
+	klass->set_account_store= tny_demoui_summary_view_set_account_store;
 
 	return;
 }

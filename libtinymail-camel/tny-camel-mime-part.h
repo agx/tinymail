@@ -49,31 +49,31 @@ struct _TnyCamelMimePartClass
 	GObjectClass parent;
 
 	/* virtual methods */
-	const gchar* (*get_content_type_func) (TnyMimePart *self);
-	gboolean (*content_type_is_func) (TnyMimePart *self, const gchar *content_type);
-	TnyStream* (*get_stream_func) (TnyMimePart *self);
-	gssize (*decode_to_stream_func) (TnyMimePart *self, TnyStream *stream, GError **err);
-	gssize (*write_to_stream_func) (TnyMimePart *self, TnyStream *stream, GError **err);
-	gint (*construct_func) (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding);
-	const gchar* (*get_filename_func) (TnyMimePart *self);
-	const gchar* (*get_content_id_func) (TnyMimePart *self);
-	const gchar* (*get_description_func) (TnyMimePart *self);
-	const gchar* (*get_content_location_func) (TnyMimePart *self);
-	gboolean (*is_purged_func) (TnyMimePart *self);
-	void (*set_content_location_func) (TnyMimePart *self, const gchar *content_location); 
-	void (*set_description_func) (TnyMimePart *self, const gchar *description); 
-	void (*set_content_id_func) (TnyMimePart *self, const gchar *content_id); 
-	void (*set_filename_func) (TnyMimePart *self, const gchar *filename);
-	void (*set_content_type_func) (TnyMimePart *self, const gchar *contenttype);
-	void (*set_purged_func) (TnyMimePart *self);
-	gboolean (*is_attachment_func) (TnyMimePart *self);
-	void (*get_parts_func) (TnyMimePart *self, TnyList *list);
-	void (*del_part_func) (TnyMimePart *self, TnyMimePart *part);
-	gint (*add_part_func) (TnyMimePart *self, TnyMimePart *part);
-	void (*get_header_pairs_func) (TnyMimePart *self, TnyList *list);
-	void (*set_header_pair_func) (TnyMimePart *self, const gchar *name, const gchar *value);
-	void (*decode_to_stream_async_func) (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
-	const gchar* (*get_transfer_encoding_func) (TnyMimePart *self);
+	const gchar* (*get_content_type) (TnyMimePart *self);
+	gboolean (*content_type_is) (TnyMimePart *self, const gchar *content_type);
+	TnyStream* (*get_stream) (TnyMimePart *self);
+	gssize (*decode_to_stream) (TnyMimePart *self, TnyStream *stream, GError **err);
+	gssize (*write_to_stream) (TnyMimePart *self, TnyStream *stream, GError **err);
+	gint (*construct) (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding);
+	const gchar* (*get_filename) (TnyMimePart *self);
+	const gchar* (*get_content_id) (TnyMimePart *self);
+	const gchar* (*get_description) (TnyMimePart *self);
+	const gchar* (*get_content_location) (TnyMimePart *self);
+	gboolean (*is_purged) (TnyMimePart *self);
+	void (*set_content_location) (TnyMimePart *self, const gchar *content_location); 
+	void (*set_description) (TnyMimePart *self, const gchar *description); 
+	void (*set_content_id) (TnyMimePart *self, const gchar *content_id); 
+	void (*set_filename) (TnyMimePart *self, const gchar *filename);
+	void (*set_content_type) (TnyMimePart *self, const gchar *contenttype);
+	void (*set_purged) (TnyMimePart *self);
+	gboolean (*is_attachment) (TnyMimePart *self);
+	void (*get_parts) (TnyMimePart *self, TnyList *list);
+	void (*del_part) (TnyMimePart *self, TnyMimePart *part);
+	gint (*add_part) (TnyMimePart *self, TnyMimePart *part);
+	void (*get_header_pairs) (TnyMimePart *self, TnyList *list);
+	void (*set_header_pair) (TnyMimePart *self, const gchar *name, const gchar *value);
+	void (*decode_to_stream_async) (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	const gchar* (*get_transfer_encoding) (TnyMimePart *self);
 };
 
 

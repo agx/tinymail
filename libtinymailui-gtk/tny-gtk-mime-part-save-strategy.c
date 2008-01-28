@@ -118,7 +118,7 @@ gtk_save_to_file (const gchar *local_filename, TnyMimePart *part, TnyMimePartSav
 static void
 tny_gtk_mime_part_save_strategy_perform_save (TnyMimePartSaveStrategy *self, TnyMimePart *part)
 {
-	TNY_GTK_MIME_PART_SAVE_STRATEGY_GET_CLASS (self)->perform_save_func (self, part);
+	TNY_GTK_MIME_PART_SAVE_STRATEGY_GET_CLASS (self)->perform_save(self, part);
 	return;
 }
 
@@ -239,7 +239,7 @@ tny_gtk_mime_part_save_strategy_init (gpointer g, gpointer iface_data)
 {
 	TnyMimePartSaveStrategyIface *klass = (TnyMimePartSaveStrategyIface *)g;
 
-	klass->perform_save_func = tny_gtk_mime_part_save_strategy_perform_save;
+	klass->perform_save= tny_gtk_mime_part_save_strategy_perform_save;
 
 	return;
 }
@@ -252,7 +252,7 @@ tny_gtk_mime_part_save_strategy_class_init (TnyGtkMimePartSaveStrategyClass *cla
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->perform_save_func = tny_gtk_mime_part_save_strategy_perform_save_default;
+	class->perform_save= tny_gtk_mime_part_save_strategy_perform_save_default;
 
 	object_class->finalize = tny_gtk_mime_part_save_strategy_finalize;
 

@@ -41,10 +41,10 @@ struct _TnyConnectionPolicyIface
 {
 	GTypeInterface parent;
 
-	void (*on_connect_func) (TnyConnectionPolicy *self, TnyAccount *account);
-	void (*on_connection_broken_func) (TnyConnectionPolicy *self, TnyAccount *account);
-	void (*on_disconnect_func) (TnyConnectionPolicy *self, TnyAccount *account);
-	void (*set_current_func) (TnyConnectionPolicy *self, TnyAccount *account, TnyFolder *folder);
+	void (*on_connect) (TnyConnectionPolicy *self, TnyAccount *account);
+	void (*on_connection_broken) (TnyConnectionPolicy *self, TnyAccount *account);
+	void (*on_disconnect) (TnyConnectionPolicy *self, TnyAccount *account);
+	void (*set_current) (TnyConnectionPolicy *self, TnyAccount *account, TnyFolder *folder);
 
 };
 

@@ -86,7 +86,7 @@ tny_moz_embed_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyM
 		gtk_widget_set_usize (GTK_WIDGET (retval), 
 			widget->allocation.width>11?widget->allocation.width-10:1, 2500);
 	} else
-		retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for_func (self, part);
+		retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for(self, part);
 
 	return retval;
 }
@@ -94,7 +94,7 @@ tny_moz_embed_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyM
 static TnyMimePartView*
 tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart *part)
 {
-	return TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for_func (self, part);
+	return TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_mime_part_view_for(self, part);
 }
 
 
@@ -102,7 +102,7 @@ tny_moz_embed_msg_view_create_mime_part_view_for (TnyMsgView *self, TnyMimePart 
 static TnyMsgView*
 tny_moz_embed_msg_view_create_new_inline_viewer (TnyMsgView *self)
 {
-	return TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_new_inline_viewer_func (self);
+	return TNY_MOZ_EMBED_MSG_VIEW_GET_CLASS (self)->create_new_inline_viewer(self);
 }
 
 /**
@@ -137,13 +137,13 @@ tny_moz_embed_msg_view_class_init (TnyMozEmbedMsgViewClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->create_mime_part_view_for_func = tny_moz_embed_msg_view_create_mime_part_view_for_default;
-	class->create_new_inline_viewer_func = tny_moz_embed_msg_view_create_new_inline_viewer_default;
+	class->create_mime_part_view_for= tny_moz_embed_msg_view_create_mime_part_view_for_default;
+	class->create_new_inline_viewer= tny_moz_embed_msg_view_create_new_inline_viewer_default;
 
 	object_class->finalize = tny_moz_embed_msg_view_finalize;
 
-	TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for_func = tny_moz_embed_msg_view_create_mime_part_view_for;
-	TNY_GTK_MSG_VIEW_CLASS (class)->create_new_inline_viewer_func = tny_moz_embed_msg_view_create_new_inline_viewer;
+	TNY_GTK_MSG_VIEW_CLASS (class)->create_mime_part_view_for= tny_moz_embed_msg_view_create_mime_part_view_for;
+	TNY_GTK_MSG_VIEW_CLASS (class)->create_new_inline_viewer= tny_moz_embed_msg_view_create_new_inline_viewer;
 
 	return;
 }

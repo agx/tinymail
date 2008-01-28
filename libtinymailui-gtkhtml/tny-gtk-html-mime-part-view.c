@@ -295,9 +295,9 @@ tny_mime_part_view_init (gpointer g, gpointer iface_data)
 {
 	TnyMimePartViewIface *klass = (TnyMimePartViewIface *)g;
 
-	klass->get_part_func = tny_gtk_html_mime_part_view_get_part;
-	klass->set_part_func = tny_gtk_html_mime_part_view_set_part;
-	klass->clear_func = tny_gtk_html_mime_part_view_clear;
+	klass->get_part= tny_gtk_html_mime_part_view_get_part;
+	klass->set_part= tny_gtk_html_mime_part_view_set_part;
+	klass->clear= tny_gtk_html_mime_part_view_clear;
 
 	return;
 }

@@ -40,8 +40,8 @@ struct _TnyHeaderViewIface
 {
 	GTypeInterface parent;
 
-	void (*set_header_func) (TnyHeaderView *self, TnyHeader *header);
-	void (*clear_func) (TnyHeaderView *self);   
+	void (*set_header) (TnyHeaderView *self, TnyHeader *header);
+	void (*clear) (TnyHeaderView *self);   
 };
 
 GType tny_header_view_get_type (void);

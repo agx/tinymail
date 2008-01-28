@@ -270,10 +270,10 @@ tny_device_init (gpointer g, gpointer iface_data)
 {
 	TnyDeviceIface *klass = (TnyDeviceIface *)g;
 
-	klass->is_online_func = tny_gnome_device_is_online;
-	klass->reset_func = tny_gnome_device_reset;
-	klass->force_offline_func = tny_gnome_device_force_offline;
-	klass->force_online_func = tny_gnome_device_force_online;
+	klass->is_online= tny_gnome_device_is_online;
+	klass->reset= tny_gnome_device_reset;
+	klass->force_offline= tny_gnome_device_force_offline;
+	klass->force_online= tny_gnome_device_force_online;
 
 	return;
 }

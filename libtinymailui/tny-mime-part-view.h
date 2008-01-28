@@ -39,9 +39,9 @@ struct _TnyMimePartViewIface
 {
 	GTypeInterface parent;
 
-	TnyMimePart* (*get_part_func) (TnyMimePartView *self);
-	void (*set_part_func) (TnyMimePartView *self, TnyMimePart *part);
-	void (*clear_func) (TnyMimePartView *self); 
+	TnyMimePart* (*get_part) (TnyMimePartView *self);
+	void (*set_part) (TnyMimePartView *self, TnyMimePart *part);
+	void (*clear) (TnyMimePartView *self); 
 };
 
 GType tny_mime_part_view_get_type (void);

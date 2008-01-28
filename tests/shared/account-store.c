@@ -48,7 +48,7 @@ static GObjectClass *parent_class = NULL;
 
 
 static gchar* 
-per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *cancel)
+per_account_get_pass(TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
 	if (strstr (tny_account_get_name (account), "SMTP"))
 		return g_strdup ("unittest");
@@ -57,7 +57,7 @@ per_account_get_pass_func (TnyAccount *account, const gchar *prompt, gboolean *c
 }
 
 static void
-per_account_forget_pass_func (TnyAccount *account)
+per_account_forget_pass(TnyAccount *account)
 {
 	g_print ("Invalid test account (password incorrect)\n");
 	return;
@@ -122,8 +122,8 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 		tny_account_set_user (account, "tnytest");
 		tny_account_set_hostname (account, "imap1.tinymail.org");
 		tny_account_set_id (account, "tnytest@imap1.tinymail.org");
-		tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
-		tny_account_set_pass_func (account, per_account_get_pass_func);
+		tny_account_set_forget_pass_func (account, per_account_forget_pass);
+		tny_account_set_pass_func (account, per_account_get_pass);
 
 		tny_list_prepend (list, (GObject*)account);
 		g_object_unref (G_OBJECT (account));
@@ -142,8 +142,8 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 		tny_account_set_id (account, "unique_smtp");
 		tny_account_set_url_string (account, "smtp://tinymailunittest;auth=PLAIN@mail.tinymail.org:2222/;use_ssl=wrapped");
 
-		tny_account_set_forget_pass_func (account, per_account_forget_pass_func);
-		tny_account_set_pass_func (account, per_account_get_pass_func);
+		tny_account_set_forget_pass_func (account, per_account_forget_pass);
+		tny_account_set_pass_func (account, per_account_get_pass);
 
 		tny_list_prepend (list, (GObject*)account);
 		g_object_unref (G_OBJECT (account));
@@ -237,10 +237,10 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 {
 	TnyAccountStoreIface *klass = (TnyAccountStoreIface *)g;
 
-	klass->get_accounts_func = tny_test_account_store_get_accounts;
-	klass->get_cache_dir_func = tny_test_account_store_get_cache_dir;
-	klass->alert_func = tny_test_account_store_alert;
-	klass->get_device_func = tny_test_account_store_get_device;
+	klass->get_accounts= tny_test_account_store_get_accounts;
+	klass->get_cache_dir= tny_test_account_store_get_cache_dir;
+	klass->alert= tny_test_account_store_alert;
+	klass->get_device= tny_test_account_store_get_device;
     
 	return;
 }

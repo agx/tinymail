@@ -49,7 +49,7 @@ struct _TnyGtkMimePartSaveStrategyClass
 	GObjectClass parent_class;
 
 	/* virtual methods */
-	void (*perform_save_func) (TnyMimePartSaveStrategy *self, TnyMimePart *part);
+	void (*perform_save) (TnyMimePartSaveStrategy *self, TnyMimePart *part);
 };
 
 GType tny_gtk_mime_part_save_strategy_get_type (void);

@@ -42,8 +42,8 @@ struct _TnyPasswordGetterIface
 {
 	GTypeInterface parent;
 
-	const gchar* (*get_password_func) (TnyPasswordGetter *self, const gchar *aid, const gchar *prompt, gboolean *cancel);
-	void (*forget_password_func) (TnyPasswordGetter *self, const gchar *aid);
+	const gchar* (*get_password) (TnyPasswordGetter *self, const gchar *aid, const gchar *prompt, gboolean *cancel);
+	void (*forget_password) (TnyPasswordGetter *self, const gchar *aid);
 
 };
 

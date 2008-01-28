@@ -61,10 +61,10 @@ tny_folder_store_add_observer (TnyFolderStore *self, TnyFolderStoreObserver *obs
 	g_assert (TNY_IS_FOLDER_STORE (self));
 	g_assert (observer);
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
-	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->add_observer_func != NULL);
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->add_observer!= NULL);
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->add_observer_func (self, observer);
+	TNY_FOLDER_STORE_GET_IFACE (self)->add_observer(self, observer);
 
 #ifdef DBC /* ensure */
 	/* TNY TODO: Check whether it's really added */
@@ -94,10 +94,10 @@ tny_folder_store_remove_observer (TnyFolderStore *self, TnyFolderStoreObserver *
 	g_assert (TNY_IS_FOLDER_STORE (self));
 	g_assert (observer);
 	g_assert (TNY_IS_FOLDER_STORE_OBSERVER (observer));
-	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->remove_observer_func != NULL);
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->remove_observer!= NULL);
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->remove_observer_func (self, observer);
+	TNY_FOLDER_STORE_GET_IFACE (self)->remove_observer(self, observer);
 
 #ifdef DBC /* ensure */
 	/* TNY TODO: Check whether it's really removed */
@@ -149,10 +149,10 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
 	g_assert (TNY_IS_FOLDER_STORE (self));
 	g_assert (folder);
 	g_assert (TNY_IS_FOLDER (folder));
-	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder_func != NULL);
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder!= NULL);
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder_func (self, folder, err);
+	TNY_FOLDER_STORE_GET_IFACE (self)->remove_folder(self, folder, err);
 
 #ifdef DBC /* ensure */
 	/* Checking this is something for a unit test */
@@ -192,10 +192,10 @@ tny_folder_store_create_folder (TnyFolderStore *self, const gchar *name, GError 
 	g_assert (TNY_IS_FOLDER_STORE (self));
 	g_assert (name);
 	g_assert (strlen (name) > 0);
-	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_func != NULL);
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->create_folder!= NULL);
 #endif
 
-	retval = TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_func (self, name, err);
+	retval = TNY_FOLDER_STORE_GET_IFACE (self)->create_folder(self, name, err);
 
 #ifdef DBC /* ensure */
 	if (retval)
@@ -248,10 +248,10 @@ tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, T
 	g_assert (TNY_IS_FOLDER_STORE (self));
 	g_assert (name);
 	g_assert (strlen (name) > 0);
-	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_async_func != NULL);
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_async!= NULL);
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_async_func (self, name, callback, status_callback, user_data);
+	TNY_FOLDER_STORE_GET_IFACE (self)->create_folder_async(self, name, callback, status_callback, user_data);
 
 #ifdef DBC /* ensure */
 #endif
@@ -301,10 +301,10 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
 	g_assert (TNY_IS_LIST (list));
 	if (query)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
-	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_func != NULL);
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->get_folders!= NULL);
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_func (self, list, query, err);
+	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders(self, list, query, err);
 
 #ifdef DBC /* ensure */
 #endif
@@ -390,10 +390,10 @@ tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFold
 	g_assert (TNY_IS_LIST (list));
 	if (query)
 		g_assert (TNY_IS_FOLDER_STORE_QUERY (query));
-	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async_func != NULL);
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async!= NULL);
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async_func (self, list, query, callback, status_callback, user_data);
+	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async(self, list, query, callback, status_callback, user_data);
 
 #ifdef DBC /* ensure */
 #endif

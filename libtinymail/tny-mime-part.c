@@ -67,10 +67,10 @@ tny_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (name);
 	g_assert (strlen (name) > 0);
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_header_pair_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_header_pair!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->set_header_pair_func (self, name, value);
+	TNY_MIME_PART_GET_IFACE (self)->set_header_pair(self, name, value);
 	return;
 }
 
@@ -109,10 +109,10 @@ tny_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list)
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (list);
 	g_assert (TNY_IS_LIST (list));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_header_pairs_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_header_pairs!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->get_header_pairs_func (self, list);
+	TNY_MIME_PART_GET_IFACE (self)->get_header_pairs(self, list);
 	return;
 }
 
@@ -150,10 +150,10 @@ tny_mime_part_get_parts (TnyMimePart *self, TnyList *list)
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (list);
 	g_assert (TNY_IS_LIST (list));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_parts_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_parts!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->get_parts_func (self, list);
+	TNY_MIME_PART_GET_IFACE (self)->get_parts(self, list);
 	return;
 }
 
@@ -187,10 +187,10 @@ tny_mime_part_add_part (TnyMimePart *self, TnyMimePart *part)
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (part);
 	g_assert (TNY_IS_MIME_PART (part));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->add_part_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->add_part!= NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->add_part_func (self, part);
+	return TNY_MIME_PART_GET_IFACE (self)->add_part(self, part);
 }
 
 /**
@@ -215,10 +215,10 @@ tny_mime_part_del_part (TnyMimePart *self, TnyMimePart *part)
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (part);
 	g_assert (TNY_IS_MIME_PART (part));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->del_part_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->del_part!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->del_part_func (self, part);
+	TNY_MIME_PART_GET_IFACE (self)->del_part(self, part);
 	return;
 }
 
@@ -267,9 +267,9 @@ tny_mime_part_is_attachment (TnyMimePart *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->is_attachment_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->is_attachment!= NULL);
 #endif
-	return TNY_MIME_PART_GET_IFACE (self)->is_attachment_func (self);
+	return TNY_MIME_PART_GET_IFACE (self)->is_attachment(self);
 }
 
 
@@ -292,10 +292,10 @@ tny_mime_part_set_content_location (TnyMimePart *self, const gchar *content_loca
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_content_location_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_content_location!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->set_content_location_func (self, content_location);
+	TNY_MIME_PART_GET_IFACE (self)->set_content_location(self, content_location);
 	return;
 }
 
@@ -318,10 +318,10 @@ tny_mime_part_set_description (TnyMimePart *self, const gchar *description)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_description_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_description!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->set_description_func (self, description);
+	TNY_MIME_PART_GET_IFACE (self)->set_description(self, description);
 	return;
 }
 
@@ -344,10 +344,10 @@ tny_mime_part_set_content_id (TnyMimePart *self, const gchar *content_id)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_content_id_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_content_id!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->set_content_id_func (self, content_id);
+	TNY_MIME_PART_GET_IFACE (self)->set_content_id(self, content_id);
 	return;
 }
 
@@ -378,10 +378,10 @@ tny_mime_part_set_purged (TnyMimePart *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_purged_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_purged!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->set_purged_func (self);
+	TNY_MIME_PART_GET_IFACE (self)->set_purged(self);
 	return;
 }
 
@@ -404,10 +404,10 @@ tny_mime_part_set_filename (TnyMimePart *self, const gchar *filename)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_filename_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_filename!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->set_filename_func (self, filename);
+	TNY_MIME_PART_GET_IFACE (self)->set_filename(self, filename);
 	return;
 }
 
@@ -431,10 +431,10 @@ tny_mime_part_set_content_type (TnyMimePart *self, const gchar *contenttype)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_content_type_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_content_type!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->set_content_type_func (self, contenttype);
+	TNY_MIME_PART_GET_IFACE (self)->set_content_type(self, contenttype);
 	return;
 }
 
@@ -457,10 +457,10 @@ tny_mime_part_get_filename (TnyMimePart *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_filename_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_filename!= NULL);
 #endif
 
-	retval = TNY_MIME_PART_GET_IFACE (self)->get_filename_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_filename(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval == NULL || strlen (retval) > 0);
@@ -486,10 +486,10 @@ tny_mime_part_get_content_id (TnyMimePart *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_content_id_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_content_id!= NULL);
 #endif
 
-	retval = TNY_MIME_PART_GET_IFACE (self)->get_content_id_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_content_id(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval == NULL || strlen (retval) > 0);
@@ -515,10 +515,10 @@ tny_mime_part_is_purged (TnyMimePart *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->is_purged_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->is_purged!= NULL);
 #endif
 
-	retval = TNY_MIME_PART_GET_IFACE (self)->is_purged_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->is_purged(self);
 
 	return retval;
 }
@@ -540,10 +540,10 @@ tny_mime_part_get_description (TnyMimePart *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_description_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_description!= NULL);
 #endif
 
-	retval = TNY_MIME_PART_GET_IFACE (self)->get_description_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_description(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval == NULL || strlen (retval) > 0);
@@ -569,10 +569,10 @@ tny_mime_part_get_content_location (TnyMimePart *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_content_location_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_content_location!= NULL);
 #endif
 
-	retval = TNY_MIME_PART_GET_IFACE (self)->get_content_location_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_content_location(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval == NULL || strlen (retval) > 0);
@@ -629,10 +629,10 @@ tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream, GError **er
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (stream);
 	g_assert (TNY_IS_STREAM (stream));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->write_to_stream_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->write_to_stream!= NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->write_to_stream_func (self, stream, err);
+	return TNY_MIME_PART_GET_IFACE (self)->write_to_stream(self, stream, err);
 }
 
 
@@ -685,10 +685,10 @@ tny_mime_part_decode_to_stream (TnyMimePart *self, TnyStream *stream, GError **e
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (stream);
 	g_assert (TNY_IS_STREAM (stream));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->decode_to_stream!= NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_func (self, stream, err);
+	return TNY_MIME_PART_GET_IFACE (self)->decode_to_stream(self, stream, err);
 }
 
 
@@ -735,10 +735,10 @@ tny_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyM
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (stream);
 	g_assert (TNY_IS_STREAM (stream));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_async_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_async!= NULL);
 #endif
 
-	TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_async_func (self, stream, callback, status_callback, user_data);
+	TNY_MIME_PART_GET_IFACE (self)->decode_to_stream_async(self, stream, callback, status_callback, user_data);
 	return;
 }
 
@@ -778,10 +778,10 @@ tny_mime_part_construct (TnyMimePart *self, TnyStream *stream, const gchar *mime
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (TNY_IS_STREAM (stream));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->construct_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->construct!= NULL);
 #endif
 
-	retval = TNY_MIME_PART_GET_IFACE (self)->construct_func (self, stream, mime_type, transfer_encoding);
+	retval = TNY_MIME_PART_GET_IFACE (self)->construct(self, stream, mime_type, transfer_encoding);
 
 #ifdef DBC /* ensure */
 	g_assert (retval == 0 || retval == -1);
@@ -806,10 +806,10 @@ tny_mime_part_get_transfer_encoding (TnyMimePart *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_transfer_encoding_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_transfer_encoding!= NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->get_transfer_encoding_func (self);
+	return TNY_MIME_PART_GET_IFACE (self)->get_transfer_encoding(self);
 }
 
 
@@ -831,10 +831,10 @@ tny_mime_part_get_stream (TnyMimePart *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_stream_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_stream!= NULL);
 #endif
 
-	retval = TNY_MIME_PART_GET_IFACE (self)->get_stream_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_stream(self);
 
 #ifdef DBC /* ensure */
 	g_assert (TNY_IS_STREAM (retval));
@@ -861,10 +861,10 @@ tny_mime_part_get_content_type (TnyMimePart *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_content_type_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_content_type!= NULL);
 #endif
 
-	retval = TNY_MIME_PART_GET_IFACE (self)->get_content_type_func (self);
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_content_type(self);
 
 #ifdef DBC /* ensure */
 	g_assert (retval == NULL || strlen (retval) > 0);
@@ -912,10 +912,10 @@ tny_mime_part_content_type_is (TnyMimePart *self, const gchar *type)
 #ifdef DBC /* require */
 	g_assert (TNY_IS_MIME_PART (self));
 	g_assert (type && strlen (type) > 0);
-	g_assert (TNY_MIME_PART_GET_IFACE (self)->content_type_is_func != NULL);
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->content_type_is!= NULL);
 #endif
 
-	return TNY_MIME_PART_GET_IFACE (self)->content_type_is_func (self, type);
+	return TNY_MIME_PART_GET_IFACE (self)->content_type_is(self, type);
 }
 
 

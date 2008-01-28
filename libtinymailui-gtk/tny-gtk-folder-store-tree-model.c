@@ -1090,25 +1090,25 @@ tny_gtk_folder_store_tree_model_store_obsr_update (TnyFolderStoreObserver *self,
 static void
 tny_folder_store_observer_init (TnyFolderStoreObserverIface *klass)
 {
-	klass->update_func = tny_gtk_folder_store_tree_model_store_obsr_update;
+	klass->update= tny_gtk_folder_store_tree_model_store_obsr_update;
 }
 
 static void
 tny_folder_observer_init (TnyFolderObserverIface *klass)
 {
-	klass->update_func = tny_gtk_folder_store_tree_model_folder_obsr_update;
+	klass->update= tny_gtk_folder_store_tree_model_folder_obsr_update;
 }
 
 static void
 tny_list_init (TnyListIface *klass)
 {
-	klass->get_length_func = tny_gtk_folder_store_tree_model_get_length;
-	klass->prepend_func = tny_gtk_folder_store_tree_model_prepend_i;
-	klass->append_func = tny_gtk_folder_store_tree_model_append_i;
-	klass->remove_func = tny_gtk_folder_store_tree_model_remove;
-	klass->create_iterator_func = tny_gtk_folder_store_tree_model_create_iterator;
-	klass->copy_func = tny_gtk_folder_store_tree_model_copy_the_list;
-	klass->foreach_func = tny_gtk_folder_store_tree_model_foreach_in_the_list;
+	klass->get_length= tny_gtk_folder_store_tree_model_get_length;
+	klass->prepend= tny_gtk_folder_store_tree_model_prepend_i;
+	klass->append= tny_gtk_folder_store_tree_model_append_i;
+	klass->remove= tny_gtk_folder_store_tree_model_remove;
+	klass->create_iterator= tny_gtk_folder_store_tree_model_create_iterator;
+	klass->copy= tny_gtk_folder_store_tree_model_copy_the_list;
+	klass->foreach= tny_gtk_folder_store_tree_model_foreach_in_the_list;
 
 	return;
 }

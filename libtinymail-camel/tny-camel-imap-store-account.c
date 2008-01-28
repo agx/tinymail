@@ -141,7 +141,7 @@ tny_camel_imap_store_account_class_init (TnyCamelIMAPStoreAccountClass *class)
 	object_class = (GObjectClass*) class;
 
 	/* Protected override */
-	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->factor_folder_func = tny_camel_imap_store_account_factor_folder;
+	TNY_CAMEL_STORE_ACCOUNT_CLASS (class)->factor_folder= tny_camel_imap_store_account_factor_folder;
 
 	object_class->finalize = tny_camel_imap_store_account_finalize;
 

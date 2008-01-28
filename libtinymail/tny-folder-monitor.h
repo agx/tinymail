@@ -48,12 +48,12 @@ struct _TnyFolderMonitorClass
 	GObjectClass parent;
 
 	/* virtuals */
-	void (*update_func) (TnyFolderObserver *self, TnyFolderChange *change);
-	void (*poke_status_func) (TnyFolderMonitor *self);
-	void (*add_list_func) (TnyFolderMonitor *self, TnyList *list);
-	void (*remove_list_func) (TnyFolderMonitor *self, TnyList *list);
-	void (*stop_func) (TnyFolderMonitor *self);
-	void (*start_func) (TnyFolderMonitor *self);
+	void (*update) (TnyFolderObserver *self, TnyFolderChange *change);
+	void (*poke_status) (TnyFolderMonitor *self);
+	void (*add_list) (TnyFolderMonitor *self, TnyList *list);
+	void (*remove_list) (TnyFolderMonitor *self, TnyList *list);
+	void (*stop) (TnyFolderMonitor *self);
+	void (*start) (TnyFolderMonitor *self);
 
 };
 

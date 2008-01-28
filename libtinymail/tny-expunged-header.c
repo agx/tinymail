@@ -159,27 +159,27 @@ tny_expunged_header_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_header_init (TnyHeaderIface *klass)
 {
-	klass->get_uid_func = tny_expunged_header_get_uid;
-	klass->get_bcc_func = tny_expunged_header_get_bcc;
-	klass->get_cc_func = tny_expunged_header_get_cc;
-	klass->get_subject_func = tny_expunged_header_get_subject;
-	klass->get_to_func = tny_expunged_header_get_to;
-	klass->get_from_func = tny_expunged_header_get_from;
-	klass->get_replyto_func = tny_expunged_header_get_replyto;
-	klass->get_message_id_func = tny_expunged_header_get_message_id;
-	klass->get_message_size_func = tny_expunged_header_get_message_size;
-	klass->get_date_received_func = tny_expunged_header_get_date_received;
-	klass->get_date_sent_func = tny_expunged_header_get_date_sent;
-	klass->set_bcc_func = tny_expunged_header_set_bcc;
-	klass->set_cc_func = tny_expunged_header_set_cc;
-	klass->set_from_func = tny_expunged_header_set_from;
-	klass->set_subject_func = tny_expunged_header_set_subject;
-	klass->set_to_func = tny_expunged_header_set_to;
-	klass->set_replyto_func = tny_expunged_header_set_replyto;
-	klass->get_folder_func = tny_expunged_header_get_folder;
-	klass->get_flags_func = tny_expunged_header_get_flags;
-	klass->set_flag_func = tny_expunged_header_set_flag;
-	klass->unset_flag_func = tny_expunged_header_unset_flag;
+	klass->get_uid= tny_expunged_header_get_uid;
+	klass->get_bcc= tny_expunged_header_get_bcc;
+	klass->get_cc= tny_expunged_header_get_cc;
+	klass->get_subject= tny_expunged_header_get_subject;
+	klass->get_to= tny_expunged_header_get_to;
+	klass->get_from= tny_expunged_header_get_from;
+	klass->get_replyto= tny_expunged_header_get_replyto;
+	klass->get_message_id= tny_expunged_header_get_message_id;
+	klass->get_message_size= tny_expunged_header_get_message_size;
+	klass->get_date_received= tny_expunged_header_get_date_received;
+	klass->get_date_sent= tny_expunged_header_get_date_sent;
+	klass->set_bcc= tny_expunged_header_set_bcc;
+	klass->set_cc= tny_expunged_header_set_cc;
+	klass->set_from= tny_expunged_header_set_from;
+	klass->set_subject= tny_expunged_header_set_subject;
+	klass->set_to= tny_expunged_header_set_to;
+	klass->set_replyto= tny_expunged_header_set_replyto;
+	klass->get_folder= tny_expunged_header_get_folder;
+	klass->get_flags= tny_expunged_header_get_flags;
+	klass->set_flag= tny_expunged_header_set_flag;
+	klass->unset_flag= tny_expunged_header_unset_flag;
 }
 
 static void

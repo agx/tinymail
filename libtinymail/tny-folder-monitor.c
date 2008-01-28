@@ -67,7 +67,7 @@ struct _TnyFolderMonitorPriv
 void 
 tny_folder_monitor_add_list (TnyFolderMonitor *self, TnyList *list)
 {
-	TNY_FOLDER_MONITOR_GET_CLASS (self)->add_list_func (self, list);
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->add_list(self, list);
 	return;
 }
 
@@ -99,7 +99,7 @@ tny_folder_monitor_add_list_default (TnyFolderMonitor *self, TnyList *list)
 void 
 tny_folder_monitor_remove_list (TnyFolderMonitor *self, TnyList *list)
 {
-	TNY_FOLDER_MONITOR_GET_CLASS (self)->remove_list_func (self, list);
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->remove_list(self, list);
 	return;
 }
 
@@ -130,7 +130,7 @@ tny_folder_monitor_remove_list_default (TnyFolderMonitor *self, TnyList *list)
 void 
 tny_folder_monitor_poke_status (TnyFolderMonitor *self)
 {
-	TNY_FOLDER_MONITOR_GET_CLASS (self)->poke_status_func (self);
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->poke_status(self);
 	return;
 }
 
@@ -149,7 +149,7 @@ tny_folder_monitor_poke_status_default (TnyFolderMonitor *self)
 static void
 tny_folder_monitor_update (TnyFolderObserver *self, TnyFolderChange *change)
 {
-	TNY_FOLDER_MONITOR_GET_CLASS (self)->update_func (self, change);
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->update(self, change);
 	return;
 }
 
@@ -308,7 +308,7 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 void 
 tny_folder_monitor_stop (TnyFolderMonitor *self)
 {
-	TNY_FOLDER_MONITOR_GET_CLASS (self)->stop_func (self);
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->stop(self);
 	return;
 }
 
@@ -334,7 +334,7 @@ tny_folder_monitor_stop_default (TnyFolderMonitor *self)
 void 
 tny_folder_monitor_start (TnyFolderMonitor *self)
 {
-	TNY_FOLDER_MONITOR_GET_CLASS (self)->start_func (self);
+	TNY_FOLDER_MONITOR_GET_CLASS (self)->start(self);
 	return;
 }
 
@@ -405,7 +405,7 @@ tny_folder_monitor_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_folder_observer_init (TnyFolderObserverIface *klass)
 {
-	klass->update_func = tny_folder_monitor_update;
+	klass->update= tny_folder_monitor_update;
 }
 
 static void
@@ -416,12 +416,12 @@ tny_folder_monitor_class_init (TnyFolderMonitorClass *klass)
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 
-	klass->update_func = tny_folder_monitor_update_default;
-	klass->poke_status_func = tny_folder_monitor_poke_status_default;
-	klass->add_list_func = tny_folder_monitor_add_list_default;
-	klass->remove_list_func = tny_folder_monitor_remove_list_default;
-	klass->stop_func = tny_folder_monitor_stop_default;
-	klass->start_func = tny_folder_monitor_start_default;
+	klass->update= tny_folder_monitor_update_default;
+	klass->poke_status= tny_folder_monitor_poke_status_default;
+	klass->add_list= tny_folder_monitor_add_list_default;
+	klass->remove_list= tny_folder_monitor_remove_list_default;
+	klass->stop= tny_folder_monitor_stop_default;
+	klass->start= tny_folder_monitor_start_default;
 
 	object_class->finalize = tny_folder_monitor_finalize;
 	g_type_class_add_private (object_class, sizeof (TnyFolderMonitorPriv));

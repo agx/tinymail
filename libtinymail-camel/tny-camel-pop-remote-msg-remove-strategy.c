@@ -69,7 +69,7 @@ static GObjectClass *parent_class = NULL;
 static void
 tny_camel_pop_remote_msg_remove_strategy_perform_remove (TnyMsgRemoveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)
 {
-	TNY_CAMEL_POP_REMOTE_MSG_REMOVE_STRATEGY_GET_CLASS (self)->perform_remove_func (self, folder, header, err);
+	TNY_CAMEL_POP_REMOTE_MSG_REMOVE_STRATEGY_GET_CLASS (self)->perform_remove(self, folder, header, err);
 	return;
 }
 
@@ -153,7 +153,7 @@ tny_camel_pop_remote_msg_remove_strategy_init (gpointer g, gpointer iface_data)
 {
 	TnyMsgRemoveStrategyIface *klass = (TnyMsgRemoveStrategyIface *)g;
 
-	klass->perform_remove_func = tny_camel_pop_remote_msg_remove_strategy_perform_remove;
+	klass->perform_remove= tny_camel_pop_remote_msg_remove_strategy_perform_remove;
 
 	return;
 }
@@ -166,7 +166,7 @@ tny_camel_pop_remote_msg_remove_strategy_class_init (TnyCamelPopRemoteMsgRemoveS
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 
-	class->perform_remove_func = tny_camel_pop_remote_msg_remove_strategy_perform_remove_default;
+	class->perform_remove= tny_camel_pop_remote_msg_remove_strategy_perform_remove_default;
 
 	object_class->finalize = tny_camel_pop_remote_msg_remove_strategy_finalize;
 

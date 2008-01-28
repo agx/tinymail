@@ -77,27 +77,27 @@ struct _TnyHeaderIface
 {
 	GTypeInterface g;
 
-	const gchar* (*get_uid_func) (TnyHeader *self);
-	const gchar* (*get_bcc_func) (TnyHeader *self);
-	const gchar* (*get_cc_func) (TnyHeader *self);
-	const gchar* (*get_subject_func) (TnyHeader *self);
-	const gchar* (*get_to_func) (TnyHeader *self);
-	const gchar* (*get_from_func) (TnyHeader *self);
-	const gchar* (*get_replyto_func) (TnyHeader *self);
-	const gchar* (*get_message_id_func) (TnyHeader *self);
-	guint (*get_message_size_func) (TnyHeader *self);
-	time_t (*get_date_received_func) (TnyHeader *self);
-	time_t (*get_date_sent_func) (TnyHeader *self);
-	void (*set_bcc_func) (TnyHeader *self, const gchar *bcc);
-	void (*set_cc_func) (TnyHeader *self, const gchar *cc);
-	void (*set_from_func) (TnyHeader *self, const gchar *from);
-	void (*set_subject_func) (TnyHeader *self, const gchar *subject);
-	void (*set_to_func) (TnyHeader *self, const gchar *to);
-	void (*set_replyto_func) (TnyHeader *self, const gchar *to);
-	TnyFolder* (*get_folder_func) (TnyHeader *self);
-	TnyHeaderFlags (*get_flags_func) (TnyHeader *self);
-	void (*set_flag_func) (TnyHeader *self, TnyHeaderFlags mask);
-	void (*unset_flag_func) (TnyHeader *self, TnyHeaderFlags mask);
+	const gchar* (*get_uid) (TnyHeader *self);
+	const gchar* (*get_bcc) (TnyHeader *self);
+	const gchar* (*get_cc) (TnyHeader *self);
+	const gchar* (*get_subject) (TnyHeader *self);
+	const gchar* (*get_to) (TnyHeader *self);
+	const gchar* (*get_from) (TnyHeader *self);
+	const gchar* (*get_replyto) (TnyHeader *self);
+	const gchar* (*get_message_id) (TnyHeader *self);
+	guint (*get_message_size) (TnyHeader *self);
+	time_t (*get_date_received) (TnyHeader *self);
+	time_t (*get_date_sent) (TnyHeader *self);
+	void (*set_bcc) (TnyHeader *self, const gchar *bcc);
+	void (*set_cc) (TnyHeader *self, const gchar *cc);
+	void (*set_from) (TnyHeader *self, const gchar *from);
+	void (*set_subject) (TnyHeader *self, const gchar *subject);
+	void (*set_to) (TnyHeader *self, const gchar *to);
+	void (*set_replyto) (TnyHeader *self, const gchar *to);
+	TnyFolder* (*get_folder) (TnyHeader *self);
+	TnyHeaderFlags (*get_flags) (TnyHeader *self);
+	void (*set_flag) (TnyHeader *self, TnyHeaderFlags mask);
+	void (*unset_flag) (TnyHeader *self, TnyHeaderFlags mask);
 };
 
 GType tny_header_get_type (void);

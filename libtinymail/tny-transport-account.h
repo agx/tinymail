@@ -42,7 +42,7 @@ struct _TnyTransportAccountIface
 {
 	GTypeInterface parent;
 
-	void (*send_func) (TnyTransportAccount *self, TnyMsg *msg, GError **err);
+	void (*send) (TnyTransportAccount *self, TnyMsg *msg, GError **err);
 };
 
 GType tny_transport_account_get_type (void);

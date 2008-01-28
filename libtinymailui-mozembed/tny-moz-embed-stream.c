@@ -303,13 +303,13 @@ tny_stream_init (gpointer g, gpointer iface_data)
 {
 	TnyStreamIface *klass = (TnyStreamIface *)g;
 
-	klass->read_func = tny_moz_embed_stream_read;
-	klass->write_func = tny_moz_embed_stream_write;
-	klass->flush_func = tny_moz_embed_stream_flush;
-	klass->close_func = tny_moz_embed_stream_close;
-	klass->is_eos_func = tny_moz_embed_stream_is_eos;
-	klass->reset_func = tny_moz_embed_stream_reset;
-	klass->write_to_stream_func = tny_moz_embed_write_to_stream;
+	klass->read= tny_moz_embed_stream_read;
+	klass->write= tny_moz_embed_stream_write;
+	klass->flush= tny_moz_embed_stream_flush;
+	klass->close= tny_moz_embed_stream_close;
+	klass->is_eos= tny_moz_embed_stream_is_eos;
+	klass->reset= tny_moz_embed_stream_reset;
+	klass->write_to_stream= tny_moz_embed_write_to_stream;
 
 	return;
 }

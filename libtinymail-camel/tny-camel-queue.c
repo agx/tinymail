@@ -158,7 +158,7 @@ perform_cancel_destroyer (gpointer user_data)
 }
 
 static gpointer 
-thread_main_func (gpointer user_data)
+tny_camel_queue_thread_main_func (gpointer user_data)
 {
 	TnyCamelQueue *queue = user_data;
 
@@ -400,7 +400,7 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 		queue->stopped = FALSE;
 		g_object_ref (queue);
 		g_object_ref (queue->account);
-		queue->thread = g_thread_create (thread_main_func, 
+		queue->thread = g_thread_create (tny_camel_queue_thread_main_func, 
 			queue, FALSE, &err);
 		if (err) {
 			queue->stopped = TRUE;

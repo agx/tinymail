@@ -50,11 +50,11 @@ struct _TnyDeviceIface
 {
 	GTypeInterface parent;
 
-	gboolean (*is_online_func) (TnyDevice *self);
+	gboolean (*is_online) (TnyDevice *self);
 
-	void (*force_online_func) (TnyDevice *self);
-	void (*force_offline_func) (TnyDevice *self);
-	void (*reset_func) (TnyDevice *self);
+	void (*force_online) (TnyDevice *self);
+	void (*force_offline) (TnyDevice *self);
+	void (*reset) (TnyDevice *self);
 
 	/* Signals */
 	void (*connection_changed) (TnyDevice *self, gboolean online);

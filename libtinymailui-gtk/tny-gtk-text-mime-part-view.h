@@ -51,9 +51,9 @@ struct _TnyGtkTextMimePartViewClass
 	GtkTextViewClass parent_class;
 
 	/* virtual methods */
-	TnyMimePart* (*get_part_func) (TnyMimePartView *self);
-	void (*set_part_func) (TnyMimePartView *self, TnyMimePart *part);
-	void (*clear_func) (TnyMimePartView *self); 
+	TnyMimePart* (*get_part) (TnyMimePartView *self);
+	void (*set_part) (TnyMimePartView *self, TnyMimePart *part);
+	void (*clear) (TnyMimePartView *self); 
 
 };
 

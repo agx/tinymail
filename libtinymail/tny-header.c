@@ -51,10 +51,10 @@ tny_header_set_replyto (TnyHeader *self, const gchar *to)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->set_replyto_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_replyto!= NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->set_replyto_func (self, to);
+	TNY_HEADER_GET_IFACE (self)->set_replyto(self, to);
 
 #ifdef DBC /* ensure */
 #endif
@@ -77,10 +77,10 @@ tny_header_get_replyto (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_replyto_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_replyto!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_replyto_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_replyto(self);
 }
 
 /**
@@ -99,10 +99,10 @@ tny_header_set_bcc (TnyHeader *self, const gchar *bcc)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->set_bcc_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_bcc!= NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->set_bcc_func (self, bcc);
+	TNY_HEADER_GET_IFACE (self)->set_bcc(self, bcc);
 
 #ifdef DBC /* ensure */
 #endif
@@ -126,10 +126,10 @@ tny_header_set_cc (TnyHeader *self, const gchar *cc)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->set_cc_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_cc!= NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->set_cc_func (self, cc);
+	TNY_HEADER_GET_IFACE (self)->set_cc(self, cc);
 
 #ifdef DBC /* ensure */
 #endif
@@ -152,10 +152,10 @@ tny_header_set_from (TnyHeader *self, const gchar *from)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->set_from_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_from!= NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->set_from_func (self, from);
+	TNY_HEADER_GET_IFACE (self)->set_from(self, from);
 
 #ifdef DBC /* ensure */
 #endif
@@ -178,10 +178,10 @@ tny_header_set_subject (TnyHeader *self, const gchar *subject)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->set_subject_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_subject!= NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->set_subject_func (self, subject);
+	TNY_HEADER_GET_IFACE (self)->set_subject(self, subject);
 
 #ifdef DBC /* ensure */
 #endif
@@ -209,10 +209,10 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->set_to_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_to!= NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->set_to_func (self, to);
+	TNY_HEADER_GET_IFACE (self)->set_to(self, to);
 
 #ifdef DBC /* ensure */
 #endif
@@ -235,10 +235,10 @@ tny_header_get_cc (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_cc_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_cc!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_cc_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_cc(self);
 }
 
 /**
@@ -256,10 +256,10 @@ tny_header_get_bcc (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_bcc_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_bcc!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_bcc_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_bcc(self);
 }
 
 /**
@@ -277,10 +277,10 @@ tny_header_get_date_received (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_date_received_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_date_received!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_date_received_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_date_received(self);
 }
 
 /**
@@ -298,10 +298,10 @@ tny_header_get_date_sent (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_date_sent_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_date_sent!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_date_sent_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_date_sent(self);
 }
 
 
@@ -322,10 +322,10 @@ tny_header_get_uid (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_uid_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_uid!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_uid_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_uid(self);
 }
 
 /**
@@ -345,10 +345,10 @@ tny_header_get_message_id (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_message_id_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_message_id!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_message_id_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_message_id(self);
 }
 
 
@@ -368,11 +368,11 @@ tny_header_get_message_size (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_message_size_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_message_size!= NULL);
 #endif
 
 
-	return TNY_HEADER_GET_IFACE (self)->get_message_size_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_message_size(self);
 }
 
 
@@ -391,10 +391,10 @@ tny_header_get_from (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_from_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_from!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_from_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_from(self);
 }
 
 /**
@@ -412,10 +412,10 @@ tny_header_get_subject (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_subject_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_subject!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_subject_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_subject(self);
 }
 
 
@@ -434,10 +434,10 @@ tny_header_get_to (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_to_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_to!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_to_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_to(self);
 }
 
 /**
@@ -459,10 +459,10 @@ tny_header_get_folder (TnyHeader *self)
 
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_folder_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_folder!= NULL);
 #endif
 
-	retval = TNY_HEADER_GET_IFACE (self)->get_folder_func (self);
+	retval = TNY_HEADER_GET_IFACE (self)->get_folder(self);
 
 #ifdef DBC /* ensure */
 	if (retval)
@@ -493,10 +493,10 @@ tny_header_get_flags (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_flags_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_flags!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_flags_func (self);
+	return TNY_HEADER_GET_IFACE (self)->get_flags(self);
 }
 
 /**
@@ -519,10 +519,10 @@ tny_header_set_flag (TnyHeader *self, TnyHeaderFlags mask)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->set_flag_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_flag!= NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->set_flag_func (self, mask);
+	TNY_HEADER_GET_IFACE (self)->set_flag(self, mask);
 
 #ifdef DBC /* ensure */
 	/* TNY TODO: A check that ensures that all bits in mask are set */
@@ -598,10 +598,10 @@ tny_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->unset_flag_func != NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->unset_flag!= NULL);
 #endif
 
-	TNY_HEADER_GET_IFACE (self)->unset_flag_func (self, mask);
+	TNY_HEADER_GET_IFACE (self)->unset_flag(self, mask);
 
 #ifdef DBC /* ensure */
 	/* TNY TODO: A check that ensures that all bits in mask are unset */

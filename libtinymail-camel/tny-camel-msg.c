@@ -97,7 +97,7 @@ _tny_camel_msg_get_camel_mime_message (TnyCamelMsg *self)
 static TnyFolder* 
 tny_camel_msg_get_folder (TnyMsg *self)
 {
-	return TNY_CAMEL_MSG_GET_CLASS (self)->get_folder_func (self);
+	return TNY_CAMEL_MSG_GET_CLASS (self)->get_folder(self);
 }
 
 static TnyFolder* 
@@ -146,7 +146,7 @@ _tny_camel_msg_set_folder (TnyCamelMsg *self, TnyFolder* folder)
 static TnyHeader*
 tny_camel_msg_get_header (TnyMsg *self)
 {
-	return TNY_CAMEL_MSG_GET_CLASS (self)->get_header_func (self);
+	return TNY_CAMEL_MSG_GET_CLASS (self)->get_header(self);
 }
 
 void 
@@ -162,7 +162,7 @@ _tny_camel_msg_set_header (TnyCamelMsg *self, TnyHeader *header)
 static gchar* 
 tny_camel_msg_get_url_string (TnyMsg *self)
 {
-	return TNY_CAMEL_MSG_GET_CLASS (self)->get_url_string_func (self);
+	return TNY_CAMEL_MSG_GET_CLASS (self)->get_url_string(self);
 }
 
 static gchar* 
@@ -222,7 +222,7 @@ tny_camel_msg_rewrite_cache_default (TnyMsg *self)
 static void
 tny_camel_msg_rewrite_cache (TnyMsg *self)
 {
-	TNY_CAMEL_MSG_GET_CLASS (self)->rewrite_cache_func (self);
+	TNY_CAMEL_MSG_GET_CLASS (self)->rewrite_cache(self);
 	return;
 }
 
@@ -255,7 +255,7 @@ tny_camel_msg_get_header_default (TnyMsg *self)
 static void 
 tny_camel_msg_uncache_attachments (TnyMsg *self)
 {
-	TNY_CAMEL_MSG_GET_CLASS (self)->uncache_attachments_func (self);
+	TNY_CAMEL_MSG_GET_CLASS (self)->uncache_attachments(self);
 }
 
 static void 
@@ -350,11 +350,11 @@ tny_msg_init (gpointer g, gpointer iface_data)
 {
 	TnyMsgIface *klass = (TnyMsgIface *)g;
 
-	klass->get_header_func = tny_camel_msg_get_header;
-	klass->get_folder_func = tny_camel_msg_get_folder;
-	klass->get_url_string_func = tny_camel_msg_get_url_string;
-	klass->uncache_attachments_func = tny_camel_msg_uncache_attachments;
-	klass->rewrite_cache_func = tny_camel_msg_rewrite_cache;
+	klass->get_header= tny_camel_msg_get_header;
+	klass->get_folder= tny_camel_msg_get_folder;
+	klass->get_url_string= tny_camel_msg_get_url_string;
+	klass->uncache_attachments= tny_camel_msg_uncache_attachments;
+	klass->rewrite_cache= tny_camel_msg_rewrite_cache;
 
 	return;
 }
@@ -367,11 +367,11 @@ tny_camel_msg_class_init (TnyCamelMsgClass *class)
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
 	
-	class->get_header_func = tny_camel_msg_get_header_default;
-	class->get_folder_func = tny_camel_msg_get_folder_default;
-	class->get_url_string_func = tny_camel_msg_get_url_string_default;
-	class->uncache_attachments_func = tny_camel_msg_uncache_attachments_default;
-	class->rewrite_cache_func = tny_camel_msg_rewrite_cache_default;
+	class->get_header= tny_camel_msg_get_header_default;
+	class->get_folder= tny_camel_msg_get_folder_default;
+	class->get_url_string= tny_camel_msg_get_url_string_default;
+	class->uncache_attachments= tny_camel_msg_uncache_attachments_default;
+	class->rewrite_cache= tny_camel_msg_rewrite_cache_default;
 	
 	object_class->finalize = tny_camel_msg_finalize;
 	

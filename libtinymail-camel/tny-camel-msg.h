@@ -51,11 +51,11 @@ struct _TnyCamelMsgClass
 	TnyCamelMimePartClass parent;
 
 	/* virtual methods */
-	TnyHeader* (*get_header_func) (TnyMsg *self);
-	TnyFolder* (*get_folder_func) (TnyMsg *self);
-	gchar* (*get_url_string_func) (TnyMsg *self);
-	void (*uncache_attachments_func) (TnyMsg *self);
-	void (*rewrite_cache_func) (TnyMsg *self);
+	TnyHeader* (*get_header) (TnyMsg *self);
+	TnyFolder* (*get_folder) (TnyMsg *self);
+	gchar* (*get_url_string) (TnyMsg *self);
+	void (*uncache_attachments) (TnyMsg *self);
+	void (*rewrite_cache) (TnyMsg *self);
 };
 
 GType tny_camel_msg_get_type (void);
