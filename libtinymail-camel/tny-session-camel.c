@@ -721,6 +721,8 @@ on_account_connect_done (TnyCamelAccount *account, gboolean canceled, GError *er
 	apriv->is_ready = TRUE;
 
 	if (!canceled && err) {
+
+		/* It seems err is forgotten here ... if the disk is full ! */
 		tny_account_store_alert (
 			(TnyAccountStore*) self->priv->account_store, 
 			TNY_ACCOUNT (account), TNY_ALERT_TYPE_ERROR, FALSE, 
