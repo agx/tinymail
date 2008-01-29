@@ -12,3 +12,14 @@ libtinymail-camel-api.raw
 libtinymailui-gtk-api.raw
 libtinymail-sharp.dll
 libtinymailui-api.raw
+generated-ui-gtk
+libtinymail-gnome-desktop-api.xml
+libtinymailui-sharp.dll
+libtinymailui-api.xml
+generated-libtinymail-*
+libtinymailui-gtk-sharp.dll
+libtinymail-sources.xml
+libtinymail-camel-api.xml
+libtinymailui-gtk-api.xml
+generated-ui
+libtinymail-*.dll
