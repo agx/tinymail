@@ -38,6 +38,8 @@ _tny_simple_list_iterator_set_model (TnySimpleListIterator *self, TnySimpleList 
 	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (model);
 
 	g_mutex_lock (lpriv->iterator_lock);
+	if (self->model)
+		g_object_unref (self->model);
 	self->model = (TnySimpleList *) g_object_ref (self->model);
 	self->current = lpriv->first;
 	g_mutex_unlock (lpriv->iterator_lock);

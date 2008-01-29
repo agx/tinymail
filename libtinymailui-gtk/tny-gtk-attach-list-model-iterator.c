@@ -32,6 +32,8 @@ GType _tny_gtk_attach_list_model_iterator_get_type (void);
 void 
 _tny_gtk_attach_list_model_iterator_set_model (TnyGtkAttachListModelIterator *self, TnyGtkAttachListModel *model)
 {
+	if (self->model)
+		g_object_unref (self->model);
 	self->model = (TnyGtkAttachListModel *) g_object_ref (model);
 	self->current = model->first;
 

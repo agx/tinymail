@@ -33,6 +33,8 @@ static void
 _tny_gtk_header_list_iterator_set_model (TnyGtkHeaderListIterator *self, TnyGtkHeaderListModel *model)
 {
 
+	if (self->model)
+		g_object_unref (self->model);
 	self->model = (TnyGtkHeaderListModel *) g_object_ref (model);
 
 	/* It's not a list_copy, so don't free this list when 

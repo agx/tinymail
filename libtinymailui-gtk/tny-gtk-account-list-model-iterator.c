@@ -31,6 +31,8 @@ GType _tny_gtk_account_list_model_iterator_get_type (void);
 void 
 _tny_gtk_account_list_model_iterator_set_model (TnyGtkAccountListModelIterator *self, TnyGtkAccountListModel *model)
 {
+	if (self->model)
+		g_object_unref (self->model);
 	self->model = (TnyGtkAccountListModel *) g_object_ref (model);
 	self->current = model->first;
 
