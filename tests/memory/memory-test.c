@@ -132,6 +132,9 @@ main (int argc, char **argv)
 	inbox = TNY_FOLDER (tny_iterator_get_current (topiter));
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (inbox), folders, NULL, NULL);
+
+	if (iter)
+		g_object_unref (iter);
 	iter = tny_list_create_iterator (folders);
 
 	while (!tny_iterator_is_done (iter))

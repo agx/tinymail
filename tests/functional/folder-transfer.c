@@ -86,13 +86,13 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query)
 		recurse_folders (folder, query);
 		recursion_level--;
 	    
- 		g_object_unref (G_OBJECT (folder));
+ 		g_object_unref (folder);
 
 		tny_iterator_next (iter);
 	}
 
-	 g_object_unref (G_OBJECT (iter));
-	 g_object_unref (G_OBJECT (folders));
+	 g_object_unref (iter);
+	 g_object_unref (folders);
 }
 
 int 
@@ -156,9 +156,9 @@ main (int argc, char **argv)
 		recurse_folders (TNY_FOLDER_STORE (account), NULL);
 
  cleanup:
-	g_object_unref (G_OBJECT (account));
-	g_object_unref (G_OBJECT (iter));
-	g_object_unref (G_OBJECT (accounts));
+	g_object_unref (account);
+	g_object_unref (iter);
+	g_object_unref (accounts);
 
 	return 0;
 }

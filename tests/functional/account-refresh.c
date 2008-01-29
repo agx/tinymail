@@ -53,8 +53,8 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query, TnyList *all
 
 		tny_iterator_next (iter);
 	}
-	 g_object_unref (G_OBJECT (iter));
-	 g_object_unref (G_OBJECT (folders));
+	 g_object_unref (iter);
+	 g_object_unref (folders);
 }
 
 static gboolean
@@ -99,7 +99,7 @@ update_account_thread (gpointer thr_user_data)
 		recurse_folders (folder, NULL, all_folders);
 		tny_iterator_next (iter);
 	}
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 
 	/* Refresh folders */
 	iter = tny_list_create_iterator (all_folders);
@@ -120,10 +120,10 @@ update_account_thread (gpointer thr_user_data)
 			g_print ("%s %s\n", __FUNCTION__, error->message);
 			g_clear_error (&error);
 		}
-		g_object_unref (G_OBJECT (folder));
+		g_object_unref (folder);
 		tny_iterator_next (iter);
 	}
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 
  out:
 	/* Frees */

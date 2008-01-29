@@ -50,24 +50,20 @@ static void
 callback (TnyFolderStore *self, gboolean cancelled, TnyList *list, GError *err, gpointer user_data)
 {
 	TnyIterator *iter = tny_list_create_iterator (list);
-    
+
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyFolderStore *folder = (TnyFolderStore*) tny_iterator_get_current (iter);
 		TnyList *folders = tny_simple_list_new ();
-
 		g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
-	    
 		tny_folder_store_get_folders_async (folder,
 			folders, NULL, callback, NULL, NULL);
-	    
 		g_object_unref (G_OBJECT (folder));
-	    
-		tny_iterator_next (iter);	    
+		tny_iterator_next (iter);
 	}
 
-	g_object_unref (G_OBJECT (iter));
-	g_object_unref (G_OBJECT (list));
+	g_object_unref (iter);
+	g_object_unref (list);
 }
 
 static gboolean
@@ -144,9 +140,9 @@ main (int argc, char **argv)
 		sleep (4);
 	}
     
-	g_object_unref (G_OBJECT (account));
-	g_object_unref (G_OBJECT (iter));
-	g_object_unref (G_OBJECT (accounts));
+	g_object_unref (account);
+	g_object_unref (iter);
+	g_object_unref (accounts);
     
 	return 0;
 }

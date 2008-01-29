@@ -252,8 +252,8 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  *    g_object_unref (G_OBJECT (cur));
  *    tny_iterator_next (iter);
  * }
- * g_object_unref (G_OBJECT (iter));
- * g_object_unref (G_OBJECT (list));
+ * g_object_unref (iter);
+ * g_object_unref (list);
  * </programlisting></informalexample>
  *
  * When implementing this API it is allowed but not required to cache the list.
@@ -325,7 +325,7 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  *        g_object_unref (cur);
  *        tny_iterator_next (iter);
  *    }
- *    g_object_unref (G_OBJECT (iter));
+ *    g_object_unref (iter);
  *    tny_session_camel_set_initialized (session);
  * }
  * </programlisting></informalexample>

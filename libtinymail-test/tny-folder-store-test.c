@@ -38,16 +38,16 @@ static TnyFolderStore *account;
 static void
 tny_folder_store_test_setup (void)
 {
-     TnyIterator *aiter;
-     TnyList *accounts = tny_simple_list_new ();
-     TnyAccountStore *account_store = tny_test_account_store_new (TRUE, NULL);
-     tny_account_store_get_accounts (account_store, accounts, TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
-     g_object_unref (account_store);
-     aiter = tny_list_create_iterator (accounts);
-     tny_iterator_first (aiter);
-     account = TNY_FOLDER_STORE (tny_iterator_get_current (aiter));
-     g_object_unref (aiter);
-     g_object_unref (accounts);
+	TnyIterator *aiter;
+	TnyList *accounts = tny_simple_list_new ();
+	TnyAccountStore *account_store = tny_test_account_store_new (TRUE, NULL);
+	tny_account_store_get_accounts (account_store, accounts, TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+	g_object_unref (account_store);
+	aiter = tny_list_create_iterator (accounts);
+	tny_iterator_first (aiter);
+	account = TNY_FOLDER_STORE (tny_iterator_get_current (aiter));
+	g_object_unref (aiter);
+	g_object_unref (accounts);
 }
 
 static void 

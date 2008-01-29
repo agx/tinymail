@@ -45,32 +45,29 @@ static gchar *str;
 static void
 tny_folder_store_query_test_setup (void)
 {
-    if (online_tests)
-    {
-	accounts = tny_simple_list_new ();
-	account_store = tny_test_account_store_new (TRUE, NULL);
-	tny_account_store_get_accounts (account_store, accounts, 
-			TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
-	aiter = tny_list_create_iterator (accounts);
-	tny_iterator_first (aiter);
-	
-	account = TNY_STORE_ACCOUNT (tny_iterator_get_current (aiter));
-       	g_object_unref (G_OBJECT (aiter));
+	if (online_tests) {
+		accounts = tny_simple_list_new ();
+		account_store = tny_test_account_store_new (TRUE, NULL);
+		tny_account_store_get_accounts (account_store, accounts, 
+				TNY_ACCOUNT_STORE_STORE_ACCOUNTS);
+		aiter = tny_list_create_iterator (accounts);
+		tny_iterator_first (aiter);
+		account = TNY_STORE_ACCOUNT (tny_iterator_get_current (aiter));
+		g_object_unref (aiter);
 
-    	if (!account)
-		online_tests = FALSE;
-   }
-   
-   return;
+		if (!account)
+			online_tests = FALSE;
+	}
+
+	return;
 }
 
 static void 
 tny_folder_store_query_test_teardown (void)
 {
-    	if (online_tests)
-    	{
-		g_object_unref (G_OBJECT (account));		
-		g_object_unref (G_OBJECT (accounts));
+	if (online_tests) {
+		g_object_unref (account);
+		g_object_unref (accounts);
 	}
 	return;
 }
@@ -94,32 +91,29 @@ START_TEST (tny_folder_store_query_test_match_on_name)
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL, NULL);
-    	length = tny_list_get_length (folders);
-    
+	length = tny_list_get_length (folders);
+
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	fail_unless (length == 1, str);
 	g_free (str);
-    
-    	if (length >= 1) 
-    	{
-		
+
+	if (length >= 1)  {
 		iter = tny_list_create_iterator (folders);
 		folder = (TnyFolder *) tny_iterator_get_current (iter);
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query, NULL);
 		g_object_unref (G_OBJECT (folder));
 		length = tny_list_get_length (subfolders);
-	    
 		str = g_strdup_printf ("^tny.*$ should match exactly one folder in the test account, it matches %d\n", length);
 		fail_unless (tny_list_get_length (subfolders) == 1, str);
-		g_free (str);	    
-		g_object_unref (G_OBJECT (iter));
+		g_free (str);
+		g_object_unref (iter);
 	}
 
-	g_object_unref (G_OBJECT (folders));
-	g_object_unref (G_OBJECT (subfolders));
-	g_object_unref (G_OBJECT (query));
-    
+	g_object_unref (folders);
+	g_object_unref (subfolders);
+	g_object_unref (query);
+
 }
 END_TEST
 
@@ -130,10 +124,10 @@ START_TEST (tny_folder_store_query_test_match_on_id)
 	TnyIterator *iter = NULL;
 	TnyFolder *folder;
 	gint length=0;
-    
+
 	if (!online_tests)
 		return;
-    
+
 	query = tny_folder_store_query_new ();
 	tny_folder_store_query_add_item (query, "^INBOX/tny.*$", TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID);
 
@@ -142,29 +136,27 @@ START_TEST (tny_folder_store_query_test_match_on_id)
 
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (account),
 			folders, NULL, NULL);
-    	length = tny_list_get_length (folders);
-    
+	length = tny_list_get_length (folders);
+
 	str = g_strdup_printf ("Root should have exactly one folder in the test account, it matches %d\n", length);
 	fail_unless (length == 1, str);
 	g_free (str);
-    
-    	if (length >= 1) 
-    	{	
+
+	if (length >= 1) {
 		iter = tny_list_create_iterator (folders);
 		folder = (TnyFolder *) tny_iterator_get_current (iter);
 		tny_folder_store_get_folders (TNY_FOLDER_STORE (folder),
 				subfolders, query, NULL);
 		g_object_unref (G_OBJECT (folder));
 		length = tny_list_get_length (subfolders);
-	    
 		str = g_strdup_printf ("^INBOX/tny.*$ should match exactly one folder in the test account, it matches %d\n", length);
 		fail_unless (tny_list_get_length (subfolders) == 1, str);
-		g_object_unref (G_OBJECT (iter));
+		g_object_unref (iter);
 	}
 
-	g_object_unref (G_OBJECT (folders));
-	g_object_unref (G_OBJECT (subfolders));
-	g_object_unref (G_OBJECT (query));
+	g_object_unref (folders);
+	g_object_unref (subfolders);
+	g_object_unref (query);
 }
 END_TEST
 

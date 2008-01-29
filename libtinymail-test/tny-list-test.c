@@ -211,7 +211,7 @@ START_TEST (tny_list_test_list)
 	fail_unless (tny_list_get_length (iface) == 3, str);
 	g_free (str);
 
-	g_object_unref (G_OBJECT(item));
+	g_object_unref (iterator);
 
 	/* What's the initial state of an iterator? */
 	iterator = tny_list_create_iterator (iface);

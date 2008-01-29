@@ -160,7 +160,7 @@ tny_folder_store_change_get_created_folders (TnyFolderStoreChange *self, TnyList
 		tny_iterator_next (iter);
 	}
 
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 
 	g_mutex_unlock (priv->lock);
 
@@ -206,7 +206,7 @@ tny_folder_store_change_get_removed_folders (TnyFolderStoreChange *self, TnyList
 		tny_iterator_next (iter);
 	}
 
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 
 	g_mutex_unlock (priv->lock);
 

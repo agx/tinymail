@@ -444,6 +444,7 @@ tny_folder_copy (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, g
  *             g_object_unref (header);
  *             tny_iterator_next (iter);
  *         }
+ *         g_object_unref (iter);
  *         g_object_unref (headers);
  *     }
  * }
@@ -823,6 +824,7 @@ tny_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err)
  *             g_object_unref (header);
  *             tny_iterator_next (iter);
  *         }
+ *         g_object_unref (iter);
  *         g_object_unref (headers);
  *     }
  * }

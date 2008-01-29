@@ -78,16 +78,13 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query, const gchar 
 			func (TNY_FOLDER (folder));
 			g_object_ref (G_OBJECT (folder));
 		}
-	    
 		recurse_folders (folder, query, folname, func);
-	    
- 		g_object_unref (G_OBJECT (folder));
-
-		tny_iterator_next (iter);	    
+ 		g_object_unref (folder);
+		tny_iterator_next (iter);
 	}
 
-	g_object_unref (G_OBJECT (iter));
-	g_object_unref (G_OBJECT (folders));
+	g_object_unref (iter);
+	g_object_unref (folders);
 }
 
 static void
@@ -107,7 +104,7 @@ tny_folder_test_setup (void)
 	account = TNY_STORE_ACCOUNT (tny_iterator_get_current (aiter));
 	g_object_unref (G_OBJECT (aiter));
 	g_object_unref (G_OBJECT (accounts));
-	
+
 	recurse_folders (TNY_FOLDER_STORE (account), NULL, "INBOX/2000", do_test_folder);
 
 	return;
@@ -116,10 +113,10 @@ tny_folder_test_setup (void)
 static void 
 tny_folder_test_teardown (void)
 {
-    	if (iface)
-	    	g_object_unref (G_OBJECT (iface));
+	if (iface)
+		g_object_unref (iface);
 
-    	g_object_unref (G_OBJECT (account));
+	g_object_unref (account);
 
 	return;
 }

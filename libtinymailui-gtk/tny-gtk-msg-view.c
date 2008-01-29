@@ -627,7 +627,7 @@ tny_gtk_msg_view_display_parts (TnyMsgView *self, TnyList *parts, gboolean alter
 		tny_iterator_next (iterator);
 	}
 
-	g_object_unref (G_OBJECT (iterator));
+	g_object_unref (iterator);
 
 }
 
