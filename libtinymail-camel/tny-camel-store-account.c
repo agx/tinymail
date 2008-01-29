@@ -1861,6 +1861,8 @@ tny_camel_store_account_queue_going_online_thread (gpointer thr_user_data)
 	if (apriv->service) {
 		CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 		camel_service_disconnect (apriv->service, FALSE, &mex);
+		if (camel_exception_is_set (&mex))
+			camel_exception_clear (&mex);
 	}
 	g_static_rec_mutex_unlock (apriv->service_lock);
 
