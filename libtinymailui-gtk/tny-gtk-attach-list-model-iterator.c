@@ -32,7 +32,7 @@ GType _tny_gtk_attach_list_model_iterator_get_type (void);
 void 
 _tny_gtk_attach_list_model_iterator_set_model (TnyGtkAttachListModelIterator *self, TnyGtkAttachListModel *model)
 {
-	self->model = model;
+	self->model = (TnyGtkAttachListModel *) g_object_ref (model);
 	self->current = model->first;
 
 	return;
@@ -64,6 +64,11 @@ tny_gtk_attach_list_model_iterator_instance_init (GTypeInstance *instance, gpoin
 static void
 tny_gtk_attach_list_model_iterator_finalize (GObject *object)
 {
+	TnyGtkAttachListModelIterator *self = (TnyGtkAttachListModelIterator *) object;
+
+	if (self->model)
+		g_object_unref (self->model);
+
 	(*parent_class->finalize) (object);
 
 	return;

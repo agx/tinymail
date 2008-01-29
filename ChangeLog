@@ -1,3 +1,7 @@
+2008-01-29  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed reference counting for all TnyIterator implementations
+
 2008-01-28  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Removed the _func from all the interfaces and virtual function

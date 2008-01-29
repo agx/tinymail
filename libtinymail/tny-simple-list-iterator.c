@@ -35,11 +35,10 @@ _tny_simple_list_iterator_set_model (TnySimpleListIterator *self, TnySimpleList 
 {
 	TnySimpleListPriv *lpriv;
 
-	self->model = model;
-
 	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (self->model);
 
 	g_mutex_lock (lpriv->iterator_lock);
+	self->model = (TnySimpleList *) g_object_ref (self->model);
 	self->current = lpriv->first;
 	g_mutex_unlock (lpriv->iterator_lock);
 
@@ -61,7 +60,7 @@ _tny_simple_list_iterator_new (TnySimpleList *model)
 static void
 tny_simple_list_iterator_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	TnySimpleListIterator *self = (TnySimpleListIterator *)instance;
+	TnySimpleListIterator *self = (TnySimpleListIterator *) instance;
 
 	self->model = NULL;
 	self->current = NULL;
@@ -72,6 +71,12 @@ tny_simple_list_iterator_instance_init (GTypeInstance *instance, gpointer g_clas
 static void
 tny_simple_list_iterator_finalize (GObject *object)
 {
+
+	TnySimpleListIterator *self = (TnySimpleListIterator *) object;
+
+	if (self->model)
+		g_object_unref (self->model);
+
 	(*parent_class->finalize) (object);
 
 	return;
