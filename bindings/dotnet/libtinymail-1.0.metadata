@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
 <metadata>
- <remove-node path="/api/namespace/object[@name='List']/method[@name='Foreach']" />
- <!-- add-node path="/api/namespace/object[@cname='TnyList']"><implements><interface name="IList" /></implements></add-node //--> 
+ <attr path="/api/namespace/object[@cname='TnyMergeFolder']/method[@name='SetFolderType']" name="name">SetMergeFolderType</attr>
 </metadata>
