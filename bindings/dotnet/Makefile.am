@@ -9,7 +9,7 @@ sources =
 
 build_sources = $(addprefix $(srcdir)/, $(sources)) AssemblyInfo.cs
 
-customs = 
+customs = List.custom Iterator.custom 
 
 CLEANFILES = $(ASSEMBLY) generated-stamp generated/*.cs $(API) $(RAW_API)
 

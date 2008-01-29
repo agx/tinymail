@@ -7,4 +7,7 @@
  <attr path="/api/namespace/interface[@cname='TnyFolder']" name="consume_only">1</attr>
  <attr path="/api/namespace/interface[@cname='TnyFolderStore']" name="consume_only">1</attr>
  <attr path="/api/namespace/interface[@cname='TnyMimePart']" name="consume_only">1</attr>
+ <add-node path="/api/namespace/interface[@name='List']"><implements><interface name="IEnumerable" /></implements></add-node>
+ <add-node path="/api/namespace/interface[@name='Iterator']"><implements><interface name="IEnumerator" /></implements></add-node>
+ <attr path="/api/namespace/interface[@cname='TnyIterator']/method[@cname='tny_iterator_get_current']" name="name">GetGlibCurrent</attr>
 </metadata>
