@@ -290,7 +290,7 @@ tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *headers)
 		tny_iterator_next (iter);
 	}
 
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 
 	g_mutex_unlock (priv->lock);
 
@@ -334,7 +334,7 @@ tny_folder_change_get_expunged_headers (TnyFolderChange *self, TnyList *headers)
 		tny_iterator_next (iter);
 	}
 
-	g_object_unref (G_OBJECT (iter));
+	g_object_unref (iter);
 
 	g_mutex_unlock (priv->lock);
 

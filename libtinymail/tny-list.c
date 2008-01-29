@@ -173,7 +173,7 @@ tny_list_append (TnyList *self, GObject* item)
  *      i++;
  *      tny_iterator_next (iter);
  * }
- * g_object_unref (G_OBJECT (iter));
+ * g_object_unref (iter);
  * iter = tny_list_create_iterator (removethese);
  * while (!tny_iterator_is_done (iter))
  * {
@@ -182,9 +182,9 @@ tny_list_append (TnyList *self, GObject* item)
  *      g_object_unref (G_OBJECT (obj));
  *      tny_iterator_next (iter);
  * }
- * g_object_unref (G_OBJECT (iter));
- * g_object_unref (G_OBJECT (removethese));
- * g_object_unref (G_OBJECT (toremovefrom));
+ * g_object_unref (iter);
+ * g_object_unref (removethese);
+ * g_object_unref (toremovefrom);
  * </programlisting></informalexample>
  *
  **/
