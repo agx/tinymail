@@ -61,6 +61,7 @@ if test x$build_net_bindings = xtrue; then
 		AC_MSG_ERROR([No gapi-fixup tool found])
 	fi
 else
+	PARSER=""
 	CODEGEN=""
 	FIXUP=""
 	GACUTIL=""
