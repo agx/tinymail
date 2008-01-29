@@ -68,7 +68,7 @@
   <api filename="@PLATFORMDIR@-api.raw">
     <library name="@PLATFORMDIR@-@API_VERSION@.dll">
       <namespace name="Tny.Platform">
-       <directory path="../../@PLATFORMDIR@" />
+       <directory path="../../@PLATFORMDIR@/" />
       </namespace>
     </library>
   </api>
