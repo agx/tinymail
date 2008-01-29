@@ -31,7 +31,10 @@ GType _tny_gtk_folder_store_tree_model_iterator_get_type (void);
 void 
 _tny_gtk_folder_store_tree_model_iterator_set_model (TnyGtkFolderStoreTreeModelIterator *self, TnyGtkFolderStoreTreeModel *model)
 {
-	self->model = model;
+	if (self->model)
+		g_object_unref (self->model);
+
+	self->model = g_object_ref (model);
 	self->current = model->first;
 
 	return;
@@ -63,6 +66,11 @@ tny_gtk_folder_store_tree_model_iterator_instance_init (GTypeInstance *instance,
 static void
 tny_gtk_folder_store_tree_model_iterator_finalize (GObject *object)
 {
+	TnyGtkFolderStoreTreeModelIterator *self = (TnyGtkFolderStoreTreeModelIterator *) object;
+
+	if (self->model)
+		g_object_unref (self->model);
+
 	(*parent_class->finalize) (object);
 
 	return;

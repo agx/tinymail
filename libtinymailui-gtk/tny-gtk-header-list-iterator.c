@@ -32,7 +32,10 @@ GType _tny_gtk_header_list_iterator_get_type (void);
 static void 
 _tny_gtk_header_list_iterator_set_model (TnyGtkHeaderListIterator *self, TnyGtkHeaderListModel *model)
 {
-	self->model = model;
+	if (self->model)
+		g_object_unref (self->model);
+
+	self->model = g_object_ref (model);
 
 	/* It's not a list_copy, so don't free this list when 
 	   destructing this iterator. Current is used as a ptr
@@ -72,6 +75,11 @@ tny_gtk_header_list_iterator_instance_init (GTypeInstance *instance, gpointer g_
 static void
 tny_gtk_header_list_iterator_finalize (GObject *object)
 {
+	TnyGtkHeaderListIterator *self = (TnyGtkHeaderListIterator *) object;
+
+	if (self->model)
+		g_object_unref (self->model);
+
 	(*parent_class->finalize) (object);
 
 	return;
