@@ -446,7 +446,7 @@ camel_store_summary_save(CamelStoreSummary *s, CamelException *ex)
 	fd = g_open(tmp_path, O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0600);
 
 	if (fd == -1) {
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_READ,
 			_("Error storing the store summary"));
 		io(printf("**  open error: %s\n", strerror (errno)));
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
@@ -456,7 +456,7 @@ camel_store_summary_save(CamelStoreSummary *s, CamelException *ex)
 
 	out = fdopen(fd, "wb");
 	if ( out == NULL ) {
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_READ,
 			_("Error storing the store summary"));
 		i = errno;
 		printf("**  fdopen error: %s\n", strerror (errno));
@@ -471,7 +471,7 @@ camel_store_summary_save(CamelStoreSummary *s, CamelException *ex)
 
 
 	if ( ((CamelStoreSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_save(s, out) == -1) {
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 			_("Error storing the store summary"));
 		i = errno;
 		fclose(out);
@@ -488,7 +488,7 @@ camel_store_summary_save(CamelStoreSummary *s, CamelException *ex)
 	}
 
 	if (fflush (out) != 0 || fsync (fileno (out)) == -1) {
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 			_("Error storing the store summary"));
 		i = errno;
 		fclose (out);
@@ -499,7 +499,7 @@ camel_store_summary_save(CamelStoreSummary *s, CamelException *ex)
 	}
 
 	if (fclose (out) != 0) {
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 			_("Error storing the store summary"));
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 		g_free (tmp_path);
@@ -512,7 +512,7 @@ camel_store_summary_save(CamelStoreSummary *s, CamelException *ex)
 		i = errno;
 		g_unlink(tmp_path);
 		errno = i;
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 			_("Error storing the store summary"));
 		CAMEL_STORE_SUMMARY_UNLOCK(s, io_lock);
 		g_free (tmp_path);
