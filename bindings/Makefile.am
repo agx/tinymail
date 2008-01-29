@@ -1,11 +1,13 @@
+SUBDIRS = .
+
 if BUILD_PYTINYMAIL
-SUBDIRS = python
+SUBDIRS += python
 endif
 
 if BUILD_VALA_BINDINGS
-SUBDIRS = vala
+SUBDIRS += vala
 endif
 
 if BUILD_NET_BINDINGS
-SUBDIRS = dotnet
+SUBDIRS += dotnet
 endif
