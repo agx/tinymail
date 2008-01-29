@@ -35,7 +35,7 @@ _tny_simple_list_iterator_set_model (TnySimpleListIterator *self, TnySimpleList 
 {
 	TnySimpleListPriv *lpriv;
 
-	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (self->model);
+	lpriv = TNY_SIMPLE_LIST_GET_PRIVATE (model);
 
 	g_mutex_lock (lpriv->iterator_lock);
 	self->model = (TnySimpleList *) g_object_ref (self->model);
