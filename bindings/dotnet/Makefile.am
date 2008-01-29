@@ -28,7 +28,7 @@ $(API): $(RAW_API) $(METADATA)
 	cp libtinymailui-gtk-api.raw libtinymailui-gtk-api.xml
 	cp libtinymail-camel-api.raw libtinymail-camel-api.xml
 	cp $(PLATFORMDIR)-api.raw $(PLATFORMDIR)-api.xml
-	chmod u+w $(API)
+	chmod u+w libtinymail-api.xml libtinymailui-api.xml libtinymailui-gtk-api.xml libtinymail-camel-api.xml $(PLATFORMDIR)-api.xml
 	$(FIXUP) --api=libtinymail-api.xml --metadata=$(METADATA)
 	$(FIXUP) --api=libtinymailui-api.xml --metadata=$(METADATA)
 	$(FIXUP) --api=libtinymailui-api.xml --metadata=$(METADATA)
@@ -85,7 +85,7 @@ uninstall-local:
 	echo "$(GACUTIL) /u libtinymailui-sharp /package libtinymailui-sharp-$(API_VERSION) /root $(DESTDIR)$(libdir)"; \
 	        $(GACUTIL) /u libtinymailui-sharp /package libtinymailui-sharp-$(API_VERSION) /root $(DESTDIR)$(libdir) || exit 1;
 	echo "$(GACUTIL) /u libtinymailui-gtk-sharp /package libtinymailui-gtk-sharp-$(API_VERSION) /root $(DESTDIR)$(libdir)"; \
-	        $(GACUTIL) /u libtinymailui-gtk-sharp /package libtinymailui-gt-sharp-$(API_VERSION) /root $(DESTDIR)$(libdir) || exit 1;
+	        $(GACUTIL) /u libtinymailui-gtk-sharp /package libtinymailui-gtk-sharp-$(API_VERSION) /root $(DESTDIR)$(libdir) || exit 1;
 #	echo "$(GACUTIL) /u libtinymail-camel-sharp /package libtinymail-camel-sharp-$(API_VERSION) /root $(DESTDIR)$(libdir)"; \
 #	        $(GACUTIL) /u libtinymail-camel-sharp /package libtinymail-camel-sharp-$(API_VERSION) /root $(DESTDIR)$(libdir) || exit 1;
 	echo "$(GACUTIL) /u $(PLATFORMDIR)-sharp /package $(PLATFORMDIR)-sharp-$(API_VERSION) /root $(DESTDIR)$(libdir)"; \
