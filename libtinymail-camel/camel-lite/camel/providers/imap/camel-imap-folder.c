@@ -5435,6 +5435,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 
 	if (stream == NULL)
 	{
+		ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
 		errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 		goto errorhander;
 	}
