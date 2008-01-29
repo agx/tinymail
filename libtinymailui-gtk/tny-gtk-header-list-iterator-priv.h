@@ -72,7 +72,7 @@ struct _TnyGtkHeaderListModelPriv
 	TnyFolder *folder;
 	gint stamp, registered;
 	gint updating_views;
-	GMutex *ra_lock, *to_lock;
+	GMutex  *ra_lock, *to_lock;
 	gint cur_len;
 	guint add_timeout;
 

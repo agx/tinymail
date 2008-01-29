@@ -1,6 +1,7 @@
 <gapi-parser-input>
+
   <api filename="libtinymail-api.raw">
-    <library name="libtinymail-1.0.dll">
+    <library name="libtinymail-@API_VERSION@.dll">
       <namespace name="Tny">
         <directory path="../../libtinymail/">
 	        <exclude>tny-common-priv.h</exclude>
@@ -8,9 +9,19 @@
 		<exclude>tny-simple-list-priv.h</exclude>
 	</directory>
       </namespace>
+    </library>
+  </api>
+
+  <api filename="libtinymailui-api.raw">
+    <library name="libtinymailui-@API_VERSION@.dll">
       <namespace name="Tny.Ui">
         <dir>../../libtinymailui/</dir>
       </namespace>
+    </library>
+  </api>
+
+  <api filename="libtinymailui-gtk-api.raw">
+    <library name="libtinymailui-gtk-@API_VERSION@.dll">
       <namespace name="Tny.UiGtk">
 	<directory path="../../libtinymailui-gtk/">
 		<exclude>tny-gtk-header-list-iterator-priv.h</exclude>
@@ -20,6 +31,11 @@
 		<exclude>tny-gtk-folder-store-tree-model-iterator-priv.h</exclude>
 	</directory>
       </namespace>
+    </library>
+  </api>
+
+  <api filename="libtinymail-camel-api.raw">
+    <library name="libtinymail-camel-@API_VERSION@.dll">
       <namespace name="Tny.Camel">
 	<directory path="../../libtinymail-camel/">
 		<exclude>tny-camel-account-priv.h</exclude>
@@ -46,4 +62,13 @@
       </namespace>
     </library>
   </api>
+
+  <api filename="@PLATFORMDIR@-api.raw">
+    <library name="@PLATFORMDIR@-@API_VERSION@.dll">
+      <namespace name="Tny.Platform">
+       <directory path="../../@PLATFORMDIR@" />
+      </namespace>
+    </library>
+  </api>
+
 </gapi-parser-input>

@@ -7,3 +7,8 @@ libtinymail-1.0.dll.config
 libtinymail-api.raw
 Makefile
 generated
+libtinymail-gnome-desktop-api.raw
+libtinymail-camel-api.raw
+libtinymailui-gtk-api.raw
+libtinymail-sharp.dll
+libtinymailui-api.raw

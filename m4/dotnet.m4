@@ -27,6 +27,7 @@ if test x$build_net_bindings = xtrue; then
 
 	PKG_CHECK_MODULES(GTK_SHARP, gtk-sharp-2.0 >= 2.11.91)
 	PKG_CHECK_MODULES(GAPI, gapi-2.0 >= 2.11.91)
+	GAPIDIR="`$PKG_CONFIG --variable=gapidir gapi-2.0`"
 
 	AC_PATH_PROG(GACUTIL, gacutil, no)
 	if test "x$GACUTIL" = "xno" ; then
@@ -61,6 +62,7 @@ if test x$build_net_bindings = xtrue; then
 		AC_MSG_ERROR([No gapi-fixup tool found])
 	fi
 else
+	GAPIDIR=""
 	PARSER=""
 	CODEGEN=""
 	FIXUP=""
@@ -77,6 +79,7 @@ else
 	GAPI2_FIXUP=""
 fi
 
+AC_SUBST(GAPIDIR)
 AC_SUBST(PARSER)
 AC_SUBST(CODEGEN)
 AC_SUBST(FIXUP)

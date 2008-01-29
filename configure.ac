@@ -521,6 +521,7 @@ bindings/vala/Makefile
 bindings/dotnet/Makefile
 bindings/dotnet/AssemblyInfo.cs
 bindings/dotnet/libtinymail-1.0.dll.config
+bindings/dotnet/libtinymail-sources.xml
 libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile
