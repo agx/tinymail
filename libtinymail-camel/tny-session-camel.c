@@ -374,7 +374,7 @@ alert_idle_func (gpointer user_data)
 	info->retval = tny_account_store_alert (
 		(TnyAccountStore*) self->priv->account_store, 
 		account, info->tnytype, info->question, 
-		(const GError *) info->err);
+		info->err);
 
 	tny_lockable_unlock (self->priv->ui_lock);
 
