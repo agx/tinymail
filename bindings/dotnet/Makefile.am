@@ -28,7 +28,8 @@ $(API): $(RAW_API) $(METADATA)
 	$(FIXUP) --api=$(API) --metadata=$(METADATA)
 
 generated-stamp: $(API)
-	 $(CODEGEN) --generate $(srcdir)/$(API) $(GTK_SHARP_CFLAGS) --outdir=generated --customdir=$(srcdir) --assembly-name=$(ASSEMBLY_NAME) && touch generated-stamp
+	rm -rf generated
+	$(CODEGEN) --generate $(srcdir)/$(API) $(GTK_SHARP_CFLAGS) --outdir=generated --customdir=$(srcdir) --assembly-name=$(ASSEMBLY_NAME) && touch generated-stamp
 
 libtinymail-sharp.dll: $(build_sources) generated-stamp generated
 	$(CSC) --unsafe --target library $(GTK_SHARP_LIBS) \
