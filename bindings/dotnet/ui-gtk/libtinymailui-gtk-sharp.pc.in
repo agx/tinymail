@@ -8,5 +8,5 @@ Name: libtinymailui-sharp
 Description: libtinymailui-gtk-sharp - Tinymail UI Gtk+ .NET Binding
 Version: @VERSION@
 Cflags: -I:${gapidir}/libtinymail-api.xml -I:${gapidir}/libtinymailui-api.xml -I:${gapidir}/libtinymailui-gtk-api.xml
-Libs: -r:${libdir}/mono/libtinymail-sharp.dll -r:${libdir}/mono/libtinymailui-sharp.dll -r:${libdir}/mono/libtinymailui-gtk-sharp.dll
+Libs: -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymail-sharp.dll -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymailui-sharp.dll -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymailui-gtk-sharp.dll
 Requires: glib-sharp-2.0 gtk-sharp-2.0 libtinymail-sharp-@API_VERSION@ libtinymailui-sharp-@API_VERSION@
