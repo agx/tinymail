@@ -3,7 +3,7 @@ SUBDIRS = .
 pkg = libtinymailui
 
 SYMBOLS =
-INCLUDE_API =
+INCLUDE_API = ../tny/libtinymail-api.xml
 METADATA = libtinymailui.metadata
 references =
 glue_includes =

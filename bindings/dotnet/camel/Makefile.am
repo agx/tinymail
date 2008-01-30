@@ -3,7 +3,7 @@ SUBDIRS = .
 pkg = libtinymail-camel
 
 SYMBOLS =
-INCLUDE_API =
+INCLUDE_API = ../tny/libtinymail-api.xmi
 METADATA = libtinymail-camel.metadata
 references =
 glue_includes =
