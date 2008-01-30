@@ -1,3 +1,4 @@
 <?xml version="1.0"?>
 <metadata>
+ <attr path="/api/namespace[@name='Tny']" name="name">Tny.Platform</attr>
 </metadata>
