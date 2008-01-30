@@ -1,16 +1,6 @@
 <configuration>
   <dllmap dll="libglib-2.0-0.dll" target="libglib-2.0@LIB_PREFIX@.0@LIB_SUFFIX@"/>
   <dllmap dll="libgobject-2.0-0.dll" target="libgobject-2.0@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libatk-1.0-0.dll" target="libatk-1.0@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libgtk-win32-2.0-0.dll" target="libgtk-x11-2.0@LIB_PREFIX@.0@LIB_SUFFIX@"/>
   <dllmap dll="libtinymail-@API_VERSION@.dll" target="libtinymail-@API_VERSION@@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libtinymail-gnomevfs-@API_VERSION@.dll" target="libtinymail-gnomevfs-@API_VERSION@@LIB_PREFIX@.0@LIB_SUFFIX@"/>
   <dllmap dll="libtinymailui-@API_VERSION@.dll" target="libtinymailui-@API_VERSION@@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libtinymailui-gtk-@API_VERSION@.dll" target="libtinymailui-gtk-@API_VERSION@@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libtinymail-camel-@API_VERSION@.dll" target="libtinymail-camel-@API_VERSION@@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libtinymailui-gtkhtml-@API_VERSION@.dll" target="libtinymailui-gtkhtml-@API_VERSION@@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libtinymail-gnome-desktop-@API_VERSION@.dll" target="libtinymail-gnome-desktop-@API_VERSION@@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libtinymailui-mozembed-@API_VERSION@.dll" target="libtinymailui-mozembed-@API_VERSION@@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libcamel-lite-1.2.dll" target="libcamel-lite-1.2@LIB_PREFIX@.0@LIB_SUFFIX@"/>
-  <dllmap dll="libcamel-lite-provider-1.2.dll" target="libcamel-lite-provider-1.2@LIB_PREFIX@.0@LIB_SUFFIX@"/>
 </configuration>
