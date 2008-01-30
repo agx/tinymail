@@ -864,6 +864,13 @@ char *camel_maildir_get_filename (const gchar *fpath, CamelMaildirMessageInfo *m
 		if (dir) {
 			while ( (d = readdir(dir)) ) {
 				char *nname = g_strdup_printf ("%s/%s", cur, d->d_name);
+				char *ptr = strstr (nname, "!");
+
+				if (!ptr)
+					strstr (nname, ":");
+				if (ptr)
+					len = (ptr - nname);
+
 				if (!g_ascii_strncasecmp (nname, name, len)) {
 					g_free (name);
 					name = nname;

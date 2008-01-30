@@ -1,3 +1,9 @@
+2008-01-30  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/local/camel-maildir-summary.c
+	(camel_maildir_get_filename): fixed the message read from a maildir
+	folder, do not take into account the message flags to read the message
+
 2008-01-30  Vivek Sekar  <viveksekar@gmail.com>
         * Cleaned up the debian/control.maemo-chinook and
 	debian/control.maemo-diablo files.
