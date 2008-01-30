@@ -1,0 +1,17 @@
+<gapi-parser-input>
+
+   <api filename="libtinymailui-gtk-api.raw">
+    <library name="libtinymailui-gtk-@API_VERSION@.dll">
+      <namespace name="Tny.UiGtk">
+	<directory path="../../../libtinymailui-gtk/">
+		<exclude>tny-gtk-header-list-iterator-priv.h</exclude>
+		<exclude>tny-gtk-account-list-model-iterator-priv.h</exclude>
+		<exclude>tny-gtk-attach-list-model-priv.h</exclude>
+		<exclude>tny-gtk-attach-list-model-iterator-priv.h</exclude>
+		<exclude>tny-gtk-folder-store-tree-model-iterator-priv.h</exclude>
+	</directory>
+      </namespace>
+    </library>
+  </api>
+
+</gapi-parser-input>

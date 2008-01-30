@@ -1,0 +1,11 @@
+<gapi-parser-input>
+
+  <api filename="libtinymail-platform-api.raw">
+    <library name="libtinymail-platform-@API_VERSION@.dll">
+      <namespace name="Tny.Platform">
+       <directory path="../../../@PLATFORMDIR@/" />
+      </namespace>
+    </library>
+  </api>
+
+</gapi-parser-input>
