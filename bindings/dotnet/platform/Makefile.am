@@ -5,7 +5,7 @@ pkg = libtinymail-platform
 SYMBOLS =
 INCLUDE_API = ../tny/libtinymail-api.xml ../ui/libtinymailui-api.xml ../camel/libtinymail-camel-api.xml
 METADATA = libtinymail-platform.metadata
-references =
+references = ../tny/libtinymail-sharp.dll ../ui/libtinymailui-sharp.dll ../camel/libtinymail-camel-sharp.dll
 glue_includes =
 
 sources =

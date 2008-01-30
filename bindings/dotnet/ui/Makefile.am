@@ -5,7 +5,7 @@ pkg = libtinymailui
 SYMBOLS =
 INCLUDE_API = ../tny/libtinymail-api.xml
 METADATA = libtinymailui.metadata
-references =
+references = ../tny/libtinymail-sharp.dll
 glue_includes =
 
 sources = 				

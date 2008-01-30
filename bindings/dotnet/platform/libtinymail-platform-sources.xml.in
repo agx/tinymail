@@ -2,7 +2,7 @@
 
   <api filename="libtinymail-platform-api.raw">
     <library name="@PLATFORMDIR@-@API_VERSION@.dll">
-      <namespace name="Tny.Platform">
+      <namespace name="Tny">
        <directory path="../../../@PLATFORMDIR@/" />
       </namespace>
     </library>

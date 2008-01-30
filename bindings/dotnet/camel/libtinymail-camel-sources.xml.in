@@ -2,7 +2,7 @@
 
   <api filename="libtinymail-camel-api.raw">
     <library name="libtinymail-camel-@API_VERSION@.dll">
-      <namespace name="Tny.Camel">
+      <namespace name="Tny">
 	<directory path="../../../libtinymail-camel/">
 		<exclude>tny-camel-account-priv.h</exclude>
 		<exclude>tny-camel-imap-folder-priv.h</exclude>

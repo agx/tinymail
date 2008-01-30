@@ -53,7 +53,7 @@ build_references = $(addprefix /r:, $(references)) $(GTK_SHARP_LIBS)
 
 $(ASSEMBLY): generated-stamp $(SNK) $(build_sources) $(references)
 	@rm -f $(ASSEMBLY).mdb
-	$(CSC) $(CSFLAGS) -nowarn:0169,0612,0618 -unsafe -out:$(ASSEMBLY) -target:library $(build_references) $(GENERATED_SOURCES) $(build_sources)
+	$(CSC) $(CSFLAGS) -nowarn:0169,0612,0618 -unsafe -out:$(ASSEMBLY) -target:library $(build_references) generated/*.cs $(build_sources)
 
 install-data-local:
 	@if test -n '$(pkg)'; then							\

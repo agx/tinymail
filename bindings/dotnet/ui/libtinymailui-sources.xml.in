@@ -2,7 +2,7 @@
 
   <api filename="libtinymailui-api.raw">
     <library name="libtinymailui-@API_VERSION@.dll">
-      <namespace name="Tny.Ui">
+      <namespace name="Tny">
         <dir>../../../libtinymailui/</dir>
       </namespace>
     </library>
