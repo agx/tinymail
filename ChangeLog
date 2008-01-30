@@ -1,3 +1,7 @@
+2008-01-30  Vivek Sekar  <viveksekar@gmail.com>
+        * Cleaned up the debian/control.maemo-chinook and
+	debian/control.maemo-diablo files.
+
 2008-01-30  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implemented DotNet bindings
