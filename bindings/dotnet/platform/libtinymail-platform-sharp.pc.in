@@ -4,9 +4,9 @@ libdir=${exec_prefix}/lib
 gapidir=${prefix}/share/gapi-2.0
 
 
-Name: libtinymailui-sharp
-Description: libtinymailui-sharp - Tinymail UI .NET Binding
+Name: libtinymail-platform-sharp
+Description: libtinymail-platform-sharp - Tinymail Platform .NET Binding
 Version: @VERSION@
-Cflags: -I:${gapidir}/libtinymailui-api.xml
-Libs: -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymailui-sharp.dll
-Requires: libtinymail-sharp-@API_VERSION@
+Cflags: -I:${gapidir}/libtinymail-api.xml -I:${gapidir}/libtinymailui-api.xml -I:${gapidir}/libtinymailui-gtk-api.xml -I:${gapidir}/libtinymail-camel-api.xml -I:${gapidir}/libtinymail-platform-api.xml
+Libs: -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymail-sharp.dll -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymailui-sharp.dll -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymailui-gtk-sharp.dll -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymail-camel-sharp.dll -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymail-platform-sharp.dll
+Requires: glib-sharp-2.0 gtk-sharp-2.0 libtinymail-sharp-@API_VERSION@ libtinymailui-sharp-@API_VERSION@ libtinymailui-gtk-sharp-@API_VERSION@ libtinymail-camel-sharp-@API_VERSION@
