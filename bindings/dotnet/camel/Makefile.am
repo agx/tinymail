@@ -3,7 +3,7 @@ SUBDIRS = .
 pkg = libtinymail-camel
 
 SYMBOLS =
-INCLUDE_API = ../tny/libtinymail-api.xmi
+INCLUDE_API = ../tny/libtinymail-api.xml
 METADATA = libtinymail-camel.metadata
 references =
 glue_includes =
@@ -17,7 +17,7 @@ customs =
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libtinymail--camel-sharp-$(API_VERSION).pc
+pkgconfig_DATA = libtinymail-camel-sharp-$(API_VERSION).pc
 add_dist = $(pkgconfig_DATA:-$(API_VERSION).pc=.pc.in)
 DISTCLEANFILES = $(pkgconfig_DATA)
 
