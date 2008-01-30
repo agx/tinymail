@@ -8,5 +8,5 @@ Name: libtinymail-camel-sharp
 Description: libtinymail-camel-sharp - Tinymail Camel .NET Binding
 Version: @VERSION@
 Cflags: -I:${gapidir}/libtinymail-api.xml -I:${gapidir}/libtinymail-camel-api.xml
-Libs: -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymail-sharp.dll -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymail-camel-sharp.dll
+Libs: -r:${libdir}/mono/libtinymail-sharp.dll -r:${libdir}/mono/libtinymail-camel-sharp.dll
 Requires: glib-sharp-2.0 libtinymail-sharp-@API_VERSION@
