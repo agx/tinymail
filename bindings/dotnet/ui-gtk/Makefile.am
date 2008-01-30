@@ -4,6 +4,7 @@ pkg = libtinymailui-gtk
 
 SYMBOLS =
 INCLUDE_API = ../tny/libtinymail-api.xml ../ui/libtinymailui-api.xml
+INCLUDE_EXTRA = $(GTK_SHARP_CFLAGS)
 METADATA = libtinymailui-gtk.metadata
 references = ../tny/libtinymail-sharp.dll ../ui/libtinymailui-sharp.dll
 glue_includes =

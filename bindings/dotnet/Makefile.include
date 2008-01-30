@@ -35,10 +35,10 @@ $(API): $(METADATA) $(RAW_API) $(SYMBOLS) $(GAPI_FIXUP)
 build_customs = $(addprefix $(srcdir)/, $(customs))
 api_includes = $(addprefix -I:, $(INCLUDE_API))
 
-generated-stamp: $(API) $(INCLUDE_API) $(GAPI_CODEGEN) $(build_customs)
+generated-stamp: $(API) $(GAPI_CODEGEN) $(build_customs)
 	rm -f generated/* &&	\
 	$(GAPI_CODEGEN) --generate $(API) \
-	$(api_includes)	\
+	$(api_includes)	$(INCLUDE_EXTRA) \
 	--outdir=generated --customdir=$(srcdir) --assembly-name=$(ASSEMBLY_NAME)	\
 	&& touch generated-stamp
 
