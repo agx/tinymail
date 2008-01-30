@@ -9,4 +9,5 @@ AssemblyInfo.cs
 libtinymail-sharp.dll
 libtinymail-sharp.dll.config
 libtinymail-api.raw
+libtinymail-sources.xml
 Makefile

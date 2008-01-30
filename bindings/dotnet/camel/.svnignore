@@ -9,4 +9,5 @@ AssemblyInfo.cs
 libtinymail-camel-sharp.dll
 libtinymail-camel-sharp.dll.config
 libtinymail-camel-api.raw
+libtinymail-camel-sources.xml
 Makefile

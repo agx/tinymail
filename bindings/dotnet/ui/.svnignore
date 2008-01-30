@@ -9,4 +9,5 @@ AssemblyInfo.cs
 libtinymailui-sharp.dll
 libtinymailui-sharp.dll.config
 libtinymailui-api.raw
+libtinymailui-sources.xml
 Makefile

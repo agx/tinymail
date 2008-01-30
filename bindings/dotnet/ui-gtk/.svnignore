@@ -9,4 +9,5 @@ AssemblyInfo.cs
 libtinymailui-gtk-sharp.dll
 libtinymailui-gtk-sharp.dll.config
 libtinymailui-gtk-api.raw
+libtinymailui-gtk-sources.xml
 Makefile
