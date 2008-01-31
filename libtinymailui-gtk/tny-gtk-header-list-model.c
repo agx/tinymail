@@ -378,12 +378,14 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	if (priv->items->pdata[i] == NULL) {
 		g_warning ("GtkTreeModel in invalid state\n");
 		set_dummy (column, value);
+		g_static_rec_mutex_unlock (priv->iterator_lock);
 		return;
 	}
 
 	if (!TNY_IS_HEADER (priv->items->pdata[i])) {
 		g_warning ("GtkTreeModel in invalid state\n");
 		set_dummy (column, value);
+		g_static_rec_mutex_unlock (priv->iterator_lock);
 		return;
 	}
 
