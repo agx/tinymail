@@ -1,0 +1,8 @@
+
+// It's sealed in Gtk.ListStore (which is not nice)
+//
+//		public override System.Collections.IEnumerator GetEnumerator()
+//		{
+//			return (System.Collections.IEnumerator) this.CreateIterator ();
+//		}
+
