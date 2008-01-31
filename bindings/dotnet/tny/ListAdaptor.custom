@@ -1,6 +1,0 @@
-
-		public IEnumerator GetEnumerator()
-		{
-			return (IEnumerator) this.CreateIterator ();
-		}
-
