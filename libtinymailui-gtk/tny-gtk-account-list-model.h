@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 #define TNY_GTK_ACCOUNT_LIST_MODEL_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_GTK_ACCOUNT_LIST_MODEL, TnyGtkAccountListModelClass))
 #define TNY_IS_GTK_ACCOUNT_LIST_MODEL(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_GTK_ACCOUNT_LIST_MODEL))
 #define TNY_IS_GTK_ACCOUNT_LIST_MODEL_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_GTK_ACCOUNT_LIST_MODEL))
-#define TNY_GTK_ACCOUNT_LIST_MODEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_GTK_ACCOUNT_LIST_MODEL, TnyGtkAccountListModelClass))
+#define TNY_GTK_ACCOUNT_LIST_MODEL_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_GTK_ACCOUNT_LIST_MODEL, TnyGtkAccountListModelClass))
 
 typedef struct _TnyGtkAccountListModel TnyGtkAccountListModel;
 typedef struct _TnyGtkAccountListModelClass TnyGtkAccountListModelClass;
