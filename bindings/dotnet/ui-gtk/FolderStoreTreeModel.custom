@@ -4,3 +4,24 @@
 			return (System.Collections.IEnumerator) this.CreateIterator ();
 		}
 
+
+		public Tny.Folder GetFolder (Gtk.TreeIter iter)
+		{
+			int column = (int) Tny.Ui.GTK.FolderStoreTreeModelColumn.InstanceColumn;
+			GLib.Value val = GLib.Value.Empty;
+			GetValue (iter, column, ref val);
+			object ret = val.Val;
+			val.Dispose ();
+			return new Tny.FolderAdapter ((Tny.FolderImplementor) ret);
+		}
+
+		public Tny.FolderStore GetFolderStore (Gtk.TreeIter iter)
+		{
+			int column = (int) Tny.Ui.GTK.FolderStoreTreeModelColumn.InstanceColumn;
+			GLib.Value val = GLib.Value.Empty;
+			GetValue (iter, column, ref val);
+			object ret = val.Val;
+			val.Dispose ();
+			return new Tny.FolderStoreAdapter ((Tny.FolderStoreImplementor) ret);
+		}
+
