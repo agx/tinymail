@@ -1,0 +1,9 @@
+
+At this moment you need to apply the patch attached in the Novell bbug
+https://bugzilla.novell.com/show_bug.cgi?id=358012 to make these DotNet
+bindings generate correct CS proxy/adapter code.
+
+The same patch is also available here: ./gtk-sharp-patch-01.diff
+
+You also need to patch ./gtk-sharp-patch-02.diff discussed in Novell
+bug https://bugzilla.novell.com/show_bug.cgi?id=357324
