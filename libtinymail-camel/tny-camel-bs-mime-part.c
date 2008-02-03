@@ -658,6 +658,17 @@ tny_camel_bs_mime_part_get_transfer_encoding_default (TnyMimePart *self)
 	return priv->bodystructure->encoding;
 }
 
+static void
+tny_camel_bs_mime_part_set_transfer_encoding (TnyMimePart *self, const gchar *transfer_encoding)
+{
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_transfer_encoding(self, transfer_encoding);
+}
+
+static void
+tny_camel_bs_mime_part_set_transfer_encoding_default (TnyMimePart *self, const gchar *transfer_encoding)
+{
+	return;
+}
 
 static TnyStream* 
 tny_camel_bs_mime_part_get_stream (TnyMimePart *self)
@@ -1029,6 +1040,8 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->set_header_pair= tny_camel_bs_mime_part_set_header_pair;
 	klass->decode_to_stream_async= tny_camel_bs_mime_part_decode_to_stream_async;
 	klass->get_transfer_encoding= tny_camel_bs_mime_part_get_transfer_encoding;
+	klass->set_transfer_encoding= tny_camel_bs_mime_part_set_transfer_encoding;
+
 	return;
 }
 
@@ -1066,6 +1079,7 @@ tny_camel_bs_mime_part_class_init (TnyCamelBsMimePartClass *class)
 	class->set_header_pair= tny_camel_bs_mime_part_set_header_pair_default;
 	class->decode_to_stream_async= tny_camel_bs_mime_part_decode_to_stream_async_default;
 	class->get_transfer_encoding= tny_camel_bs_mime_part_get_transfer_encoding_default;
+	class->set_transfer_encoding= tny_camel_bs_mime_part_set_transfer_encoding_default;
 
 	object_class->finalize = tny_camel_bs_mime_part_finalize;
 

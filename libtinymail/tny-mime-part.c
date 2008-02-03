@@ -743,6 +743,30 @@ tny_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyM
 }
 
 
+
+/**
+ * tny_mime_part_set_transfer_encoding:
+ * @self: a #TnyMimePart
+ * @transfer_encoding: the Content-Transfer-Encoding
+ * 
+ * Set the transfer encoding
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+void
+tny_mime_part_set_transfer_encoding (TnyMimePart *self, const gchar *transfer_encoding)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->set_transfer_encoding!= NULL);
+#endif
+
+	TNY_MIME_PART_GET_IFACE (self)->set_transfer_encoding(self, transfer_encoding);
+
+	return;
+}
+
 /**
  * tny_mime_part_construct:
  * @self: a #TnyMimePart

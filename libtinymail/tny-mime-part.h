@@ -69,6 +69,7 @@ struct _TnyMimePartIface
 	void (*set_header_pair) (TnyMimePart *self, const gchar *name, const gchar *value);
 	void (*decode_to_stream_async) (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	const gchar* (*get_transfer_encoding) (TnyMimePart *self);
+	void (*set_transfer_encoding) (TnyMimePart *self, const gchar *transfer_encoding);
 
 };
 
@@ -99,6 +100,7 @@ void tny_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list);
 void tny_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value);
 void tny_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 const gchar* tny_mime_part_get_transfer_encoding (TnyMimePart *self);
+void tny_mime_part_set_transfer_encoding (TnyMimePart *self, const gchar *transfer_encoding);
 
 G_END_DECLS
 

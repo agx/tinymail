@@ -74,6 +74,7 @@ struct _TnyCamelMimePartClass
 	void (*set_header_pair) (TnyMimePart *self, const gchar *name, const gchar *value);
 	void (*decode_to_stream_async) (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	const gchar* (*get_transfer_encoding) (TnyMimePart *self);
+	void (*set_transfer_encoding) (TnyMimePart *self, const gchar *transfer_encoding);
 };
 
 
