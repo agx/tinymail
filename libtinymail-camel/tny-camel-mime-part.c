@@ -317,6 +317,8 @@ recreate_part (TnyMimePart *orig)
 
 	tny_mime_part_set_content_id (piece, tny_mime_part_get_content_id (orig));
 
+	tny_mime_part_set_transfer_encoding (piece, tny_mime_part_get_transfer_encoding (orig));
+
 	if (tny_mime_part_get_content_location (orig))
 		tny_mime_part_set_content_location (piece, tny_mime_part_get_content_location (orig));
 
