@@ -2980,6 +2980,10 @@ camel_header_mailbox_decode(const char *in, const char *charset)
 	return header_decode_mailbox(&in, charset);
 }
 
+#ifndef MAX_MAILS
+#define MAX_MAILS 2000
+#endif
+
 struct _camel_header_address *
 camel_header_address_decode(const char *in, const char *charset)
 {
@@ -3009,7 +3013,7 @@ camel_header_address_decode(const char *in, const char *charset)
 
 		cnt++;
 
-		if (cnt > 5000)
+		if (cnt > MAX_MAILS)
 			break;
 
 	} while (inptr != last);
