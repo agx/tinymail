@@ -19,6 +19,8 @@ libedataserver_1_2_la_SOURCES =		\
 	e-sexp.c			\
 	e-time-utils.c			\
 	e-data-server-util.c		\
+	e-array.c			\
+	e-array.h			\
 	md5-utils.c
 
 libedataserverincludedir = $(includedir)/libedataserver-lite/libedataserver

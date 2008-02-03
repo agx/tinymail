@@ -3,6 +3,7 @@
 	* Crashfix when retrieving a large message while expunging it from
 	another E-mail client
 	* Added tny_mime_part_set_transfer_encoding
+	* Temporary solution for large E-mails
 
 	* This was a minor API change
 
