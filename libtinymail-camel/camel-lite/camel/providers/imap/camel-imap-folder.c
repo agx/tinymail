@@ -2494,13 +2494,16 @@ get_content (CamelImapFolder *imap_folder, const char *uid,
 
 		/* TNY TODO: partial message retrieval exception */
 		stream = camel_imap_folder_fetch_data (imap_folder, uid, spec, FALSE, CAMEL_FOLDER_RECEIVE_FULL, -1, ex);
-		if (stream) {
+		if (stream && CAMEL_IS_STREAM (stream)) {
 			ret = camel_data_wrapper_construct_from_stream (CAMEL_DATA_WRAPPER (body_mp), stream);
 			camel_object_unref (CAMEL_OBJECT (stream));
 			if (ret == -1) {
 				camel_object_unref ((CamelObject *) body_mp);
 				return NULL;
 			}
+		} else {
+			camel_object_unref (body_mp);
+			return NULL;
 		}
 
 		return (CamelDataWrapper *) body_mp;
@@ -2532,7 +2535,7 @@ get_content (CamelImapFolder *imap_folder, const char *uid,
 			sprintf (child_spec + speclen, "%d.MIME", num++);
 			/* TNY TODO: partial message retrieval exception */
 			stream = camel_imap_folder_fetch_data (imap_folder, uid, child_spec, TRUE, CAMEL_FOLDER_RECEIVE_FULL, -1, ex);
-			if (stream) {
+			if (stream && CAMEL_IS_STREAM (stream)) {
 				int ret;
 
 				part = camel_mime_part_new ();
@@ -2548,7 +2551,7 @@ get_content (CamelImapFolder *imap_folder, const char *uid,
 				content = get_content (imap_folder, uid, part, ci, FALSE, ex);
 			}
 
-			if (!stream || !content) {
+			if (!stream || !content || !CAMEL_IS_STREAM (stream)) {
 				camel_object_unref (CAMEL_OBJECT (body_mp));
 				g_free (child_spec);
 				return NULL;
@@ -2630,7 +2633,7 @@ get_message (CamelImapFolder *imap_folder, const char *uid,
 	stream = camel_imap_folder_fetch_data (imap_folder, uid, section_text, FALSE, type, param, ex);
 	g_free (section_text);
 	g_free(part_spec);
-	if (!stream)
+	if (!stream || !CAMEL_IS_STREAM (stream))
 		return NULL;
 
 	msg = camel_mime_message_new ();
@@ -2851,8 +2854,8 @@ imap_cache_message (CamelDiscoFolder *disco_folder, const char *uid,
 
 	/* TNY TODO: partial message retrieval exception */
 	stream = camel_imap_folder_fetch_data (imap_folder, uid, "", FALSE, CAMEL_FOLDER_RECEIVE_FULL, -1, ex);
-	if (stream)
-		camel_object_unref (CAMEL_OBJECT (stream));
+	if (stream && CAMEL_IS_STREAM (stream))
+		camel_object_unref (stream);
 }
 
 /* We pretend that a FLAGS or RFC822.SIZE response is always exactly
@@ -5438,6 +5441,14 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 		goto errorhander;
 	}
+
+	/* There's a danger in how the message cache works: if an expunge happens
+	 * while we are working with a stream, the message cache's bag of streams
+	 * will take our first reference if we have the first reference. This 
+	 * makes it possible that this function returns a stream that is finalized
+	 * in stead of a NULL. We should somehow fix this in the message cache
+	 * code. Right now, all who use this function should check for the 
+	 * instance being valid cause of this reason. */
 
 	while (retry)
 	{
