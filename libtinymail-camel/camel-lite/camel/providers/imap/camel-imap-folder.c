@@ -2675,14 +2675,14 @@ get_message_simple (CamelImapFolder *imap_folder, const char *uid,
 	if (!stream) {
 		stream = camel_imap_folder_fetch_data (imap_folder, uid, "",
 						       FALSE, type, param, ex);
-		if (!stream)
+		if (!stream || !CAMEL_IS_STREAM (stream))
 			return NULL;
 	}
 
 	msg = camel_mime_message_new ();
 	ret = camel_data_wrapper_construct_from_stream (CAMEL_DATA_WRAPPER (msg),
 							stream);
-	camel_object_unref (CAMEL_OBJECT (stream));
+	camel_object_unref (stream);
 	if (ret == -1) {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_MEMORY,
 				      _("Unable to retrieve message: %s"),
@@ -5433,8 +5433,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		stream = camel_imap_message_cache_insert (imap_folder->cache,
 			uid, "", "", 0, NULL);
 
-	if (stream == NULL)
-	{
+	if (stream == NULL) {
 		ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
 		errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
 		goto errorhander;
@@ -5570,7 +5569,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 					rec += hread;
 					camel_operation_progress (NULL, rec, length);
 				} else {
-					if (hread != 0) {
+					if (hread < 0) {
 						ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
 						errmessage = g_strdup_printf (_("Read from service failed, UID=%s"), uid);
 						err = TRUE;
