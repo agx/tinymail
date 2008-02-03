@@ -2985,6 +2985,7 @@ camel_header_address_decode(const char *in, const char *charset)
 {
 	const char *inptr = in, *last;
 	struct _camel_header_address *list = NULL, *addr;
+	int cnt = 0;
 
 	d(printf("decoding To: '%s'\n", in));
 
@@ -3005,6 +3006,12 @@ camel_header_address_decode(const char *in, const char *charset)
 			inptr++;
 		else
 			break;
+
+		cnt++;
+
+		if (cnt > 5000)
+			break;
+
 	} while (inptr != last);
 
 	if (*inptr) {
