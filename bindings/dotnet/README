@@ -53,11 +53,11 @@ make
 
 export LD_LIBRARY_PATH=/opt/tinymail/lib/:/opt/gtk-sharp/lib/
 export MONO_PATH=/opt/gtk-sharp/lib/mono/gtk-sharp-2.0/:\
-	/opt/tinymail/lib/mono/libtinymail-sharp-1.0/:\
-	/opt/tinymail/lib/mono/libtinymailui-sharp-1.0/:\
-	/opt/tinymail/lib/mono/libtinymailui-gtk-sharp-1.0/:\
-	/opt/tinymail/lib/mono/libtinymail-camel-sharp-1.0/:\
-	/opt/tinymail/lib/mono/libtinymail-platform-sharp-1.0/
+/opt/tinymail/lib/mono/libtinymail-sharp-1.0/:\
+/opt/tinymail/lib/mono/libtinymailui-sharp-1.0/:\
+/opt/tinymail/lib/mono/libtinymailui-gtk-sharp-1.0/:\
+/opt/tinymail/lib/mono/libtinymail-camel-sharp-1.0/:\
+/opt/tinymail/lib/mono/libtinymail-platform-sharp-1.0/
 
 mono dotnet-demo.exe
 
@@ -70,11 +70,11 @@ mcs -pkg:libtinymail-platform-sharp-1.0 *cs gtk-gui/*.cs \
 
 export LD_LIBRARY_PATH=/opt/tinymail/lib/:/opt/gtk-sharp/lib/
 export MONO_PATH=/opt/gtk-sharp/lib/mono/gtk-sharp-2.0/:\
-	/opt/tinymail/lib/mono/libtinymail-sharp-1.0/:\
-	/opt/tinymail/lib/mono/libtinymailui-sharp-1.0/:\
-	/opt/tinymail/lib/mono/libtinymailui-gtk-sharp-1.0/:\
-	/opt/tinymail/lib/mono/libtinymail-camel-sharp-1.0/:\
-	/opt/tinymail/lib/mono/libtinymail-platform-sharp-1.0/
+/opt/tinymail/lib/mono/libtinymail-sharp-1.0/:\
+/opt/tinymail/lib/mono/libtinymailui-sharp-1.0/:\
+/opt/tinymail/lib/mono/libtinymailui-gtk-sharp-1.0/:\
+/opt/tinymail/lib/mono/libtinymail-camel-sharp-1.0/:\
+/opt/tinymail/lib/mono/libtinymail-platform-sharp-1.0/
 
 mono test.exe
 
