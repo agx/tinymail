@@ -7,21 +7,27 @@
 
 		public Tny.Folder GetFolder (Gtk.TreeIter iter)
 		{
+			Tny.Folder retval;
+
 			int column = (int) Tny.Ui.GTK.FolderStoreTreeModelColumn.InstanceColumn;
 			GLib.Value val = GLib.Value.Empty;
 			GetValue (iter, column, ref val);
-			object ret = val.Val;
+			retval = (Tny.Folder) val.Val;
 			val.Dispose ();
-			return new Tny.FolderAdapter ((Tny.FolderImplementor) ret);
+
+			return retval;
 		}
 
 		public Tny.FolderStore GetFolderStore (Gtk.TreeIter iter)
 		{
+			Tny.FolderStore retval;
+
 			int column = (int) Tny.Ui.GTK.FolderStoreTreeModelColumn.InstanceColumn;
 			GLib.Value val = GLib.Value.Empty;
 			GetValue (iter, column, ref val);
-			object ret = val.Val;
+			retval = (Tny.FolderStore) val.Val;
 			val.Dispose ();
-			return new Tny.FolderStoreAdapter ((Tny.FolderStoreImplementor) ret);
+
+			return retval;
 		}
 

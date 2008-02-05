@@ -1,10 +1,13 @@
 
-public class Init {
+namespace Tny.Platform
+{
+	public class Init {
 
-	static void Initialize () {
-		GtkSharp.LibtinymailPlatformSharp.ObjectManager.Initialize ();
-		GtkSharp.LibtinymailCamelSharp.ObjectManager.Initialize ();
-		// GtkSharp.LibtinymailuiGtkSharp.ObjectManager.Initialize ();
+		public static void Initialize () {
+			GtkSharp.LibtinymailPlatformSharp.ObjectManager.Initialize ();
+			GtkSharp.LibtinymailCamelSharp.ObjectManager.Initialize ();
+			// GtkSharp.LibtinymailuiGtkSharp.ObjectManager.Initialize ();
+		}
 	}
 }
 
