@@ -38,7 +38,7 @@ patch -p0 < gtk-sharp-patch-02.diff
 ./boodstrap-2.12 --prefix=/opt/gtk-sharp
 
 make && sudo make install
-export PKG_CONFIG_PATH=/opt/gtk-sharp/lib/pkgconfig
+export PKG_CONFIG_PATH=/opt/gtk-sharp/lib/pkgconfig:/opt/tinymail/lib/pkgconfig
 export PATH=$PATH:/opt/gtk-sharp/bin
 cd ..
 ./autogen.sh --prefix=/opt/tinymail --enable-dotnet-bindings
@@ -48,18 +48,8 @@ make && sudo make install
 ## Testing it with a little demo ui written in C#
 #
 
-cd tests/dotnet
-make
-
-export LD_LIBRARY_PATH=/opt/tinymail/lib/:/opt/gtk-sharp/lib/
-export MONO_PATH=/opt/gtk-sharp/lib/mono/gtk-sharp-2.0/:\
-/opt/tinymail/lib/mono/libtinymail-sharp-1.0/:\
-/opt/tinymail/lib/mono/libtinymailui-sharp-1.0/:\
-/opt/tinymail/lib/mono/libtinymailui-gtk-sharp-1.0/:\
-/opt/tinymail/lib/mono/libtinymail-camel-sharp-1.0/:\
-/opt/tinymail/lib/mono/libtinymail-platform-sharp-1.0/
-
-mono dotnet-demo.exe
+cd tests/dotnet-demo
+sh ./build.sh
 
 #
 ## To compile something simple
@@ -67,6 +57,11 @@ mono dotnet-demo.exe
 
 mcs -pkg:libtinymail-platform-sharp-1.0 *cs gtk-gui/*.cs \
 	-resource:gtk-gui/gui.stetic -o test.exe
+
+# Or for example:
+
+mcs -r:Mono.Posix.dll -pkg:libtinymail-platform-sharp-1.0 \
+	*cs gtk-gui/*.cs -resource:gtk-gui/gui.stetic -o test.exe
 
 export LD_LIBRARY_PATH=/opt/tinymail/lib/:/opt/gtk-sharp/lib/
 export MONO_PATH=/opt/gtk-sharp/lib/mono/gtk-sharp-2.0/:\

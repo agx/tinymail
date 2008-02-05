@@ -39,7 +39,6 @@
 static GObjectClass *parent_class = NULL;
 
 #include <tny-camel-msg.h>
-#include <tny-camel-header.h>
 #include <tny-camel-transport-account.h>
 #include <tny-status.h>
 #define TINYMAIL_ENABLE_PRIVATE_API

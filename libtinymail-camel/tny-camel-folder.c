@@ -36,7 +36,6 @@
 #include <tny-msg.h>
 #include <tny-header.h>
 #include <tny-camel-msg.h>
-#include <tny-camel-header.h>
 #include <tny-store-account.h>
 #include <tny-camel-store-account.h>
 #include <tny-list.h>

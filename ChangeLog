@@ -1,3 +1,8 @@
+2008-02-05  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Making the DotNet bindings actually work
+	* Added a demoui written in C#
+
 2008-02-05  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/camel.[ch]:

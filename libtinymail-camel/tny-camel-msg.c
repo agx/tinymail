@@ -34,7 +34,6 @@
 #include <tny-header.h>
 #include <tny-camel-mime-part.h>
 #include <tny-stream-camel.h>
-#include <tny-camel-header.h>
 #include <tny-camel-shared.h>
 #include <tny-account.h>
 #include <tny-folder.h>

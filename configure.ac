@@ -578,6 +578,7 @@ tests/python-demo/Makefile
 tests/memory/Makefile
 tests/functional/Makefile
 tests/vala-demo/Makefile
+tests/dotnet-demo/build.sh
 m4/Makefile
 ])
 

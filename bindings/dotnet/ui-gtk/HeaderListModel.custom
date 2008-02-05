@@ -5,6 +5,25 @@
 		}
 
 
+		public Tny.Header GetHeader (Gtk.TreeIter iter)
+		{
+			try {
+				Tny.Header retval;
+
+				int column = (int) Tny.Ui.GTK.HeaderListModelColumn.InstanceColumn;
+				GLib.Value val = GLib.Value.Empty;
+				GetValue (iter, column, ref val);
+				retval = (Tny.Header) val.Val;
+				val.Dispose ();
+
+				return retval;
+			} catch {
+				return null;
+			}
+		}
+
+
+
 		[DllImport("libgtk-win32-2.0-0.dll")]
 		static extern bool gtk_tree_model_iter_children (IntPtr raw, out Gtk.TreeIter iter, IntPtr parent);
 		public bool IterChildren (out Gtk.TreeIter iter) 

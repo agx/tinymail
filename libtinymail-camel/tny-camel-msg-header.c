@@ -26,7 +26,6 @@
 #include <string.h>
 
 #include <tny-header.h>
-#include <tny-camel-header.h>
 #include <tny-camel-folder.h>
 
 #include "tny-camel-common-priv.h"

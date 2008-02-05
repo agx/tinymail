@@ -27,4 +27,7 @@
  <attr path="/api/namespace/object[@cname='TnyGtkTextBufferStream']" name="name">TextBufferStream</attr>
  <attr path="/api/namespace/object[@cname='TnyGtkTextMimePartView']" name="name">TextMimePartView</attr>
 
+ <attr path="/api/namespace/*/*/parameters/parameter[@name='callback']" name="scope">async</attr>
+ <attr path="/api/namespace/*/*/parameters/parameter[@name='status_callback']" name="scope">call</attr>
+
 </metadata>
