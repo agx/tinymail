@@ -65,7 +65,8 @@ mono dotnet-demo.exe
 ## To compile something simple
 #
 
-mcs -pkg:libtinymail-platform-sharp-1.0 -pkg:glade-sharp-2.0 *cs gtk-gui/*.cs -resource:gtk-gui/gui.stetic -o test.exe
+mcs -pkg:libtinymail-platform-sharp-1.0 *cs gtk-gui/*.cs \
+	-resource:gtk-gui/gui.stetic -o test.exe
 
 export LD_LIBRARY_PATH=/opt/tinymail/lib/:/opt/gtk-sharp/lib/
 export MONO_PATH=/opt/gtk-sharp/lib/mono/gtk-sharp-2.0/:\
