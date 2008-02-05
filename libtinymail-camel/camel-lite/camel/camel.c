@@ -46,7 +46,7 @@
 
 static int initialised = FALSE;
 
-static void
+void
 camel_shutdown (void)
 {
 	CamelCertDB *certdb;

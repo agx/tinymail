@@ -1,3 +1,13 @@
+2008-02-05  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/camel.[ch]:
+	Make camel_shutdown method be public, for the cases we cannot
+	rely on g_atexit.
+	* libtinymail-camel/camel-lite/camel/camel-tcp-stream-ssl.c:
+	Modified method to calculate the fingerprint of a certificate.
+	Now we use Mozilla NSS api for this as the old method was not
+	reliable in some cases.
+
 2008-02-03  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Crashfix when retrieving a large message while expunging it from
