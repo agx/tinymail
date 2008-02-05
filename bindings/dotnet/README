@@ -50,6 +50,38 @@ make && sudo make install
 
 cd tests/dotnet
 make
+
+export LD_LIBRARY_PATH=/opt/tinymail/lib/:/opt/gtk-sharp/lib/
+export MONO_PATH=/opt/gtk-sharp/lib/mono/gtk-sharp-2.0/:\
+	/opt/tinymail/lib/mono/libtinymail-sharp-1.0/:\
+	/opt/tinymail/lib/mono/libtinymailui-sharp-1.0/:\
+	/opt/tinymail/lib/mono/libtinymailui-gtk-sharp-1.0/:\
+	/opt/tinymail/lib/mono/libtinymail-camel-sharp-1.0/:\
+	/opt/tinymail/lib/mono/libtinymail-platform-sharp-1.0/
+
 mono dotnet-demo.exe
 
+#
+## To compile something simple
+#
+
+mcs -pkg:libtinymail-platform-sharp-1.0 -pkg:glade-sharp-2.0 *cs gtk-gui/*.cs -resource:gtk-gui/gui.stetic -o test.exe
+
+export LD_LIBRARY_PATH=/opt/tinymail/lib/:/opt/gtk-sharp/lib/
+export MONO_PATH=/opt/gtk-sharp/lib/mono/gtk-sharp-2.0/:\
+	/opt/tinymail/lib/mono/libtinymail-sharp-1.0/:\
+	/opt/tinymail/lib/mono/libtinymailui-sharp-1.0/:\
+	/opt/tinymail/lib/mono/libtinymailui-gtk-sharp-1.0/:\
+	/opt/tinymail/lib/mono/libtinymail-camel-sharp-1.0/:\
+	/opt/tinymail/lib/mono/libtinymail-platform-sharp-1.0/
+
+mono test.exe
+
+#
+## Note about those insane LD_LIBRARY_PATH and MONO_PATH variables:
+#
+
+A normal install does not require these. They are required because the 
+assemblies and shared object files, when installed in /opt, wont be found by 
+Mono unless you specify MONO_PATH and LD_LIBRARY_PATH.
 
