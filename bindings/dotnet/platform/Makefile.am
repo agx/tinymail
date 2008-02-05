@@ -8,7 +8,7 @@ METADATA = libtinymail-platform.metadata
 references = ../tny/libtinymail-sharp.dll ../ui/libtinymailui-sharp.dll ../camel/libtinymail-camel-sharp.dll
 glue_includes =
 
-sources =
+sources = Init.cs
 
 customs =
 

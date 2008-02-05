@@ -7,6 +7,6 @@ gapidir=${prefix}/share/gapi-2.0
 Name: libtinymail-sharp
 Description: libtinymail-sharp - Tinymail .NET Binding
 Version: @VERSION@
-Cflags: -I:${gapidir}/libtinymail-api.xml
+Cflags: -I:${gapidir}/libtinymail-api.xml /d:HAVE_TNY_SHARP
 Libs: -r:${libdir}/mono/@PACKAGE_VERSION@/libtinymail-sharp.dll
 Requires: glib-sharp-2.0
