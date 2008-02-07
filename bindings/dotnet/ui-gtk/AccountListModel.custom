@@ -32,3 +32,15 @@
 				return null;
 			}
 		}
+
+		public Tny.Account GetAccount (Gtk.TreeSelection selection)
+		{
+			Gtk.TreeIter iter;
+
+			if (selection.GetSelected (out iter)) {
+				return this.GetAccount (iter);
+			}
+
+			return null;
+		}
+

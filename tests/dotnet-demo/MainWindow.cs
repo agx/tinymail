@@ -74,38 +74,26 @@ public partial class MainWindow: Gtk.Window
 			
 	private void OnMailSelected (object o, EventArgs args)
 	{
-		Gtk.TreeModel model;
-		Gtk.TreeIter iter;
-		Gtk.TreeSelection selection = (Gtk.TreeSelection) o;
-
-	 	if (selection.GetSelected (out model, out iter)) {
-	 		Tny.Ui.GTK.HeaderListModel headers_model = (Tny.Ui.GTK.HeaderListModel) model;	
- 			Tny.Header header = headers_model.GetHeader (iter);
-
-			if (header != null) {
-				Console.WriteLine ("Message selected: " + header.From);				
-				if (this.cur_folder != null)
-					this.cur_folder.GetMsgAsync (header, GetMsgCallBack, StatusCallback);
-			}
+		Tny.Ui.GTK.HeaderListModel model = (o as Gtk.TreeSelection).TreeView.Model as Tny.Ui.GTK.HeaderListModel;
+		Tny.Header header = model.GetHeader (o as Gtk.TreeSelection);
+		
+		if (header != null) {
+			Console.WriteLine ("Message selected: " + header.From);	
+			this.cur_folder.GetMsgAsync (header, GetMsgCallBack, StatusCallback);
 		}
+		
 	}
 	
 	private void OnFolderChanged (object o, EventArgs args)
 	{
-		Gtk.TreeModel model;
-		Gtk.TreeIter iter;
-		Gtk.TreeSelection selection = (Gtk.TreeSelection) o;
-
-	 	if (selection.GetSelected (out model, out iter)) {
-	 		Tny.Ui.GTK.FolderStoreTreeModel folders_model = (Tny.Ui.GTK.FolderStoreTreeModel) model;	
- 			Tny.Folder folder = folders_model.GetFolder (iter);
-
-			if (folder != null) {
-				this.cur_folder = folder;
-				Console.WriteLine ("Folder selected: " + folder.Name);		
-				Tny.Ui.GTK.HeaderListModel headers_model = new Tny.Ui.GTK.HeaderListModel();
-				folder.GetHeadersAsync (headers_model, true, GetHeadersCallback, StatusCallback);
-			}
+		Tny.Ui.GTK.FolderStoreTreeModel model = (o as Gtk.TreeSelection).TreeView.Model as Tny.Ui.GTK.FolderStoreTreeModel;
+		Tny.Folder folder = model.GetFolder (o as Gtk.TreeSelection);
+		
+		if (folder != null) {
+			Tny.Ui.GTK.HeaderListModel headers_model = new Tny.Ui.GTK.HeaderListModel();
+			Console.WriteLine ("Folder selected: " + folder.Name);	
+			this.cur_folder = folder;
+			folder.GetHeadersAsync (headers_model, true, GetHeadersCallback, StatusCallback);
 		}
 	}
 

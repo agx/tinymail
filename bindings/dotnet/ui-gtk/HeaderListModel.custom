@@ -43,6 +43,17 @@
 		}
 
 
+		public Tny.Header GetHeader (Gtk.TreeSelection selection)
+		{
+			Gtk.TreeIter iter;
+
+			if (selection.GetSelected (out iter)) {
+				return this.GetHeader (iter);
+			}
+
+			return null;
+		}
+
 
 		[DllImport("libgtk-win32-2.0-0.dll")]
 		static extern bool gtk_tree_model_iter_children (IntPtr raw, out Gtk.TreeIter iter, IntPtr parent);

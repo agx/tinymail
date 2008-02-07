@@ -33,3 +33,15 @@
 				return null;
 			}
 		}
+
+		public Tny.MimePart GetMimePart (Gtk.TreeSelection selection)
+		{
+			Gtk.TreeIter iter;
+
+			if (selection.GetSelected (out iter)) {
+				return this.GetMimePart (iter);
+			}
+
+			return null;
+		}
+

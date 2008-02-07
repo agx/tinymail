@@ -50,3 +50,26 @@
 			}
 		}
 
+		public Tny.FolderStore GetFolderStore (Gtk.TreeSelection selection)
+		{
+			Gtk.TreeIter iter;
+
+			if (selection.GetSelected (out iter)) {
+				return this.GetFolderStore (iter);
+			}
+
+			return null;
+		}
+
+
+		public Tny.Folder GetFolder (Gtk.TreeSelection selection)
+		{
+			Gtk.TreeIter iter;
+
+			if (selection.GetSelected (out iter)) {
+				return this.GetFolder (iter);
+			}
+
+			return null;
+		}
+
