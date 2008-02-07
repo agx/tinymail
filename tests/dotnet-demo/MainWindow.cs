@@ -112,10 +112,10 @@ public partial class MainWindow: Gtk.Window
 	
 	private void OnConnectButtonClicked (object sender, System.EventArgs e)
 	{
-		// Tny.Ui.PlatformFactory factory = Tny.Platform.GnomePlatformFactory.Instance;
+		// Tny.Ui.PlatformFactory factory = Tny.Platform.PlatformFactory.Instance;
 		// this.store = factory.NewAccountStore ();
 
-		this.store = new Tny.Platform.GnomeAccountStore ();
+		this.store = new Tny.Platform.AccountStore ();
 		Tny.Ui.GTK.FolderStoreTreeModel model = new Tny.Ui.GTK.FolderStoreTreeModel (new Tny.FolderStoreQuery ());
 		store.GetAccounts (model, Tny.GetAccountsRequestType.StoreAccounts);		
 		this.folders_treeview.Model = model;

@@ -70,6 +70,7 @@ build_unittests=false
 build_tp=false
 have_conic=false
 PLATFORMDIR=libtinymail-gnome-desktop
+PLATFORMSPECIFICNAME=Gnome
 PLATFORM=1
 
 dnl ### Select the platform library ##
@@ -78,13 +79,15 @@ AC_HELP_STRING([--with-platform=gnome-desktop],
   [Platform to compile (gnome-desktop, maemo, olpc or gpe)]),
 [case "${with_platform}" in
   gnome-desktop) 
-	PLATFORMDIR=libtinymail-gnome-desktop 
+	PLATFORMDIR=libtinymail-gnome-desktop
+	PLATFORMSPECIFICNAME=Gnome 
 	build_uigtk=true
 	build_demoui=true
 	PLATFORM=1
 	;;
   maemo)
         PLATFORMDIR=libtinymail-maemo
+	PLATFORMSPECIFICNAME=Maemo
         build_gtkhtml=false
         build_mozembed=false
         build_gnome=false
@@ -94,13 +97,15 @@ AC_HELP_STRING([--with-platform=gnome-desktop],
 	PLATFORM=2
         ;;
   gpe) 
-	PLATFORMDIR=libtinymail-gpe 
+	PLATFORMDIR=libtinymail-gpe
+	PLATFORMSPECIFICNAME=Gpe 
 	build_uigtk=true
 	build_demoui=true
 	PLATFORM=3
 	;;
   olpc)
         PLATFORMDIR=libtinymail-olpc
+	PLATFORMSPECIFICNAME=Olpc
         build_gtkhtml=false
         build_mozembed=false
         build_gnome=false
@@ -111,6 +116,7 @@ AC_HELP_STRING([--with-platform=gnome-desktop],
         ;;
   *) 
 	PLATFORMDIR=${with_platform}
+	PLATFORMSPECIFICNAME=
 	build_uigtk=false
 	build_demoui=false
 	PLATFORM=0
@@ -119,6 +125,7 @@ esac], [PLATFORMDIR=libtinymail-gnome-desktop
 
 AC_SUBST(PLATFORMDIR)
 AC_SUBST(PLATFORM)
+AC_SUBST(PLATFORMSPECIFICNAME)
 
 dnl ### Select the html component ##
 AC_ARG_WITH(html-component,
@@ -539,6 +546,7 @@ bindings/dotnet/camel/Makefile
 bindings/dotnet/platform/libtinymail-platform-sharp.dll.config
 bindings/dotnet/platform/libtinymail-platform-sharp.pc
 bindings/dotnet/platform/libtinymail-platform-sources.xml
+bindings/dotnet/platform/libtinymail-platform.metadata
 bindings/dotnet/platform/Makefile
 libtinymail/Makefile
 libtinymail/libtinymail.pc
