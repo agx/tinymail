@@ -1,10 +1,8 @@
 
-// It's sealed in Gtk.ListStore (which is not nice)
-//
-//		public override System.Collections.IEnumerator GetEnumerator()
-//		{
-//			return (System.Collections.IEnumerator) this.CreateIterator ();
-//		}
+		public new System.Collections.IEnumerator GetEnumerator()
+		{
+			return (System.Collections.IEnumerator) this.CreateIterator ();
+		}
 
 
 		public void GetValue(Gtk.TreeIter iter, Tny.Ui.GTK.AccountListModelColumn column, ref GLib.Value value) 

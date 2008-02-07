@@ -5,7 +5,6 @@
 		}
 
 
-
 		public object GetValue(Gtk.TreeIter iter, int column) 
 		{
 			GLib.Value val = GLib.Value.Empty;
