@@ -6,6 +6,7 @@ public partial class MainWindow: Gtk.Window
 
 	private Tny.Ui.MsgView msg_view;
 	private Tny.Folder cur_folder = null;
+	private Tny.AccountStore store = null;
 	
 	public MainWindow (): base (Gtk.WindowType.Toplevel)
 	{
@@ -111,7 +112,7 @@ public partial class MainWindow: Gtk.Window
 	
 	private void OnConnectButtonClicked (object sender, System.EventArgs e)
 	{
-		Tny.AccountStore store = new Tny.Platform.GnomeAccountStore ();
+		this.store = new Tny.Platform.GnomeAccountStore ();
 		Tny.Ui.GTK.FolderStoreTreeModel model = new Tny.Ui.GTK.FolderStoreTreeModel (new Tny.FolderStoreQuery ());
 		store.GetAccounts (model, Tny.GetAccountsRequestType.StoreAccounts);		
 		this.folders_treeview.Model = model;
