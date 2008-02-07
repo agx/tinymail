@@ -5,14 +5,35 @@
 		}
 
 
+
+		public object GetValue(Gtk.TreeIter iter, int column) 
+		{
+			GLib.Value val = GLib.Value.Empty;
+			GetValue (iter, column, ref val);
+			object ret = val.Val;
+			val.Dispose ();
+			return ret;
+		}
+
+		public void GetValue(Gtk.TreeIter iter, Tny.Ui.GTK.HeaderListModelColumn column, ref GLib.Value value) 
+		{
+			this.GetValue (iter, ((int) column), ref value);
+		}
+
+		public void GetValue(Gtk.TreeIter iter, Tny.Ui.GTK.AttachListModelColumn column, ref Tny.Header value) 
+		{
+			GLib.Value val = GLib.Value.Empty;
+			this.GetValue (iter, ((int) column), ref val);
+			value = (Tny.Header) val.Val;
+		}
+
 		public Tny.Header GetHeader (Gtk.TreeIter iter)
 		{
 			try {
 				Tny.Header retval;
 
-				int column = (int) Tny.Ui.GTK.HeaderListModelColumn.InstanceColumn;
 				GLib.Value val = GLib.Value.Empty;
-				GetValue (iter, column, ref val);
+				GetValue (iter, Tny.Ui.GTK.HeaderListModelColumn.InstanceColumn, ref val);
 				retval = (Tny.Header) val.Val;
 				val.Dispose ();
 
@@ -96,15 +117,6 @@
 			GLib.Value val = new GLib.Value (value);
 			SetValue (iter, column, val);
 			val.Dispose ();
-		}
-
-		public object GetValue(Gtk.TreeIter iter, int column) 
-		{
-			GLib.Value val = GLib.Value.Empty;
-			GetValue (iter, column, ref val);
-			object ret = val.Val;
-			val.Dispose ();
-			return ret;
 		}
 
 
