@@ -19,6 +19,21 @@
 
 #include <tny-error.h>
 
+
+/**
+ * tny_error_get_message:
+ * @err: a #GError
+ *
+ * Get the error message
+ *
+ * returns: a error message
+ **/
+const gchar* 
+tny_error_get_message (GError *err)
+{
+	return err->message;
+}
+
 /**
  * tny_error_domain_get_type:
  *

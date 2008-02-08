@@ -54,10 +54,15 @@ public partial class MainWindow: Gtk.Window
 		a.RetVal = true;
 	}
 
-	private void GetHeadersCallback (Tny.Folder folder, bool cancel, Tny.List model, IntPtr user_data)
+	private void GetHeadersCallback (Tny.Folder folder, bool cancel, Tny.List model, IntPtr err)
 	{
-		if (model != null && !cancel)
-			this.headers_treeview.Model = (Gtk.TreeModel) model;
+		if (err != IntPtr.Zero) {
+			Exception ex = new Tny.TException (err);
+			Console.WriteLine (ex.Message);
+		} else {
+			if (model != null && !cancel)
+				this.headers_treeview.Model = (Gtk.TreeModel) model;
+		}
 	}
 	
 	private void StatusCallback (GLib.Object sender, Tny.Status status)
@@ -65,10 +70,15 @@ public partial class MainWindow: Gtk.Window
 		this.progressbar.Fraction = status.Fraction;
 	}
 
-	private void GetMsgCallBack (Tny.Folder folder, bool cancel, Tny.Msg msg, IntPtr user_data)
+	private void GetMsgCallBack (Tny.Folder folder, bool cancel, Tny.Msg msg, IntPtr err)
 	{
-		if (msg != null && !cancel)
-			this.msg_view.Msg = msg;
+		if (err != IntPtr.Zero) {
+			Exception ex = new Tny.TException (err);
+			Console.WriteLine (ex.Message);
+		} else {
+			if (msg != null && !cancel)
+				this.msg_view.Msg = msg;
+		}
 	}
 	
 			
@@ -80,8 +90,7 @@ public partial class MainWindow: Gtk.Window
 		if (header != null) {
 			Console.WriteLine ("Message selected: " + header.From);	
 			this.cur_folder.GetMsgAsync (header, GetMsgCallBack, StatusCallback);
-		}
-		
+		}	
 	}
 	
 	private void OnFolderChanged (object o, EventArgs args)

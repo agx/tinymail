@@ -137,6 +137,8 @@ enum _TnyError
 
 typedef enum _TnyError TnyError;
 
+const gchar* tny_error_get_message (GError *err);
+
 GType tny_error_domain_get_type (void);
 GType tny_error_get_type (void);
 
