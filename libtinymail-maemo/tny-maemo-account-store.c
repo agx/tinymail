@@ -153,8 +153,11 @@ gconf_listener_account_changed (GConfClient *client, guint cnxn_id,
 	TnyAccountStore *self = user_data;
 	TnyMaemoAccountStorePriv *priv = TNY_MAEMO_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	gchar *key = g_strdup (entry->key);
-	gchar *ptr = strrchr (key, '/'); ptr++;
+	gchar *key = entry->key ? g_strdup (entry->key) : g_strdup ("");
+	gchar *ptr = strrchr (key, '/'); 
+
+	if (ptr)
+		ptr++;
 
 	if (!strcmp (ptr, "count"))
 		kill_stored_accounts (priv);

@@ -390,6 +390,12 @@ tny_gtk_folder_store_tree_model_on_changed (TnyAccount *account, TnyGtkFolderSto
 
 typedef struct
 {
+	GObject *instance;
+	guint handler_id;
+} SignalSlot;
+
+typedef struct
+{
 	TnyGtkFolderStoreTreeModel *self;
 	TnyAccount *account;
 } AccNotYetReadyInfo;
@@ -402,11 +408,19 @@ account_was_not_yet_ready_idle (gpointer user_data)
 
 	if (tny_account_is_ready (info->account))
 	{
-		g_signal_connect (info->account, "connection-status-changed",
-			G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), info->self);
+		SignalSlot *slot;
 
-		g_signal_connect (info->account, "changed",
+		slot = g_slice_new (SignalSlot);
+		slot->instance = g_object_ref (info->account);
+		slot->handler_id = g_signal_connect (info->account, "connection-status-changed",
+			G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), info->self);
+		g_ptr_array_add (info->self->signals, slot);
+
+		slot = g_slice_new (SignalSlot);
+		slot->instance = g_object_ref (info->account);
+		slot->handler_id = g_signal_connect (info->account, "changed",
 			G_CALLBACK (tny_gtk_folder_store_tree_model_on_changed), info->self);
+		g_ptr_array_add (info->self->signals, slot);
 
 		tny_gtk_folder_store_tree_model_on_constatus_changed (info->account, 
 			tny_account_get_connection_status (info->account), info->self);
@@ -466,10 +480,19 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 				info, account_was_not_yet_ready_destroy);
 
 		} else {
-			g_signal_connect (folder_store, "connection-status-changed",
+			SignalSlot *slot;
+
+			slot = g_slice_new (SignalSlot);
+			slot->instance = g_object_ref (folder_store);
+			slot->handler_id = g_signal_connect (folder_store, "connection-status-changed",
 				G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), self);
-			g_signal_connect (folder_store, "changed",
+			g_ptr_array_add (self->signals, slot);
+
+			slot = g_slice_new (SignalSlot);
+			slot->instance = g_object_ref (folder_store);
+			slot->handler_id = g_signal_connect (folder_store, "changed",
 				G_CALLBACK (tny_gtk_folder_store_tree_model_on_changed), self);
+			g_ptr_array_add (self->signals, slot);
 		}
 	}
 
@@ -523,13 +546,17 @@ static void
 tny_gtk_folder_store_tree_model_finalize (GObject *object)
 {
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) object;
-/*
-	if (me->signal1 != -1)
-		g_signal_handler_disconnect (me, me->signal1);
+	int i = 0;
 
-	if (me->signal2 != -1)
-		g_signal_handler_disconnect (me, me->signal2);
-*/
+	for (i = 0; i < me->signals->len; i++) {
+		SignalSlot *slot = (SignalSlot *) me->signals->pdata [i];
+		g_signal_handler_disconnect (slot->instance, slot->handler_id);
+		g_object_unref (slot->instance);
+		g_slice_free (SignalSlot, slot);
+	}
+
+	g_ptr_array_free (me->signals, TRUE);
+	me->signals = NULL;
 
 /* Experimentally removed this. With weak referencing this ain't needed ...
 
@@ -593,6 +620,7 @@ tny_gtk_folder_store_tree_model_instance_init (GTypeInstance *instance, gpointer
 	TnyGtkFolderStoreTreeModel *me = (TnyGtkFolderStoreTreeModel*) instance;
 	static GType types[] = { G_TYPE_STRING, G_TYPE_UINT, G_TYPE_UINT, G_TYPE_INT, G_TYPE_OBJECT };
 
+	me->signals = g_ptr_array_new ();
 	me->fol_obs = NULL;
 	me->store_obs = NULL;
 	me->iterator_lock = g_mutex_new ();

@@ -192,10 +192,9 @@ decode_estring (unsigned char **in, unsigned char *inend, GError **err)
 
 				inptr++; /* My '(' */
 
-				if (!first) {
+				if (!first)
 					g_string_append (str, ", ");
-					first = FALSE;
-				}
+				first = FALSE;
 
 				name = decode_qstring (&inptr, inend, err);
 				separator = decode_qstring (&inptr, inend, err);

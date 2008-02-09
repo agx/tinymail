@@ -676,6 +676,15 @@ summary_block_write_flags (SummaryBlock *b)
 
 	flags = fopen (flags_filename_n, "w");
 
+	if (!flags) {
+		g_free (flags_filename);
+		g_free (flags_filename_n);
+		g_list_free (items);
+		/* TODO: Error reporting */
+		g_static_rec_mutex_unlock (b->lock);
+		return;
+	}
+
 	while (items) {
 		SummaryItem *item = (SummaryItem *) items->data;
 		fprintf (flags, "%d %d\n", item->seq, item->flags); 

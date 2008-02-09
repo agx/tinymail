@@ -1,3 +1,9 @@
+2008-02-09  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Crash when the IMAP server doesn't support namespaces
+	* GLib Signal leakage in TnyGtkFolderStoreTreeModel
+	* Various smaller fixes and code improvements
+
 2008-02-05  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Making the DotNet bindings actually work
