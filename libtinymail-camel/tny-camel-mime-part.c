@@ -62,6 +62,8 @@ static GObjectClass *parent_class = NULL;
 #include <camel/camel-mime-filter-charset.h>
 #include <camel/camel-mime-filter-windows.h>
 
+static ssize_t camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream);
+
 static void 
 tny_camel_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value)
 {
@@ -276,7 +278,7 @@ recreate_part (TnyMimePart *orig)
 	TnyList *list = tny_simple_list_new ();
 	TnyIterator *iter;
 	const gchar *type = tny_mime_part_get_content_type (orig);
-	TnyStream *in_stream = tny_mime_part_get_stream (orig);
+	TnyStream *in_stream = tny_mime_part_get_decoded_stream (orig);
 /*
 	TnyList *header_pairs = tny_simple_list_new ();
 */
@@ -826,6 +828,56 @@ tny_camel_mime_part_get_stream_default (TnyMimePart *self)
 
 	return retval;
 }
+
+
+
+
+static TnyStream* 
+tny_camel_mime_part_get_decoded_stream (TnyMimePart *self)
+{
+	return TNY_CAMEL_MIME_PART_GET_CLASS (self)->get_decoded_stream(self);
+}
+
+static TnyStream* 
+tny_camel_mime_part_get_decoded_stream_default (TnyMimePart *self)
+{
+	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	TnyStream *retval = NULL;
+	CamelDataWrapper *wrapper;
+	CamelMedium *medium;
+	CamelStream *stream = camel_stream_mem_new ();
+
+	g_mutex_lock (priv->part_lock);
+	medium =  CAMEL_MEDIUM (priv->part);
+	camel_object_ref (medium);
+	g_mutex_unlock (priv->part_lock);
+
+	wrapper = camel_medium_get_content_object (medium);
+
+	if (!wrapper) {
+		wrapper = camel_data_wrapper_new (); 
+		camel_medium_set_content_object (medium, wrapper);
+		camel_object_unref (wrapper);
+	} 
+
+	if (wrapper->stream) {
+		camel_stream_reset (wrapper->stream);
+
+		if (camel_content_type_is (wrapper->mime_type, "text", "*"))
+			camel_stream_format_text (wrapper, stream);
+		else
+			camel_data_wrapper_decode_to_stream (wrapper, stream);
+	}
+
+	retval = TNY_STREAM (tny_camel_stream_new (stream));
+	camel_object_unref (stream);
+
+	tny_stream_reset (retval);
+	camel_object_unref (medium);
+
+	return retval;
+}
+
 
 static const gchar* 
 tny_camel_mime_part_get_content_type (TnyMimePart *self)

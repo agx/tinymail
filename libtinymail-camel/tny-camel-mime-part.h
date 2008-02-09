@@ -52,6 +52,7 @@ struct _TnyCamelMimePartClass
 	const gchar* (*get_content_type) (TnyMimePart *self);
 	gboolean (*content_type_is) (TnyMimePart *self, const gchar *content_type);
 	TnyStream* (*get_stream) (TnyMimePart *self);
+	TnyStream* (*get_decoded_stream) (TnyMimePart *self);
 	gssize (*decode_to_stream) (TnyMimePart *self, TnyStream *stream, GError **err);
 	gssize (*write_to_stream) (TnyMimePart *self, TnyStream *stream, GError **err);
 	gint (*construct) (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding);

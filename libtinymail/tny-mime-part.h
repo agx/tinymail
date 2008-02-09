@@ -46,6 +46,7 @@ struct _TnyMimePartIface
 	const gchar* (*get_content_type) (TnyMimePart *self);
 	gboolean (*content_type_is) (TnyMimePart *self, const gchar *content_type);
 	TnyStream* (*get_stream) (TnyMimePart *self);
+	TnyStream* (*get_decoded_stream) (TnyMimePart *self);
 	gssize (*decode_to_stream) (TnyMimePart *self, TnyStream *stream, GError **err);
 	gssize (*write_to_stream) (TnyMimePart *self, TnyStream *stream, GError **err);
 	gint (*construct) (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding);
@@ -78,6 +79,7 @@ GType tny_mime_part_get_type (void);
 const gchar* tny_mime_part_get_content_type (TnyMimePart *self);
 gboolean tny_mime_part_content_type_is (TnyMimePart *self, const gchar *type);
 TnyStream* tny_mime_part_get_stream (TnyMimePart *self);
+TnyStream* tny_mime_part_get_decoded_stream (TnyMimePart *self);
 gssize tny_mime_part_write_to_stream (TnyMimePart *self, TnyStream *stream, GError **err);
 gint tny_mime_part_construct (TnyMimePart *self, TnyStream *stream, const gchar *mime_type, const gchar *transfer_encoding);
 const gchar* tny_mime_part_get_filename (TnyMimePart *self);

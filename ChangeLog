@@ -4,6 +4,9 @@
 	* GLib Signal leakage in TnyGtkFolderStoreTreeModel
 	* Various smaller fixes and code improvements
 	* Has-attachment status detection improvement
+	* Added a tny_mime_part_get_decoded_stream API
+
+	* This was a minor API change
 
 2008-02-05  Philip Van Hoof <pvanhoof@gnome.org>
 

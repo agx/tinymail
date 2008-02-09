@@ -867,6 +867,38 @@ tny_mime_part_get_stream (TnyMimePart *self)
 	return retval;
 }
 
+
+
+/**
+ * tny_mime_part_get_decoded_stream:
+ * @self: a #TnyMimePart
+ * 
+ * Inefficiently get a stream for @self. The entire data of the part will be
+ * kept in memory until the returned value is unreferenced.
+ *
+ * returns: an in-memory stream
+ * since: 1.0
+ * audience: application-developer
+ **/
+TnyStream* 
+tny_mime_part_get_decoded_stream (TnyMimePart *self)
+{
+	TnyStream *retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MIME_PART (self));
+	g_assert (TNY_MIME_PART_GET_IFACE (self)->get_decoded_stream!= NULL);
+#endif
+
+	retval = TNY_MIME_PART_GET_IFACE (self)->get_decoded_stream(self);
+
+#ifdef DBC /* ensure */
+	g_assert (TNY_IS_STREAM (retval));
+#endif
+
+	return retval;
+}
+
 /**
  * tny_mime_part_get_content_type:
  * @self: a #TnyMimePart
