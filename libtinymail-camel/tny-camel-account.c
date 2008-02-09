@@ -1241,7 +1241,8 @@ tny_camel_account_cancel_default (TnyAccount *self)
 		TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 
 		_tny_camel_queue_cancel_remove_items (priv->queue, 
-			TNY_CAMEL_QUEUE_CANCELLABLE_ITEM);
+			TNY_CAMEL_QUEUE_GET_HEADERS_ITEM|TNY_CAMEL_QUEUE_SYNC_ITEM|
+			TNY_CAMEL_QUEUE_REFRESH_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM);
 
 	} else {
 		_tny_camel_account_actual_cancel (TNY_CAMEL_ACCOUNT (self));
