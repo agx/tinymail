@@ -2973,6 +2973,7 @@ message_from_data (CamelFolder *folder, GData *data)
 	CamelImapMessageInfo *mi;
 	const char *idate;
 	gint size = 0;
+	struct _camel_header_raw *h;
 
 	stream = g_datalist_get_data (&data, "BODY_PART_STREAM");
 	if (!stream)
@@ -2991,11 +2992,22 @@ message_from_data (CamelFolder *folder, GData *data)
 	if (size)
 		mi->info.size = size;
 
-	/* TNY TODO: This is a hack! But else we need to parse
-	 * BODYSTRUCTURE (and I'm lazy). It needs fixing though. */
-	if (size > 102400)
-		((CamelMessageInfoBase *)mi)->flags |= CAMEL_MESSAGE_ATTACHMENTS;
-	/* ... it does */
+
+	h = ((CamelMimePart *)msg)->headers;
+
+	if (camel_header_raw_find(&h, "X-MSMail-Priority", NULL) &&
+		!camel_header_raw_find(&h, "X-MS-Has-Attach", NULL)) {
+		/**/
+		((CamelMessageInfoBase *)mi)->flags &= ~CAMEL_MESSAGE_ATTACHMENTS;
+	} else {
+		/* TNY TODO: This is a hack! But else we need to parse
+		 * BODYSTRUCTURE (and I'm lazy). It needs fixing though. */
+
+		if (size > 102400)
+			((CamelMessageInfoBase *)mi)->flags |= CAMEL_MESSAGE_ATTACHMENTS;
+		/* ... it does */
+
+	}
 
 	/* This overrides Received: (although it wont be found by the messages
 	 * fed to message_info_new_from_header, as this header is not in the

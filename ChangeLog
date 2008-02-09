@@ -3,6 +3,7 @@
 	* Crash when the IMAP server doesn't support namespaces
 	* GLib Signal leakage in TnyGtkFolderStoreTreeModel
 	* Various smaller fixes and code improvements
+	* Has-attachment status detection improvement
 
 2008-02-05  Philip Van Hoof <pvanhoof@gnome.org>
 
