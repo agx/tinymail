@@ -400,6 +400,19 @@ typedef struct
 	TnyAccount *account;
 } AccNotYetReadyInfo;
 
+static void 
+notify_signal_slots (gpointer user_data, GObject *instance)
+{
+	TnyGtkFolderStoreTreeModel *self = (TnyGtkFolderStoreTreeModel *) user_data;
+	int i=0;
+
+	for (i=0; i < self->signals->len; i++) {
+		SignalSlot *slot = (SignalSlot *) self->signals->pdata[i];
+		if (slot->instance == instance)
+			slot->instance = NULL;
+	}
+}
+
 static gboolean
 account_was_not_yet_ready_idle (gpointer user_data)
 {
@@ -411,15 +424,17 @@ account_was_not_yet_ready_idle (gpointer user_data)
 		SignalSlot *slot;
 
 		slot = g_slice_new (SignalSlot);
-		slot->instance = g_object_ref (info->account);
+		slot->instance = (GObject *) info->account;
 		slot->handler_id = g_signal_connect (info->account, "connection-status-changed",
 			G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), info->self);
+		g_object_weak_ref (G_OBJECT (info->account), notify_signal_slots, info->self);
 		g_ptr_array_add (info->self->signals, slot);
 
 		slot = g_slice_new (SignalSlot);
-		slot->instance = g_object_ref (info->account);
+		slot->instance = (GObject *) info->account;
 		slot->handler_id = g_signal_connect (info->account, "changed",
 			G_CALLBACK (tny_gtk_folder_store_tree_model_on_changed), info->self);
+		g_object_weak_ref (G_OBJECT (info->account), notify_signal_slots, info->self);
 		g_ptr_array_add (info->self->signals, slot);
 
 		tny_gtk_folder_store_tree_model_on_constatus_changed (info->account, 
@@ -444,6 +459,7 @@ account_was_not_yet_ready_destroy (gpointer user_data)
 
 	g_slice_free (AccNotYetReadyInfo, user_data);
 }
+
 
 static void
 tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *folder_store, treeaddfunc func, const gchar *root_name)
@@ -483,15 +499,18 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 			SignalSlot *slot;
 
 			slot = g_slice_new (SignalSlot);
-			slot->instance = g_object_ref (folder_store);
+
+			slot->instance = (GObject *)folder_store; 
 			slot->handler_id = g_signal_connect (folder_store, "connection-status-changed",
 				G_CALLBACK (tny_gtk_folder_store_tree_model_on_constatus_changed), self);
+			g_object_weak_ref (G_OBJECT (folder_store), notify_signal_slots, self);
 			g_ptr_array_add (self->signals, slot);
 
 			slot = g_slice_new (SignalSlot);
-			slot->instance = g_object_ref (folder_store);
+			slot->instance = (GObject *)folder_store; //g_object_ref (folder_store);
 			slot->handler_id = g_signal_connect (folder_store, "changed",
 				G_CALLBACK (tny_gtk_folder_store_tree_model_on_changed), self);
+			g_object_weak_ref (G_OBJECT (folder_store), notify_signal_slots, self);
 			g_ptr_array_add (self->signals, slot);
 		}
 	}
@@ -550,8 +569,10 @@ tny_gtk_folder_store_tree_model_finalize (GObject *object)
 
 	for (i = 0; i < me->signals->len; i++) {
 		SignalSlot *slot = (SignalSlot *) me->signals->pdata [i];
-		g_signal_handler_disconnect (slot->instance, slot->handler_id);
-		g_object_unref (slot->instance);
+		if (slot->instance) {
+			g_signal_handler_disconnect (slot->instance, slot->handler_id);
+			g_object_weak_unref (G_OBJECT (slot->instance), notify_signal_slots, object);
+		}
 		g_slice_free (SignalSlot, slot);
 	}
 
