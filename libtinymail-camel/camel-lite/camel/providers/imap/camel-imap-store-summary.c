@@ -421,7 +421,7 @@ CamelImapStoreNamespace *camel_imap_store_summary_namespace_new(CamelImapStoreSu
 	int len;
 
 	ns = g_malloc0(sizeof(*ns));
-	ns->full_name = g_strdup(full_name);
+	ns->full_name = full_name?g_strdup(full_name):g_strdup ("");
 	len = strlen(ns->full_name)-1;
 	if (len >= 0 && ns->full_name[len] == dir_sep)
 		ns->full_name[len] = 0;
