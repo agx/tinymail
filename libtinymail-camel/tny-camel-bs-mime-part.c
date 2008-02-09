@@ -684,6 +684,21 @@ tny_camel_bs_mime_part_get_stream_default (TnyMimePart *self)
 	return retval;
 }
 
+
+static TnyStream* 
+tny_camel_bs_mime_part_get_decoded_stream (TnyMimePart *self)
+{
+	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->get_decoded_stream(self);
+}
+
+static TnyStream* 
+tny_camel_bs_mime_part_get_decoded_stream_default (TnyMimePart *self)
+{
+	TnyStream *retval = tny_camel_mem_stream_new ();
+	fetch_part (self, retval, FALSE);
+	return retval;
+}
+
 static const gchar* 
 tny_camel_bs_mime_part_get_content_type (TnyMimePart *self)
 {
@@ -1018,6 +1033,7 @@ tny_mime_part_init (gpointer g, gpointer iface_data)
 	klass->content_type_is= tny_camel_bs_mime_part_content_type_is;
 	klass->get_content_type= tny_camel_bs_mime_part_get_content_type;
 	klass->get_stream= tny_camel_bs_mime_part_get_stream;
+	klass->get_decoded_stream= tny_camel_bs_mime_part_get_decoded_stream;
 	klass->write_to_stream= tny_camel_bs_mime_part_write_to_stream;
 	klass->construct= tny_camel_bs_mime_part_construct;
 	klass->get_filename= tny_camel_bs_mime_part_get_filename;
@@ -1057,6 +1073,7 @@ tny_camel_bs_mime_part_class_init (TnyCamelBsMimePartClass *class)
 	class->content_type_is= tny_camel_bs_mime_part_content_type_is_default;
 	class->get_content_type= tny_camel_bs_mime_part_get_content_type_default;
 	class->get_stream= tny_camel_bs_mime_part_get_stream_default;
+	class->get_decoded_stream= tny_camel_bs_mime_part_get_decoded_stream_default;
 	class->write_to_stream= tny_camel_bs_mime_part_write_to_stream_default;
 	class->construct= tny_camel_bs_mime_part_construct_default;
 	class->get_filename= tny_camel_bs_mime_part_get_filename_default;
