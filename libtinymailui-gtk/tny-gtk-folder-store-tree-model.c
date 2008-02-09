@@ -507,7 +507,7 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 			g_ptr_array_add (self->signals, slot);
 
 			slot = g_slice_new (SignalSlot);
-			slot->instance = (GObject *)folder_store; //g_object_ref (folder_store);
+			slot->instance = (GObject *)folder_store; 
 			slot->handler_id = g_signal_connect (folder_store, "changed",
 				G_CALLBACK (tny_gtk_folder_store_tree_model_on_changed), self);
 			g_object_weak_ref (G_OBJECT (folder_store), notify_signal_slots, self);
