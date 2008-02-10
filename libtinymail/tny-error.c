@@ -35,6 +35,20 @@ tny_error_get_message (GError *err)
 }
 
 /**
+ * tny_error_get_code:
+ * @err: a #GError
+ *
+ * Get the error's code
+ *
+ * returns: a error code
+ **/
+gint
+tny_error_get_code (GError *err)
+{
+	return err->code;
+}
+
+/**
  * tny_error_domain_get_type:
  *
  * GType system helper function

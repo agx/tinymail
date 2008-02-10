@@ -24,7 +24,9 @@
  <attr path="/api/namespace/callback[@cname='TnySendQueueAddCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
  <attr path="/api/namespace/callback[@cname='TnyTransferMsgsCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
 
- <add-node path="/api"><symbol type="manual" cname="TError" name="Tny.TError"/></add-node>
+ <attr path="/api/namespace/enum[@cname='TnyError']" name="name">ErrorEnum</attr>
+
+ <add-node path="/api"><symbol type="manual" cname="TError" name="Tny.Error"/></add-node>
 
 </metadata>
 

@@ -140,6 +140,7 @@ typedef GError TError;
 typedef enum _TnyError TnyError;
 
 const gchar* tny_error_get_message (GError *err);
+gint tny_error_get_code (GError *err);
 
 GType tny_error_domain_get_type (void);
 GType tny_error_get_type (void);

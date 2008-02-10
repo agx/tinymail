@@ -8,7 +8,7 @@ METADATA = libtinymail.metadata
 references =
 glue_includes =
 
-sources = TException.cs TError.cs
+sources = Error.cs
 
 customs =
 
