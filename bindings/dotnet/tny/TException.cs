@@ -6,6 +6,10 @@ namespace Tny {
 	public class TException : System.Exception
 	{
 		IntPtr errptr;
+
+		static TException Create (IntPtr errptr) {
+			return new TException (errptr);
+		}
 	
 		public TException (IntPtr errptr) : base ()
 		{

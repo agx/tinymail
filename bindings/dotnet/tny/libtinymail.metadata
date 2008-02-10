@@ -14,5 +14,17 @@
  <attr path="/api/namespace/*/*/parameters/parameter[@name='callback']" name="scope">async</attr>
  <attr path="/api/namespace/*/*/parameters/parameter[@name='status_callback']" name="scope">call</attr>
 
+ <attr path="/api/namespace/callback[@cname='TnyFolderCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
+ <attr path="/api/namespace/callback[@cname='TnyCopyFolderCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
+ <attr path="/api/namespace/callback[@cname='TnyCreateFolderCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
+ <attr path="/api/namespace/callback[@cname='TnyGetFoldersCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
+ <attr path="/api/namespace/callback[@cname='TnyGetHeadersCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
+ <attr path="/api/namespace/callback[@cname='TnyGetMsgCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
+ <attr path="/api/namespace/callback[@cname='TnyMimePartCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
+ <attr path="/api/namespace/callback[@cname='TnySendQueueAddCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
+ <attr path="/api/namespace/callback[@cname='TnyTransferMsgsCallback']/parameters/parameter[@name='err']" name="type">TError</attr>
+
+ <add-node path="/api"><symbol type="manual" cname="TError" name="Tny.TError"/></add-node>
+
 </metadata>
 

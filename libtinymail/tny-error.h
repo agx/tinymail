@@ -135,6 +135,8 @@ enum _TnyError
 */
 };
 
+typedef GError TError;
+
 typedef enum _TnyError TnyError;
 
 const gchar* tny_error_get_message (GError *err);
