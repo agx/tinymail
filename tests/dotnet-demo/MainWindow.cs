@@ -54,9 +54,9 @@ public partial class MainWindow: Gtk.Window
 		a.RetVal = true;
 	}
 
-	private void GetHeadersCallback (Tny.Folder folder, bool cancel, Tny.List model, Tny.Error err)
+	private void GetHeadersCallback (Tny.Folder folder, bool cancel, Tny.List model, Tny.TnyException ex)
 	{
-		Console.WriteLine (err.Message);
+		Console.WriteLine (ex.Message);
 
 		if (model != null && !cancel)
 			this.headers_treeview.Model = (Gtk.TreeModel) model;
@@ -67,9 +67,9 @@ public partial class MainWindow: Gtk.Window
 		this.progressbar.Fraction = status.Fraction;
 	}
 
-	private void GetMsgCallBack (Tny.Folder folder, bool cancel, Tny.Msg msg, Tny.Error err)
+	private void GetMsgCallBack (Tny.Folder folder, bool cancel, Tny.Msg msg, Tny.TnyException ex)
 	{
-		Console.WriteLine (err.Message);
+		Console.WriteLine (ex.Message);
 
 		if (msg != null && !cancel)
 			this.msg_view.Msg = msg;

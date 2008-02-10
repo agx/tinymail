@@ -26,7 +26,7 @@
 
  <attr path="/api/namespace/enum[@cname='TnyError']" name="name">ErrorEnum</attr>
 
- <add-node path="/api"><symbol type="manual" cname="TError" name="Tny.Error"/></add-node>
+ <add-node path="/api"><symbol type="manual" cname="TError" name="Tny.TnyException"/></add-node>
 
 </metadata>
 
