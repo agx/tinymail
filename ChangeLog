@@ -1,3 +1,8 @@
+2008-02-11  Alberto Garcia Gonzalez <agarcia@igalia.com>
+
+	* libtinymail-gnomevfs/tny-vfs-stream.c:
+	(tny_vfs_reset): Return 0 on success
+
 2008-02-09  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Crash when the IMAP server doesn't support namespaces

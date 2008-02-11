@@ -334,7 +334,7 @@ static gint
 tny_vfs_reset (TnyStream *self)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
-	gint retval = -1;
+	gint retval = 0;
 	GnomeVFSResult res;
 
 	if (priv->handle == NULL) 
