@@ -20,6 +20,8 @@ bug https://bugzilla.novell.com/show_bug.cgi?id=357324
 You also need to patch ./gtk-sharp-patch-03.diff discussed in Novell
 bug https://bugzilla.novell.com/show_bug.cgi?id=361504
 
+Tracker bug: https://bugzilla.novell.com/show_bug.cgi?id=361505
+
 
 #
 ## Instructions to get it working
