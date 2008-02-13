@@ -1,3 +1,10 @@
+2008-02-12  Alberto Garcia Gonzalez <agarcia@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-text-buffer-stream.c:
+	Write only full UTF-8 characters into the GtkTextBuffer. If an
+	input buffer contains incomplete UTF-8 chars, save those bytes and
+	write them with the following buffer.
+
 2008-02-11  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* libtinymail-gnomevfs/tny-vfs-stream.c:
