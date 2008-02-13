@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <metadata>
-
  <attr path="/api/namespace[@name='Tny']" name="name">Tny.Camel</attr>
+ <attr path="/api/namespace[@name='Tny']" name="error_handler">throw Tny.TnyExceptionFactory.Create (error)</attr>
+
  <attr path="/api/namespace/object[@cname='TnyCamelAccount']" name="name">Account</attr>
  <attr path="/api/namespace/enum[@cname='_TnyCamelAccountSignal']" name="name">AccountSignal</attr>
  <attr path="/api/namespace/object[@cname='TnyCamelBsMimePart']" name="name">BsMimePart</attr>

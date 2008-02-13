@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <metadata>
+ <attr path="/api/namespace[@name='Tny']" name="error_handler">throw Tny.TnyExceptionFactory.Create (error)</attr>
+
  <attr path="/api/namespace/object[@cname='TnyMergeFolder']/method[@name='SetFolderType']" name="name">SetMergeFolderType</attr>
  <attr path="/api/namespace/interface[@cname='TnyAccount']" name="consume_only">1</attr>
  <remove-node path="/api/namespace/interface[@cname='TnyList']/method[@name='RemoveMatches']" />
