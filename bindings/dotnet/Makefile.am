@@ -1,2 +1,2 @@
 EXTRA_DIST = tny-sharp.snk
-SUBDIRS = tny ui ui-gtk camel platform
+SUBDIRS = . tny ui ui-gtk camel platform
