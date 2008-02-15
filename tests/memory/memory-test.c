@@ -31,7 +31,6 @@
 #include <account-store.h>
 
 #include <camel/camel.h>
-#include <tny-camel-header-priv.h>
 
 typedef void (*performer_t) (TnyFolder *folder);
 static gchar *cachedir=NULL;

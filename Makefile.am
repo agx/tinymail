@@ -79,6 +79,7 @@ DIST_SUBDIRS = \
 	libtinymail-olpc \
 	libtinymail-gpe m4 \
 	libtinymailui-mozembed \
+	libtinymailui-gtkhtml \
 	libtinymailui-gnome-keyring \
 	libtinymail-acap \
 	libtinymail-gnome-desktop \

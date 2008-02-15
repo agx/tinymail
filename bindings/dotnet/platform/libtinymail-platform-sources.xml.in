@@ -1,9 +1,9 @@
 <gapi-parser-input>
 
-  <api filename="libtinymail-platform-api.raw">
+  <api filename="@top_builddir@/bindings/dotnet//platform/libtinymail-platform-api.raw">
     <library name="@PLATFORMDIR@-@API_VERSION@.dll">
       <namespace name="Tny">
-       <directory path="../../../@PLATFORMDIR@/" />
+       <directory path="@top_srcdir@/@PLATFORMDIR@/" />
       </namespace>
     </library>
   </api>

@@ -1,9 +1,9 @@
 <gapi-parser-input>
 
-   <api filename="libtinymailui-gtk-api.raw">
+   <api filename="@top_builddir@/bindings/dotnet/ui-gtk/libtinymailui-gtk-api.raw">
     <library name="libtinymailui-gtk-@API_VERSION@.dll">
       <namespace name="Tny">
-	<directory path="../../../libtinymailui-gtk/">
+	<directory path="@top_srcdir@/libtinymailui-gtk/">
 		<exclude>tny-gtk-header-list-iterator-priv.h</exclude>
 		<exclude>tny-gtk-account-list-model-iterator-priv.h</exclude>
 		<exclude>tny-gtk-attach-list-model-priv.h</exclude>
