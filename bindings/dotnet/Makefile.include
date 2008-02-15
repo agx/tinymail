@@ -1,4 +1,3 @@
-SNK = tny-sharp.snk
 API = $(pkg)-api.xml
 RAW_API = $(pkg)-api.raw
 
@@ -10,13 +9,13 @@ noinst_DATA = $(TARGET)
 TARGET_API = $(pkg:=-api.xml)
 gapidir = $(datadir)/gapi-2.0
 gapi_DATA = $(TARGET_API)
-CLEANFILES = $(ASSEMBLY) $(ASSEMBLY).mdb $(POLICY_ASSEMBLIES) generated-stamp generated/*.cs $(API) glue/generated.c $(SNK) AssemblyInfo.cs $(POLICY_CONFIGS)
+CLEANFILES = $(ASSEMBLY) $(ASSEMBLY).mdb $(POLICY_ASSEMBLIES) generated-stamp generated/*.cs $(API) glue/generated.c AssemblyInfo.cs $(POLICY_CONFIGS)
 DISTCLEANFILES += $(ASSEMBLY).config
 
 POLICY_ASSEMBLIES = $(addsuffix .$(ASSEMBLY), $(addprefix policy., $(POLICY_VERSIONS)))
 POLICY_CONFIGS = $(addsuffix .config, $(addprefix policy., $(POLICY_VERSIONS)))
 
-EXTRA_DIST = $(RAW_API) $(SYMBOLS) $(ASSEMBLY).config.in $(METADATA) $(customs) $(sources) $(add_dist) $(SNK)
+EXTRA_DIST = $(RAW_API) $(SYMBOLS) $(ASSEMBLY).config.in $(METADATA) $(customs) $(sources) $(add_dist)
 
 build_symbols = $(addprefix --symbols=$(srcdir)/, $(SYMBOLS))
 
@@ -42,17 +41,15 @@ generated-stamp: $(API) $(GAPI_CODEGEN) $(build_customs)
 	--outdir=generated --customdir=$(srcdir) --assembly-name=$(ASSEMBLY_NAME)	\
 	&& touch generated-stamp
 
-$(SNK): $(top_builddir)/bindings/dotnet/$(SNK)
-	cp $(top_builddir)/bindings/dotnet/$(SNK) .
-
 AssemblyInfo.cs: $(top_builddir)/bindings/dotnet/AssemblyInfo.cs
 	cp $(top_builddir)/bindings/dotnet/AssemblyInfo.cs .
 
 build_sources = $(addprefix $(srcdir)/, $(sources)) AssemblyInfo.cs
 build_references = $(addprefix /r:, $(references)) $(GTK_SHARP_LIBS)
 
-$(ASSEMBLY): generated-stamp $(SNK) $(build_sources) $(references)
+$(ASSEMBLY): generated-stamp $(build_sources) $(references)
 	@rm -f $(ASSEMBLY).mdb
+	cp $(top_builddir)/bindings/dotnet/$(SNK) .
 	$(CSC) $(CSFLAGS) -nowarn:0169,0612,0618 -unsafe -out:$(ASSEMBLY) -target:library $(build_references) generated/*.cs $(build_sources)
 
 install-data-local:

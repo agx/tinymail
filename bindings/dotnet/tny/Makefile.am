@@ -2,6 +2,7 @@ SUBDIRS = .
 
 pkg = libtinymail
 
+SNK = tny-sharp.snk
 SYMBOLS =
 INCLUDE_API =
 METADATA = libtinymail.metadata
