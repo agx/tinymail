@@ -1,3 +1,17 @@
+2008-02-15  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Merged Alberto's cancel patch of yesterday with some minor
+	corrections and committed the patch
+
+2008-02-14  Alberto Garcia Gonzalez <agarcia@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.[ch]:
+	Added new attribute: cancel_occurred
+	(imap_update_summary): Set cancel_occurred to TRUE when the
+	operation is cancelled by the user.
+	(camel_imap_folder_selected): Don't try to refresh the folder
+	again if a cancel has happened.
+
 2008-02-12  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-text-buffer-stream.c:

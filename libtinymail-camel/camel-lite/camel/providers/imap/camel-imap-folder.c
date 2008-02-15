@@ -247,6 +247,7 @@ camel_imap_folder_init (gpointer object, gpointer klass)
 
 	imap_folder->stopping = FALSE;
 	imap_folder->in_idle = FALSE;
+	imap_folder->cancel_occurred = FALSE;
 
 	imap_folder->gmsgstore = NULL;
 	imap_folder->gmsgstore_ticks = 0;
@@ -750,12 +751,14 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 			phighestmodseq = NULL;
 		}
 
-		if (imap_folder->need_rescan) {
+		if (imap_folder->need_rescan && !imap_folder->cancel_occurred) {
 			suc = imap_rescan (folder, exists, ex);
-			if (imap_folder->need_rescan)
+			if (imap_folder->need_rescan && !imap_folder->cancel_occurred)
 				camel_imap_folder_changed (folder, exists, NULL, ex);
-		} else if (exists > count)
+		} else if (exists > count && !imap_folder->cancel_occurred)
 			camel_imap_folder_changed (folder, exists, NULL, ex);
+
+		imap_folder->cancel_occurred = FALSE;
 	} else {
 		/* Wow, this IMAP server rocks! it has QRESYNC! Hi there Isode!*/
 		suc = TRUE;
@@ -775,7 +778,6 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 		camel_object_trigger_event(CAMEL_OBJECT (folder), "folder_changed", changes);
 		camel_folder_change_info_free(changes);
 	}
-
 }
 
 
@@ -3244,9 +3246,14 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	if (!camel_imap_command_start (store, folder, ex,
 		"UID SEARCH %d:%d ALL", seq + 1, MAX (1, MIN (seq + 1 + nextn, exists))))
-		{ if (!camel_operation_cancel_check (NULL))
-			g_warning ("IMAP error getting UIDs (1)");
-		 camel_operation_end (NULL); return; }
+		{
+			if (camel_operation_cancel_check (NULL))
+				imap_folder->cancel_occurred = TRUE;
+			else
+				g_warning ("IMAP error getting UIDs (1)");
+			camel_operation_end (NULL);
+			return;
+		}
 
 	more = FALSE;
 	needheaders = g_ptr_array_new ();
@@ -3254,7 +3261,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
 	{
-		if (!camel_operation_cancel_check (NULL))
+		if (camel_operation_cancel_check (NULL))
+			imap_folder->cancel_occurred = TRUE;
+		else
 			g_warning ("IMAP error getting UIDs (1,1)");
 
 		g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
@@ -3275,15 +3284,22 @@ imap_update_summary (CamelFolder *folder, int exists,
 	{
 		if (!camel_imap_command_start (store, folder, ex,
 			"UID SEARCH %d:* ALL", seq + 1 + cnt))
-			{ if (!camel_operation_cancel_check (NULL))
-				g_warning ("IMAP error getting UIDs (2)");
-			  camel_operation_end (NULL);
-			  store->dontdistridlehack = FALSE; return; }
+			{
+				if (camel_operation_cancel_check (NULL))
+					imap_folder->cancel_occurred = TRUE;
+				else
+					g_warning ("IMAP error getting UIDs (2)");
+				camel_operation_end (NULL);
+				store->dontdistridlehack = FALSE;
+				return;
+			}
 		cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - cnt);
 
 		if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
 		{
-			if (!camel_operation_cancel_check (NULL))
+			if (camel_operation_cancel_check (NULL))
+				imap_folder->cancel_occurred = TRUE;
+			else
 				g_warning ("IMAP error getting UIDs (2,1)");
 
 			g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
@@ -3304,17 +3320,24 @@ imap_update_summary (CamelFolder *folder, int exists,
 			needheaders = g_ptr_array_new ();
 			if (!camel_imap_command_start (store, folder, ex,
 				"UID FETCH 1:* (UID)")) /* Old less efficient style */
-				{ if (!camel_operation_cancel_check (NULL))
-					g_warning ("IMAP error getting UIDs (3)");
+				{
+					if (camel_operation_cancel_check (NULL))
+						imap_folder->cancel_occurred = TRUE;
+					else
+						g_warning ("IMAP error getting UIDs (3)");
 					camel_folder_summary_kill_hash (folder->summary);
-				  camel_operation_end (NULL);
-				  store->dontdistridlehack = FALSE; return; }
+					camel_operation_end (NULL);
+					store->dontdistridlehack = FALSE;
+					return;
+				}
 			camel_folder_summary_clear (folder->summary);
 			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - tcnt);
 
 			if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
 			{
-				if (!camel_operation_cancel_check (NULL))
+				if (camel_operation_cancel_check (NULL))
+					imap_folder->cancel_occurred = TRUE;
+				else
 					g_warning ("IMAP error getting UIDs (3,1)");
 
 				g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
@@ -3352,7 +3375,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 						       "UID FETCH %s (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
 						       uidset, header_spec))
 			{
-				if (!camel_operation_cancel_check (NULL))
+				if (camel_operation_cancel_check (NULL))
+					imap_folder->cancel_occurred = TRUE;
+				else
 					g_warning ("IMAP error getting headers (1)");
 				g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 				g_ptr_array_free (needheaders, TRUE);
@@ -3492,7 +3517,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 			if (type == CAMEL_IMAP_RESPONSE_ERROR)
 			{
-				if (!camel_operation_cancel_check (NULL))
+				if (camel_operation_cancel_check (NULL))
+					imap_folder->cancel_occurred = TRUE;
+				else
 					g_warning ("IMAP error getting headers (2)");
 				g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 				g_ptr_array_free (needheaders, TRUE);
