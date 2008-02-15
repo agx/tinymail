@@ -30,8 +30,8 @@ with a #TnyMsgView implementation.
 </para>
 
 @parent: 
-@set_header_func: 
-@clear_func: 
+@set_header: 
+@clear: 
 
 <!-- ##### FUNCTION tny_header_view_set_header ##### -->
 <para>

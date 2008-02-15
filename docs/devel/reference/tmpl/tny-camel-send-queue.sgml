@@ -58,15 +58,3 @@ An implementation of #TnySendQueue for Camel
 @trans_account: 
 
 
-<!-- ##### FUNCTION tny_camel_send_queue_add_async ##### -->
-<para>
-
-</para>
-
-@self: 
-@msg: 
-@callback: 
-@status_callback: 
-@user_data: 
-
-

@@ -30,7 +30,7 @@ A type typically used by a #TnyMsgView implementation for saving a #TnyMimePart 
 </para>
 
 @parent: 
-@perform_save_func: 
+@perform_save: 
 
 <!-- ##### FUNCTION tny_mime_part_save_strategy_perform_save ##### -->
 <para>

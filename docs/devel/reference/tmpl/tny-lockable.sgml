@@ -29,8 +29,8 @@ A lockable type with a lock and unlock implementation
 </para>
 
 @parent: 
-@lock_func: 
-@unlock_func: 
+@lock: 
+@unlock: 
 
 <!-- ##### FUNCTION tny_lockable_lock ##### -->
 <para>

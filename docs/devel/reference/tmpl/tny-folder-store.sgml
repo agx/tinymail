@@ -29,13 +29,13 @@ A abstract type that defines a store for child folders
 </para>
 
 @parent: 
-@remove_folder_func: 
-@create_folder_func: 
-@create_folder_async_func: 
-@get_folders_func: 
-@get_folders_async_func: 
-@add_observer_func: 
-@remove_observer_func: 
+@remove_folder: 
+@create_folder: 
+@create_folder_async: 
+@get_folders: 
+@get_folders_async: 
+@add_observer: 
+@remove_observer: 
 
 <!-- ##### FUNCTION tny_folder_store_remove_folder ##### -->
 <para>

@@ -29,14 +29,14 @@ An iteratable list type
 </para>
 
 @parent: 
-@get_length_func: 
-@prepend_func: 
-@append_func: 
-@remove_func: 
-@foreach_func: 
-@copy_func: 
-@create_iterator_func: 
-@remove_matches_func: 
+@get_length: 
+@prepend: 
+@append: 
+@remove: 
+@foreach: 
+@copy: 
+@create_iterator: 
+@remove_matches: 
 
 <!-- ##### USER_FUNCTION TnyListMatcher ##### -->
 <para>

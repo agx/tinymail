@@ -29,7 +29,7 @@ A strategy that can implement receiving a message. For example by fully receivin
 </para>
 
 @parent: 
-@perform_get_msg_func: 
+@perform_get_msg: 
 
 <!-- ##### FUNCTION tny_msg_receive_strategy_perform_get_msg ##### -->
 <para>

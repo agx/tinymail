@@ -29,13 +29,13 @@ A stream is an object that can be written to and can be read from in a streaming
 </para>
 
 @parent: 
-@read_func: 
-@write_func: 
-@flush_func: 
-@close_func: 
-@is_eos_func: 
-@reset_func: 
-@write_to_stream_func: 
+@read: 
+@write: 
+@flush: 
+@close: 
+@is_eos: 
+@reset: 
+@write_to_stream: 
 
 <!-- ##### FUNCTION tny_stream_read ##### -->
 <para>

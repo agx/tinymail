@@ -22,6 +22,7 @@ A type that can display a text/html mime part implemented using #GtkMozEmbed
 
 </para>
 
+@parent: 
 
 <!-- ##### FUNCTION tny_moz_embed_html_mime_part_view_new ##### -->
 <para>

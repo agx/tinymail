@@ -31,13 +31,13 @@ can keep a position state for a list.
 </para>
 
 @parent: 
-@next_func: 
-@prev_func: 
-@first_func: 
-@nth_func: 
-@get_current_func: 
+@next: 
+@prev: 
+@first: 
+@nth: 
+@get_current: 
 @is_done: 
-@get_list_func: 
+@get_list: 
 
 <!-- ##### FUNCTION tny_iterator_next ##### -->
 <para>

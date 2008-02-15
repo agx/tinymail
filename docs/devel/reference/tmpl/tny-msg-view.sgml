@@ -30,12 +30,12 @@ A type that defines a view for a #TnyMsg implementation. The type is sometimes d
 </para>
 
 @parent: 
-@get_msg_func: 
-@set_msg_func: 
-@set_unavailable_func: 
-@clear_func: 
-@create_mime_part_view_for_func: 
-@create_new_inline_viewer_func: 
+@get_msg: 
+@set_msg: 
+@set_unavailable: 
+@clear: 
+@create_mime_part_view_for: 
+@create_new_inline_viewer: 
 
 <!-- ##### FUNCTION tny_msg_view_get_msg ##### -->
 <para>

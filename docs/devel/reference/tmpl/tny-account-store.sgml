@@ -49,6 +49,8 @@ A abstract type that defines a store for accounts
 
 </para>
 
+@:
+
 @tnyaccountstore: the object which received the signal.
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
@@ -57,11 +59,11 @@ A abstract type that defines a store for accounts
 </para>
 
 @parent: 
-@get_accounts_func: 
-@get_cache_dir_func: 
-@get_device_func: 
-@alert_func: 
-@find_account_func: 
+@get_accounts: 
+@get_cache_dir: 
+@get_device: 
+@alert: 
+@find_account: 
 @connecting_started: 
 
 <!-- ##### FUNCTION tny_get_accounts_request_type_get_type ##### -->

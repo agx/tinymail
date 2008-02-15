@@ -29,10 +29,10 @@ tny-connection-policy
 </para>
 
 @parent: 
-@on_connect_func: 
-@on_connection_broken_func: 
-@on_disconnect_func: 
-@set_current_func: 
+@on_connect: 
+@on_connection_broken: 
+@on_disconnect: 
+@set_current: 
 
 <!-- ##### FUNCTION tny_connection_policy_on_connect ##### -->
 <para>

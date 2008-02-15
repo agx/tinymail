@@ -29,9 +29,9 @@ A type for displaying a #TnyMimePart
 </para>
 
 @parent: 
-@get_part_func: 
-@set_part_func: 
-@clear_func: 
+@get_part: 
+@set_part: 
+@clear: 
 
 <!-- ##### FUNCTION tny_mime_part_view_clear ##### -->
 <para>

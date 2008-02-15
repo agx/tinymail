@@ -45,10 +45,10 @@ A store account contains the folders of an E-mail service and handles the authen
 
 @parent: 
 @subscription_changed: 
-@subscribe_func: 
-@unsubscribe_func: 
-@find_folder_func: 
-@delete_cache_func: 
+@subscribe: 
+@unsubscribe: 
+@find_folder: 
+@delete_cache: 
 
 <!-- ##### FUNCTION tny_store_account_subscribe ##### -->
 <para>

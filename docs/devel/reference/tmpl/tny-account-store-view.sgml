@@ -29,7 +29,7 @@ A abstract type for showing #TnyAccountStore to the user.
 </para>
 
 @parent: 
-@set_account_store_func: 
+@set_account_store: 
 
 <!-- ##### FUNCTION tny_account_store_view_set_account_store ##### -->
 <para>

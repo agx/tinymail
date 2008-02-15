@@ -29,7 +29,7 @@ A transport account and transport E-mail via a service and handles the authentic
 </para>
 
 @parent: 
-@send_func: 
+@send: 
 
 <!-- ##### FUNCTION tny_transport_account_send ##### -->
 <para>

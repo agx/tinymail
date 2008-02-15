@@ -53,7 +53,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
+@tnyaccountstore: the object which received the signal.
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -61,11 +61,11 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@get_accounts_func: 
-@get_cache_dir_func: 
-@get_device_func: 
-@alert_func: 
-@find_account_func: 
+@get_accounts: 
+@get_cache_dir: 
+@get_device: 
+@alert: 
+@find_account: 
 @connecting_started: 
 
 <!-- ##### STRUCT TnyList ##### -->
@@ -86,14 +86,14 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@get_length_func: 
-@prepend_func: 
-@append_func: 
-@remove_func: 
-@foreach_func: 
-@copy_func: 
-@create_iterator_func: 
-@remove_matches_func: 
+@get_length: 
+@prepend: 
+@append: 
+@remove: 
+@foreach: 
+@copy: 
+@create_iterator: 
+@remove_matches: 
 
 <!-- ##### STRUCT TnyIteratorIface ##### -->
 <para>
@@ -101,13 +101,13 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@next_func: 
-@prev_func: 
-@first_func: 
-@nth_func: 
-@get_current_func: 
+@next: 
+@prev: 
+@first: 
+@nth: 
+@get_current: 
 @is_done: 
-@get_list_func: 
+@get_list: 
 
 <!-- ##### STRUCT TnyMsg ##### -->
 <para>
@@ -121,11 +121,11 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@get_header_func: 
-@get_folder_func: 
-@get_url_string_func: 
-@uncache_attachments_func: 
-@rewrite_cache_func: 
+@get_header: 
+@get_folder: 
+@get_url_string: 
+@uncache_attachments: 
+@rewrite_cache: 
 
 <!-- ##### STRUCT TnyFolder ##### -->
 <para>
@@ -139,42 +139,42 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@remove_msg_func: 
-@remove_msgs_func: 
-@add_msg_func: 
-@add_msg_async_func: 
-@sync_func: 
-@sync_async_func: 
-@get_msg_remove_strategy_func: 
-@set_msg_remove_strategy_func: 
-@get_msg_receive_strategy_func: 
-@set_msg_receive_strategy_func: 
-@get_msg_func: 
-@find_msg_func: 
-@get_msg_async_func: 
-@get_headers_func: 
-@get_headers_async_func: 
-@get_name_func: 
-@get_id_func: 
-@get_account_func: 
-@get_folder_type_func: 
-@get_all_count_func: 
-@get_unread_count_func: 
-@get_local_size_func: 
-@is_subscribed_func: 
-@refresh_async_func: 
-@refresh_func: 
-@transfer_msgs_func: 
-@transfer_msgs_async_func: 
-@copy_func: 
-@copy_async_func: 
-@poke_status_func: 
-@add_observer_func: 
-@remove_observer_func: 
-@get_folder_store_func: 
-@get_stats_func: 
-@get_url_string_func: 
-@get_caps_func: 
+@remove_msg: 
+@remove_msgs: 
+@add_msg: 
+@add_msg_async: 
+@sync: 
+@sync_async: 
+@get_msg_remove_strategy: 
+@set_msg_remove_strategy: 
+@get_msg_receive_strategy: 
+@set_msg_receive_strategy: 
+@get_msg: 
+@find_msg: 
+@get_msg_async: 
+@get_headers: 
+@get_headers_async: 
+@get_name: 
+@get_id: 
+@get_account: 
+@get_folder_type: 
+@get_all_count: 
+@get_unread_count: 
+@get_local_size: 
+@is_subscribed: 
+@refresh_async: 
+@refresh: 
+@transfer_msgs: 
+@transfer_msgs_async: 
+@copy: 
+@copy_async: 
+@poke_status: 
+@add_observer: 
+@remove_observer: 
+@get_folder_store: 
+@get_stats: 
+@get_url_string: 
+@get_caps: 
 
 <!-- ##### STRUCT TnyHeader ##### -->
 <para>
@@ -188,27 +188,27 @@ Shared include file with forward typedefs
 </para>
 
 @g: 
-@get_uid_func: 
-@get_bcc_func: 
-@get_cc_func: 
-@get_subject_func: 
-@get_to_func: 
-@get_from_func: 
-@get_replyto_func: 
-@get_message_id_func: 
-@get_message_size_func: 
-@get_date_received_func: 
-@get_date_sent_func: 
-@set_bcc_func: 
-@set_cc_func: 
-@set_from_func: 
-@set_subject_func: 
-@set_to_func: 
-@set_replyto_func: 
-@get_folder_func: 
-@get_flags_func: 
-@set_flag_func: 
-@unset_flag_func: 
+@get_uid: 
+@get_bcc: 
+@get_cc: 
+@get_subject: 
+@get_to: 
+@get_from: 
+@get_replyto: 
+@get_message_id: 
+@get_message_size: 
+@get_date_received: 
+@get_date_sent: 
+@set_bcc: 
+@set_cc: 
+@set_from: 
+@set_subject: 
+@set_to: 
+@set_replyto: 
+@get_folder: 
+@get_flags: 
+@set_flag: 
+@unset_flag: 
 
 <!-- ##### STRUCT TnyMimePart ##### -->
 <para>
@@ -222,31 +222,33 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@get_content_type_func: 
-@content_type_is_func: 
-@get_stream_func: 
-@decode_to_stream_func: 
-@write_to_stream_func: 
-@construct_func: 
-@get_filename_func: 
-@get_content_id_func: 
-@get_description_func: 
-@get_content_location_func: 
-@is_purged_func: 
-@set_content_location_func: 
-@set_description_func: 
-@set_content_id_func: 
-@set_filename_func: 
-@set_content_type_func: 
-@set_purged_func: 
-@is_attachment_func: 
-@get_parts_func: 
-@del_part_func: 
-@add_part_func: 
-@get_header_pairs_func: 
-@set_header_pair_func: 
-@decode_to_stream_async_func: 
-@get_transfer_encoding_func: 
+@get_content_type: 
+@content_type_is: 
+@get_stream: 
+@get_decoded_stream: 
+@decode_to_stream: 
+@write_to_stream: 
+@construct: 
+@get_filename: 
+@get_content_id: 
+@get_description: 
+@get_content_location: 
+@is_purged: 
+@set_content_location: 
+@set_description: 
+@set_content_id: 
+@set_filename: 
+@set_content_type: 
+@set_purged: 
+@is_attachment: 
+@get_parts: 
+@del_part: 
+@add_part: 
+@get_header_pairs: 
+@set_header_pair: 
+@decode_to_stream_async: 
+@get_transfer_encoding: 
+@set_transfer_encoding: 
 
 <!-- ##### STRUCT TnyAccount ##### -->
 <para>
@@ -259,7 +261,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccount: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
 <para>
@@ -275,35 +277,35 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@get_connection_status_func: 
-@set_id_func: 
-@set_name_func: 
-@set_secure_auth_mech_func: 
-@set_proto_func: 
-@set_user_func: 
-@set_hostname_func: 
-@set_port_func: 
-@set_url_string_func: 
-@set_pass_func_func: 
-@set_forget_pass_func_func: 
-@get_pass_func_func: 
-@get_forget_pass_func_func: 
-@get_id_func: 
-@get_name_func: 
-@get_secure_auth_mech_func: 
-@get_proto_func: 
-@get_user_func: 
-@get_hostname_func: 
-@get_port_func: 
-@get_url_string_func: 
-@get_account_type_func: 
-@cancel_func: 
-@matches_url_string_func: 
-@start_operation_func: 
-@stop_operation_func: 
-@is_ready_func: 
-@get_connection_policy_func: 
-@set_connection_policy_func: 
+@get_connection_status: 
+@set_id: 
+@set_name: 
+@set_secure_auth_mech: 
+@set_proto: 
+@set_user: 
+@set_hostname: 
+@set_port: 
+@set_url_string: 
+@set_pass_func: 
+@set_forget_pass_func: 
+@get_pass_func: 
+@get_forget_pass_func: 
+@get_id: 
+@get_name: 
+@get_secure_auth_mech: 
+@get_proto: 
+@get_user: 
+@get_hostname: 
+@get_port: 
+@get_url_string: 
+@get_account_type: 
+@cancel: 
+@matches_url_string: 
+@start_operation: 
+@stop_operation: 
+@is_ready: 
+@get_connection_policy: 
+@set_connection_policy: 
 @connection_status_changed: 
 @changed: 
 
@@ -318,8 +320,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
-@: 
+@tnydevice: the object which received the signal.
+@arg1: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -327,10 +329,10 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@is_online_func: 
-@force_online_func: 
-@force_offline_func: 
-@reset_func: 
+@is_online: 
+@force_online: 
+@force_offline: 
+@reset: 
 @connection_changed: 
 
 <!-- ##### STRUCT TnyStoreAccount ##### -->
@@ -354,10 +356,10 @@ Shared include file with forward typedefs
 
 @parent: 
 @subscription_changed: 
-@subscribe_func: 
-@unsubscribe_func: 
-@find_folder_func: 
-@delete_cache_func: 
+@subscribe: 
+@unsubscribe: 
+@find_folder: 
+@delete_cache: 
 
 <!-- ##### STRUCT TnyTransportAccount ##### -->
 <para>
@@ -371,7 +373,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@send_func: 
+@send: 
 
 <!-- ##### STRUCT TnyStream ##### -->
 <para>
@@ -385,13 +387,13 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@read_func: 
-@write_func: 
-@flush_func: 
-@close_func: 
-@is_eos_func: 
-@reset_func: 
-@write_to_stream_func: 
+@read: 
+@write: 
+@flush: 
+@close: 
+@is_eos: 
+@reset: 
+@write_to_stream: 
 
 <!-- ##### STRUCT TnySimpleList ##### -->
 <para>
@@ -431,13 +433,13 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@remove_folder_func: 
-@create_folder_func: 
-@create_folder_async_func: 
-@get_folders_func: 
-@get_folders_async_func: 
-@add_observer_func: 
-@remove_observer_func: 
+@remove_folder: 
+@create_folder: 
+@create_folder_async: 
+@get_folders: 
+@get_folders_async: 
+@add_observer: 
+@remove_observer: 
 
 <!-- ##### STRUCT TnyFolderStoreQuery ##### -->
 <para>
@@ -477,7 +479,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@perform_remove_func: 
+@perform_remove: 
 
 <!-- ##### STRUCT TnySendQueue ##### -->
 <para>
@@ -490,32 +492,46 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-@arg4: 
+@: 
+@: 
+@: 
+@: 
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
+@: 
+@: 
+@: 
+@: 
+@: 
+
+<!-- ##### SIGNAL TnySendQueue::queue-start ##### -->
+<para>
+
+</para>
+
 @tnysendqueue: the object which received the signal.
-@arg1: 
-@arg2: 
-@arg3: 
-@arg4: 
+
+<!-- ##### SIGNAL TnySendQueue::queue-stop ##### -->
+<para>
+
+</para>
+
+@tnysendqueue: the object which received the signal.
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -526,10 +542,13 @@ Shared include file with forward typedefs
 @msg_sending: 
 @msg_sent: 
 @error_happened: 
-@add_func: 
-@get_sentbox_func: 
-@get_outbox_func: 
-@cancel_func: 
+@queue_start: 
+@queue_stop: 
+@add: 
+@add_async: 
+@get_sentbox: 
+@get_outbox: 
+@cancel: 
 
 <!-- ##### STRUCT TnyMsgReceiveStrategy ##### -->
 <para>
@@ -543,7 +562,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@perform_get_msg_func: 
+@perform_get_msg: 
 
 <!-- ##### STRUCT TnyPair ##### -->
 <para>
@@ -570,8 +589,8 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@lock_func: 
-@unlock_func: 
+@lock: 
+@unlock: 
 
 <!-- ##### STRUCT TnyNoopLockable ##### -->
 <para>
@@ -598,7 +617,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@update_func: 
+@update: 
 
 <!-- ##### STRUCT TnyFolderChange ##### -->
 <para>
@@ -625,12 +644,12 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@update_func: 
-@poke_status_func: 
-@add_list_func: 
-@remove_list_func: 
-@stop_func: 
-@start_func: 
+@update: 
+@poke_status: 
+@add_list: 
+@remove_list: 
+@stop: 
+@start: 
 
 <!-- ##### STRUCT TnyFolderStoreChange ##### -->
 <para>
@@ -657,7 +676,7 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@update_func: 
+@update: 
 
 <!-- ##### STRUCT TnyFolderStats ##### -->
 <para>
@@ -684,8 +703,8 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@get_password_func: 
-@forget_password_func: 
+@get_password: 
+@forget_password: 
 
 <!-- ##### STRUCT TnyCombinedAccount ##### -->
 <para>
@@ -712,10 +731,10 @@ Shared include file with forward typedefs
 </para>
 
 @parent: 
-@on_connect_func: 
-@on_connection_broken_func: 
-@on_disconnect_func: 
-@set_current_func: 
+@on_connect: 
+@on_connection_broken: 
+@on_disconnect: 
+@set_current: 
 
 <!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
