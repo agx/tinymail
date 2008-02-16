@@ -1950,11 +1950,11 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	if (!apriv->service) {
-		GError *err;
+		GError *err = NULL;
 		g_set_error (&err, TNY_SYSTEM_ERROR, TNY_SYSTEM_ERROR_MEMORY, 
 			_("Internal error, account not ready"));
 		callback ((TnyCamelAccount *) self, TRUE, err, user_data);
-		g_error_free (err);
+		g_error_free (err); known leak
 		return;
 	}
 
