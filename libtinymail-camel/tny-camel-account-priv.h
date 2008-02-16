@@ -62,7 +62,7 @@ struct _TnyCamelAccountPriv
 	TnyForgetPassFunc forget_pass_func;
 	gboolean pass_func_set, forget_pass_func_set;
 	CamelProviderType type;
-	CamelOperation *cancel;
+	CamelOperation *cancel, *getmsg_cancel;
 	GStaticRecMutex *cancel_lock;
 	gboolean inuse_spin, in_auth;
 	gchar *name; GList *options;

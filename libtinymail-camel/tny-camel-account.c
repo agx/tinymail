@@ -1214,6 +1214,8 @@ _tny_camel_account_actual_cancel (TnyCamelAccount *self)
 	g_static_rec_mutex_lock (priv->cancel_lock);
 	if (priv->cancel)
 		camel_operation_cancel (priv->cancel);
+	if (priv->getmsg_cancel)
+		camel_operation_cancel (priv->getmsg_cancel);
 	g_static_rec_mutex_unlock (priv->cancel_lock);
 
 	return;
@@ -1239,10 +1241,16 @@ tny_camel_account_cancel_default (TnyAccount *self)
 	if (TNY_IS_CAMEL_STORE_ACCOUNT (self))
 	{
 		TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 		_tny_camel_queue_cancel_remove_items (priv->queue, 
 			TNY_CAMEL_QUEUE_GET_HEADERS_ITEM|TNY_CAMEL_QUEUE_SYNC_ITEM|
 			TNY_CAMEL_QUEUE_REFRESH_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM);
+
+		g_static_rec_mutex_lock (apriv->cancel_lock);
+		if (apriv->getmsg_cancel)
+			camel_operation_cancel (apriv->getmsg_cancel);
+		g_static_rec_mutex_unlock (apriv->cancel_lock);
 
 	} else {
 		_tny_camel_account_actual_cancel (TNY_CAMEL_ACCOUNT (self));

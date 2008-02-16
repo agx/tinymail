@@ -551,6 +551,15 @@ decode_async_thread (gpointer user_data)
 	/* g_static_rec_mutex_lock (priv->folder_lock); */
 
 	cancel = camel_operation_new (decode_async_status, info);
+
+	if (priv->folder && TNY_IS_CAMEL_FOLDER (priv->folder)) {
+		TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->folder);
+		if (fpriv->account && TNY_IS_CAMEL_ACCOUNT (fpriv->account)) {
+			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (fpriv->account);
+			apriv->getmsg_cancel = cancel;
+		}
+	}
+
 	camel_operation_ref (cancel);
 	camel_operation_register (cancel);
 	camel_operation_start (cancel, (char *) "Getting message part");
@@ -572,6 +581,15 @@ decode_async_thread (gpointer user_data)
 	camel_operation_end (cancel);
 	if (cancel)
 		camel_operation_unref (cancel);
+
+
+	if (priv->folder && TNY_IS_CAMEL_FOLDER (priv->folder)) {
+		TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->folder);
+		if (fpriv->account && TNY_IS_CAMEL_ACCOUNT (fpriv->account)) {
+			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (fpriv->account);
+			apriv->getmsg_cancel = NULL;
+		}
+	}
 
 	/* To disable parallel getting of messages while summary is being retreived,
 	 * restore this lock (B) */

@@ -1389,6 +1389,51 @@ sync_button_clicked (GtkWidget *button, gpointer user_data)
 }
 
 
+
+static void
+cancel_button_clicked (GtkWidget *button, gpointer user_data)
+{
+	TnyDemouiSummaryView *self = user_data;
+	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
+	GtkTreeIter iter;
+	GtkTreeModel *model;
+
+	if (gtk_tree_selection_get_selected (priv->mailbox_select, &model, &iter))
+	{
+		gint type;
+		TnyAccount *account = NULL;
+
+		gtk_tree_model_get (model, &iter, 
+			TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, 
+			&type, -1);
+
+		if (type != TNY_FOLDER_TYPE_ROOT) 
+		{ 
+			TnyFolder *folder;
+
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&folder, -1);
+
+			if (TNY_IS_FOLDER (folder))
+				account = tny_folder_get_account (folder);
+
+			g_object_unref (folder);
+
+		} else {
+			gtk_tree_model_get (model, &iter, 
+				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+				&account, -1);
+		}
+
+		if (account) {
+			tny_account_cancel (account);
+			g_object_unref (account);
+		}
+	}
+}
+
+
 static void 
 on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 {
@@ -1730,7 +1775,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 	TnyPlatformFactory *platfact;
 	GtkVBox *vbox = GTK_VBOX (self);
-	GtkWidget *mailbox_sw, *widget;
+	GtkWidget *mailbox_sw, *widget, *cancel_button;
 	GtkWidget *header_sw;
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
@@ -1752,6 +1797,9 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	priv->sync_button = gtk_button_new_with_label ("Sync");
 	priv->killacc_button = gtk_button_new_with_label ("Kill account");
 
+	cancel_button = gtk_button_new_with_label ("Cancel");
+
+
 	priv->current_accounts = NULL;
 
 	priv->online_button_signal = g_signal_connect (G_OBJECT (priv->online_button), "toggled", 
@@ -1759,6 +1807,9 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 
 	g_signal_connect (G_OBJECT (priv->poke_button), "clicked", 
 		G_CALLBACK (poke_button_toggled), self);
+
+	g_signal_connect (G_OBJECT (cancel_button), "clicked", 
+		G_CALLBACK (cancel_button_clicked), self);
 
 	g_signal_connect (G_OBJECT (priv->sync_button), "clicked", 
 		G_CALLBACK (sync_button_clicked), self);
@@ -1795,7 +1846,9 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->poke_button, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->sync_button, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX (priv->status), priv->killacc_button, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (priv->status), cancel_button, FALSE, FALSE, 0);
 
+	gtk_widget_show (cancel_button);
 	gtk_widget_show (priv->online_button);
 	gtk_widget_show (priv->poke_button);
 	gtk_widget_show (priv->killacc_button);

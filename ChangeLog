@@ -1,6 +1,8 @@
 2008-02-16  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* NAMESPACE vs. LIST separator for mail.h-farm.it
+	* Get-Message cancels
+	* Various smaller bugfixes
 
 2008-02-15  Philip Van Hoof <pvanhoof@gnome.org>
 
