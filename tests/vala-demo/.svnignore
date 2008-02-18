@@ -4,3 +4,5 @@ tinymail-vala-test.c
 tinymail-vala-test.vala.stamp
 tinymail-vala-test.h
 Makefile
+tinymail-vala-test
+.libs

@@ -2,6 +2,7 @@ SUBDIRS = .
 
 pkg = libtinymail-platform
 
+EXTRA_DIST = 
 SNK = tny-sharp.snk
 SYMBOLS =
 INCLUDE_API = ../tny/libtinymail-api.xml ../ui/libtinymailui-api.xml ../camel/libtinymail-camel-api.xml

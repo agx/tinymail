@@ -1,4 +1,5 @@
 SUBDIRS = .
+EXTRA_DIST = 
 
 pkg = libtinymail
 
@@ -11,7 +12,7 @@ glue_includes =
 
 sources = TnyException.cs
 
-customs =
+customs = IteratorAdapter.custom ListAdapter.custom SimpleList.custom
 
 %-$(API_VERSION).pc: %.pc
 	cp $< $@

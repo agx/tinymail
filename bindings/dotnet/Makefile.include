@@ -10,12 +10,12 @@ TARGET_API = $(pkg:=-api.xml)
 gapidir = $(datadir)/gapi-2.0
 gapi_DATA = $(TARGET_API)
 CLEANFILES = $(ASSEMBLY) $(ASSEMBLY).mdb $(POLICY_ASSEMBLIES) generated-stamp generated/*.cs $(API) glue/generated.c AssemblyInfo.cs $(POLICY_CONFIGS)
-DISTCLEANFILES += $(ASSEMBLY).config
+DISTCLEANFILES += $(ASSEMBLY).config $(RAW_API) 
 
 POLICY_ASSEMBLIES = $(addsuffix .$(ASSEMBLY), $(addprefix policy., $(POLICY_VERSIONS)))
 POLICY_CONFIGS = $(addsuffix .config, $(addprefix policy., $(POLICY_VERSIONS)))
 
-EXTRA_DIST = $(RAW_API) $(SYMBOLS) $(ASSEMBLY).config.in $(METADATA) $(customs) $(sources) $(add_dist)
+EXTRA_DIST += $(RAW_API) $(SYMBOLS) $(ASSEMBLY).config.in $(METADATA) $(customs) $(sources) $(add_dist)
 
 build_symbols = $(addprefix --symbols=$(srcdir)/, $(SYMBOLS))
 
@@ -49,8 +49,9 @@ build_references = $(addprefix /r:, $(references)) $(GTK_SHARP_LIBS)
 
 $(ASSEMBLY): generated-stamp $(build_sources) $(references)
 	@rm -f $(ASSEMBLY).mdb
-	cp $(top_builddir)/bindings/dotnet/$(SNK) .
+	if ! test -f ./$(SNK); then cp $(top_srcdir)/bindings/dotnet/$(SNK) .; fi
 	$(CSC) $(CSFLAGS) -nowarn:0169,0612,0618 -unsafe -out:$(ASSEMBLY) -target:library $(build_references) generated/*.cs $(build_sources)
+	rm -rf ./$(SNK)
 
 install-data-local:
 	@if test -n '$(pkg)'; then							\

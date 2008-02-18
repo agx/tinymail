@@ -2,6 +2,7 @@ SUBDIRS = .
 
 pkg = libtinymailui-gtk
 
+EXTRA_DIST = 
 SNK = tny-sharp.snk
 SYMBOLS =
 INCLUDE_API = ../tny/libtinymail-api.xml ../ui/libtinymailui-api.xml
@@ -12,7 +13,7 @@ glue_includes =
 
 sources =	
 
-customs =
+customs = AccountListModel.custom AttachListModel.custom FolderStoreTreeModel.custom HeaderListModel.custom
 
 
 %-$(API_VERSION).pc: %.pc
