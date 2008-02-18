@@ -1949,7 +1949,7 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	if (!apriv->service) {
+	if (!apriv->service && callback) {
 		GError *err = NULL;
 		g_set_error (&err, TNY_SYSTEM_ERROR, TNY_SYSTEM_ERROR_MEMORY, 
 			_("Internal error, account not ready"));
