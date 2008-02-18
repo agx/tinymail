@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include <glib.h>
+#include <gtk/gtk.h>
 
 #include <tny-list.h>
 #include <tny-iterator.h>
@@ -111,6 +112,8 @@ main (int argc, char **argv)
 	recursion_level = 0;
 	for (i=0; i<1; i++) 
 		recurse_folders (TNY_FOLDER_STORE (account), NULL);
+
+	gtk_main();
 
 	g_object_unref (account);
 	g_object_unref (iter);

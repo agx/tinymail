@@ -98,6 +98,24 @@ tny_test_account_store_get_cache_dir (TnyAccountStore *self)
 	return me->cache_dir;
 }
 
+typedef struct {
+	GCond *condition;
+	GMutex *mutex;
+	gboolean had_callback;
+} SyncInfo;
+
+
+static void went_online (TnyCamelAccount *account, gboolean canceled, GError *err, gpointer user_data)
+{
+	SyncInfo *info = (SyncInfo *) user_data;
+
+	g_mutex_lock (info->mutex);
+	g_cond_broadcast (info->condition);
+	info->had_callback = TRUE;
+	g_mutex_unlock (info->mutex);
+
+	return;	
+}
 
 static void
 tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGetAccountsRequestType types)
@@ -115,7 +133,6 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 		tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
 		camel_session_set_online ((CamelSession*)me->session, me->force_online); 
-		tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), me->force_online, NULL, NULL);
 
 		tny_account_set_proto (account, "imap");
 		tny_account_set_name (account, "imap1.tinymail.org");
@@ -124,6 +141,25 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 		tny_account_set_id (account, "tnytest@imap1.tinymail.org");
 		tny_account_set_forget_pass_func (account, per_account_forget_pass);
 		tny_account_set_pass_func (account, per_account_get_pass);
+
+		if (me->force_online) {
+			SyncInfo *info = g_slice_new (SyncInfo);
+
+			info->mutex = g_mutex_new ();
+			info->condition = g_cond_new ();
+			info->had_callback = FALSE;
+
+			tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), me->force_online, went_online, info);
+
+			g_mutex_lock (info->mutex);
+			if (!info->had_callback)
+				g_cond_wait (info->condition, info->mutex);
+			g_mutex_unlock (info->mutex);
+
+			g_mutex_free (info->mutex);
+			g_cond_free (info->condition);
+			g_slice_free (SyncInfo, info);
+		}
 
 		tny_list_prepend (list, (GObject*)account);
 		g_object_unref (G_OBJECT (account));
@@ -135,7 +171,6 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 		tny_camel_account_set_session (TNY_CAMEL_ACCOUNT (account), me->session);
 		camel_session_set_online ((CamelSession*)me->session, me->force_online); 
-		tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), me->force_online, NULL, NULL);
 
 		tny_account_set_proto (account, "something");
 		tny_account_set_name (account, "SMTP unit test account");
@@ -144,6 +179,25 @@ tny_test_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 
 		tny_account_set_forget_pass_func (account, per_account_forget_pass);
 		tny_account_set_pass_func (account, per_account_get_pass);
+
+		if (me->force_online) {
+			SyncInfo *info = g_slice_new (SyncInfo);
+
+			info->mutex = g_mutex_new ();
+			info->condition = g_cond_new ();
+			info->had_callback = FALSE;
+
+			tny_camel_account_set_online (TNY_CAMEL_ACCOUNT (account), me->force_online, went_online, info);
+
+			g_mutex_lock (info->mutex);
+			if (!info->had_callback)
+				g_cond_wait (info->condition, info->mutex);
+			g_mutex_unlock (info->mutex);
+
+			g_mutex_free (info->mutex);
+			g_cond_free (info->condition);
+			g_slice_free (SyncInfo, info);
+		}
 
 		tny_list_prepend (list, (GObject*)account);
 		g_object_unref (G_OBJECT (account));
