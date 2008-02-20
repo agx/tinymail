@@ -369,7 +369,7 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 					     g_strerror (errno));
 
 
-		camel_imap_recon (store, &mex);
+		camel_imap_recon (store, &mex, FALSE);
 		imap_debug ("Recon in start: %s\n", camel_exception_get_description (&mex));
 
 		camel_exception_clear (&mex);
@@ -411,7 +411,7 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					     _("Operation cancelled"));
-			camel_imap_recon (store, &mex);
+			camel_imap_recon (store, &mex, TRUE);
 			imap_debug ("Recon in cont: %s\n", camel_exception_get_description (&mex));
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 			camel_exception_clear (&mex);
@@ -710,7 +710,7 @@ imap_read_untagged_opp (CamelImapStore *store, char *line, CamelException *ex, i
 					CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 					camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 							     _("Operation cancelled"));
-					camel_imap_recon (store, &mex);
+					camel_imap_recon (store, &mex, TRUE);
 					imap_debug ("Recon in untagged: %s\n", camel_exception_get_description (&mex));
 					camel_exception_clear (&mex);
 				} else {
@@ -730,7 +730,7 @@ imap_read_untagged_opp (CamelImapStore *store, char *line, CamelException *ex, i
 				CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 				camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 						     _("Operation cancelled"));
-				camel_imap_recon (store, &mex);
+				camel_imap_recon (store, &mex, TRUE);
 				imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
 				camel_exception_clear (&mex);
 			} else {
@@ -875,7 +875,7 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 					CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 					camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 							     _("Operation cancelled"));
-					camel_imap_recon (store, &mex);
+					camel_imap_recon (store, &mex, TRUE);
 					imap_debug ("Recon in untagged: %s\n", camel_exception_get_description (&mex));
 					camel_exception_clear (&mex);
 				} else {
@@ -895,7 +895,7 @@ imap_read_untagged (CamelImapStore *store, char *line, CamelException *ex)
 				CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 				camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 						     _("Operation cancelled"));
-				camel_imap_recon (store, &mex);
+				camel_imap_recon (store, &mex, TRUE);
 				imap_debug ("Recon in untagged idle: %s\n", camel_exception_get_description (&mex));
 				camel_exception_clear (&mex);
 			} else {

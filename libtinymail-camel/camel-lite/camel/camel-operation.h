@@ -22,6 +22,20 @@
 #ifndef CAMEL_OPERATION_H
 #define CAMEL_OPERATION_H 1
 
+#include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/time.h>
+
+
+#include <glib.h>
+
+#include <libedataserver/e-msgport.h>
+
+#ifdef HAVE_NSS
+#include <nspr.h>
+#endif
+
 G_BEGIN_DECLS
 
 /* cancellation helper stuff, not yet finalised */
@@ -29,6 +43,35 @@ G_BEGIN_DECLS
 typedef struct _CamelOperation CamelOperation;
 
 typedef void (*CamelOperationStatusFunc)(struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *data);
+
+#ifndef CAMEL_OPERATION_CANCELLED
+#define CAMEL_OPERATION_CANCELLED (1<<0)
+#endif
+
+
+struct _CamelOperation {
+	struct _CamelOperation *next;
+	struct _CamelOperation *prev;
+
+	pthread_t id;		/* id of running thread */
+	guint32 flags;		/* cancelled ? */
+	int blocked;		/* cancellation blocked depth */
+	int refcount;
+
+	CamelOperationStatusFunc status;
+	void *status_data;
+	unsigned int status_update;
+
+	/* stack of status messages (struct _status_stack *) */
+	GSList *status_stack;
+	struct _status_stack *lastreport;
+
+	EMsgPort *cancel_port;
+	int cancel_fd;
+#ifdef HAVE_NSS
+	PRFileDesc *cancel_prfd;
+#endif
+};
 
 typedef enum _camel_operation_status_t {
 	CAMEL_OPERATION_START = -1,

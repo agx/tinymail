@@ -1,3 +1,7 @@
+2008-02-20  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Improvement for cancel's their reconnection
+
 2008-02-18  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Make distcheck for the .NET bindings (finally)

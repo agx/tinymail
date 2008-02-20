@@ -24,18 +24,6 @@
 #include <config.h>
 #endif
 
-#include <pthread.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/time.h>
-
-#ifdef HAVE_NSS
-#include <nspr.h>
-#endif
-
-#include <glib.h>
-
-#include <libedataserver/e-msgport.h>
 
 #include "camel-operation.h"
 
@@ -50,31 +38,10 @@ struct _status_stack {
 	unsigned int stamp;		/* last stamp reported */
 };
 
-struct _CamelOperation {
-	struct _CamelOperation *next;
-	struct _CamelOperation *prev;
 
-	pthread_t id;		/* id of running thread */
-	guint32 flags;		/* cancelled ? */
-	int blocked;		/* cancellation blocked depth */
-	int refcount;
-
-	CamelOperationStatusFunc status;
-	void *status_data;
-	unsigned int status_update;
-
-	/* stack of status messages (struct _status_stack *) */
-	GSList *status_stack;
-	struct _status_stack *lastreport;
-
-	EMsgPort *cancel_port;
-	int cancel_fd;
-#ifdef HAVE_NSS
-	PRFileDesc *cancel_prfd;
-#endif
-};
-
+#ifndef CAMEL_OPERATION_CANCELLED
 #define CAMEL_OPERATION_CANCELLED (1<<0)
+#endif
 #define CAMEL_OPERATION_TRANSIENT (1<<1)
 
 /* Delay before a transient operation has any effect on the status */

@@ -159,12 +159,11 @@ imapstore_get_local_size (CamelStore *store, const gchar *folder_name)
 }
 
 void
-camel_imap_recon (CamelImapStore *store, CamelException *mex)
+camel_imap_recon (CamelImapStore *store, CamelException *mex, gboolean was_cancel)
 {
 	if (store->not_recon) {
 		camel_exception_set (mex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 			_("Connection lost during operation"));
-		return;
 	} else {
 		CamelService *service = CAMEL_SERVICE (store);
 
@@ -194,6 +193,13 @@ camel_imap_recon (CamelImapStore *store, CamelException *mex)
 		}
 
 		service->reconnecting = FALSE;
+	}
+
+	if (was_cancel) {
+		CamelOperation *cc = camel_operation_registered ();
+		errno = EINTR;
+		cc->flags |= CAMEL_OPERATION_CANCELLED;
+		camel_operation_unref (cc);
 	}
 }
 
@@ -4211,7 +4217,7 @@ camel_imap_store_readline (CamelImapStore *store, char **dest, CamelException *e
 		if (errno == EINTR) {
 			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
-			camel_imap_recon (store, &mex);
+			camel_imap_recon (store, &mex, TRUE);
 			imap_debug ("Recon: %s\n", camel_exception_get_description (&mex));
 			camel_exception_clear (&mex);
 		} else {
@@ -4287,7 +4293,7 @@ camel_imap_store_readline_nl (CamelImapStore *store, char **dest, CamelException
 		{
 			CamelException mex = CAMEL_EXCEPTION_INITIALISER;
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Operation cancelled"));
-			camel_imap_recon (store, &mex);
+			camel_imap_recon (store, &mex, TRUE);
 			imap_debug ("Recon in nl: %s\n", camel_exception_get_description (&mex));
 			camel_exception_clear (&mex);
 		} else {
