@@ -35,6 +35,7 @@ struct _TnyCamelSendQueuePriv
 	GMutex *todo_lock, *sending_lock; 
 	gboolean do_continue, is_running;
 	gboolean observer_attached;
+	gint pending_send_notifies;
 };
 
 #endif

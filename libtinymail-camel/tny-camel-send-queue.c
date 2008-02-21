@@ -71,6 +71,8 @@ typedef struct {
 } ControlInfo;
 
 
+static void emit_queue_control_signals (TnySendQueue *self, guint signal_id);
+
 static TnyFolder*
 get_sentbox (TnySendQueue *self)
 {
@@ -234,6 +236,11 @@ on_msg_sent_get_msg (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError 
 		g_object_unref (header);
 	}
 
+	priv->pending_send_notifies--;
+	if (priv->pending_send_notifies == 0 && priv->thread == NULL) {		
+		emit_queue_control_signals (self, TNY_SEND_QUEUE_STOP);
+	}
+
 	g_object_unref (self);
 }
 
@@ -263,7 +270,9 @@ tny_camel_send_queue_update (TnyFolderObserver *self, TnyFolderChange *change)
 			iter = tny_list_create_iterator (list);
 			while (!tny_iterator_is_done (iter))
 			{
+				TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 				TnyHeader *cur = TNY_HEADER (tny_iterator_get_current (iter));
+				priv->pending_send_notifies++;
 				tny_folder_get_msg_async (sentbox, cur, 
 					on_msg_sent_get_msg, on_status, 
 					g_object_ref (self));
@@ -289,6 +298,8 @@ emit_queue_control_signals_on_mainloop (gpointer data)
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
 	TnyCamelAccountPriv *apriv = NULL;
 
+	if ((priv->pending_send_notifies > 0) && (info->signal_id == TNY_SEND_QUEUE_STOP))
+		return FALSE;
 	if (priv && priv->trans_account)
 		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
 	if (apriv)
@@ -1134,6 +1145,7 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->sending_lock = g_mutex_new ();
 	priv->is_running = FALSE;
 	priv->thread = NULL;
+	priv->pending_send_notifies = 0;
 
 	return;
 }

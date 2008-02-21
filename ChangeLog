@@ -4,6 +4,11 @@
 	Do not lose the filename of the attachment disposition in
 	case we set it as purged.
 
+	* libtinymail-camel/tny-camel-send-queue-priv.h,
+ 	libtinymail-camel/tny-camel-send-queue.c:
+ 	Now we don't send the run-queue-stop signal until
+ 	we've processed all sent signals.
+
 2008-02-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Improvement for cancel's their reconnection
