@@ -1161,8 +1161,17 @@ static void
 tny_camel_mime_part_set_purged_default (TnyMimePart *self)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	const gchar *tmp;
+	gchar *filename = NULL;
 	g_mutex_lock (priv->part_lock);
+	tmp = camel_mime_part_get_filename (priv->part);
+	if (tmp != NULL)
+		filename = g_strdup (tmp);
 	camel_mime_part_set_disposition (priv->part, "purged");
+	if (filename) {
+		camel_mime_part_set_filename (priv->part, filename);
+		g_free (filename);
+	}
 	g_mutex_unlock (priv->part_lock);
 	return;
 }

@@ -1,3 +1,9 @@
+2008-02-21  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-mime-part.c:
+	Do not lose the filename of the attachment disposition in
+	case we set it as purged.
+
 2008-02-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Improvement for cancel's their reconnection
