@@ -927,9 +927,15 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 	CamelMessageInfoBase *mi; gboolean im_certain=FALSE;
 	gint retry = 0;
 	gboolean had_attachment = FALSE;
+	gboolean free_ex = FALSE;
+
+	if (!ex) {
+		free_ex = TRUE;
+		ex = camel_exception_new ();
+	}		
 
 	if (!uid)
-		return;
+		goto do_free_ex;
 
 	pop3_debug ("%s requested\n", uid);
 
@@ -951,14 +957,14 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 		camel_object_unref (CAMEL_OBJECT (stream));
 
-		return message;
+		goto do_free_ex;
 	}
 
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 			     _("This message is not currently available"));
-		return NULL;
+		goto do_free_ex;
 	}
 
 	g_static_rec_mutex_lock (pop3_store->uidl_lock);
@@ -1027,7 +1033,7 @@ rfail:
 			  uid);
 
 			g_static_rec_mutex_unlock (pop3_store->uidl_lock);
-			return NULL;
+			goto do_free_ex;
 		}
 	}
 
@@ -1040,7 +1046,7 @@ rfail:
 		  "Message with UID %s is not currently available", uid);
 
 		g_static_rec_mutex_unlock (pop3_store->uidl_lock);
-		return NULL;
+		goto do_free_ex;
 	}
 
    while (retry < 2)
@@ -1053,7 +1059,7 @@ rfail:
 		if (camel_exception_is_set (ex)) {
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 			g_static_rec_mutex_unlock (pop3_store->uidl_lock);
-			return NULL;
+			goto do_free_ex;
 		}
 	}
 	g_static_rec_mutex_unlock (pop3_store->eng_lock);
@@ -1133,7 +1139,7 @@ rfail:
 		if (pop3_store->cache == NULL
 		    || (stream = camel_data_cache_add(pop3_store->cache, "cache", fi->uid, ex)) == NULL) {
 			/* stream = camel_stream_mem_new(); */
-			return NULL;
+			goto do_free_ex;
 		}
 
 		/* ref it, the cache storage routine unref's when done */
@@ -1260,6 +1266,9 @@ fail:
 
 	g_static_rec_mutex_unlock (pop3_store->uidl_lock);
 
+ do_free_ex:
+	if (free_ex)
+		camel_exception_free (ex);
 	return message;
 }
 

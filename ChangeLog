@@ -13,6 +13,9 @@
 	Added a missing else that could cause freeing some summary info entries
 	when they shouldn't
 
+	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c:
+	(pop3_get_message). Now it works even if no exception parameter is passed.
+
 2008-02-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Improvement for cancel's their reconnection
