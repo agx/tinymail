@@ -9,6 +9,10 @@
  	Now we don't send the run-queue-stop signal until
  	we've processed all sent signals.
 
+	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c:
+	Added a missing else that could cause freeing some summary info entries
+	when they shouldn't
+
 2008-02-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Improvement for cancel's their reconnection

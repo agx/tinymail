@@ -1243,7 +1243,7 @@ rfail:
 		if (had_attachment)
 			camel_message_info_set_flags((CamelMessageInfo *) mi, CAMEL_MESSAGE_ATTACHMENTS, CAMEL_MESSAGE_ATTACHMENTS);
 		camel_folder_summary_add (summary, (CamelMessageInfo *)mi);
-	} if (mi) {
+	} else if (mi) {
 		if (had_attachment)
 			camel_message_info_set_flags((CamelMessageInfo *) mi, CAMEL_MESSAGE_ATTACHMENTS, CAMEL_MESSAGE_ATTACHMENTS);
 		camel_message_info_free (mi);
