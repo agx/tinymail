@@ -1,8 +1,3 @@
-2008-02-26  Philip Van Hoof <pvanhoof@gnome.org>
-
-	* Merged bugfix in certificate fingerprint generation from upstream
-	camel
-
 2008-02-21  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c:

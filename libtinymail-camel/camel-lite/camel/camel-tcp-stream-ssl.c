@@ -829,29 +829,25 @@ void camel_certdb_nss_cert_set(CamelCertDB *certdb, CamelCert *ccert, CERTCertif
 static char *
 cert_fingerprint(CERTCertificate *cert)
 {
-	unsigned char md5sum[16], fingerprint[50], *f;
-	int i;
-	const char tohex[16] = "0123456789abcdef";
+	unsigned char fp[16];
+	SECItem fpitem;
+	char *fpstr;
+	char *c;
 
-	md5_get_digest ((const char *) cert->derCert.data, cert->derCert.len, md5sum);
-	for (i=0,f = fingerprint; i<16; i++) {
-		unsigned int c = md5sum[i];
+	PK11_HashBuf (SEC_OID_MD5, fp, cert->derCert.data, cert->derCert.len);
+	fpitem.data = fp;
+	fpitem.len = sizeof (fp);
+	fpstr = CERT_Hexify (&fpitem, 1);
 
-		*f++ = tohex[(c >> 4) & 0xf];
-		*f++ = tohex[c & 0xf];
-#ifndef G_OS_WIN32
-		*f++ = ':';
-#else
-		/* The fingerprint is used as a file name, can't have
-		 * colons in file names. Use underscore instead.
-		 */
-		*f++ = '_';
+	for (c = fpstr; *c != 0; c++) {
+#ifdef G_OS_WIN32
+		if (*c == ':')
+			*c = '_';
 #endif
+		*c = g_ascii_tolower (*c);
 	}
 
-	fingerprint[47] = 0;
-
-	return g_strdup((char*) fingerprint);
+	return fpstr;
 }
 
 /* lookup a cert uses fingerprint to index an on-disk file */
