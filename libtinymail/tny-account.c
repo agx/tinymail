@@ -834,7 +834,7 @@ tny_account_get_proto (TnyAccount *self)
  * imap://user@hostname. Note that it doesn't necessarily contain the password 
  * of the account.
  *
- * returns (null-ok) (caller-owns): the url-string or NULL.
+ * Returns: (null-ok) (caller-owns): the url-string or NULL.
  * since: 1.0
  * audience: application-developer
  **/

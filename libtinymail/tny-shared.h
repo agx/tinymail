@@ -115,7 +115,44 @@ typedef void (*TnyCreateFolderCallback) (TnyFolderStore *self, gboolean cancelle
 
 typedef void (*TnyFolderCallback) (TnyFolder *self, gboolean cancelled, GError *err, gpointer user_data);
 typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data);
+
+/** 
+ * TnyGetMsgCallback:
+ * @folder: a #TnyFolder that caused the callback
+ * @cancelled: if the operation got cancelled
+ * @msg: (null-ok): a #TnyMsg with the fetched message or NULL
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
+ *
+ * A folder callback for when a message fetch was requested. If allocated, you
+ * must cleanup @user_data at the end of your implementation of the callback. All 
+ * other fields in the parameters of the callback are read-only.
+ *
+ * When cancelled, @cancelled will be TRUE while @err might nonetheless be NULL.
+ * If @err is not NULL, an error occurred that you should handle gracefully.
+ * The @msg parameter might be NULL in case of error or cancellation.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
 typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data);
+/** 
+ * TnyTransferMsgsCallback:
+ * @folder: a #TnyFolder that caused the callback
+ * @cancelled: if the operation got cancelled
+ * @err: (null-ok): if an error occurred
+ * @user_data: (null-ok):  user data that was passed to the callbacks
+ *
+ * A folder callback for when a transfer of messages was requested. If allocated,
+ * you must cleanup @user_data at the end of your implementation of the callback.
+ * All other fields in the parameters of the callback are read-only.
+ *
+ * When cancelled, @cancelled will be TRUE while @err might nonetheless be NULL.
+ * If @err is not NULL, an error occurred that you should handle gracefully.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
 typedef void (*TnyTransferMsgsCallback) (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data);
 typedef void (*TnyCopyFolderCallback) (TnyFolder *self, gboolean cancelled, TnyFolderStore *into, TnyFolder *new_folder, GError *err, gpointer user_data);
 

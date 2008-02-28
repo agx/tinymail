@@ -821,7 +821,7 @@ tny_mime_part_construct (TnyMimePart *self, TnyStream *stream, const gchar *mime
  * 
  * Get the transfer encoding of @self or NULL if default transfer encoding 7bit.
  * 
- * returns (null-ok): transfer encoding
+ * Returns: (null-ok): transfer encoding
  * since: 1.0
  * audience: application-developer
  **/

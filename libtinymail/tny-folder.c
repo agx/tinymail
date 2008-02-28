@@ -1045,24 +1045,6 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
 	return;
 }
 
-/** 
- * TnyTransferMsgsCallback:
- * @self: a #TnyFolder that caused the callback
- * @cancelled: if the operation got cancelled
- * @err: (null-ok): if an error occurred
- * @user_data: (null-ok):  user data that was passed to the callbacks
- *
- * A folder callback for when a transfer of messages was requested. If allocated,
- * you must cleanup @user_data at the end of your implementation of the callback.
- * All other fields in the parameters of the callback are read-only.
- *
- * When cancelled, @cancelled will be TRUE while @err might nonetheless be NULL.
- * If @err is not NULL, an error occurred that you should handle gracefully.
- *
- * since: 1.0
- * audience: application-developer
- **/
-
 /**
  * tny_folder_transfer_msgs_async:
  * @self: a #TnyFolder
@@ -1202,26 +1184,6 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
 	return retval;
 }
 
-
-/** 
- * TnyGetMsgCallback:
- * @self: a #TnyFolder that caused the callback
- * @cancelled: if the operation got cancelled
- * @msg: (null-ok): a #TnyMsg with the fetched message or NULL
- * @err: (null-ok): if an error occurred
- * @user_data: (null-ok):  user data that was passed to the callbacks
- *
- * A folder callback for when a message fetch was requested. If allocated, you
- * must cleanup @user_data at the end of your implementation of the callback. All 
- * other fields in the parameters of the callback are read-only.
- *
- * When cancelled, @cancelled will be TRUE while @err might nonetheless be NULL.
- * If @err is not NULL, an error occurred that you should handle gracefully.
- * The @msg parameter might be NULL in case of error or cancellation.
- *
- * since: 1.0
- * audience: application-developer
- **/
 
 /**
  * tny_folder_get_msg_async:

@@ -23,7 +23,8 @@
 #include "tny-idle-stopper-priv.h"
 #undef TINYMAIL_ENABLE_PRIVATE_API
 
-/** TnyIdleStopper:
+/** 
+ * TnyIdleStopper:
  * 
  * This API can be used to allow 2 idle callbacks to cooperate, 
  * so that one idle callback (for instance the main callback)
@@ -56,14 +57,16 @@ struct _TnyIdleStopper
 	gint* refcount;
 };
 
-/** tny_idle_stopper_new:
- * @returns: A new TnyIdleStopper instance. Release this with tny_idle_stopper_destroy().
+/** 
+ * tny_idle_stopper_new:
  * 
  * Creates a new ref count object, with an initial ref count.
  * Use tny_idle_stopper_copy() to create a second instance sharing 
  * the same underlying stopped status.
  * You must call tny_idle_stopper_stop() on one of these instances,
  * and call tny_idle_stopper_destroy() on all instances.
+ *
+ * Returns: A new #TnyIdleStopper instance. Release this with tny_idle_stopper_destroy().
  */
 TnyIdleStopper* tny_idle_stopper_new()
 {
@@ -78,12 +81,13 @@ TnyIdleStopper* tny_idle_stopper_new()
 	return result;
 }
 
-/** tny_idle_stopper_copy
- * @stopper: The TnyIdleStopper instance to be shared.
+/** 
+ * tny_idle_stopper_copy:
+ * @stopper: The #TnyIdleStopper instance to be shared.
  * 
  * Create a shared copy of the stopper, 
  * so that you can call tny_idle_stopper_stop() on one instance, 
- * so that tny_idle_stopper_is_stopped() returns TRUE for ther other instance.
+ * so that tny_idle_stopper_is_stopped() returns %TRUE for ther other instance.
  */
 TnyIdleStopper* tny_idle_stopper_copy (TnyIdleStopper *stopper)
 {
@@ -101,10 +105,11 @@ TnyIdleStopper* tny_idle_stopper_copy (TnyIdleStopper *stopper)
 	return result;
 }
 
-/** tny_idle_stopper_stop:
- * @stopper: The TnyIdleStopper instance.
+/** 
+ * tny_idle_stopper_stop:
+ * @stopper: The #TnyIdleStopper instance.
  * 
- * Call this to make tny_idle_stopper_is_stopped() return TRUE for all 
+ * Call this to make tny_idle_stopper_is_stopped() return %TRUE for all 
  * instances of the stopper.
  */
 void tny_idle_stopper_stop (TnyIdleStopper *stopper)
@@ -116,11 +121,12 @@ void tny_idle_stopper_stop (TnyIdleStopper *stopper)
 	*(stopper->stopped) = TRUE;
 }
 
-/** tny_idle_stopper_destroy:
- * @stopper: The TnyIdleStopper instance.
+/** 
+ * tny_idle_stopper_destroy:
+ * @stopper: The #TnyIdleStopper instance.
  * 
  * Call this when you are sure that the callback will never be called again.
- * For instance, in your GDestroyNotify callback provided to g_idle_add_full().
+ * For instance, in your #GDestroyNotify callback provided to g_idle_add_full().
  * Do not attempt to use @stopper after calling this.
  */
 void tny_idle_stopper_destroy(TnyIdleStopper *stopper)
