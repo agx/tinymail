@@ -1,3 +1,9 @@
+2008-02-28  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-account.c:
+	(tny_camel_account_set_pass_func_default) reactivate the account
+	always, even when we're setting the same pass func again.
+
 2008-02-27  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:

@@ -1045,10 +1045,6 @@ tny_camel_account_set_pass_func_default (TnyAccount *self, TnyGetPassFunc get_pa
 	gboolean reconf_if = FALSE;
 	gboolean changed = FALSE;
 
-	/* Ignore this if it is not a change: */
-	if (get_pass_func == priv->get_pass_func)
-		return;
-
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	if (priv->get_pass_func != get_pass_func)
