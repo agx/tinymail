@@ -1,3 +1,8 @@
+2008-02-27  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
+	Now we regenerate the addrinfo on each call to connect_to_server_wrapper.
+
 2008-02-21  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c:

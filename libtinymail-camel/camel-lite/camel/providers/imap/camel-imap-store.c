@@ -1342,6 +1342,11 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_family = PF_UNSPEC;
 
+	if (store->addrinfo != NULL) {
+		camel_freeaddrinfo (store->addrinfo);
+		store->addrinfo = NULL;
+	}
+
 	if (store->addrinfo == NULL)
 		store->addrinfo = camel_getaddrinfo(service->url->host, serv, &hints, ex);
 
