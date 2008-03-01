@@ -25,7 +25,8 @@ libcamel_liteincludedir = $(includedir)/camel-lite/camel
 libcamel_lite_providerincludedir = $(includedir)/camel-lite/camel
 camel_litelibexecdir = $(libexecdir)
 
-lib_LTLIBRARIES = libcamel-lite-1.2.la
+noinst_LTLIBRARIES = libcamel-lite-1.2.la
+# lib_LTLIBRARIES = libcamel-lite-1.2.la
 
 INCLUDES = -I.. -I$(srcdir)/.. \
 	-I$(top_srcdir)/intl \
