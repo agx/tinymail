@@ -407,17 +407,17 @@ wait_for_login_delay (gpointer user_data)
 
 		sleep (login_delay);
 
-		g_static_rec_mutex_lock (store->uidl_lock);
-		g_static_rec_mutex_lock (store->eng_lock);
 
 		if (!store->is_refreshing) {
 			CamelException dex = CAMEL_EXCEPTION_INITIALISER;
+			g_static_rec_mutex_lock (store->uidl_lock);
+			g_static_rec_mutex_lock (store->eng_lock);
 			camel_pop3_store_destroy_lists_nl (store);
 			camel_service_disconnect (CAMEL_SERVICE (store), TRUE, &dex);
+			g_static_rec_mutex_unlock (store->eng_lock);
+			g_static_rec_mutex_unlock (store->uidl_lock);
 			killed = TRUE;
 		}
-		g_static_rec_mutex_unlock (store->eng_lock);
-		g_static_rec_mutex_unlock (store->uidl_lock);
 
 	}
 
