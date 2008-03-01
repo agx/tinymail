@@ -182,7 +182,7 @@ cmd_builduid(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	case CAMEL_MIME_PARSER_STATE_MULTIPART:
 		h = camel_mime_parser_headers_raw(mp);
 		while (h) {
-			if (g_ascii_strcasecmp(h->name, "status") != 0
+			if (h->name && g_ascii_strcasecmp(h->name, "status") != 0
 			    && g_ascii_strcasecmp(h->name, "x-status") != 0) {
 				md5_update(&md5, (const guchar*) h->name, strlen(h->name));
 				md5_update(&md5, (const guchar*) h->value, strlen(h->value));
@@ -356,10 +356,12 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 				continue;
 			}
 
-			if (pop3_store->engine && pop3_store->engine->capa & CAMEL_POP3_CAP_TOP)
+			if (pop3_store->engine && pop3_store->engine->capa & CAMEL_POP3_CAP_TOP) {
 				msg = pop3_get_top (folder, fi->uid, NULL);
-			else if (pop3_store->engine)
-				msg = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_PARTIAL, -1, NULL);
+				if (!msg && (!(pop3_store->engine->capa & CAMEL_POP3_CAP_TOP)))
+					msg = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
+			} else if (pop3_store->engine)
+				msg = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
 
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
@@ -455,7 +457,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 		for (t=0; t < pop3_store->uids->len; t++)
 		{
 			CamelPOP3FolderInfo *fi2 = pop3_store->uids->pdata[t];
-			if (fi2 && fi2->uid && !strcmp (fi2->uid, info->uid)) {
+			if (info && fi2 && fi2->uid && info->uid && !strcmp (fi2->uid, info->uid)) {
 				found = TRUE;
 				break;
 			}
@@ -602,7 +604,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			for (t=0; t < pop3_store->uids->len; t++)
 			{
 				CamelPOP3FolderInfo *fi2 = pop3_store->uids->pdata[t];
-				if (fi2 && fi2->uid && !strcmp (fi2->uid, info->uid)) {
+				if (info && fi2 && fi2->uid && info->uid && !strcmp (fi2->uid, info->uid)) {
 					found = TRUE;
 					break;
 				}
@@ -755,12 +757,12 @@ cmd_tocache(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 			break;
 
 		/* heuristics */
-		if (camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
+		if (buffer && camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
 			fi->has_attachments = TRUE;
-		else if (camel_strstrcase (buffer, "filename=") != NULL &&
+		else if (buffer && camel_strstrcase (buffer, "filename=") != NULL &&
 			 strchr (buffer, '.'))
 			fi->has_attachments = TRUE;
-		else if (camel_strstrcase (buffer, "Content-Type: message/rfc822") != NULL)
+		else if (buffer && camel_strstrcase (buffer, "Content-Type: message/rfc822") != NULL)
 			fi->has_attachments = TRUE;
 
 		w += n;
@@ -816,15 +818,15 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 			continue;
 
 		/* heuristics */
-		if (camel_strstrcase ((const char *) buffer, "Content-Disposition: attachment") != NULL)
+		if (buffer && camel_strstrcase ((const char *) buffer, "Content-Disposition: attachment") != NULL)
 			fi->has_attachments = TRUE;
-		else if (camel_strstrcase ((const char *) buffer, "filename=") != NULL &&
+		else if (buffer && camel_strstrcase ((const char *) buffer, "filename=") != NULL &&
 			 strchr ((const char *) buffer, '.'))
 			fi->has_attachments = TRUE;
-		else if (camel_strstrcase ((const char *) buffer, "Content-Type: message/rfc822") != NULL)
+		else if (buffer && camel_strstrcase ((const char *) buffer, "Content-Type: message/rfc822") != NULL)
 			fi->has_attachments = TRUE;
 
-		if (boundary == NULL)
+		if (boundary == NULL && buffer)
 		{
 			   CamelContentType *ct = NULL;
 			   const char *bound=NULL;
@@ -843,7 +845,7 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 				if (bound && strlen (bound) > 0)
 					boundary = g_strdup (bound);
 			   }
-		} else if (strstr ((const char*) buffer, (const char*) boundary))
+		} else if (buffer && strstr ((const char*) buffer, (const char*) boundary))
 		{
 			if (occurred)
 			{
@@ -857,7 +859,7 @@ cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 			occurred = TRUE;
 		}
 
-		if (!theend)
+		if (!theend && buffer)
 		{
 		    n = camel_stream_write(fi->stream, (const char*) buffer, len);
 		    if (n == -1 || camel_stream_write(fi->stream, "\n", 1) == -1)
@@ -1410,6 +1412,12 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 			;
 		if (i == -1)
 			fi->err = errno;
+
+		if (pcr->state == CAMEL_POP3_COMMAND_ERR) {
+			fi->err = -1;
+			pop3_store->engine->capa &= ~CAMEL_POP3_CAP_TOP;
+		}
+
 		camel_pop3_engine_command_free(pop3_store->engine, pcr);
 
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);

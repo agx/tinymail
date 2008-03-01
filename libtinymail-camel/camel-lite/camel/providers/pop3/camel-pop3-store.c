@@ -860,6 +860,8 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 	if (pcu)
 		camel_pop3_engine_command_free(store->engine, pcu);
 
+	/* camel_pop3_engine_reget_capabilities (store->engine); */
+
 	return status;
 }
 

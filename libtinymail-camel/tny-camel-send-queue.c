@@ -346,7 +346,7 @@ thread_main (gpointer data)
 	priv->is_running = TRUE;
 	list = tny_simple_list_new ();
 
-	g_mutex_lock (priv->todo_lock);
+	g_static_rec_mutex_lock (priv->todo_lock);
 	{
 		GError *terror = NULL;
 		sentbox = get_sentbox (self);
@@ -362,7 +362,7 @@ thread_main (gpointer data)
 				"return NULL. This indicates a problem in the "
 				"software.");
 			priv->is_running = FALSE;
-			g_mutex_unlock (priv->todo_lock);
+			g_static_rec_mutex_unlock (priv->todo_lock);
 			goto errorhandler;
 		}
 
@@ -373,14 +373,14 @@ thread_main (gpointer data)
 			emit_error (self, NULL, NULL, terror, i, priv->total);
 			g_error_free (terror);
 			g_object_unref (list);
-			g_mutex_unlock (priv->todo_lock);
+			g_static_rec_mutex_unlock (priv->todo_lock);
 			goto errorhandler;
 		}
 
 		length = tny_list_get_length (list);
 		priv->total = length;
 	}
-	g_mutex_unlock (priv->todo_lock);
+	g_static_rec_mutex_unlock (priv->todo_lock);
 
 	g_object_unref (list);
 
@@ -391,9 +391,9 @@ thread_main (gpointer data)
 		TnyHeader *header = NULL;
 		TnyMsg *msg = NULL;
 
-		g_mutex_lock (priv->sending_lock);
+		g_static_rec_mutex_lock (priv->sending_lock);
 
-		g_mutex_lock (priv->todo_lock);
+		g_static_rec_mutex_lock (priv->todo_lock);
 		{
 			GError *ferror = NULL;
 			TnyIterator *hdriter = NULL;
@@ -405,8 +405,8 @@ thread_main (gpointer data)
 				tny_folder_get_headers (outbox, headers, TRUE, &ferror);
 			else {
 				priv->is_running = FALSE;
-				g_mutex_unlock (priv->todo_lock);
-				g_mutex_unlock (priv->sending_lock);
+				g_static_rec_mutex_unlock (priv->todo_lock);
+				g_static_rec_mutex_unlock (priv->sending_lock);
 				goto errorhandler;
 			}
 
@@ -416,8 +416,8 @@ thread_main (gpointer data)
 				emit_error (self, NULL, NULL, ferror, i, priv->total);
 				g_error_free (ferror);
 				g_object_unref (headers);
-				g_mutex_unlock (priv->todo_lock);
-				g_mutex_unlock (priv->sending_lock);
+				g_static_rec_mutex_unlock (priv->todo_lock);
+				g_static_rec_mutex_unlock (priv->sending_lock);
 				goto errorhandler;
 			}
 
@@ -456,8 +456,8 @@ thread_main (gpointer data)
 			{
 				priv->is_running = FALSE;
 				g_object_unref (headers);
-				g_mutex_unlock (priv->todo_lock);
-				g_mutex_unlock (priv->sending_lock);
+				g_static_rec_mutex_unlock (priv->todo_lock);
+				g_static_rec_mutex_unlock (priv->sending_lock);
 				break;
 			}
 
@@ -467,7 +467,7 @@ thread_main (gpointer data)
 			g_object_unref (hdriter);
 			g_object_unref (headers);
 		}
-		g_mutex_unlock (priv->todo_lock);
+		g_static_rec_mutex_unlock (priv->todo_lock);
 
 		if (header && TNY_IS_HEADER (header) && tny_device_is_online (device))
 		{
@@ -500,7 +500,7 @@ thread_main (gpointer data)
 						     g_strdup (tny_header_get_uid (header)), NULL);
 			}
 
-			g_mutex_lock (priv->todo_lock);
+			g_static_rec_mutex_lock (priv->todo_lock);
 			{
 				if (err == NULL)
 				{
@@ -515,7 +515,7 @@ thread_main (gpointer data)
 					priv->total--;
 				}
 			}
-			g_mutex_unlock (priv->todo_lock);
+			g_static_rec_mutex_unlock (priv->todo_lock);
 
 			/* Emits msg-sent signal to inform msg has been sent */
 			/* This now happens in on_msg_sent_get_msg! */
@@ -536,11 +536,11 @@ thread_main (gpointer data)
 			length = 0;
 			if (header && G_IS_OBJECT (header))
 				g_object_unref (header);
-			g_mutex_unlock (priv->sending_lock);
+			g_static_rec_mutex_unlock (priv->sending_lock);
 			break;
 		}
 
-		g_mutex_unlock (priv->sending_lock);
+		g_static_rec_mutex_unlock (priv->sending_lock);
 
 	}
 
@@ -610,7 +610,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 	TnyList *headers = tny_simple_list_new ();
 	TnyIterator *iter;
 
-	g_mutex_lock (priv->sending_lock);
+	g_static_rec_mutex_lock (priv->sending_lock);
 
 	priv->is_running = FALSE;
 
@@ -622,7 +622,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 	{
 		g_object_unref (headers);
 		g_object_unref (outbox);
-		g_mutex_unlock (priv->sending_lock);
+		g_static_rec_mutex_unlock (priv->sending_lock);
 		return;
 	}
 
@@ -643,7 +643,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 			g_object_unref (iter);
 			g_object_unref (headers);
 			g_object_unref (outbox);
-			g_mutex_unlock (priv->sending_lock);
+			g_static_rec_mutex_unlock (priv->sending_lock);
 			return;
 		}
 
@@ -656,7 +656,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 	tny_folder_sync (outbox, TRUE, err);
 	g_object_unref (outbox);
 
-	g_mutex_unlock (priv->sending_lock);
+	g_static_rec_mutex_unlock (priv->sending_lock);
 
 	return;
 }
@@ -714,7 +714,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 
-	g_mutex_lock (priv->todo_lock);
+	g_static_rec_mutex_lock (priv->todo_lock);
 	{
 		TnyFolder *outbox;
 		TnyList *headers = tny_simple_list_new ();
@@ -730,7 +730,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 				"because it does not have a valid outbox. "
 				"This problem indicates a bug in the software."));
 			g_object_unref (headers);
-			g_mutex_unlock (priv->todo_lock);
+			g_static_rec_mutex_unlock (priv->todo_lock);
 			return;
 		}
 
@@ -740,7 +740,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		{
 			g_object_unref (headers);
 			g_object_unref (outbox);
-			g_mutex_unlock (priv->todo_lock);
+			g_static_rec_mutex_unlock (priv->todo_lock);
 			return;
 		}
 
@@ -756,7 +756,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 
 		g_object_unref (outbox);
 	}
-	g_mutex_unlock (priv->todo_lock);
+	g_static_rec_mutex_unlock (priv->todo_lock);
 
 	return;
 }
@@ -777,7 +777,7 @@ tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySend
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 
-	g_mutex_lock (priv->todo_lock);
+	g_static_rec_mutex_lock (priv->todo_lock);
 	{
 		TnyFolder *outbox;
 		TnyList *headers = tny_simple_list_new ();
@@ -793,7 +793,7 @@ tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySend
 				"because it does not have a valid outbox. "
 				"This problem indicates a bug in the software."));
 			g_object_unref (headers);
-			g_mutex_unlock (priv->todo_lock);
+			g_static_rec_mutex_unlock (priv->todo_lock);
 			return;
 		}
 
@@ -803,7 +803,7 @@ tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySend
 		{
 			g_object_unref (headers);
 			g_object_unref (outbox);
-			g_mutex_unlock (priv->todo_lock);
+			g_static_rec_mutex_unlock (priv->todo_lock);
 			return;
 		}
 
@@ -821,7 +821,7 @@ tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySend
 
 		g_object_unref (outbox);
 	}
-	g_mutex_unlock (priv->todo_lock);
+	g_static_rec_mutex_unlock (priv->todo_lock);
 
 	return;
 }
@@ -964,7 +964,7 @@ tny_camel_send_queue_finalize (GObject *object)
 		_tny_session_camel_unreg_queue (apriv->session, (TnyCamelSendQueue *) self);
 	}
 
-	g_mutex_lock (priv->todo_lock);
+	g_static_rec_mutex_lock (priv->todo_lock);
 
 	if (priv->signal != -1)
 		g_signal_handler_disconnect (G_OBJECT (priv->trans_account), 
@@ -974,10 +974,14 @@ tny_camel_send_queue_finalize (GObject *object)
 	if (priv->outbox_cache)
 		g_object_unref (priv->outbox_cache);
 
-	g_mutex_unlock (priv->todo_lock);
+	g_static_rec_mutex_unlock (priv->todo_lock);
 
-	g_mutex_free (priv->todo_lock);
-	g_mutex_free (priv->sending_lock);
+	g_free (priv->todo_lock);
+	priv->todo_lock = NULL;
+
+	g_free (priv->sending_lock);
+	priv->sending_lock = NULL;
+
 	g_object_unref (priv->trans_account);
 
 	(*parent_class->finalize) (object);
@@ -1141,8 +1145,12 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->signal = -1;
 	priv->sentbox_cache = NULL;
 	priv->outbox_cache = NULL;
-	priv->todo_lock = g_mutex_new ();
-	priv->sending_lock = g_mutex_new ();
+
+	priv->todo_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->todo_lock);
+	priv->sending_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->sending_lock);
+
 	priv->is_running = FALSE;
 	priv->thread = NULL;
 	priv->pending_send_notifies = 0;

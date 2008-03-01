@@ -32,7 +32,7 @@ struct _TnyCamelSendQueuePriv
 	guint total, cur_i;
 	gint signal;
 	GThread *thread;
-	GMutex *todo_lock, *sending_lock; 
+	GStaticRecMutex *todo_lock, *sending_lock; 
 	gboolean do_continue, is_running;
 	gboolean observer_attached;
 	gint pending_send_notifies;

@@ -294,6 +294,11 @@ get_capabilities(CamelPOP3Engine *pe)
 
 			camel_pop3_engine_command_free (pe, pc);
 		}
+
+		if (pe->capa == 0) {
+			/* Ugly assumptions */
+			pe->capa |= CAMEL_POP3_CAP_TOP;
+		}
 	}
 
 	g_static_rec_mutex_unlock (pe->lock);
