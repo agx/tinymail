@@ -101,7 +101,6 @@ libtinymail_camel_1_0_la_SOURCES = \
 libtinymail_camel_1_0_la_LIBADD = \
 	$(LIBTINYMAIL_CAMEL_LIBS) \
 	$(top_builddir)/libtinymail-camel/camel-lite/camel/libcamel-lite-1.2.la \
-	$(top_builddir)/libtinymail-camel/camel-lite/camel/libcamel-lite-provider-1.2.la \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/libtinymail-camel/bs/libbodystruct.la 
 

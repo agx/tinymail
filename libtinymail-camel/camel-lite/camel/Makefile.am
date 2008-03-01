@@ -25,7 +25,7 @@ libcamel_liteincludedir = $(includedir)/camel-lite/camel
 libcamel_lite_providerincludedir = $(includedir)/camel-lite/camel
 camel_litelibexecdir = $(libexecdir)
 
-lib_LTLIBRARIES = libcamel-lite-1.2.la libcamel-lite-provider-1.2.la
+lib_LTLIBRARIES = libcamel-lite-1.2.la
 
 INCLUDES = -I.. -I$(srcdir)/.. \
 	-I$(top_srcdir)/intl \
@@ -37,7 +37,7 @@ INCLUDES = -I.. -I$(srcdir)/.. \
 	-DLOCALEDIR=\""$(localedir)"\" \
 	$(CAMEL_CFLAGS)
 
-libcamel_lite_provider_1_2_la_SOURCES = 	\
+provider_sources = 	\
 	camel-cipher-context.c			\
 	camel-digest-folder.c			\
 	camel-digest-store.c			\
@@ -83,12 +83,12 @@ libcamel_lite_provider_1_2_la_SOURCES = 	\
 	$(LIBCAMEL_PROVIDER_PLATFORM_DEP_SOURCES)
 
 if ENABLE_OPENSSL
-libcamel_lite_provider_1_2_la_SOURCES += camel-tcp-stream-openssl.c
+provider_sources += camel-tcp-stream-openssl.c
 else
-libcamel_lite_provider_1_2_la_SOURCES += camel-tcp-stream-ssl.c
+provider_sources += camel-tcp-stream-ssl.c
 endif
 
-libcamel_lite_providerinclude_HEADERS =		\
+providerinclude_headers =		\
 	camel-cipher-context.h			\
 	camel-digest-folder.h			\
 	camel-digest-store.h			\
@@ -139,17 +139,8 @@ libcamel_lite_providerinclude_HEADERS =		\
 	camel-vee-summary.h			\
 	camel-vtrash-folder.h
 
-libcamel_lite_provider_1_2_la_LDFLAGS = -version-info $(LIBCAMEL_CURRENT):$(LIBCAMEL_REVISION):$(LIBCAMEL_AGE) $(NO_UNDEFINED)
-
-libcamel_lite_provider_1_2_la_LIBADD =		\
-	$(top_builddir)/libedataserver/libedataserver-${API_VERSION}.la \
-	libcamel-lite-1.2.la			\
-	$(CAMEL_LIBS)				\
-	$(SOCKET_LIBS)				\
-	$(REGEX_LIBS)				\
-	$(SSL_LIBS)
-
 libcamel_lite_1_2_la_SOURCES = 			\
+	$(provider_sources)			\
 	broken-date-parser.c			\
 	camel-address.c				\
 	camel-arg.c				\
@@ -217,6 +208,7 @@ libcamel_lite_1_2_la_SOURCES = 			\
 	$(LIBCAMEL_PLATFORM_DEP_SOURCES)
 
 libcamel_liteinclude_HEADERS =			\
+	$(providerinclude_headers)		\
 	broken-date-parser.h			\
 	camel-address.h				\
 	camel-arg.h				\
@@ -287,7 +279,7 @@ libcamel_liteinclude_HEADERS =			\
 	camel-lock-helper.h			\
 	camel.h
 
-libcamel_lite_1_2_la_LDFLAGS = -version-info 0:0:0 $(NO_UNDEFINED)
+libcamel_lite_1_2_la_LDFLAGS = -version-info $(LIBCAMEL_CURRENT):$(LIBCAMEL_REVISION):$(LIBCAMEL_AGE) $(NO_UNDEFINED)
 
 libcamel_lite_1_2_la_LIBADD =				\
 	$(top_builddir)/libedataserver/libedataserver-${API_VERSION}.la \

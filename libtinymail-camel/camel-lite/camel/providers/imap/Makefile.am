@@ -43,7 +43,6 @@ noinst_HEADERS =			\
 libcamelimap_la_LDFLAGS = -avoid-version -module $(NO_UNDEFINED)
 
 libcamelimap_la_LIBADD = \
-	$(top_builddir)/camel/libcamel-lite-provider-1.2.la			\
 	$(top_builddir)/camel/libcamel-lite-1.2.la				\
 	$(CAMEL_LIBS)
 

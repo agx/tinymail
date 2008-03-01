@@ -2,6 +2,8 @@
 
 	* Fixes in the POP code for POP servers that return invalid CAPA
 	responses (like pop.sina.com)
+	* Experimental reduction of libraries (camel-lite merged with
+	camel-lite-providers)
 
 2008-02-28  Jose Dapena Paz  <jdapena@igalia.com>
 

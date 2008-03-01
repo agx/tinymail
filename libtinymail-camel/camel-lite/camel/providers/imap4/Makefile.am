@@ -43,7 +43,6 @@ libcamelimap4_la_SOURCES = 			\
 libcamelimap4_la_LDFLAGS = -avoid-version -module $(NO_UNDEFINED)
 
 libcamelimap4_la_LIBADD = \
-	$(top_builddir)/camel/libcamel-lite-provider-1.2.la			\
 	$(top_builddir)/camel/libcamel-lite-1.2.la				\
 	$(CAMEL_LIBS)
 
