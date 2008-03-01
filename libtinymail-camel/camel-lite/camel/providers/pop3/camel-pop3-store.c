@@ -348,6 +348,47 @@ camel_pop3_store_destroy_lists (CamelPOP3Store *pop3_store)
 
 }
 
+
+
+static void
+camel_pop3_store_destroy_lists_nl (CamelPOP3Store *pop3_store)
+{
+
+	if (pop3_store->uids != NULL)
+	{
+		CamelPOP3FolderInfo **fi = (CamelPOP3FolderInfo **) pop3_store->uids->pdata;
+		int i;
+
+		for (i=0;i<pop3_store->uids->len;i++,fi++) {
+			if (fi[0]->cmd) {
+
+				if (pop3_store->engine == NULL) {
+					g_ptr_array_free(pop3_store->uids, TRUE);
+					g_hash_table_destroy(pop3_store->uids_uid);
+					g_free(fi[0]->uid);
+					g_free(fi[0]);
+					return;
+				}
+
+				while (camel_pop3_engine_iterate(pop3_store->engine, fi[0]->cmd) > 0)
+					;
+				camel_pop3_engine_command_free(pop3_store->engine, fi[0]->cmd);
+				fi[0]->cmd = NULL;
+			}
+
+			g_free(fi[0]->uid);
+			g_free(fi[0]);
+		}
+
+		kill_lists (pop3_store);
+
+		pop3_store->uids = g_ptr_array_new ();
+		pop3_store->uids_uid = g_hash_table_new(g_str_hash, g_str_equal);
+		pop3_store->uids_id = g_hash_table_new(NULL, NULL);
+
+	}
+}
+
 static gpointer
 wait_for_login_delay (gpointer user_data)
 {
@@ -366,14 +407,18 @@ wait_for_login_delay (gpointer user_data)
 
 		sleep (login_delay);
 
+		g_static_rec_mutex_lock (store->uidl_lock);
 		g_static_rec_mutex_lock (store->eng_lock);
+
 		if (!store->is_refreshing) {
 			CamelException dex = CAMEL_EXCEPTION_INITIALISER;
-			camel_pop3_store_destroy_lists (store);
+			camel_pop3_store_destroy_lists_nl (store);
 			camel_service_disconnect (CAMEL_SERVICE (store), TRUE, &dex);
 			killed = TRUE;
 		}
 		g_static_rec_mutex_unlock (store->eng_lock);
+		g_static_rec_mutex_unlock (store->uidl_lock);
+
 	}
 
 	camel_object_unref (store);
