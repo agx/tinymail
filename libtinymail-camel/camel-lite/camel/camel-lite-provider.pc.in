@@ -9,5 +9,5 @@ Name: camel-lite-provider
 Requires: camel-lite-1.2
 Description: A light mail access library
 Version: 1.2
-Libs: -L${libdir} -lcamel-lite-1.2 -lcamel-lite-provider-1.2
+Libs: -L${libdir} -ltinymail-camel-@API_VERSION@
 Cflags: -I${includedir}/camel-lite -I${includedir}/libedataserver-lite
