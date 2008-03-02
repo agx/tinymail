@@ -71,7 +71,7 @@ static int stream_gettimeout (CamelTcpStream *stream);
 static void 
 raw_enable_compress (CamelTcpStream *stream)
 {
-	/* TODO */ 
+	g_print ("RAW COMPRESS enable request: not yet supported");
 	return;
 }
 

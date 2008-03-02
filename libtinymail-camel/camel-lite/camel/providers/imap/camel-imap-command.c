@@ -149,7 +149,7 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 			CamelImapSummary *imap_summary = CAMEL_IMAP_SUMMARY (folder->summary);
 
 			cmd = imap_command_strdup_printf (store,
-				"SELECT %F (QRESYNC (%d %s 1:*))",
+				"SELECT %F (QRESYNC (%d %s))",
 				folder->full_name,
 				imap_summary->validity, modseq);
 

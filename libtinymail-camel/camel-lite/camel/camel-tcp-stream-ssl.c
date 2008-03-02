@@ -103,6 +103,7 @@ static void
 ssl_enable_compress (CamelTcpStream *stream)
 {
 	/* TODO */ 
+	g_print ("NSS COMPRESS enable request: not yet supported");
 	return;
 }
 

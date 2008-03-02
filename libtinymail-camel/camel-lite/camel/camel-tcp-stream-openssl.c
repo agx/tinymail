@@ -96,6 +96,7 @@ static pthread_mutex_t *mutex_buf = NULL;
 static void 
 openssl_enable_compress (CamelTcpStream *stream)
 {
+	g_print ("OpenSSL COMPRESS enable request: not yet supported");
 	/* TODO */ 
 	return;
 }
