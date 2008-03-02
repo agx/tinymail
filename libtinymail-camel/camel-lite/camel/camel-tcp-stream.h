@@ -108,6 +108,7 @@ typedef struct {
 	struct sockaddr * (*get_remote_address) (CamelTcpStream *stream, socklen_t *len);
 	ssize_t (*read_nb)   (CamelTcpStream *stream, char *buffer, size_t n);
 	int (*gettimeout) (CamelTcpStream *stream);
+	void (*enable_compress) (CamelTcpStream *stream);
 
 } CamelTcpStreamClass;
 
@@ -125,6 +126,8 @@ struct sockaddr *camel_tcp_stream_get_remote_address (CamelTcpStream *stream, so
 int         camel_tcp_stream_read_nb    (CamelTcpStream *stream, char *buffer, size_t n);
 
 int         camel_tcp_stream_gettimeout (CamelTcpStream *stream);
+
+void        camel_tcp_stream_enable_compress (CamelTcpStream *stream);
 
 G_END_DECLS
 

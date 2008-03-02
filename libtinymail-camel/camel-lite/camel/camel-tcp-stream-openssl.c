@@ -92,6 +92,14 @@ struct CRYPTO_dynlock_value {
 
 static pthread_mutex_t *mutex_buf = NULL;
 
+
+static void 
+openssl_enable_compress (CamelTcpStream *stream)
+{
+	/* TODO */ 
+	return;
+}
+
 static void locking_function(int mode, int n, const char *file, int line)
 {
 	if (mode & CRYPTO_LOCK)
@@ -203,6 +211,7 @@ camel_tcp_stream_ssl_class_init (CamelTcpStreamSSLClass *camel_tcp_stream_ssl_cl
 	camel_stream_class->flush = stream_flush;
 	camel_stream_class->close = stream_close;
 
+	camel_tcp_stream_class->enable_compress = openssl_enable_compress;
 	camel_tcp_stream_class->gettimeout = stream_gettimeout;
 	camel_tcp_stream_class->read_nb = stream_read_nb;
 	camel_tcp_stream_class->connect = stream_connect;

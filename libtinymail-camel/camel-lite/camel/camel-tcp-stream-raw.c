@@ -68,6 +68,13 @@ static ssize_t stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
 static int stream_gettimeout (CamelTcpStream *stream);
 
 
+static void 
+raw_enable_compress (CamelTcpStream *stream)
+{
+	/* TODO */ 
+	return;
+}
+
 static void
 camel_tcp_stream_raw_class_init (CamelTcpStreamRawClass *camel_tcp_stream_raw_class)
 {
@@ -84,6 +91,7 @@ camel_tcp_stream_raw_class_init (CamelTcpStreamRawClass *camel_tcp_stream_raw_cl
 	camel_stream_class->flush = stream_flush;
 	camel_stream_class->close = stream_close;
 
+	camel_tcp_stream_class->enable_compress = raw_enable_compress;
 	camel_tcp_stream_class->gettimeout = stream_gettimeout;
 	camel_tcp_stream_class->read_nb = stream_read_nb;
 	camel_tcp_stream_class->connect = stream_connect;

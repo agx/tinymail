@@ -756,6 +756,7 @@ static struct {
 	{ "ESEARCH",		IMAP_CAPABILITY_ESEARCH },
 	{ "CONVERT",		IMAP_CAPABILITY_CONVERT },
 	{ "LIST-EXTENDED",	IMAP_CAPABILITY_LISTEXT },
+	{ "COMPRESS=DEFLATE",	IMAP_CAPABILITY_COMPRESS },
 	{ NULL, 0 }
 };
 
@@ -879,7 +880,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	CamelImapResponse *response;
 	CamelStream *tcp_stream;
 	CamelSockOptData sockopt;
-	gboolean force_imap4 = FALSE;
+	gboolean force_imap4 = FALSE, ssl_ena = FALSE;
 	gboolean clean_quit = TRUE;
 	char *buf;
 	gboolean not_ssl = TRUE;
@@ -1019,6 +1020,14 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 				"Failed to connect to IMAP server %s: %s",
 				service->url->host, "LOGINDISABLED");
 			goto exception;
+		}
+
+		if (store->capabilities & IMAP_CAPABILITY_COMPRESS) {
+			// response = camel_imap_command (store, NULL, ex, "COMPRESS DEFLATE");
+			if (TRUE /* && response */) {
+				camel_tcp_stream_enable_compress (CAMEL_TCP_STREAM (tcp_stream));
+				// camel_imap_response_free_without_processing (store, response);
+			}
 		}
 
 		/* we're done */

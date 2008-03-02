@@ -43,6 +43,14 @@ static struct sockaddr *tcp_get_remote_address (CamelTcpStream *stream, socklen_
 static ssize_t tcp_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
 static int tcp_gettimeout (CamelTcpStream *stream);
 
+static void 
+tcp_enable_compress (CamelTcpStream *stream)
+{
+	g_warning ("Compress not supported on this stream");
+	return;
+}
+
+
 static void
 camel_tcp_stream_class_init (CamelTcpStreamClass *camel_tcp_stream_class)
 {
@@ -51,6 +59,7 @@ camel_tcp_stream_class_init (CamelTcpStreamClass *camel_tcp_stream_class)
 	parent_class = CAMEL_STREAM_CLASS (camel_type_get_global_classfuncs (CAMEL_STREAM_TYPE));
 
 	/* tcp stream methods */
+	camel_tcp_stream_class->enable_compress     = tcp_enable_compress;
 	camel_tcp_stream_class->gettimeout         = tcp_gettimeout;
 	camel_tcp_stream_class->read_nb            = tcp_read_nb;
 	camel_tcp_stream_class->connect            = tcp_connect;
@@ -115,6 +124,15 @@ camel_tcp_stream_connect (CamelTcpStream *stream, struct addrinfo *host)
 	g_return_val_if_fail (CAMEL_IS_TCP_STREAM (stream), -1);
 
 	return CTS_CLASS (stream)->connect (stream, host);
+}
+
+
+void 
+camel_tcp_stream_enable_compress (CamelTcpStream *stream)
+{
+	g_return_if_fail (CAMEL_IS_TCP_STREAM (stream));
+
+	CTS_CLASS (stream)->enable_compress (stream);
 }
 
 static int
