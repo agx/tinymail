@@ -41,7 +41,6 @@ struct _CamelTcpStreamRaw
 #ifdef G_OS_WIN32
 	int is_nonblocking;
 #endif
-	gboolean compress;
 };
 
 typedef struct {
