@@ -1067,10 +1067,12 @@ tny_camel_mime_part_get_filename_default (TnyMimePart *self)
 	if (!priv->cached_filename) {
 		const char *str = camel_mime_part_get_filename (priv->part);
 
-		if (!g_utf8_validate (str, strlen (str), NULL))
-			priv->cached_filename = decode_it_2 (priv->part, str, FALSE);
-		else
-			priv->cached_filename = g_strdup (str);
+		if (str) {
+			if (!g_utf8_validate (str, strlen (str), NULL))
+				priv->cached_filename = decode_it_2 (priv->part, str, FALSE);
+			else
+				priv->cached_filename = g_strdup (str);
+		}
 	}
 	g_mutex_unlock (priv->part_lock);
 
