@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libtinymail-camel 
 Description: TinyMail generic library implemented for camel
 Version: @VERSION@
-Requires: libtinymail-@API_VERSION@ camel-lite-1.2  camel-lite-provider-1.2
+Requires: libtinymail-@API_VERSION@ camel-lite-1.2
 Libs: -L${libdir} -ltinymail-camel-@API_VERSION@
 Cflags: -I${includedir}/libtinymail-camel-@API_VERSION@
