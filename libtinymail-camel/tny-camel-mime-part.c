@@ -1061,7 +1061,6 @@ static const gchar*
 tny_camel_mime_part_get_filename_default (TnyMimePart *self)
 {
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
-	const gchar *retval;
 
 	g_mutex_lock (priv->part_lock);
 	if (!priv->cached_filename) {
