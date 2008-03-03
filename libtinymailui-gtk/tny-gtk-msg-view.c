@@ -454,12 +454,22 @@ tny_gtk_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMimePar
 	/* Inline message RFC822 */
 	} else if (tny_mime_part_content_type_is (part, "image/*"))
 	{
+		gboolean nf = FALSE;
 		TnyMimePartView *image_view = tny_gtk_image_mime_part_view_new (priv->status_callback, priv->status_user_data);
-		const gchar *desc = tny_mime_part_get_description (part);
+		gchar *desc = (gchar *) tny_mime_part_get_description (part);
+
 		retval = tny_gtk_expander_mime_part_view_new (image_view);
-		if (!desc)
-			desc = _("Attached image");
+		if (!desc) {
+			const gchar *filen = tny_mime_part_get_filename (part);
+			if (filen) {
+				desc = g_strdup_printf (_("Attached image: %s"), filen);
+				nf = TRUE;
+			} else
+				desc = _("Attached image");
+		}
 		gtk_expander_set_label (GTK_EXPANDER (retval), desc);
+		if (nf)
+			g_free (desc);
 	} else if (tny_mime_part_content_type_is (part, "multipart/*"))
 	{
 		retval = TNY_MIME_PART_VIEW (tny_msg_view_create_new_inline_viewer (self));

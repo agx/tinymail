@@ -62,7 +62,56 @@ static GObjectClass *parent_class = NULL;
 #include <camel/camel-mime-filter-charset.h>
 #include <camel/camel-mime-filter-windows.h>
 
+#include <libedataserver/e-iconv.h>
+
 static ssize_t camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream);
+
+
+
+static char*
+decode_it_2 (CamelMimePart *part, const char *str, gboolean is_addr)
+{
+	struct _camel_header_raw *h = part->headers;
+	const char *content, *charset = NULL;
+	CamelContentType *ct = NULL;
+
+	if (!str)
+		return NULL;
+	
+	if ((content = camel_header_raw_find(&h, "Content-Type", NULL))
+	     && (ct = camel_content_type_decode(content))
+	     && (charset = camel_content_type_param(ct, "charset"))
+	     && (g_ascii_strcasecmp(charset, "us-ascii") == 0))
+		charset = NULL;
+
+	charset = charset ? e_iconv_charset_name (charset) : NULL;
+
+	while (isspace ((unsigned) *str))
+		str++;
+
+	if (is_addr) {
+		char *ret;
+		struct _camel_header_address *addr;
+		addr = camel_header_address_decode (str, charset);
+		if (addr) {
+			ret = camel_header_address_list_format (addr);
+			camel_header_address_list_clear (&addr);
+		} else {
+			ret = g_strdup (str);
+		}
+
+		if (ct)
+			camel_content_type_unref (ct);
+
+		return ret;
+	}
+
+	if (ct)
+		camel_content_type_unref (ct);
+
+	return camel_header_decode_string (str, charset);
+}
+
 
 static void 
 tny_camel_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value)
@@ -959,6 +1008,10 @@ _tny_camel_mime_part_set_part (TnyCamelMimePart *self, CamelMimePart *part)
 
 	g_mutex_lock (priv->part_lock);
 
+	if (priv->cached_filename)
+		g_free (priv->cached_filename);
+	priv->cached_filename = NULL;
+
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
@@ -1011,10 +1064,17 @@ tny_camel_mime_part_get_filename_default (TnyMimePart *self)
 	const gchar *retval;
 
 	g_mutex_lock (priv->part_lock);
-	retval = camel_mime_part_get_filename (priv->part);
+	if (!priv->cached_filename) {
+		const char *str = camel_mime_part_get_filename (priv->part);
+
+		if (!g_utf8_validate (str, strlen (str), NULL))
+			priv->cached_filename = decode_it_2 (priv->part, str, FALSE);
+		else
+			priv->cached_filename = g_strdup (str);
+	}
 	g_mutex_unlock (priv->part_lock);
-	
-	return retval;
+
+	return priv->cached_filename;
 }
 
 static const gchar*
@@ -1192,9 +1252,15 @@ tny_camel_mime_part_set_content_type_default (TnyMimePart *self, const gchar *co
 
 	g_mutex_lock (priv->part_lock);
 	camel_mime_part_set_content_type (priv->part, content_type);
+
+	if (priv->cached_filename)
+		g_free (priv->cached_filename);
+	priv->cached_filename = NULL;
+
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
+
 	g_mutex_unlock (priv->part_lock);
 
 	return;
@@ -1207,9 +1273,15 @@ tny_camel_mime_part_finalize (GObject *object)
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	g_mutex_lock (priv->part_lock);
+
+	if (priv->cached_filename)
+		g_free (priv->cached_filename);
+	priv->cached_filename = NULL;
+
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
+
 	if (priv->part && CAMEL_IS_OBJECT (priv->part))
 		camel_object_unref (CAMEL_OBJECT (priv->part));
 	g_mutex_unlock (priv->part_lock);
@@ -1349,6 +1421,9 @@ tny_camel_mime_part_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelMimePartPriv *priv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 
 	priv->part_lock = g_mutex_new ();
+
+	priv->cached_filename = NULL;
+	priv->cached_content_type = NULL;
 
 	return;
 }

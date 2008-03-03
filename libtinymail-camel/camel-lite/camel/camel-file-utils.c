@@ -34,6 +34,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <zlib.h>
+
 #include <glib.h>
 
 #ifdef G_OS_WIN32
@@ -798,6 +800,133 @@ camel_read_socket (int fd, char *buf, size_t n)
 }
 
 
+
+ssize_t
+camel_read_socket_compress (int fd, char *buf, size_t n)
+{
+
+	ssize_t nread;
+	int cancel_fd;
+
+	if (camel_operation_cancel_check (NULL)) {
+		errno = EINTR;
+		return -1;
+	}
+#ifndef G_OS_WIN32
+	cancel_fd = camel_operation_cancel_fd (NULL);
+#else
+	cancel_fd = -1;
+#endif
+
+	cancel_fd = -1;
+
+	if (cancel_fd == -1) {
+
+		z_stream zst;
+		int err;
+		Byte *output;
+		char tbuf[1000000];
+
+		zst.zalloc = (alloc_func) NULL;
+		zst.zfree = (free_func) Z_NULL;
+		err = inflateInit2_(&zst, -15, "1.2.3", sizeof (zst));
+
+		zst.avail_out = 1000000;
+		output = (Byte *) malloc(zst.avail_out);
+
+		ssize_t nread;
+
+		int errnosav, flags, fdmax;
+		fd_set rdset;
+		struct timeval tv;
+		int res;
+
+		flags = fcntl (fd, F_GETFL);
+		fcntl (fd, F_SETFL, flags | O_NONBLOCK);
+
+
+			FD_ZERO (&rdset);
+			FD_SET (fd, &rdset);
+			fdmax = fd + 1;
+			tv.tv_sec = BLOCKING_READ_TIMEOUT;
+			tv.tv_usec = 0;
+			nread = -1;
+
+			res = select(fdmax, &rdset, 0, 0, &tv);
+			if (res == -1)
+				;
+			else if (res == 0)
+				errno = ETIMEDOUT;
+			else {
+				nread = read (fd, tbuf, n);
+
+				printf ("%d\n", nread);
+
+				zst.next_out = (Byte *) output;
+				zst.next_in = (Byte *) tbuf;
+				zst.avail_in = nread;
+
+				err=inflate(&zst, Z_FINISH);
+				err=inflateEnd(&zst);
+
+				memcpy (buf, output, zst.total_out);
+				nread = zst.total_out;
+				//free (output);
+
+				printf ("%s (%s) (%d v. %d -- %d)\n", output, buf, err, Z_OK, zst.total_out);
+
+			}
+
+		errnosav = errno;
+		fcntl (fd, F_SETFL, flags);
+		errno = errnosav;
+
+
+	} else {
+#ifndef G_OS_WIN32
+		int errnosav, flags, fdmax;
+		fd_set rdset;
+
+		flags = fcntl (fd, F_GETFL);
+		fcntl (fd, F_SETFL, flags | O_NONBLOCK);
+
+		do {
+			struct timeval tv;
+			int res;
+
+			FD_ZERO (&rdset);
+			FD_SET (fd, &rdset);
+			FD_SET (cancel_fd, &rdset);
+			fdmax = MAX (fd, cancel_fd) + 1;
+			tv.tv_sec = BLOCKING_READ_TIMEOUT;
+			tv.tv_usec = 0;
+			nread = -1;
+
+			res = select(fdmax, &rdset, 0, 0, &tv);
+			if (res == -1)
+				;
+			else if (res == 0)
+				errno = ETIMEDOUT;
+			else if (FD_ISSET (cancel_fd, &rdset)) {
+				errno = EINTR;
+				goto failed;
+			} else {
+				do {
+					nread = read (fd, buf, n);
+				} while (nread == -1 && errno == EINTR);
+			}
+		} while (nread == -1 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK));
+	failed:
+		errnosav = errno;
+		fcntl (fd, F_SETFL, flags);
+		errno = errnosav;
+#endif
+	}
+
+	return nread;
+
+}
+
 ssize_t
 camel_read_socket_nb (int fd, char *buf, size_t n)
 {
@@ -879,6 +1008,18 @@ camel_read_socket_nb (int fd, char *buf, size_t n)
 #endif
 }
 
+
+
+
+ssize_t
+camel_read_socket_nb_compress (int fd, char *buf, size_t n)
+{
+#ifdef G_OS_WIN32
+	g_critical ("Not supported on Windows");
+#endif
+
+	return camel_read_nb (fd, buf, n);
+}
 
 
 /**
@@ -991,6 +1132,109 @@ camel_write_socket (int fd, const char *buf, size_t n)
 #endif
 }
 
+
+
+ssize_t
+camel_write_socket_compress (int fd, const char *buf, size_t n)
+{
+	ssize_t w, written = 0;
+	int cancel_fd;
+
+	if (camel_operation_cancel_check (NULL)) {
+		errno = EINTR;
+		return -1;
+	}
+#ifndef G_OS_WIN32
+	cancel_fd = camel_operation_cancel_fd (NULL);
+#else
+	cancel_fd = -1;
+#endif
+
+cancel_fd = -1;
+
+
+	if (cancel_fd == -1) {
+
+		z_stream zst;
+		int err;
+		Byte *output;
+
+		zst.zalloc=(alloc_func)NULL;
+		zst.zfree=(free_func)Z_NULL;
+		err=deflateInit2_ (&zst, 9, 8, -15, 9, 0, "1.2.3", sizeof (zst));
+
+		printf ("init: %d\n", err);
+
+		zst.avail_out = 1000000;
+		output = (Byte *) malloc(zst.avail_out);
+
+		zst.next_out = (Byte *) output;
+		zst.next_in = (Byte *) buf;
+		zst.avail_in = n;
+
+		err=deflate(&zst, Z_FINISH);
+		err=deflateEnd(&zst);
+
+		w = write (fd, output, zst.total_out);
+
+		//free (output);
+
+		printf ("%s (%d v. %d -- %d)\n", output, err, Z_OK, zst.total_out);
+
+	} else {
+#ifndef G_OS_WIN32
+		int errnosav, flags, fdmax;
+		fd_set rdset, wrset;
+
+		flags = fcntl (fd, F_GETFL);
+		fcntl (fd, F_SETFL, flags | O_NONBLOCK);
+
+		fdmax = MAX (fd, cancel_fd) + 1;
+		do {
+			struct timeval tv;
+			int res;
+
+			FD_ZERO (&rdset);
+			FD_ZERO (&wrset);
+			FD_SET (fd, &wrset);
+			FD_SET (cancel_fd, &rdset);
+			tv.tv_sec = BLOCKING_READ_TIMEOUT;
+			tv.tv_usec = 0;
+			w = -1;
+
+			res = select (fdmax, &rdset, &wrset, 0, &tv);
+			if (res == -1) {
+				if (errno == EINTR)
+					w = 0;
+			} else if (res == 0)
+				errno = ETIMEDOUT;
+			else if (FD_ISSET (cancel_fd, &rdset))
+				errno = EINTR;
+			else {
+				do {
+					w = write (fd, buf + written, n - written);
+				} while (w == -1 && errno == EINTR);
+
+				if (w == -1) {
+					if (errno == EAGAIN || errno == EWOULDBLOCK)
+						w = 0;
+				} else
+					written += w;
+			}
+		} while (w != -1 && written < n);
+
+		errnosav = errno;
+		fcntl (fd, F_SETFL, flags);
+		errno = errnosav;
+#endif
+	}
+
+	if (w == -1)
+		return -1;
+
+	return n;
+
+}
 
 /**
  * camel_file_util_savename:

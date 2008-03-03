@@ -89,9 +89,12 @@ ssize_t camel_read (int fd, char *buf, size_t n);
 ssize_t camel_write (int fd, const char *buf, size_t n);
 
 ssize_t camel_write_socket (int fd, const char *buf, size_t n);
-
 ssize_t camel_read_socket (int fd, char *buf, size_t n);
 ssize_t camel_read_socket_nb (int fd, char *buf, size_t n);
+
+ssize_t camel_write_socket_compress (int fd, const char *buf, size_t n);
+ssize_t camel_read_socket_compress (int fd, char *buf, size_t n);
+ssize_t camel_read_socket_nb_compress (int fd, char *buf, size_t n);
 
 char *camel_file_util_savename(const char *filename);
 void camel_file_util_read_counts (const gchar *spath, CamelFolderInfo *fi);

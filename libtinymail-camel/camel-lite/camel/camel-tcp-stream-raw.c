@@ -71,7 +71,8 @@ static int stream_gettimeout (CamelTcpStream *stream);
 static void 
 raw_enable_compress (CamelTcpStream *stream)
 {
-	g_print ("RAW COMPRESS enable request: not yet supported");
+	CamelTcpStreamRaw *raw = (CamelTcpStreamRaw *) stream;
+	raw->compress = TRUE;
 	return;
 }
 
@@ -112,6 +113,7 @@ camel_tcp_stream_raw_init (gpointer object, gpointer klass)
 {
 	CamelTcpStreamRaw *stream = CAMEL_TCP_STREAM_RAW (object);
 
+	stream->compress = FALSE;
 	stream->sockfd = -1;
 }
 
@@ -269,6 +271,9 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 {
 	CamelTcpStreamRaw *raw = CAMEL_TCP_STREAM_RAW (stream);
 
+	if (raw->compress)
+		return camel_read_socket_compress (raw->sockfd, buffer, n);
+
 	return camel_read_socket (raw->sockfd, buffer, n);
 }
 
@@ -277,6 +282,9 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 {
 	CamelTcpStreamRaw *raw = CAMEL_TCP_STREAM_RAW (stream);
 
+	if (raw->compress)
+		return camel_read_socket_nb_compress (raw->sockfd, buffer, n);
+
 	return camel_read_socket_nb (raw->sockfd, buffer, n);
 }
 
@@ -284,6 +292,9 @@ static ssize_t
 stream_write (CamelStream *stream, const char *buffer, size_t n)
 {
 	CamelTcpStreamRaw *raw = CAMEL_TCP_STREAM_RAW (stream);
+
+	if (raw->compress)
+		return camel_write_socket_compress (raw->sockfd, buffer, n);
 
 	return camel_write_socket (raw->sockfd, buffer, n);
 }

@@ -31,6 +31,7 @@ struct _TnyCamelMimePartPriv
 	GMutex *part_lock;
 	CamelMimePart *part;
 	gchar *cached_content_type;
+	gchar *cached_filename;
 };
 
 #define TNY_CAMEL_MIME_PART_GET_PRIVATE(o)	\

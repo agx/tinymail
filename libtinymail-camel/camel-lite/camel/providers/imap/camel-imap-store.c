@@ -1023,10 +1023,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		}
 
 		if (store->capabilities & IMAP_CAPABILITY_COMPRESS) {
-			// response = camel_imap_command (store, NULL, ex, "COMPRESS DEFLATE");
-			if (TRUE /* && response */) {
+			response = camel_imap_command (store, NULL, ex, "COMPRESS DEFLATE");
+			if (response) {
 				camel_tcp_stream_enable_compress (CAMEL_TCP_STREAM (tcp_stream));
-				// camel_imap_response_free_without_processing (store, response);
+				camel_imap_response_free_without_processing (store, response);
 			}
 		}
 
