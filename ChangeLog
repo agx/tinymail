@@ -1,3 +1,9 @@
+2008-03-03  Alberto Garcia Gonzalez <agarcia@igalia.com>
+
+	* debian/libtinymail-camel-1.0-0.install
+	* debian/libtinymail-camel-1.0-0-dev.install:
+	Removed obsolete libraries
+
 2008-03-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixes in the POP code for POP servers that return invalid CAPA
