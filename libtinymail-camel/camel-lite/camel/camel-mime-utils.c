@@ -3158,7 +3158,7 @@ rfc2184_param_cmp(const void *ap, const void *bp)
 
 /* NB: Steals name and value */
 static struct _camel_header_param *
-header_append_param(struct _camel_header_param *last, char *name, char *value)
+header_append_param(struct _camel_header_param *last, char *name, char *value, const char *default_charset)
 {
 	struct _camel_header_param *node;
 
@@ -3174,7 +3174,7 @@ header_append_param(struct _camel_header_param *last, char *name, char *value)
 	    && (node->value = header_decode_text(value, FALSE, NULL))) {
 		g_free(value);
 	} else if (g_ascii_strcasecmp (name, "boundary") != 0 && !g_utf8_validate(value, -1, NULL)) {
-		const char *charset = e_iconv_locale_charset();
+		const char *charset = default_charset?default_charset:e_iconv_locale_charset();
 
 		if ((node->value = header_convert("UTF-8", charset?charset:"ISO-8859-1", value, strlen(value)))) {
 			g_free(value);
@@ -3191,7 +3191,7 @@ header_append_param(struct _camel_header_param *last, char *name, char *value)
 }
 
 static struct _camel_header_param *
-header_decode_param_list (const char **in)
+header_decode_param_list (const char **in, const char *default_charset)
 {
 	struct _camel_header_param *head = NULL, *last = (struct _camel_header_param *)&head;
 	GPtrArray *split = NULL;
@@ -3225,7 +3225,7 @@ header_decode_param_list (const char **in)
 						g_free(value);
 						value = tmp;
 					}
-					last = header_append_param(last, name, value);
+					last = header_append_param(last, name, value, default_charset);
 				} else {
 					/* VAL*1="foo", save for later */
 					*index++ = 0;
@@ -3238,7 +3238,7 @@ header_decode_param_list (const char **in)
 					g_ptr_array_add(split, work);
 				}
 			} else {
-				last = header_append_param(last, name, value);
+				last = header_append_param(last, name, value, default_charset);
 			}
 		} else {
 			g_free(name);
@@ -3266,7 +3266,7 @@ header_decode_param_list (const char **in)
 				if (tmp == NULL)
 					tmp = g_strdup(value->str);
 
-				last = header_append_param(last, g_strdup(first->param.name), tmp);
+				last = header_append_param(last, g_strdup(first->param.name), tmp, default_charset);
 				g_string_truncate(value, 0);
 				first = work;
 			}
@@ -3289,12 +3289,12 @@ header_decode_param_list (const char **in)
 }
 
 struct _camel_header_param *
-camel_header_param_list_decode(const char *in)
+camel_header_param_list_decode(const char *in, const char *default_charset)
 {
 	if (in == NULL)
 		return NULL;
 
-	return header_decode_param_list(&in);
+	return header_decode_param_list(&in, default_charset);
 }
 
 static char *
@@ -3482,7 +3482,7 @@ camel_content_type_decode(const char *in)
 		}
 
 		t = camel_content_type_new(type, subtype);
-		t->params = header_decode_param_list(&inptr);
+		t->params = header_decode_param_list(&inptr, NULL);
 		g_free(type);
 		g_free(subtype);
 	} else {
@@ -3569,7 +3569,7 @@ camel_content_transfer_encoding_decode (const char *in)
 }
 
 CamelContentDisposition *
-camel_content_disposition_decode(const char *in)
+camel_content_disposition_decode(const char *in, const char *default_encoding)
 {
 	CamelContentDisposition *d = NULL;
 	const char *inptr = in;
@@ -3582,7 +3582,7 @@ camel_content_disposition_decode(const char *in)
 	d->disposition = decode_token(&inptr);
 	if (d->disposition == NULL)
 		w(g_warning("Empty disposition type"));
-	d->params = header_decode_param_list(&inptr);
+	d->params = header_decode_param_list(&inptr, default_encoding);
 	return d;
 }
 

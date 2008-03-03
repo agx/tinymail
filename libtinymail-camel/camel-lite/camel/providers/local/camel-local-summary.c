@@ -576,7 +576,7 @@ local_summary_decode_x_evolution(CamelLocalSummary *cls, const char *xev, CamelL
 	/* check for additional data */
 	header = strchr(xev, ';');
 	if (header) {
-		params = camel_header_param_list_decode(header+1);
+		params = camel_header_param_list_decode(header+1, NULL);
 		scan = params;
 		while (scan) {
 			if (!g_ascii_strcasecmp(scan->name, "flags")) {

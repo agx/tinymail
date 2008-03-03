@@ -131,7 +131,7 @@ char *camel_header_address_list_encode (struct _camel_header_address *addrlist);
 char *camel_header_address_list_format (struct _camel_header_address *addrlist);
 
 /* structured header prameters */
-struct _camel_header_param *camel_header_param_list_decode (const char *in);
+struct _camel_header_param *camel_header_param_list_decode (const char *in, const char *default_encoding);
 char *camel_header_param (struct _camel_header_param *params, const char *name);
 struct _camel_header_param *camel_header_set_param (struct _camel_header_param **paramsp, const char *name, const char *value);
 void camel_header_param_list_format_append (GString *out, struct _camel_header_param *params);
@@ -153,7 +153,7 @@ char *camel_content_type_simple (CamelContentType *content_type);
 void camel_content_type_dump (CamelContentType *content_type);
 
 /* Content-Disposition header */
-CamelContentDisposition *camel_content_disposition_decode (const char *in);
+CamelContentDisposition *camel_content_disposition_decode (const char *in, const char *default_encoding);
 void camel_content_disposition_ref (CamelContentDisposition *disposition);
 void camel_content_disposition_unref (CamelContentDisposition *disposition);
 char *camel_content_disposition_format (CamelContentDisposition *disposition);

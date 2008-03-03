@@ -1,3 +1,8 @@
+2008-03-03  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Smaller bug fixes in the build
+	* filename= encoding fixes
+
 2008-03-03  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* debian/libtinymail-camel-1.0-0.install

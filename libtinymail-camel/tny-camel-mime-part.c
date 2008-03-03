@@ -1067,7 +1067,7 @@ tny_camel_mime_part_get_filename_default (TnyMimePart *self)
 		const char *str = camel_mime_part_get_filename (priv->part);
 
 		if (str) {
-			if (!g_utf8_validate (str, strlen (str), NULL))
+			if (!g_utf8_validate (str, -1, NULL))
 				priv->cached_filename = decode_it_2 (priv->part, str, FALSE);
 			else
 				priv->cached_filename = g_strdup (str);

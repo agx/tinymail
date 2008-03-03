@@ -369,10 +369,30 @@ camel_mime_part_get_description (CamelMimePart *mime_part)
 static void
 set_disposition (CamelMimePart *mime_part, const char *disposition)
 {
+
 	camel_content_disposition_unref(mime_part->disposition);
-	if (disposition)
-		mime_part->disposition = camel_content_disposition_decode(disposition);
-	else
+	if (disposition) {
+		const char *charset = NULL;
+
+		if (!g_utf8_validate (disposition, -1, NULL) && mime_part->headers) {
+			struct _camel_header_raw *h = mime_part->headers;
+			const char *content;
+			CamelContentType *ct = NULL;
+
+			if ((content = camel_header_raw_find(&h, "Content-Type", NULL))
+			     && (ct = camel_content_type_decode(content))
+			     && (charset = camel_content_type_param(ct, "charset"))
+			     && (g_ascii_strcasecmp(charset, "us-ascii") == 0))
+				charset = NULL;
+
+			charset = charset ? e_iconv_charset_name (charset) : NULL;
+
+			if (ct)
+				camel_content_type_unref (ct);
+		}
+
+		mime_part->disposition = camel_content_disposition_decode (disposition, charset);
+	} else
 		mime_part->disposition = NULL;
 }
 
@@ -439,7 +459,7 @@ camel_mime_part_set_filename (CamelMimePart *mime_part, const char *filename)
 	char *str;
 
 	if (mime_part->disposition == NULL)
-		mime_part->disposition = camel_content_disposition_decode("attachment");
+		mime_part->disposition = camel_content_disposition_decode("attachment", NULL);
 
 	camel_header_set_param(&mime_part->disposition->params, "filename", filename);
 	str = camel_content_disposition_format(mime_part->disposition);
