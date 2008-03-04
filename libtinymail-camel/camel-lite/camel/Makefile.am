@@ -288,7 +288,8 @@ libcamel_lite_1_2_la_LIBADD =				\
 	$(CAMEL_LIBS)							\
 	$(SOCKET_LIBS)							\
 	$(REGEX_LIBS)							\
-	$(SSL_LIBS)
+	$(SSL_LIBS)                                                     \
+	$(top_builddir)/bs/libbodystruct.la 
 
 camel-mime-tables.c: gentables.pl
 	perl gentables.pl > $@

@@ -221,6 +221,7 @@ AC_SUBST(camel_providerdir)
 
 AC_OUTPUT([
 Makefile
+bs/Makefile
 camel/Makefile
 camel/providers/Makefile
 camel/providers/imap/Makefile

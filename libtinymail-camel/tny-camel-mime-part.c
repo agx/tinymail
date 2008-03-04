@@ -169,6 +169,7 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 	CamelDataWrapper *containee;
 	gboolean is_related = FALSE;
 	CamelContentType *content_type = NULL;
+	gboolean has_attachments = FALSE;
 
 	g_assert (TNY_IS_LIST (list));
 
@@ -197,9 +198,15 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 			CamelMimePart *tpart = camel_multipart_get_part (CAMEL_MULTIPART (containee), i);
 			TnyMimePart *newpart=NULL;
 			CamelContentType *type;
+			const gchar *disposition;
 
 			if (!tpart || !CAMEL_IS_MIME_PART (tpart))
 				continue;
+
+			disposition = camel_mime_part_get_disposition (tpart);
+
+			if (camel_strstrcase (disposition, "attachment") != NULL)
+				has_attachments = TRUE;
 
 			type = camel_mime_part_get_content_type (tpart);
 			if (CAMEL_IS_MIME_MESSAGE (tpart))
@@ -241,6 +248,18 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 
 			tny_list_prepend (list, G_OBJECT (newpart));
 			g_object_unref (G_OBJECT (newpart));
+		}
+	}
+
+	if (TNY_IS_MSG (self)) {
+		TnyHeader *header;
+
+		header = tny_msg_get_header (TNY_MSG (self));
+		if (header) {
+			if (has_attachments && 
+			    !(tny_header_get_flags (header) & TNY_HEADER_FLAG_ATTACHMENTS))
+				tny_header_set_flag (header, TNY_HEADER_FLAG_ATTACHMENTS);
+			g_object_unref (header);
 		}
 	}
 

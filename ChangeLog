@@ -1,3 +1,16 @@
+2008-03-04  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-mime-part.c:
+	Now, when we get the parts of a mime part that's a message,
+	we check if any part has an attachment content disposition,
+	and update the attachments flag properly.
+	* Moved bodystructure parser to camel, so that we
+	can use it there.
+	* libtinymail-camel/camel-lite/bs/bodystruct.c:
+	Added missing if, to avoid fetching the header badly (and
+	causing coredumps) for bodystructure strings not
+	including BODYSTRUCTURE prefix.
+
 2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
 
         * Attempt at making mime parsing use the seekable capability of

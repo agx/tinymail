@@ -1116,13 +1116,15 @@ bodystruct_parse (guchar *inbuf, guint inlen, GError **err)
 	int lendif;
 	bodystruct_t *r = NULL;
 
-	if (!start)
+	if (!start) {
 		r = bodystruct_part_decode (&inbuf, inbuf + inlen, NULL, 1, err);
+	} else {
 
-	start += 13;
-	lendif = (int) start - (int) inbuf;
-
-	r = bodystruct_part_decode (&start, (unsigned char *) ( start + (inlen - lendif) ), NULL, 1, err);
+		start += 13;
+		lendif = (int) start - (int) inbuf;
+		
+		r = bodystruct_part_decode (&start, (unsigned char *) ( start + (inlen - lendif) ), NULL, 1, err);
+	}
 	if (!r->part_spec)
 		r->part_spec = g_strdup ("1");
 	return r;

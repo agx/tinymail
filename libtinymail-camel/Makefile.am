@@ -1,4 +1,4 @@
-SUBDIRS = camel-lite bs .
+SUBDIRS = camel-lite .
 
 INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS)  	\
 	-I. -I$(top_srcdir)			\
@@ -101,8 +101,7 @@ libtinymail_camel_1_0_la_SOURCES = \
 libtinymail_camel_1_0_la_LIBADD = \
 	$(LIBTINYMAIL_CAMEL_LIBS) \
 	$(top_builddir)/libtinymail-camel/camel-lite/camel/libcamel-lite-1.2.la \
-	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
-	$(top_builddir)/libtinymail-camel/bs/libbodystruct.la 
+	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la
 
 libtinymail_camel_1_0_la_LDFLAGS = -export-dynamic -version-info \
 	$(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
