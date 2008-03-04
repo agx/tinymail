@@ -284,6 +284,8 @@ tny_vfs_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->eos = FALSE;
 	priv->handle = NULL;
+	priv->bound_start = 0;
+	priv->bound_end = (~0);
 
 	return;
 }
