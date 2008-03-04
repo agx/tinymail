@@ -235,5 +235,6 @@ camel/camel-lite.pc
 camel/camel-lite-provider.pc
 libedataserver/Makefile
 summary/Makefile
+bs/Makefile
 ])
 
