@@ -552,7 +552,6 @@ libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile
 libtinymail-camel/libtinymail-camel.pc
-libtinymail-camel/bs/Makefile
 libtinymail-tp/libtinymail-tp.pc
 libtinymail-tp/Makefile
 libtinymailui/Makefile
