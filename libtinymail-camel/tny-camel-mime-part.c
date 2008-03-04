@@ -27,6 +27,7 @@
 
 #include <string.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include <tny-mime-part.h>
 #include <tny-camel-mime-part.h>

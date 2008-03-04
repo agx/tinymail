@@ -145,6 +145,7 @@ struct _header_scan_filter {
 	CamelMimeFilter *filter;
 };
 
+static void folder_scan_step_hdr(struct _header_scan_state *s, char **databuffer, size_t *datalength, int *hdr_end);
 static void folder_scan_step(struct _header_scan_state *s, char **databuffer, size_t *datalength);
 static void folder_scan_drop_step(struct _header_scan_state *s);
 static int folder_scan_init_with_fd(struct _header_scan_state *s, int fd);
@@ -621,6 +622,32 @@ camel_mime_parser_step (CamelMimeParser *parser, char **databuffer, size_t *data
 		}
 
 		folder_scan_step(s, databuffer, datalength);
+	} else
+		s->unstep--;
+
+	d(printf("NEW STATE:  '%s' :\n", states[s->state]));
+
+	return s->state;
+}
+
+
+camel_mime_parser_state_t
+camel_mime_parser_step_hdr (CamelMimeParser *parser, char **databuffer, size_t *datalength, int *hdr_end)
+{
+	struct _header_scan_state *s = _PRIVATE (parser);
+
+	d(printf("OLD STATE:  '%s' :\n", states[s->state]));
+
+	if (s->unstep <= 0) {
+		char *dummy;
+		size_t dummylength;
+
+		if (databuffer == NULL) {
+			databuffer = &dummy;
+			datalength = &dummylength;
+		}
+
+		folder_scan_step_hdr (s, databuffer, datalength, hdr_end);
 	} else
 		s->unstep--;
 
@@ -1518,7 +1545,7 @@ folder_scan_init_with_stream(struct _header_scan_state *s, CamelStream *stream)
 #define USE_FROM
 
 static void
-folder_scan_step(struct _header_scan_state *s, char **databuffer, size_t *datalength)
+folder_scan_step_hdr (struct _header_scan_state *s, char **databuffer, size_t *datalength, int *hdr_end)
 {
 	struct _header_scan_stack *h, *hb;
 	const char *content;
@@ -1651,6 +1678,7 @@ tail_recurse:
 
 	case CAMEL_MIME_PARSER_STATE_HEADER:
 		s->state = CAMEL_MIME_PARSER_STATE_BODY;
+		*hdr_end = folder_tell (s);
 
 	case CAMEL_MIME_PARSER_STATE_BODY:
 		h = s->parts;
@@ -1765,6 +1793,13 @@ tail_recurse:
 	}
 
 	return;
+}
+
+static void
+folder_scan_step (struct _header_scan_state *s, char **databuffer, size_t *datalength)
+{
+	int i;
+	folder_scan_step_hdr (s, databuffer, datalength, &i);
 }
 
 /* drops the current state back one */

@@ -1,3 +1,7 @@
+2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Leave on disk, MIME parsing. Highly experimental
+
 2008-03-04  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c:
