@@ -58,27 +58,49 @@
 static void
 simple_data_wrapper_construct_from_parser (CamelDataWrapper *dw, CamelMimeParser *mp)
 {
-	char *buf;
-	GByteArray *buffer;
-	CamelStream *mem;
+	GByteArray *buffer = NULL;
+	CamelStream *stream;
+	off_t start, end;
+	int fd = -1;
 	size_t len;
-
+	char *buf;
+	
 	d(printf ("simple_data_wrapper_construct_from_parser()\n"));
-
-	/* read in the entire content */
-	buffer = e_byte_array_new ();
-	while (camel_mime_parser_step (mp, &buf, &len) != CAMEL_MIME_PARSER_STATE_BODY_END) {
-		d(printf("appending o/p data: %d: %.*s\n", len, len, buf));
-		if (!e_byte_array_append (buffer, (guint8 *) buf, len))
-			break;
+	
+	if (!(stream = camel_mime_parser_stream (mp)))
+		fd = camel_mime_parser_fd (mp);
+	else if (!CAMEL_IS_SEEKABLE_SUBSTREAM (stream))
+		stream = NULL;
+	
+	if ((stream || fd != -1) && (start = camel_mime_parser_tell (mp)) != -1) {
+		/* we can keep content on disk */
+	} else {
+		/* need to load content into memory */
+		buffer = g_byte_array_new ();
 	}
-
-	d(printf("message part kept in memory!\n"));
-
-	mem = camel_stream_mem_new_with_byte_array (buffer);
-	camel_data_wrapper_construct_from_stream (dw, mem);
-	camel_object_unref (mem);
+	
+	while (camel_mime_parser_step (mp, &buf, &len) != CAMEL_MIME_PARSER_STATE_BODY_END) {
+		if (buffer != NULL) {
+			d(printf("appending o/p data: %d: %.*s\n", len, len, buf));
+			g_byte_array_append (buffer, (guint8 *) buf, len);
+		}
+	}
+	
+	if (buffer == NULL) {
+		end = camel_mime_parser_tell (mp);
+		
+		if (stream != NULL)
+			stream = camel_seekable_substream_new ((CamelSeekableStream *) stream, start, end);
+		else
+			stream = camel_stream_fs_new_with_fd_and_bounds (dup (fd), start, end);
+	} else {
+		stream = camel_stream_mem_new_with_byte_array (buffer);
+	}
+	
+	camel_data_wrapper_construct_from_stream (dw, stream);
+	camel_object_unref (stream);
 }
+
 
 /* This replaces the data wrapper repository ... and/or could be replaced by it? */
 void

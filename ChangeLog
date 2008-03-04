@@ -1,6 +1,12 @@
 2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
 
+        * Attempt at making mime parsing use the seekable capability of
+	streams in stead of copying them in memory. This is experimental!
+
+2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Introduction of TnySeekable
+	* This is experimental
 
 2008-03-03  Philip Van Hoof <pvanhoof@gnome.org>
 
