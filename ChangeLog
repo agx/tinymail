@@ -1,3 +1,7 @@
+2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Introduction of TnySeekable
+
 2008-03-03  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Smaller bug fixes in the build

@@ -20,6 +20,7 @@
 #include <config.h>
 
 #include <tny-stream-camel.h>
+#include <tny-camel-stream.h>
 #include <tny-camel-shared.h>
 
 static CamelStreamClass *parent_class = NULL;
@@ -112,6 +113,43 @@ tny_stream_camel_reset (CamelStream *stream)
 	return tny_stream_reset (self->stream);
 }
 
+
+static off_t 
+tny_stream_camel_seek (CamelSeekableStream *stream, off_t offset, CamelStreamSeekPolicy policy)
+{
+	TnyStreamCamel *self = (TnyStreamCamel *)stream;
+	off_t retval = -1;
+
+	if (TNY_IS_SEEKABLE (self->stream))
+		retval = tny_seekable_seek ((TnySeekable *) self->stream, offset, (int) policy);
+
+	return retval;
+}
+
+static off_t 
+tny_stream_camel_tell (CamelSeekableStream *stream)
+{
+	TnyStreamCamel *self = (TnyStreamCamel *)stream;
+	off_t retval = -1;
+
+	if (TNY_IS_SEEKABLE (self->stream))
+		retval = tny_seekable_tell ((TnySeekable *) self->stream);
+
+	return retval;
+}
+
+int 
+tny_stream_camel_set_bouds (CamelSeekableStream *stream, off_t start, off_t end)
+{
+	TnyStreamCamel *self = (TnyStreamCamel *)stream;
+	int retval = -1;
+
+	if (TNY_IS_SEEKABLE (self->stream))
+		retval = tny_seekable_set_bounds ((TnySeekable *) self->stream, start, end);
+
+	return retval;
+}
+
 static void
 tny_stream_camel_init (CamelObject *object)
 {
@@ -126,14 +164,12 @@ tny_stream_camel_finalize (CamelObject *object)
 {
 	TnyStreamCamel *self = (TnyStreamCamel *)object;
 
-	if (G_LIKELY (self->stream))
-		g_object_unref (G_OBJECT (self->stream));
-
-	/* CamelObject types don't need parent finalization (build-in camel)
-	(*((CamelObjectClass*)parent_class)->finalise) (object); */
+	if (self->stream)
+		g_object_unref (self->stream);
 
 	return;
 }
+
 
 static void
 tny_stream_camel_class_init (TnyStreamCamelClass *klass)
@@ -144,6 +180,11 @@ tny_stream_camel_class_init (TnyStreamCamelClass *klass)
 	((CamelStreamClass *)klass)->eos = tny_stream_camel_eos;
 	((CamelStreamClass *)klass)->reset = tny_stream_camel_reset;
 	((CamelStreamClass *)klass)->flush = tny_stream_camel_flush;
+
+
+	((CamelSeekableStreamClass *)klass)->seek = tny_stream_camel_seek;
+	((CamelSeekableStreamClass *)klass)->tell = tny_stream_camel_tell;
+	((CamelSeekableStreamClass *)klass)->set_bounds = tny_stream_camel_set_bouds;
 
 	return;
 }

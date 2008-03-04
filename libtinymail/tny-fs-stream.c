@@ -56,7 +56,6 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <tny-stream.h>
 #include <tny-fs-stream.h>
 
 static GObjectClass *parent_class = NULL;
@@ -66,7 +65,9 @@ typedef struct _TnyFsStreamPriv TnyFsStreamPriv;
 struct _TnyFsStreamPriv
 {
 	int fd;
-	gint offset;
+	off_t position;		/* current postion in the stream */
+	off_t bound_start;	/* first valid position */
+	off_t bound_end;	/* first invalid position */
 	gboolean eos;
 };
 
@@ -103,23 +104,22 @@ tny_fs_stream_write_to_stream (TnyStream *self, TnyStream *output)
 	return total;
 }
 
+
 static gssize
-tny_fs_stream_read  (TnyStream *self, char *buffer, gsize n)
+tny_fs_stream_read (TnyStream *self, char *buffer, gsize n)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	gssize nread;
-	char b[1];
-	
+
+	if (priv->bound_end != (~0))
+		n = MIN (priv->bound_end - priv->position, n);
+
 	if ((nread = read (priv->fd, buffer, n)) > 0)
-		priv->offset += nread;
-	if (nread != n)
-		priv->eos = TRUE;
-	if (read (priv->fd, b, 1) != 1)
+		priv->position += nread;
+	else if (nread == 0)
 		priv->eos = TRUE;
 
-	priv->offset = lseek (priv->fd, priv->offset, SEEK_SET);
 	return nread;
-
 }
 
 static gssize
@@ -127,11 +127,16 @@ tny_fs_stream_write (TnyStream *self, const char *buffer, gsize n)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	gssize nwritten;
+
+	if (priv->bound_end != (~0))
+		n = MIN (priv->bound_end - priv->position, n);
+
 	if ((nwritten = write (priv->fd, buffer, n)) > 0)
-		priv->offset += nwritten;
-	priv->eos = FALSE;
+		priv->position += nwritten;
+
 	return nwritten;
 }
+
 
 static gint
 tny_fs_stream_close (TnyStream *self)
@@ -163,10 +168,9 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
 	if (priv->fd != -1)
 		close (priv->fd);
 	priv->fd = fd;
-	priv->offset = lseek (priv->fd, 0, SEEK_SET);
-	if (priv->offset == -1)
-		priv->offset = 0;
-	priv->eos = FALSE;
+	priv->position = lseek (priv->fd, 0, SEEK_CUR);
+	if (priv->position == -1)
+		priv->position = 0;
 	return;
 }
 
@@ -204,16 +208,19 @@ tny_fs_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyFsStream *self = (TnyFsStream *)instance;
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
-	priv->eos = TRUE;
+
 	priv->fd = -1;
-	priv->offset = 0;
+	priv->position = 0;
+	priv->bound_start = 0;
+	priv->bound_end = (~0);
+
 	return;
 }
 
 static void
 tny_fs_stream_finalize (GObject *object)
 {
-	TnyFsStream *self = (TnyFsStream *)object;	
+	TnyFsStream *self = (TnyFsStream *)object;
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
 	if (priv->fd != -1) {
 		fsync (priv->fd);
@@ -243,10 +250,70 @@ static gint
 tny_fs_reset (TnyStream *self)
 {
 	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
-	priv->offset = lseek (priv->fd, 0, SEEK_SET);
+	priv->position = lseek (priv->fd, 0, SEEK_SET);
 	priv->eos = FALSE;
 	return 0;
 }
+
+static off_t 
+tny_fs_seek (TnySeekable *self, off_t offset, int policy)
+{
+	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
+	off_t real = 0;
+
+	switch (policy) {
+	case SEEK_SET:
+		real = offset;
+		break;
+	case SEEK_CUR:
+		real = priv->position + offset;
+		break;
+	case SEEK_END:
+		if (priv->bound_end == (~0)) {
+			real = lseek(priv->fd, offset, SEEK_END);
+			if (real != -1) {
+				if (real<priv->bound_start)
+					real = priv->bound_start;
+				priv->position = real;
+			}
+			return real;
+		}
+		real = priv->bound_end + offset;
+		break;
+	}
+
+	if (priv->bound_end != (~0))
+		real = MIN (real, priv->bound_end);
+	real = MAX (real, priv->bound_start);
+
+	real = lseek(priv->fd, real, SEEK_SET);
+	if (real == -1)
+		return -1;
+
+	if (real != priv->position && priv->eos)
+		priv->eos = FALSE;
+
+	priv->position = real;
+
+	return real;
+}
+
+static off_t
+tny_fs_tell (TnySeekable *self)
+{
+	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
+	return priv->position;
+}
+
+static gint 
+tny_fs_set_bounds (TnySeekable *self, off_t start, off_t end)
+{
+	TnyFsStreamPriv *priv = TNY_FS_STREAM_GET_PRIVATE (self);
+	priv->bound_end = end;
+	priv->bound_start = start;
+	return;
+}
+
 
 static void
 tny_stream_init (gpointer g, gpointer iface_data)
@@ -260,6 +327,18 @@ tny_stream_init (gpointer g, gpointer iface_data)
 	klass->write= tny_fs_stream_write;
 	klass->close= tny_fs_stream_close;
 	klass->write_to_stream= tny_fs_stream_write_to_stream;
+
+	return;
+}
+
+static void
+tny_seekable_init (gpointer g, gpointer iface_data)
+{
+	TnySeekableIface *klass = (TnySeekableIface *)g;
+
+	klass->seek= tny_fs_seek;
+	klass->tell= tny_fs_tell;
+	klass->set_bounds= tny_fs_set_bounds;
 
 	return;
 }
@@ -305,12 +384,23 @@ tny_fs_stream_get_type (void)
 		  NULL          /* interface_data */
 		};
 
+		static const GInterfaceInfo tny_seekable_info = 
+		{
+		  (GInterfaceInitFunc) tny_seekable_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyFsStream",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_STREAM, 
 			&tny_stream_info);
+
+		g_type_add_interface_static (type, TNY_TYPE_SEEKABLE, 
+			&tny_seekable_info);
+
 	}
 
 	return type;

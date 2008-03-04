@@ -102,6 +102,9 @@ typedef struct _TnyCombinedAccount TnyCombinedAccount;
 typedef struct _TnyCombinedAccountClass TnyCombinedAccountClass;
 typedef struct _TnyConnectionPolicy TnyConnectionPolicy;
 typedef struct _TnyConnectionPolicyIface TnyConnectionPolicyIface;
+typedef struct _TnySeekable TnySeekable;
+typedef struct _TnySeekableIface TnySeekableIface;
+
 
 typedef void (*TnyStatusCallback) (GObject *self, TnyStatus *status, gpointer user_data);
 

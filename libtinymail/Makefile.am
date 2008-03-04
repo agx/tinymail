@@ -39,6 +39,7 @@ libtinymail_1_0_headers = \
 	tny-transport-account.h \
 	tny-account-store.h \
 	tny-stream.h \
+	tny-seekable.h \
 	tny-fs-stream.h \
 	tny-simple-list.h \
 	tny-folder-store.h \
@@ -78,6 +79,7 @@ libtinymail_1_0_la_SOURCES = \
 	tny-transport-account.c \
 	tny-account-store.c \
 	tny-stream.c \
+	tny-seekable.c \
 	tny-fs-stream.c \
 	tny-simple-list-priv.h \
 	tny-simple-list.c \

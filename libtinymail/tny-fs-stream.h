@@ -28,6 +28,7 @@
 #include <stdlib.h>
 
 #include <tny-stream.h>
+#include <tny-seekable.h>
 
 G_BEGIN_DECLS
 

@@ -308,14 +308,14 @@ tny_gtk_text_buffer_stream_instance_init (GTypeInstance *instance, gpointer g_cl
 static void
 tny_gtk_text_buffer_stream_finalize (GObject *object)
 {
-	TnyGtkTextBufferStream *self = (TnyGtkTextBufferStream *)object;	
+	TnyGtkTextBufferStream *self = (TnyGtkTextBufferStream *)object;
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 
 	if (priv->buffer && priv->pending_bytes)
-		tny_gtk_text_buffer_stream_flush (self);
+		tny_gtk_text_buffer_stream_flush ((TnyStream *) self);
 
 	if (priv->buffer)
-		g_object_unref (G_OBJECT (priv->buffer));
+		g_object_unref (priv->buffer);
 	if (priv->pending_bytes)
 		g_byte_array_free (priv->pending_bytes, TRUE);
 

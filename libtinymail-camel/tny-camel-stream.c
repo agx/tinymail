@@ -128,6 +128,34 @@ tny_camel_stream_reset (TnyStream *self)
 	return camel_stream_reset (priv->stream);
 }
 
+static off_t 
+tny_camel_stream_seek (TnySeekable *self, off_t offset, int policy)
+{
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
+	if (CAMEL_IS_SEEKABLE_STREAM (priv->stream))
+		return camel_seekable_stream_seek ((CamelSeekableStream *) priv->stream, offset, (CamelStreamSeekPolicy) policy);
+	return -1;
+}
+
+
+static off_t
+tny_camel_stream_tell (TnySeekable *self)
+{
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
+	if (CAMEL_IS_SEEKABLE_STREAM (priv->stream))
+		return camel_seekable_stream_tell ((CamelSeekableStream *) priv->stream);
+	return -1;
+}
+
+static gint 
+tny_camel_stream_set_bounds (TnySeekable *self, off_t start, off_t end)
+{
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
+	if (CAMEL_IS_SEEKABLE_STREAM (priv->stream))
+		return camel_seekable_stream_set_bounds ((CamelSeekableStream *) priv->stream, start, end);
+	return -1;
+}
+
 
 /**
  * tny_camel_stream_get_stream:
@@ -143,7 +171,7 @@ tny_camel_stream_get_stream (TnyCamelStream *self)
 	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
 	if (priv->stream)
-		camel_object_ref (CAMEL_OBJECT (priv->stream));
+		camel_object_ref (priv->stream);
 
 	return priv->stream;
 }
@@ -185,11 +213,11 @@ tny_camel_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_camel_stream_finalize (GObject *object)
 {
-	TnyCamelStream *self = (TnyCamelStream *)object;	
+	TnyCamelStream *self = (TnyCamelStream *)object;
 	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
 
-	if (G_LIKELY (priv->stream))
-		camel_object_unref (CAMEL_OBJECT (priv->stream));
+	if (priv->stream)
+		camel_object_unref (priv->stream);
 
 	(*parent_class->finalize) (object);
 
@@ -208,6 +236,20 @@ tny_stream_init (gpointer g, gpointer iface_data)
 	klass->is_eos= tny_camel_stream_is_eos;
 	klass->reset= tny_camel_stream_reset;
 	klass->write_to_stream= tny_camel_stream_write_to_stream;
+
+	return;
+}
+
+
+
+static void
+tny_seekable_init (gpointer g, gpointer iface_data)
+{
+	TnySeekableIface *klass = (TnySeekableIface *)g;
+
+	klass->seek= tny_camel_stream_seek;
+	klass->tell= tny_camel_stream_tell;
+	klass->set_bounds= tny_camel_stream_set_bounds;
 
 	return;
 }
@@ -270,12 +312,23 @@ tny_camel_stream_get_type (void)
 		  NULL          /* interface_data */
 		};
 
+		static const GInterfaceInfo tny_seekable_info = 
+		{
+		  (GInterfaceInitFunc) tny_seekable_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyCamelStream",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_STREAM, 
 			&tny_stream_info);
+
+		g_type_add_interface_static (type, TNY_TYPE_SEEKABLE, 
+			&tny_seekable_info);
+
 	}
 
 	return type;

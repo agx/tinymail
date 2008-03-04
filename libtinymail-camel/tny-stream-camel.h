@@ -23,8 +23,10 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-stream.h>
+#include <tny-seekable.h>
 
 #include <camel/camel-seekable-stream.h>
+#include <camel/camel-seekable-substream.h>
 
 G_BEGIN_DECLS
 
@@ -40,14 +42,14 @@ typedef struct _TnyStreamCamelClass TnyStreamCamelClass;
 
 struct _TnyStreamCamel
 {
-	CamelStream parent;
+	CamelSeekableSubstream parent;
 
 	TnyStream *stream;
 };
 
 struct _TnyStreamCamelClass 
 {
-	CamelStreamClass parent;
+	CamelSeekableSubstreamClass parent;
 };
 
 CamelType tny_stream_camel_get_type (void);

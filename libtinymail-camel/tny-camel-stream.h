@@ -23,6 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <tny-stream.h>
+#include <tny-seekable.h>
 
 #include <camel/camel-stream.h>
 

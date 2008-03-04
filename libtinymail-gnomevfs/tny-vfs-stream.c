@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <tny-stream.h>
 #include <tny-vfs-stream.h>
 
 static GObjectClass *parent_class = NULL;
@@ -34,6 +33,9 @@ struct _TnyVfsStreamPriv
 {
 	GnomeVFSHandle *handle;
 	gboolean eos;
+	off_t position;		/* current postion in the stream */
+	off_t bound_start;	/* first valid position */
+	off_t bound_end;	/* first invalid position */
 };
 
 #define TNY_VFS_STREAM_GET_PRIVATE(o) \
@@ -165,63 +167,43 @@ static gssize
 tny_vfs_stream_read  (TnyStream *self, char *buffer, gsize n)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
-	GnomeVFSFileSize count;
-	GnomeVFSResult res;
+	GnomeVFSFileSize nread = 0;
+	GnomeVFSResult result;
 
-	if (G_UNLIKELY (priv->handle == NULL))
-	{
-		errno = EINVAL;
-		return -1;
-	}
+	if (priv->bound_end != (~0))
+		n = MIN (priv->bound_end - priv->position, n);
 
-	res = gnome_vfs_read (priv->handle, buffer, n, &count);
+	result = gnome_vfs_read (priv->handle, buffer, n, &nread);
 
-	if (G_LIKELY (res == GNOME_VFS_OK))
-	{
-		gchar buf[1]; GnomeVFSResult res2;
-		GnomeVFSFileSize curpos, cnt;
-		gnome_vfs_tell (priv->handle, &curpos);
-		res2 = gnome_vfs_read (priv->handle, buf, 1, &cnt);
-		if (res2 == GNOME_VFS_ERROR_EOF)
+	if (nread > 0 && result == GNOME_VFS_OK)
+		priv->position += nread;
+	else { 
+		if (nread == 0)
 			priv->eos = TRUE;
-	    	else priv->eos = FALSE;
-		gnome_vfs_seek (priv->handle, GNOME_VFS_SEEK_START, curpos);
-	    
-		return (ssize_t)count;
-
-	} else if (G_LIKELY (res == GNOME_VFS_ERROR_EOF))
-	{
-		priv->eos = TRUE;
-		return (ssize_t)count;
+		tny_vfs_stream_set_errno (result);
 	}
 
-	tny_vfs_stream_set_errno (res);
-
-	return -1;
+	return nread;
 }
 
 static gssize
 tny_vfs_stream_write (TnyStream *self, const char *buffer, gsize n)
 {
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
-	GnomeVFSFileSize count;
-	GnomeVFSResult res;
+	GnomeVFSFileSize nwritten = 0;
+	GnomeVFSResult result;
 
-	if (G_UNLIKELY (priv->handle == NULL))
-	{
-		errno = EINVAL;
-		return -1;
-	}
+	if (priv->bound_end != (~0))
+		n = MIN (priv->bound_end - priv->position, n);
 
-	res = gnome_vfs_write (priv->handle, buffer, n, &count);
-    	priv->eos = FALSE;
-	if (G_LIKELY (res == GNOME_VFS_OK))
-		return (ssize_t)count;
+	result = gnome_vfs_write (priv->handle, buffer, n, &nwritten);
 
-	tny_vfs_stream_set_errno (res);
+	if (nwritten > 0 && result == GNOME_VFS_OK)
+		priv->position += nwritten;
+	else 
+		tny_vfs_stream_set_errno (result);
 
-	return -1;
-
+	return nwritten;
 }
 
 static gint
@@ -230,8 +212,7 @@ tny_vfs_stream_close (TnyStream *self)
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 	GnomeVFSResult res;
 
-	if (priv->handle == NULL) 
-	{
+	if (priv->handle == NULL)  {
 		errno = EINVAL;
 		return -1;
 	}
@@ -240,7 +221,7 @@ tny_vfs_stream_close (TnyStream *self)
 
 	priv->handle = NULL;
 	priv->eos = TRUE;
-    
+
 	if (res == GNOME_VFS_OK)
 		return 0;
 
@@ -266,9 +247,14 @@ tny_vfs_stream_set_handle (TnyVfsStream *self, GnomeVFSHandle *handle)
 	if (priv->handle)
 		gnome_vfs_close (priv->handle);
 
+	if (!handle)
+		return;
+
 	priv->handle = handle;
 	priv->eos = FALSE;
-    
+	priv->position = 0;
+	gnome_vfs_seek (handle, GNOME_VFS_SEEK_CURRENT, priv->position);
+
 	return;
 }
 
@@ -351,8 +337,74 @@ tny_vfs_reset (TnyStream *self)
 		retval = -1;
 	}
 	priv->eos = FALSE;
-    
+
 	return retval;
+}
+
+
+
+static off_t 
+tny_vfs_seek (TnySeekable *self, off_t offset, int policy)
+{
+	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
+	GnomeVFSFileSize real = 0;
+	GnomeVFSResult result;
+	GnomeVFSHandle *handle = priv->handle;
+
+	switch (policy) {
+	case SEEK_SET:
+		real = offset;
+		break;
+	case SEEK_CUR:
+		real = priv->position + offset;
+		break;
+	case SEEK_END:
+		if (priv->bound_end == (~0)) {
+			result = gnome_vfs_seek (handle, GNOME_VFS_SEEK_END, offset);
+			if (result != GNOME_VFS_OK)
+				return -1;
+			gnome_vfs_tell (handle, &real);
+			if (real != -1) {
+				if (real<priv->bound_start)
+					real = priv->bound_start;
+				priv->position = real;
+			}
+			return real;
+		}
+		real = priv->bound_end + offset;
+		break;
+	}
+
+	if (priv->bound_end != (~0))
+		real = MIN (real, priv->bound_end);
+	real = MAX (real, priv->bound_start);
+
+	result = gnome_vfs_seek (handle, GNOME_VFS_SEEK_START, real);
+	if (result != GNOME_VFS_OK)
+		return -1;
+
+	if (real != priv->position && priv->eos)
+		priv->eos = FALSE;
+
+	priv->position = real;
+
+	return real;
+}
+
+static off_t
+tny_vfs_tell (TnySeekable *self)
+{
+	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
+	return priv->position;
+}
+
+static gint 
+tny_vfs_set_bounds (TnySeekable *self, off_t start, off_t end)
+{
+	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
+	priv->bound_end = end;
+	priv->bound_start = start;
+	return;
 }
 
 static void
@@ -363,11 +415,23 @@ tny_stream_init (gpointer g, gpointer iface_data)
 	klass->reset= tny_vfs_reset;
 	klass->flush= tny_vfs_flush;
 	klass->is_eos= tny_vfs_is_eos;
-
 	klass->read= tny_vfs_stream_read;
 	klass->write= tny_vfs_stream_write;
 	klass->close= tny_vfs_stream_close;
 	klass->write_to_stream= tny_vfs_stream_write_to_stream;
+
+	return;
+}
+
+
+static void
+tny_seekable_init (gpointer g, gpointer iface_data)
+{
+	TnySeekableIface *klass = (TnySeekableIface *)g;
+
+	klass->seek= tny_vfs_seek;
+	klass->tell= tny_vfs_tell;
+	klass->set_bounds= tny_vfs_set_bounds;
 
 	return;
 }
@@ -415,12 +479,23 @@ tny_vfs_stream_get_type (void)
 		  NULL          /* interface_data */
 		};
 
+		static const GInterfaceInfo tny_seekable_info = 
+		{
+		  (GInterfaceInitFunc) tny_seekable_init, /* interface_init */
+		  NULL,         /* interface_finalize */
+		  NULL          /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT,
 			"TnyVfsStream",
 			&info, 0);
 
 		g_type_add_interface_static (type, TNY_TYPE_STREAM, 
 			&tny_stream_info);
+
+		g_type_add_interface_static (type, TNY_TYPE_SEEKABLE, 
+			&tny_seekable_info);
+
 	}
 
 	return type;
