@@ -74,7 +74,7 @@ simple_data_wrapper_construct_from_parser (CamelDataWrapper *dw, CamelMimeParser
 	else if (!CAMEL_IS_SEEKABLE_STREAM (stream))
 		stream = NULL;
 
-	if ((stream || fd != -1) && (start = camel_mime_parser_tell (mp) != -1)) {
+	if ((stream || fd != -1) && (start = camel_mime_parser_tell (mp)) != -1) {
 		/* we can keep content on disk */
 	} else {
 		/* need to load content into memory */

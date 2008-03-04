@@ -205,8 +205,7 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 				continue;
 
 			disposition = camel_mime_part_get_disposition (tpart);
-
-			if (camel_strstrcase (disposition, "attachment") != NULL)
+			if (disposition && camel_strstrcase (disposition, "attachment") != NULL)
 				has_attachments = TRUE;
 
 			type = camel_mime_part_get_content_type (tpart);
