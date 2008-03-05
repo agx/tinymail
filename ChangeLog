@@ -1,6 +1,7 @@
 2008-03-05  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Check-for-duplicates in TnyFolderObserver and TnyFolderMonitor
+	* Introduction of tny_gtk_header_list_model_set_no_duplicates
 
 	* This was a minor API change
 

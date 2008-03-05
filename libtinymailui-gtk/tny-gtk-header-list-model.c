@@ -152,7 +152,6 @@ tny_gtk_header_list_model_get_column_type (GtkTreeModel *self, gint column)
 	return retval;
 }
 
-
 static gboolean
 tny_gtk_header_list_model_get_iter (GtkTreeModel *self, GtkTreeIter *iter, GtkTreePath *path)
 {
@@ -700,6 +699,17 @@ notify_views_add (gpointer data)
 }
 
 
+static gboolean 
+uid_matcher (TnyList *list, GObject *item, gpointer match_data)
+{
+	const char *uid = tny_header_get_uid ((TnyHeader *) item);
+
+	if (uid && !strcmp (uid, (const char*) match_data))
+ 		return TRUE;
+
+	return FALSE;
+}
+
 
 /* This will be called often while you are in tny_folder_refresh(_async). It can
  * and will be called from a thread, so we must cope with that in case we want 
@@ -710,6 +720,12 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 
 	g_static_rec_mutex_lock (priv->iterator_lock);
+
+	if (priv->no_duplicates) {
+		const gchar *uid = tny_header_get_uid ((TnyHeader *) item);
+		if (uid)
+			tny_list_remove_matches (self, uid_matcher, (gpointer) uid); 
+	}
 
 	/* Prepend something to the list itself. The get_length will auto update
 	 * because that one uses GPtrArray's len property. We are reusing the 
@@ -1132,6 +1148,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 					   TnyGtkHeaderListModelPriv));
 	self->priv = priv;
 
+	priv->no_duplicates = FALSE;
 	priv->folder = NULL;
 	priv->iterator_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->iterator_lock);
@@ -1149,6 +1166,29 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	return;
 }
 
+
+/**
+ * tny_gtk_header_list_model_set_no_duplicates:
+ * @self: a #TnyGtkHeaderListModel
+ * @setting: whether or not to allow duplicates
+ *
+ * Sets whether or not @self allows duplicates of TnyHeader instances to be
+ * added. The duplicates will be tested by tny_header_get_uid uniqueness.
+ * Setting this property to TRUE will negatively impact performance of @self.
+ * It'll also influence behaviour of tny_list_prepend and tny_list_append.
+ *
+ * Default value, therefore, is FALSE.
+ * 
+ * since: 1.0
+ * audience: application-developer
+ **/
+void
+tny_gtk_header_list_model_set_no_duplicates (TnyGtkHeaderListModel *self, gboolean setting)
+{
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
+	priv->no_duplicates = setting;
+	return;
+}
 
 /**
  * tny_gtk_header_list_model_set_folder:

@@ -80,6 +80,7 @@ struct _TnyGtkHeaderListModelPriv
 	GPtrArray *items;
 	GArray *del_timeouts;
 	TnyIterator *iterator;
+	gboolean no_duplicates;
 };
 
 G_END_DECLS
