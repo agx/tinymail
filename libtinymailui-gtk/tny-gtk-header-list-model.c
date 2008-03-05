@@ -1172,12 +1172,8 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
  * tny_gtk_header_list_model_get_no_duplicates:
  * @self: a #TnyGtkHeaderListModel
  *
- * Gets whether or not @self allows duplicates of TnyHeader instances to be
+ * Gets whether or not @self allows duplicates of #TnyHeader instances to be
  * added. The duplicates will be tested by tny_header_get_uid uniqueness.
- * Setting this property to TRUE will negatively impact performance of @self.
- * It'll also influence behaviour of tny_list_prepend and tny_list_append.
- *
- * Default value, therefore, is FALSE.
  * 
  * returns: whether or not to allow duplicates
  * since: 1.0
@@ -1195,7 +1191,7 @@ tny_gtk_header_list_model_get_no_duplicates (TnyGtkHeaderListModel *self)
  * @self: a #TnyGtkHeaderListModel
  * @setting: whether or not to allow duplicates
  *
- * Sets whether or not @self allows duplicates of TnyHeader instances to be
+ * Sets whether or not @self allows duplicates of #TnyHeader instances to be
  * added. The duplicates will be tested by tny_header_get_uid uniqueness.
  * Setting this property to TRUE will negatively impact performance of @self.
  * It'll also influence behaviour of tny_list_prepend and tny_list_append.
