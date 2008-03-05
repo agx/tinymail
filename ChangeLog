@@ -1,3 +1,7 @@
+2008-03-05  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Experimental improvement in locking
+
 2008-03-05  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:

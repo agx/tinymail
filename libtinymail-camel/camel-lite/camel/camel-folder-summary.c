@@ -729,6 +729,7 @@ camel_folder_summary_load(CamelFolderSummary *s)
 	int i;
 	CamelMessageInfo *mi;
 	GError *err = NULL;
+	gboolean ul = FALSE;
 
 	if (s->summary_path == NULL || !g_file_test (s->summary_path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR))
 		return -1;
@@ -768,15 +769,17 @@ printf ("Removes %s\n", ri->uid);
 		}
 	}
 
+	g_static_rec_mutex_lock (&global_lock);
+
 	/* now read in each message ... */
 	for (i=0; i < s->saved_count; i++)
 	{
 		gboolean must_add = FALSE;
 		s->idx = i;
 
-		g_static_rec_mutex_lock (&global_lock);
+		ul = TRUE;
+
 		mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_load(s, &must_add);
-		g_static_rec_mutex_unlock (&global_lock);
 
 		camel_operation_progress (NULL, i , s->saved_count);
 
@@ -799,6 +802,10 @@ printf ("Removes %s\n", ri->uid);
 			camel_folder_summary_mmap_add(s, mi);
 	}
 
+	g_static_rec_mutex_unlock (&global_lock);
+
+	ul = FALSE;
+
 	if (s->saved_count <= 0) {
 		g_mapped_file_free (s->file);
 		s->file = NULL;
@@ -814,6 +821,9 @@ printf ("Removes %s\n", ri->uid);
 	return 0;
 
 error:
+	if (ul)
+		g_static_rec_mutex_unlock (&global_lock);
+
 	camel_operation_end (NULL);
 
 	if (errno != EINVAL)
