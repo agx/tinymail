@@ -173,11 +173,10 @@ foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header, gint len
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
+		const gchar *uid = tny_header_get_uid (header);
 
-		if (check_duplicates) {
-			tny_list_remove_matches (list, uid_matcher, 
-				(gpointer) tny_header_get_uid (header)); 
-		}
+		if (check_duplicates && uid)
+			tny_list_remove_matches (list, uid_matcher, (gpointer) uid); 
 
 		tny_list_prepend (list, (GObject *) header);
 
