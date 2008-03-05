@@ -2,6 +2,9 @@
 
 	* Check-for-duplicates in TnyFolderObserver and TnyFolderMonitor
 	* Introduction of tny_gtk_header_list_model_set_no_duplicates
+	* Introduction of tny_gtk_header_list_model_get_no_duplicates for
+	completeness of language bindings who'll make getters/setters from
+	this.
 
 	* This was a minor API change
 

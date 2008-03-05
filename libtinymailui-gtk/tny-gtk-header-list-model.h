@@ -78,6 +78,7 @@ void tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolde
 gint tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);
 gint tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);
 void tny_gtk_header_list_model_set_no_duplicates (TnyGtkHeaderListModel *self, gboolean setting);
+gboolean tny_gtk_header_list_model_get_no_duplicates (TnyGtkHeaderListModel *self);
 
 G_END_DECLS
 
