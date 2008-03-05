@@ -873,6 +873,26 @@ camel_imap_store_restore_stream_buffer (CamelImapStore *store)
 	return TRUE;
 }
 
+static void
+is_secure_auth (gpointer key, gpointer value, gpointer userdata)
+{
+	gchar *auth_name = (gchar *) key;
+	gboolean *result = (gboolean *) userdata;
+
+	if (camel_strstrcase (auth_name, "CRAM-MD5") != NULL)
+		*result = TRUE;
+}
+
+static gboolean
+has_secure_auth_types (GHashTable *table)
+{
+	gboolean result = FALSE;
+
+	g_hash_table_foreach (table, is_secure_auth, &result);
+	
+	return result;
+}
+
 static gboolean
 connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int must_tls, CamelException *ex)
 {
@@ -1014,7 +1034,8 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	if (!must_tls && (not_ssl || ssl_mode != MODE_TLS))
 	{
 		/* LOGINDISABLED but no SSL either? :-\ */
-		if (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED) {
+		if ((!has_secure_auth_types (store->authtypes)) &&
+		    (store->capabilities & IMAP_CAPABILITY_LOGINDISABLED)) {
 			clean_quit = TRUE;
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
 				"Failed to connect to IMAP server %s: %s",
