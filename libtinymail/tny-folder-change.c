@@ -44,11 +44,50 @@ struct _TnyFolderChangePriv
 	TnyFolder *folder;
 	gchar *oldname, *newname;
 	TnyFolderChangeChanged changed;
-	TnyMsg *msg;
+	TnyMsg *msg; gboolean check_duplicates;
 };
 
 #define TNY_FOLDER_CHANGE_GET_PRIVATE(o) \
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_FOLDER_CHANGE, TnyFolderChangePriv))
+
+
+/**
+ * tny_folder_change_get_check_duplicates:
+ * @self: a #TnyFolderChange
+ *
+ * Get whether or not the observer must check for duplicates in its
+ * tny_folder_observer_update() implementation.
+ *
+ * returns: whether or not to check duplicates
+ * since: 1.0
+ * audience: tinymail-developer
+ **/
+gboolean 
+tny_folder_change_get_check_duplicates (TnyFolderChange *self)
+{
+	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
+	return priv->check_duplicates;
+}
+
+
+/**
+ * tny_folder_change_set_check_duplicates:
+ * @self: a #TnyFolderChange
+ * @check_duplicates: whether or not to check for duplicates
+ *
+ * Set whether or not the observer must check for duplicates in its
+ * tny_folder_observer_update() implementation. Default value is FALSE.
+ *
+ * since: 1.0
+ * audience: tinymail-developer
+ **/
+void 
+tny_folder_change_set_check_duplicates (TnyFolderChange *self, gboolean check_duplicates)
+{
+	TnyFolderChangePriv *priv = TNY_FOLDER_CHANGE_GET_PRIVATE (self);
+	priv->check_duplicates = check_duplicates;
+	return;
+}
 
 /**
  * tny_folder_change_set_received_msg:
@@ -56,7 +95,7 @@ struct _TnyFolderChangePriv
  * @msg: a #TnyMsg
  *
  * Set the message that got received in @self. This is an internal function not
- * intended for application developers to alter.
+ * intended for application developers to alter. Default value is FALSE.
  *
  * since: 1.0
  * audience: tinymail-developer
@@ -492,6 +531,7 @@ tny_folder_change_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	g_mutex_lock (priv->lock);
 
+	priv->check_duplicates = FALSE;
 	priv->msg = NULL;
 	priv->changed = 0;
 	priv->new_unread_count = 0;

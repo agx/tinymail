@@ -874,6 +874,7 @@ tny_camel_folder_add_msg_async_thread (gpointer thr_user_data)
 		"Adding message");
 
 	info->change = tny_folder_change_new (info->self);
+	tny_folder_change_set_check_duplicates (info->change, TRUE);
 
 	tny_camel_folder_add_msg_shared (info->self, info->adding_msg, 
 		info->change, &info->err);
@@ -1021,10 +1022,11 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 		}
 
 	change = tny_folder_change_new (self);
+	tny_folder_change_set_check_duplicates (change, TRUE);
 
 	if (tny_camel_folder_add_msg_shared (self, msg, change, err))
 	{
-
+		/* TNY Question: should change contain the new header? */
 		tny_folder_change_set_new_all_count (change, priv->cached_length);
 		tny_folder_change_set_new_unread_count (change, priv->unread_length);
 		reset_local_size (priv);
@@ -1093,6 +1095,7 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 
 	/* Notify header has been removed */
 	change = tny_folder_change_new (self);
+	tny_folder_change_set_check_duplicates (change, TRUE);
 	tny_folder_change_add_expunged_header (change, header);
 	notify_folder_observers_about_in_idle (self, change);
 	g_object_unref (change);
@@ -1150,6 +1153,8 @@ tny_camel_folder_remove_msgs_default (TnyFolder *self, TnyList *headers, GError 
 		}
 
 	change = tny_folder_change_new (self);
+	tny_folder_change_set_check_duplicates (change, TRUE);
+
 	iter = tny_list_create_iterator (headers);
 	while (!tny_iterator_is_done (iter)) {
 		header = TNY_HEADER(tny_iterator_get_current (iter));
@@ -2220,6 +2225,7 @@ tny_camel_folder_get_msg_async_callback (gpointer thr_user_data)
 	if (info->msg) 
 	{
 		change = tny_folder_change_new (info->self);
+		tny_folder_change_set_check_duplicates (change, TRUE);
 		tny_folder_change_set_received_msg (change, info->msg);
 		notify_folder_observers_about (info->self, change);
 		g_object_unref (change);
@@ -2488,6 +2494,7 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 	if (retval)
 	{
 		change = tny_folder_change_new (self);
+		tny_folder_change_set_check_duplicates (change, TRUE);
 		tny_folder_change_set_received_msg (change, retval);
 		notify_folder_observers_about_in_idle (self, change);
 		g_object_unref (change);
@@ -3500,6 +3507,9 @@ notify_folder_observers_about_transfer (TnyFolder *from, TnyFolder *to, gboolean
 	TnyFolderChange *tochange = tny_folder_change_new (to);
 	TnyFolderChange *fromchange = tny_folder_change_new (from);
 	TnyIterator *iter;
+
+	tny_folder_change_set_check_duplicates (tochange, TRUE);
+	tny_folder_change_set_check_duplicates (fromchange, TRUE);
 
 	iter = tny_list_create_iterator (new_header_list);
 	while (!tny_iterator_is_done (iter)) 

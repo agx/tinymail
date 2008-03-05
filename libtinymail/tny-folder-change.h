@@ -85,6 +85,9 @@ void tny_folder_change_get_added_headers (TnyFolderChange *self, TnyList *header
 void tny_folder_change_get_expunged_headers (TnyFolderChange *self, TnyList *headers);
 void tny_folder_change_reset (TnyFolderChange *self);
 TnyFolder* tny_folder_change_get_folder (TnyFolderChange *self);
+gboolean tny_folder_change_get_check_duplicates (TnyFolderChange *self);
+void tny_folder_change_set_check_duplicates (TnyFolderChange *self, gboolean check_duplicates);
+
 TnyFolderChangeChanged tny_folder_change_get_changed  (TnyFolderChange *self);
 
 G_END_DECLS

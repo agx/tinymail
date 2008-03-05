@@ -166,23 +166,18 @@ uid_matcher (TnyList *list, GObject *item, gpointer match_data)
 
 
 static void
-foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header, gint length)
+foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header, gint length, gboolean check_duplicates)
 {
-	TnyIterator *iter;
-	const gchar *uid = (length<100)?tny_header_get_uid (header):NULL;
+	TnyIterator *iter = tny_list_create_iterator (priv->lists);
 
-	iter = tny_list_create_iterator (priv->lists);
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
 
-		/* If the length is larger than 100, we're bulk receiving
-		 * a lot of headers. It's probably not an IDLE situation and
-		 * we can therefore assume that we'll for sure wont have 
-		 * duplicates. */
-
-		if (uid)
-			tny_list_remove_matches (list, uid_matcher, (gpointer) uid); 
+		if (check_duplicates) {
+			tny_list_remove_matches (list, uid_matcher, 
+				(gpointer) tny_header_get_uid (header)); 
+		}
 
 		tny_list_prepend (list, (GObject *) header);
 
@@ -250,7 +245,8 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 		while (!tny_iterator_is_done (iter))
 		{
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-			foreach_list_add_header (priv, header, length);
+			foreach_list_add_header (priv, header, length, 
+				tny_folder_change_get_check_duplicates (change));
 			g_object_unref (header);
 			tny_iterator_next (iter);
 		}
