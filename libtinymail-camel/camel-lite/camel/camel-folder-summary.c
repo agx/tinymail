@@ -864,6 +864,14 @@ perform_content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentI
 	return 0;
 }
 
+static void 
+flush_for_reload (CamelFolderSummary *s, CamelMessageInfoBase *mi)
+{
+	mi->subject = " ";
+	mi->to = " ";
+	mi->from = " ";
+	mi->cc = " ";
+} 
 
 /**
  * camel_folder_summary_save:
@@ -953,6 +961,7 @@ camel_folder_summary_save_append (CamelFolderSummary *s, CamelException *ex)
 				}
 			}
 		}
+
 	}
 
 	if (fflush (out) != 0 || fsync (fileno (out)) == -1)
@@ -981,6 +990,11 @@ haerror:
 
 	g_static_rec_mutex_lock (&global_lock);
 	g_static_mutex_lock (&global_lock2);
+
+	for (i = 0; i < count; i++) {
+		mi = s->messages->pdata[i];
+		flush_for_reload (s, (CamelMessageInfoBase *) mi);
+	}
 
 	/* Remap the appended file :). Moeha! */
 	camel_folder_summary_unload_mmap (s);
