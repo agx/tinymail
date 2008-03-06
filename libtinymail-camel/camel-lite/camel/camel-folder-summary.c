@@ -867,10 +867,12 @@ perform_content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentI
 static void 
 flush_for_reload (CamelFolderSummary *s, CamelMessageInfoBase *mi)
 {
-	mi->subject = " ";
-	mi->to = " ";
-	mi->from = " ";
-	mi->cc = " ";
+	if (!(mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)) {
+		mi->subject = " ";
+		mi->to = " ";
+		mi->from = " ";
+		mi->cc = " ";
+	}
 } 
 
 /**
