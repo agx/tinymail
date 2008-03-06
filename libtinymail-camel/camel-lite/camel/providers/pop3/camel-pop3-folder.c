@@ -358,7 +358,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 			if (pop3_store->engine && pop3_store->engine->capa & CAMEL_POP3_CAP_TOP) {
 				msg = pop3_get_top (folder, fi->uid, NULL);
-				if (!msg && (!(pop3_store->engine->capa & CAMEL_POP3_CAP_TOP)))
+				if (!msg && (!(pop3_store->engine && pop3_store->engine->capa & CAMEL_POP3_CAP_TOP)))
 					msg = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);
 			} else if (pop3_store->engine)
 				msg = pop3_get_message (folder, fi->uid, CAMEL_FOLDER_RECEIVE_FULL, -1, NULL);

@@ -1,6 +1,7 @@
 2008-03-06  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Experimental improvement in locking in the POP3 provider
+	* Bugfix when canceling POP summary retrieval
 
 2008-03-06  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
