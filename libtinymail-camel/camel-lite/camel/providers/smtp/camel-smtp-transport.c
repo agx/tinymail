@@ -572,7 +572,8 @@ smtp_connect (CamelService *service, CamelException *ex)
 
 				if (!service->url->passwd) {
 					camel_service_disconnect (service, TRUE, NULL);
-					return FALSE;
+					authenticated = FALSE;
+					goto error_situation;
 				}
 			}
 
@@ -587,6 +588,8 @@ smtp_connect (CamelService *service, CamelException *ex)
 		}
 	} else 
 		authenticated = TRUE;
+
+error_situation:
 
 	if (!authenticated)
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
