@@ -49,6 +49,7 @@ struct _TnyCamelMemStreamClass
 
 GType  tny_camel_mem_stream_get_type (void);
 TnyStream* tny_camel_mem_stream_new (void);
+TnyStream* tny_camel_mem_stream_new_with_buffer (const char *buffer, size_t len);
 
 G_END_DECLS
 

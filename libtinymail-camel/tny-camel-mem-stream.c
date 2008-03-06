@@ -43,6 +43,28 @@ tny_camel_mem_stream_new (void)
 	return TNY_STREAM (self);
 }
 
+/**
+ * tny_camel_mem_stream_new_with_buffer:
+ * @buffer: a memory buffer to use as the stream data
+ * @len: length of @buffer
+ *
+ * Create a new in-memory stream
+ *
+ * returns: (caller-owns): a new #TnyStream instance
+ * since: 1.0
+ * audience: application-developer
+ **/
+TnyStream*
+tny_camel_mem_stream_new_with_buffer (const char *buffer, size_t len)
+{
+	TnyCamelMemStream *self = g_object_new (TNY_TYPE_CAMEL_MEM_STREAM, NULL);
+	TnyCamelStreamPriv *priv = TNY_CAMEL_STREAM_GET_PRIVATE (self);
+
+	priv->stream = camel_stream_mem_new_with_buffer (buffer, len);
+
+	return TNY_STREAM (self);
+}
+
 static void
 tny_camel_mem_stream_instance_init (GTypeInstance *instance, gpointer g_class)
 {
