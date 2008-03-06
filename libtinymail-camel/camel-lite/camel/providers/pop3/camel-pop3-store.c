@@ -583,7 +583,9 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 
 	camel_object_unref (CAMEL_OBJECT (store->engine));
 	camel_object_unref (CAMEL_OBJECT (tcp_stream));
+	g_static_rec_mutex_lock (store->eng_lock);
 	store->engine = NULL;
+	g_static_rec_mutex_unlock (store->eng_lock);
 	store->connected = FALSE;
 
 	return FALSE;
@@ -681,9 +683,11 @@ query_auth_types (CamelService *service, CamelException *ex)
 		}
 
 		types = g_list_concat(types, g_list_copy(store->engine->auth));
-		g_static_rec_mutex_unlock (store->eng_lock);
 
 		pop3_disconnect (service, TRUE, NULL);
+
+		g_static_rec_mutex_unlock (store->eng_lock);
+
 	} else {
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CONNECT,
 				      _("Could not connect to POP server %s"),
@@ -986,15 +990,19 @@ pop3_connect (CamelService *service, CamelException *ex)
 	return TRUE;
 }
 
+
+// This is called locked by query_auth_types
 static gboolean
 pop3_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 {
 	CamelPOP3Store *store = CAMEL_POP3_STORE (service);
 
+	//g_static_rec_mutex_lock (store->eng_lock);
+
 	store->logged_in = FALSE;
 
 	if (store->engine == NULL) {
-		g_static_rec_mutex_unlock (store->eng_lock);
+		//g_static_rec_mutex_unlock (store->eng_lock);
 		return TRUE;
 	}
 
@@ -1007,8 +1015,11 @@ pop3_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 		camel_pop3_engine_command_free(store->engine, pc);
 	}
 
-	camel_object_unref((CamelObject *)store->engine);
+	g_timeout_add (20000, unref_it, store->engine);
+	/* camel_object_unref((CamelObject *)store->engine); */
 	store->engine = NULL;
+
+	//g_static_rec_mutex_unlock (store->eng_lock);
 
 	return TRUE;
 }

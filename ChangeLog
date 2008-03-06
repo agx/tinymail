@@ -1,3 +1,7 @@
+2008-03-06  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Experimental improvement in locking in the POP3 provider
+
 2008-03-06  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* debian/libtinymail-camel-1.0-0.install

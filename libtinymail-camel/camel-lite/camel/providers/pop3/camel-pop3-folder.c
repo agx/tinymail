@@ -1413,7 +1413,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 		if (i == -1)
 			fi->err = errno;
 
-		if (pcr->state == CAMEL_POP3_COMMAND_ERR) {
+		if (pop3_store->engine && pcr->state == CAMEL_POP3_COMMAND_ERR) {
 			fi->err = -1;
 			pop3_store->engine->capa &= ~CAMEL_POP3_CAP_TOP;
 		}
