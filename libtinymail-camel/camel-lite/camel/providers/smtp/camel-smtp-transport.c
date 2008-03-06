@@ -260,7 +260,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 			tcp_stream = camel_tcp_stream_ssl_new (service, service->url->host, SSL_PORT_FLAGS);
 		}
 #else
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CONNECT,
 				      _("Could not connect to %s: %s"),
 				      service->url->host, _("SSL unavailable"));
 
@@ -275,7 +275,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					     _("Connection canceled"));
 		else
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_UNAVAILABLE,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CONNECT,
 					      _("Could not connect to %s: %s"),
 					      service->url->host, g_strerror (errno));
 
@@ -337,7 +337,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 
 #ifdef HAVE_SSL
 	if (!(transport->flags & CAMEL_SMTP_TRANSPORT_STARTTLS)) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CONNECT,
 				      _("Failed to connect to SMTP server %s in secure mode: %s"),
 				      service->url->host, _("STARTTLS not supported"));
 
@@ -370,13 +370,13 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 
 	/* Okay, now toggle SSL/TLS mode */
 	if (camel_tcp_stream_ssl_enable_ssl (CAMEL_TCP_STREAM_SSL (tcp_stream)) == -1) {
-		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CONNECT,
 				      _("Failed to connect to SMTP server %s in secure mode: %s"),
 				      service->url->host, g_strerror (errno));
 		goto exception_cleanup;
 	}
 #else
-	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
+	camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CONNECT,
 			      _("Failed to connect to SMTP server %s in secure mode: %s"),
 			      service->url->host, _("SSL is not available in this build"));
 	goto exception_cleanup;
@@ -475,6 +475,8 @@ smtp_connect (CamelService *service, CamelException *ex)
 {
 	CamelSmtpTransport *transport = CAMEL_SMTP_TRANSPORT (service);
 	gboolean has_authtypes;
+	gboolean mtry = 0;
+	gboolean authenticated = FALSE;
 
 	/* We (probably) need to check popb4smtp before we connect ... */
 	if (service->url->authmech && !strcmp (service->url->authmech, "POPB4SMTP")) {
@@ -503,7 +505,6 @@ smtp_connect (CamelService *service, CamelException *ex)
 	if (service->url->authmech && (transport->flags & CAMEL_SMTP_TRANSPORT_IS_ESMTP) && has_authtypes) {
 		CamelSession *session = camel_service_get_session (service);
 		CamelServiceAuthType *authtype;
-		gboolean authenticated = FALSE;
 		char *errbuf = NULL;
 
 		if (!g_hash_table_lookup (transport->authtypes, service->url->authmech)) {
@@ -539,7 +540,8 @@ smtp_connect (CamelService *service, CamelException *ex)
 		}
 
 		/* keep trying to login until either we succeed or the user cancels */
-		while (!authenticated) {
+		while (!authenticated && mtry < 3) {
+			mtry++;
 			if (errbuf) {
 				/* We need to un-cache the password before prompting again */
 				camel_session_forget_password (session, service, NULL, "password", NULL);
@@ -583,9 +585,15 @@ smtp_connect (CamelService *service, CamelException *ex)
 				camel_exception_clear (ex);
 			}
 		}
-	}
+	} else 
+		authenticated = TRUE;
 
-	return TRUE;
+	if (!authenticated)
+		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
+			      _("Authentication error on SMTP server %s"),
+			      service->url->host);
+
+	return authenticated;
 }
 
 static void

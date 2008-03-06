@@ -197,9 +197,13 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	{
 		if (camel_exception_is_set (&ex)) {
 			_tny_camel_exception_to_tny_error (&ex, err);
-			g_static_rec_mutex_unlock (apriv->service_lock);
-			return;
+		} else {
+			g_set_error (err, TNY_SERVICE_ERROR, 
+				TNY_SERVICE_ERROR_AUTHENTICATE,
+				_("Authentication error"));
 		}
+		g_static_rec_mutex_unlock (apriv->service_lock);
+		return;
 	} 
 
 	g_static_rec_mutex_unlock (apriv->service_lock);
