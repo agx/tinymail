@@ -119,7 +119,7 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 		    CamelException *ex, const char *fmt, ...)
 {
 	va_list ap;
-	char *cmd;
+	char *cmd = NULL;
 
 	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 
