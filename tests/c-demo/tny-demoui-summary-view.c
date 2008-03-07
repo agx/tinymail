@@ -1123,6 +1123,67 @@ on_rename (TnyFolder *self, gboolean cancelled, TnyFolderStore *into, TnyFolder 
 	g_object_unref (mself);
 }
 
+static void
+fetch_folder_store_from_path (const gchar *path, TnyFolder *origin, gchar **name, TnyFolderStore **into)
+{
+	TnyFolderStore *origin_store;
+	*name = NULL;
+	*into = NULL;
+
+	if (path == NULL || path[0] == '\0') {
+		return;
+	}
+
+	if (path[0] == '/') {
+		origin_store = TNY_FOLDER_STORE (tny_folder_get_account (origin));
+		path++;
+	} else {
+		origin_store = tny_folder_get_folder_store (origin);
+	}
+
+	while (*path != '\0') {
+		char *slash_pos;
+		if (strncmp (path, "../", 3)== 0) {
+			if (!TNY_IS_ACCOUNT (origin_store)) {
+				TnyFolderStore *tmp;
+				tmp = tny_folder_get_folder_store (TNY_FOLDER (origin_store));
+				if (tmp) {
+					g_object_unref (origin_store);
+					origin_store = tmp;
+				}
+			}
+			path += 3;
+		} else if ((slash_pos = strstr (path, "/")) != NULL) {
+			TnyFolderStoreQuery *query;
+			TnyList *list;
+			gchar *folder_name;
+			
+			query = tny_folder_store_query_new ();
+			folder_name = g_strndup (path, slash_pos - path);
+			tny_folder_store_query_add_item (query, folder_name, TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME);
+			g_free (folder_name);
+			list = tny_simple_list_new ();
+			tny_folder_store_get_folders (origin_store, list, query, NULL);
+			g_object_unref (query);
+			if (tny_list_get_length (list) == 1) {
+				TnyIterator *iter;
+				TnyFolderStore *tmp;
+				iter = tny_list_create_iterator (list);
+				tmp = TNY_FOLDER_STORE (tny_iterator_get_current (iter));
+				g_object_unref (origin_store);
+				origin_store = tmp;
+				g_object_unref (iter);
+			}
+			g_object_unref (list);
+			path = slash_pos + 1;
+		} else {
+			*name = g_strdup (path);
+			*into = origin_store;
+			break;
+		}
+	}
+}
+
 static void 
 on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 {
@@ -1174,20 +1235,25 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				{
 					gboolean move = (result == GTK_RESPONSE_ACCEPT);
 					GError *err = NULL;
-					const gchar *newname = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry)));
+					gchar *entry_value = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry)));
+					gchar *new_name;
 					TnyFolderStore *into;
 
 					clear_header_view (priv);
 
-					into = tny_folder_get_folder_store (folder);
+					
+					fetch_folder_store_from_path (entry_value, folder, &new_name, &into);
 
 					gtk_widget_destroy (dialog);
 					dialog = NULL;
 
-					tny_folder_copy_async (folder, into, newname, move, 
-						on_rename, NULL, g_object_ref (self));
+					if (new_name != NULL) {
 
-					g_free (newname);
+						tny_folder_copy_async (folder, into, new_name, move, 
+								       on_rename, NULL, g_object_ref (self));
+
+						g_free (new_name);
+					}
 
 					if (into)
 						g_object_unref (into);

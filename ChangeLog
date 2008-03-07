@@ -1,3 +1,10 @@
+2008-03-07  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* tests/c-demo/tny-demoui-summary-view.c:
+	Added a simple syntax to provide different parent folders
+	in rename/copy operation. Now you can provide
+	paths as "/newfolder", "../another-parent/folder", etc.
+
 2008-03-06  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* tinymail/libtinymail-camel/tny-camel-mem-stream.h
