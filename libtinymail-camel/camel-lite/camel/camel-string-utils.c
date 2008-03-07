@@ -71,7 +71,7 @@ void camel_du (char *name, int *my_size)
 
 	while ((ent = readdir (dir)))
 	{
-		if (ent->d_name && !ignorent (ent->d_name)) {
+		if (/*ent->d_name && */ !ignorent (ent->d_name)) {
 			char *p = g_strdup_printf ("%s/%s", name, ent->d_name);
 			if (isdir (p))
 				camel_du (p, my_size);
