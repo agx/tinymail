@@ -4194,7 +4194,7 @@ tny_camel_folder_uncache_nl (TnyCamelFolder *self)
 void 
 _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 {
-	g_mutex_lock (priv->reason_lock);
+	g_static_rec_mutex_lock (priv->reason_lock);
 	priv->reason_to_live--;
 
 #ifdef DEBUG_EXTRA
@@ -4230,15 +4230,15 @@ _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 			}
 		}
 	}
-	g_mutex_unlock (priv->reason_lock);
+	g_static_rec_mutex_unlock (priv->reason_lock);
 }
 
 void 
 _tny_camel_folder_reason (TnyCamelFolderPriv *priv)
 {
-	g_mutex_lock (priv->reason_lock);
+	//g_static_rec_mutex_lock (priv->reason_lock);
 	priv->reason_to_live++;
-	g_mutex_unlock (priv->reason_lock);
+	//g_static_rec_mutex_unlock (priv->reason_lock);
 }
 
 static TnyMsgRemoveStrategy* 
@@ -5569,7 +5569,8 @@ tny_camel_folder_finalize (GObject *object)
 	g_free (priv->obs_lock);
 	priv->obs_lock = NULL;
 
-	g_mutex_free (priv->reason_lock);
+	g_free (priv->reason_lock);
+	priv->reason_lock = NULL;
 
 	if (priv->folder_name)
 		g_free (priv->folder_name);
@@ -5753,7 +5754,9 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;
 	priv->remove_strat = tny_camel_msg_remove_strategy_new ();
 	priv->receive_strat = tny_camel_full_msg_receive_strategy_new ();
-	priv->reason_lock = g_mutex_new ();
+	priv->reason_lock = g_new0 (GStaticRecMutex, 1);
+	g_static_rec_mutex_init (priv->reason_lock);
+
 	priv->folder_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->folder_lock);
 	priv->obs_lock = g_new0 (GStaticRecMutex, 1);

@@ -1100,6 +1100,29 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 }
 
 
+static void
+on_rename (TnyFolder *self, gboolean cancelled, TnyFolderStore *into, TnyFolder *new_folder, GError *err, gpointer user_data)
+{
+	GObject *mself = user_data;
+
+	if (err != NULL)
+	{
+		GtkWidget *edialog;
+		edialog = gtk_message_dialog_new (
+			  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (mself))),
+			  GTK_DIALOG_DESTROY_WITH_PARENT,
+			  GTK_MESSAGE_ERROR,
+			  GTK_BUTTONS_CLOSE,
+			  err->message);
+		g_signal_connect_swapped (edialog, "response",
+			G_CALLBACK (gtk_widget_destroy), edialog);
+		gtk_widget_show_all (edialog);
+	} else {
+	}
+
+	g_object_unref (mself);
+}
+
 static void 
 on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 {
@@ -1151,39 +1174,24 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				{
 					gboolean move = (result == GTK_RESPONSE_ACCEPT);
 					GError *err = NULL;
-					const gchar *newname = gtk_entry_get_text (GTK_ENTRY (entry));
+					const gchar *newname = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry)));
 					TnyFolderStore *into;
-					TnyFolder *nfol;
 
 					clear_header_view (priv);
 
 					into = tny_folder_get_folder_store (folder);
-					nfol = tny_folder_copy (folder, into, newname, move, &err);
 
-					if (err != NULL)
-					{
-						GtkWidget *edialog;
+					gtk_widget_destroy (dialog);
+					dialog = NULL;
 
-						gtk_widget_destroy (dialog);
-						dialog = NULL;
+					tny_folder_copy_async (folder, into, newname, move, 
+						on_rename, NULL, g_object_ref (self));
 
-						edialog = gtk_message_dialog_new (
-										  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
-										  GTK_DIALOG_DESTROY_WITH_PARENT,
-										  GTK_MESSAGE_ERROR,
-										  GTK_BUTTONS_CLOSE,
-										  err->message);
-						g_signal_connect_swapped (edialog, "response",
-							G_CALLBACK (gtk_widget_destroy), edialog);
-						gtk_widget_show_all (edialog);
-						g_error_free (err);
-					}
+					g_free (newname);
 
 					if (into)
 						g_object_unref (into);
 
-					if (nfol)
-						g_object_unref (nfol);
 
 				}
 				break;
