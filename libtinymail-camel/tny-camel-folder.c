@@ -5141,7 +5141,7 @@ tny_camel_folder_poke_status_thread (gpointer user_data)
 	priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 	store = priv->store;
 
-	if (info->do_status) {
+	if (info->do_status && ((CamelService *) store)->status == CAMEL_SERVICE_CONNECTED) {
 		camel_store_get_folder_status (store, priv->folder_name, 
 			&newurlen, &newlen, &uidnext);
 	}
