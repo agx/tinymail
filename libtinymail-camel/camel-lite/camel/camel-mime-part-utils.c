@@ -60,18 +60,16 @@ simple_data_wrapper_construct_from_parser (CamelDataWrapper *dw, CamelMimeParser
 {
 	GByteArray *buffer = NULL;
 	CamelStream *stream;
-	int start = -1, end;
+	off_t start, end;
 	int fd = -1;
 	size_t len;
 	char *buf;
-	gboolean done = FALSE;
-	camel_mime_parser_state_t state;
-
+	
 	d(printf ("simple_data_wrapper_construct_from_parser()\n"));
 	
 	if (!(stream = camel_mime_parser_stream (mp)))
 		fd = camel_mime_parser_fd (mp);
-	else if (!CAMEL_IS_SEEKABLE_STREAM (stream))
+	else if (!CAMEL_IS_SEEKABLE_SUBSTREAM (stream))
 		stream = NULL;
 
 	if ((stream || fd != -1) && (start = camel_mime_parser_tell (mp)) != -1) {
@@ -80,25 +78,17 @@ simple_data_wrapper_construct_from_parser (CamelDataWrapper *dw, CamelMimeParser
 		/* need to load content into memory */
 		buffer = g_byte_array_new ();
 	}
-
-	do {
-
-		state = camel_mime_parser_step_hdr (mp, &buf, &len, &start);
-
-		if (state == CAMEL_MIME_PARSER_STATE_BODY) {
-			//start = camel_mime_parser_tell (mp);
-			done = TRUE;
-		}
-
+	
+	while (camel_mime_parser_step (mp, &buf, &len) != CAMEL_MIME_PARSER_STATE_BODY_END) {
 		if (buffer != NULL) {
 			d(printf("appending o/p data: %d: %.*s\n", len, len, buf));
 			g_byte_array_append (buffer, (guint8 *) buf, len);
 		}
-	} while (state != CAMEL_MIME_PARSER_STATE_BODY_END);
-
-
+	}
+	
 	if (buffer == NULL) {
 		end = camel_mime_parser_tell (mp);
+		
 		if (stream != NULL)
 			stream = camel_seekable_substream_new ((CamelSeekableStream *) stream, start, end);
 		else

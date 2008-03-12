@@ -99,7 +99,6 @@ void camel_mime_parser_scan_pre_from (CamelMimeParser *parser, gboolean scan_pre
 int camel_mime_parser_set_header_regex (CamelMimeParser *parser, char *matchstr);
 
 /* normal interface */
-camel_mime_parser_state_t camel_mime_parser_step_hdr (CamelMimeParser *parser, char **buf, size_t *buflen, int *hdr_end);
 camel_mime_parser_state_t camel_mime_parser_step (CamelMimeParser *parser, char **buf, size_t *buflen);
 void camel_mime_parser_unstep (CamelMimeParser *parser);
 void camel_mime_parser_drop_step (CamelMimeParser *parser);
