@@ -182,6 +182,7 @@ tny_gnome_device_is_online (TnyDevice *self)
 
 			libnm_glib_unregister_callback (priv->nm_ctx, priv->callback_id);
 			libnm_glib_shutdown (priv->nm_ctx);
+			priv->nm_ctx = NULL;
 
 			case LIBNM_NO_NETWORK_CONNECTION:
 			default:

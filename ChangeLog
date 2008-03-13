@@ -1,3 +1,11 @@
+2008-03-12  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-gnome-desktop/tny-gnome-device.c:
+	(tny_gnome_device_is_online) if we try to get the network
+	state and find that the network manager context is invalid,
+	we shutdown it AND after this we nullify the context
+	reference.
+
 2008-03-12  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* Reverted the "Leave on disk, MIME parsing" patch, as it's
