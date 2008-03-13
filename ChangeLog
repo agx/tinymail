@@ -1,3 +1,8 @@
+2008-03-03  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* IMAP provider: bugfix when asking for a list of folders that has no
+	subfolders, on Cyrus.
+
 2008-03-12  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-gnome-desktop/tny-gnome-device.c:

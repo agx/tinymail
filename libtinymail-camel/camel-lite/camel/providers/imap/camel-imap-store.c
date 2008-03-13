@@ -3568,23 +3568,23 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 			lst = "%";
 		}
 
-	} else if (namespace->prefix[strlen(namespace->prefix)-1] != namespace->delim)
+	} else if (namespace->prefix[strlen(namespace->prefix)-1] == namespace->delim) {
 
 		/**
 		 * NAMESPACE (("something" ".") ...
-		 * Usually, IMAP servers give you "something." in stead, but
-		 * this one didn't, so we'll just do that here. I don't really
+		 * Usually, IMAP servers give you "something.". I don't really
 		 * understand from the IMAP spec what the correct way is, looks
 		 * like there's quite a bit of confusion among the IMAP server
 		 * developers about this too. So let's just cope with both here.
 		 **/
-		prefix = g_strdup_printf ("%s%c", namespace->prefix, namespace->delim);
-	else 
+		prefix = g_strndup(namespace->prefix, strlen(namespace->prefix)-1);
+	} else {
 		/**
 		 * NAMESPACE (("something." ".")..
 		 * This one is fine as-is. We'll just ask for LIST "something." *
 		 **/
 		prefix = g_strdup(namespace->prefix);
+	}
 
 	present = g_hash_table_new(folder_hash, folder_eq);
 
@@ -3878,6 +3878,10 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 		/* Asking LIST and LSUB recursively is fine for the personal 
 		 * namespace. Whoever puts thousands of folders in his personal
 		 * namespace is just asking for it ... */
+
+		/*get_folders_sync (imap_store, "*",ex);
+		if (camel_exception_is_set(ex))
+			goto fail;*/
 
 		if (ns->personal)
 			get_folders_sync_ns (imap_store, ns->personal, 

@@ -134,7 +134,7 @@ tny_account_is_ready (TnyAccount *self)
  * @self: a #TnyAccount
  * @domain: the domain of the #TnyStatus that will happen in @status_callback
  * @code: the code of the #TnyStatus that will happen in @status_callback
- * @status_callback: (null-ok) status callback handler or NULL
+ * @status_callback: (null-ok): status callback handler or NULL
  * @status_user_data: (null-ok): the user-data to give to the @status_callback or NULL
  *
  * Starts an operation. This only works for methods that don't end with _async.
