@@ -1,4 +1,8 @@
-2008-03-03  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-16  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added extra insurance that an INBOX folder will be present
+
+2008-03-13  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* IMAP provider: bugfix when asking for a list of folders that has no
 	subfolders, on Cyrus.

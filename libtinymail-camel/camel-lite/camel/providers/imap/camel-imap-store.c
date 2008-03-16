@@ -3874,6 +3874,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 	if (imap_store->namespaces && imap_store->capabilities & IMAP_CAPABILITY_NAMESPACE) 
 	{
 		struct _namespaces *ns = imap_store->namespaces;
+		char delim = '.';
 
 		/* Asking LIST and LSUB recursively is fine for the personal 
 		 * namespace. Whoever puts thousands of folders in his personal
@@ -3883,10 +3884,12 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 		if (camel_exception_is_set(ex))
 			goto fail;*/
 
-		if (ns->personal)
+		if (ns->personal) {
 			get_folders_sync_ns (imap_store, ns->personal, 
 				(gboolean) ns->other, 
 				(gboolean) ns->shared, ex);
+			delim = ns->personal->delim;
+		}
 
 		if (camel_exception_is_set(ex))
 			goto fail;
@@ -3910,6 +3913,13 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 
 		if (camel_exception_is_set(ex))
 			goto fail;
+
+		if (imap_store->summary && camel_store_summary_count( (CamelStoreSummary*)imap_store->summary) == 0) {
+			gchar *str = g_strdup_printf ("* LIST () \"%c\" \"INBOX\"", delim);
+			CamelFolderInfo *fi = parse_list_response_as_folder_info (imap_store, str);
+			camel_folder_info_free(fi);
+			g_free (str);
+		}
 
 	} else {
 
