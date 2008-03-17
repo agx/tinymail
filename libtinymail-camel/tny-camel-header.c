@@ -298,7 +298,7 @@ tny_camel_header_finalize (GObject *object)
 {
 	TnyCamelHeader *self = (TnyCamelHeader*) object;
 
-	if (self->info)
+	if (self->info && self->info->refcount > 0)
 		camel_message_info_free (self->info);
 
 	if (self->folder) {
