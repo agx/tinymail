@@ -2988,7 +2988,6 @@ message_from_data (CamelFolder *folder, GData *data)
 	}
 
 	mi = (CamelImapMessageInfo *)camel_folder_summary_info_new_from_message (folder->summary, msg);
-	camel_object_unref (CAMEL_OBJECT (msg));
 
 	size = GPOINTER_TO_INT (g_datalist_get_data (&data, "RFC822.SIZE"));
 	if (size)
@@ -3001,7 +3000,7 @@ message_from_data (CamelFolder *folder, GData *data)
 		!camel_header_raw_find(&h, "X-MS-Has-Attach", NULL)) {
 		/**/
 		((CamelMessageInfoBase *)mi)->flags &= ~CAMEL_MESSAGE_ATTACHMENTS;
-	} else {
+	} else if (!camel_header_raw_find (&h, "X-MS-Has-Attach", NULL)) {
 		/* TNY TODO: This is a hack! But else we need to parse
 		 * BODYSTRUCTURE (and I'm lazy). It needs fixing though. */
 
@@ -3011,6 +3010,7 @@ message_from_data (CamelFolder *folder, GData *data)
 
 	}
 
+	camel_object_unref (CAMEL_OBJECT (msg));
 	/* This overrides Received: (although it wont be found by the messages
 	 * fed to message_info_new_from_header, as this header is not in the
 	 * query. Leaving them out makes retrieving summary consume a lot less

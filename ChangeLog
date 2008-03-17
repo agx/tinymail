@@ -1,3 +1,10 @@
+2008-03-17  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c
+	(message_from_data): don't free the message before evaluating
+	headers. Also take into account the case we get ms has attachments but
+	we don't have priority flag, for avoiding using heuristics.
+
 2008-03-16  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Added extra insurance that an INBOX folder will be present
