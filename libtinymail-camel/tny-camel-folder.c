@@ -3609,17 +3609,17 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 	g_assert (TNY_IS_FOLDER (folder_src));
 	g_assert (TNY_IS_FOLDER (folder_dst));
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
-			TNY_SERVICE_ERROR_TRANSFER))
-		return;
-
 	if (!priv->account) {
 		g_set_error (err, TNY_SERVICE_ERROR, 
 			TNY_SERVICE_ERROR_TRANSFER,
 			_("Folder not ready for transfer"));
 		return;
 	}
+
+	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
+			priv->account, err, TNY_SERVICE_ERROR, 
+			TNY_SERVICE_ERROR_TRANSFER))
+		return;
 
 	list_length = tny_list_get_length (headers);
 
@@ -3640,6 +3640,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			_tny_camel_exception_to_tny_error (&priv_src->load_ex, err);
 			g_static_rec_mutex_unlock (priv_src->folder_lock);
 			g_static_rec_mutex_unlock (priv_dst->folder_lock);
+			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 			return;
 		}
 
@@ -3648,6 +3649,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			_tny_camel_exception_to_tny_error (&priv_dst->load_ex, err);
 			g_static_rec_mutex_unlock (priv_src->folder_lock);
 			g_static_rec_mutex_unlock (priv_dst->folder_lock);
+			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 			return;
 		}
 
@@ -3685,6 +3687,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			g_static_rec_mutex_unlock (priv_dst->folder_lock);
 			g_static_rec_mutex_unlock (priv_src->folder_lock);
 
+			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 			return;
 		} else
 			g_ptr_array_add (uids, (gpointer) g_strdup (uid));
@@ -4054,14 +4057,14 @@ tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_l
 	_tny_camel_folder_reason (priv_dst);
 	g_object_ref (info->folder_dst);
 
-	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv),
+	_tny_camel_queue_launch_wflags (TNY_FOLDER_PRIV_GET_QUEUE (priv),
 		tny_camel_folder_transfer_msgs_async_thread, 
 		tny_camel_folder_transfer_msgs_async_callback,
 		tny_camel_folder_transfer_msgs_async_destroyer, 
 		tny_camel_folder_transfer_msgs_async_cancelled_callback,
 		tny_camel_folder_transfer_msgs_async_cancelled_destroyer, 
 		&info->cancelled,
-		info, sizeof (TransferMsgsInfo),
+		info, sizeof (TransferMsgsInfo), TNY_CAMEL_QUEUE_CANCELLABLE_ITEM,
 		__FUNCTION__);
 
 	return;
