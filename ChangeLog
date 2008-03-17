@@ -3,6 +3,8 @@
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
 	fixed an small memory leak and set the proper error code when a
 	get_msg fails due to full memory conditions in the local storage.
+	* libtinymail-camel/camel-lite/camel/camel-folder-summary.c: improved
+	error notification when there are problems in the local storage
 
 2008-03-17  Philip Van Hoof <pvanhoof@gnome.org>
 
