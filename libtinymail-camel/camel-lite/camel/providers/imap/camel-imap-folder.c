@@ -4527,8 +4527,10 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 						_("This message is not currently available"
 						" and can't go online to fetch it"));
 			else if (camel_strstrcase (camel_exception_get_description (ex), "summary") != NULL)
+				if (camel_exception_is_set (ex))
+					camel_exception_clear (ex);
 				camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
-						_("This message can't be retrieved due to insufficient "
+						_("This message can't be retrieved due to insufficient"
 						" storage space resources."));
 
 			CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
