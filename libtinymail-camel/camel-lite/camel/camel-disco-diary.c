@@ -227,6 +227,7 @@ diary_decode_uids (CamelDiscoDiary *diary)
 
 	if (camel_file_util_decode_uint32 (diary->file, &i) == -1)
 		return NULL;
+
 	uids = g_ptr_array_new ();
 	while (i--) {
 		if (camel_file_util_decode_string (diary->file, &uid) == -1) {
@@ -360,20 +361,25 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 		case CAMEL_DISCO_DIARY_FOLDER_TRANSFER:
 		{
 			CamelFolder *source, *destination;
-			GPtrArray *uids, *ret_uids;
+			GPtrArray *uids = NULL, *ret_uids = NULL;
 			guint32 delete_originals;
 			int i;
 
 			source = diary_decode_folder (diary);
 			destination = diary_decode_folder (diary);
 			uids = diary_decode_uids (diary);
+
 			if (!uids)
 				goto lose;
-			if (camel_file_util_decode_uint32 (diary->file, &delete_originals) == -1)
+
+			if (camel_file_util_decode_uint32 (diary->file, &delete_originals) == -1) {
+				free_uids (uids);
 				goto lose;
+			}
 
 			if (!source || !destination) {
 				free_uids (uids);
+				uids = NULL;
 				continue;
 			}
 
