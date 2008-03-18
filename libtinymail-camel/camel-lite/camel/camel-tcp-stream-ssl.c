@@ -200,6 +200,9 @@ camel_tcp_stream_ssl_get_type (void)
  *
  * Returns a new #CamelTcpStreamSSL stream preset in SSL mode
  **/
+
+static gboolean has_init = FALSE;
+
 CamelStream *
 camel_tcp_stream_ssl_new (CamelService *service, const char *expected_host, guint32 flags)
 {
@@ -210,6 +213,15 @@ camel_tcp_stream_ssl_new (CamelService *service, const char *expected_host, guin
 	stream = CAMEL_TCP_STREAM_SSL (camel_object_new (camel_tcp_stream_ssl_get_type ()));
 
 	stream->priv->session = service->session;
+
+	if (!has_init) {
+		char *str = camel_session_get_storage_path (stream->priv->session, service, NULL);
+		if (!str)
+			str = g_strdup (g_get_tmp_dir ());
+		NSS_InitReadWrite (str);
+		has_init = TRUE;
+	}
+
 	camel_object_ref(service->session);
 	stream->priv->expected_host = g_strdup (expected_host);
 	stream->priv->ssl_mode = TRUE;
