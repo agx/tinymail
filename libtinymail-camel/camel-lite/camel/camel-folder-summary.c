@@ -873,10 +873,10 @@ static void
 flush_for_reload (CamelFolderSummary *s, CamelMessageInfoBase *mi)
 {
 	if (!(mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)) {
-		mi->subject = " ";
-		mi->to = " ";
-		mi->from = " ";
-		mi->cc = " ";
+		mi->subject = "...";
+		mi->to = "...";
+		mi->from = "...";
+		mi->cc = "...";
 	}
 } 
 

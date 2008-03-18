@@ -1075,12 +1075,30 @@ static void forea (gpointer u, gpointer o)
 }
 #endif
 
+static gboolean
+free_items (gpointer user_data)
+{
+	GPtrArray *copy = user_data;
+
+#ifdef DEBUG_EXTRA
+	g_ptr_array_foreach (copy, (GFunc) forea, NULL);
+#else
+	g_ptr_array_foreach (copy, (GFunc) g_object_unref, NULL);
+#endif
+	g_ptr_array_free (copy, TRUE);
+
+	return FALSE;
+}
+
+static inline void 
+copy_them (gpointer data, gpointer user_data) { g_ptr_array_add ((GPtrArray *) user_data, data); }
 
 static void
 tny_gtk_header_list_model_finalize (GObject *object)
 {
 	TnyGtkHeaderListModel *self = (TnyGtkHeaderListModel *) object;
 	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
+	GPtrArray *copy = g_ptr_array_new ();
 
 	g_static_rec_mutex_lock (priv->iterator_lock);
 
@@ -1095,11 +1113,10 @@ tny_gtk_header_list_model_finalize (GObject *object)
 
 	remove_del_timeouts (self);
 
-#ifdef DEBUG_EXTRA
-	g_ptr_array_foreach (priv->items, (GFunc) forea, NULL);
-#else
-	g_ptr_array_foreach (priv->items, (GFunc) g_object_unref, NULL);
-#endif
+	g_ptr_array_foreach (priv->items, (GFunc) copy_them, copy);
+
+	g_timeout_add (5*1000, free_items, copy);
+
 
 	if (priv->folder)
 		g_object_unref (priv->folder);
@@ -1229,6 +1246,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	GtkTreeIter iter;
 	GtkTreePath *path;
+	GPtrArray *copy_items;
 
 	g_static_rec_mutex_lock (priv->iterator_lock);
 
@@ -1244,14 +1262,12 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	 * assertion in gtk_tree_model_sort_build_level (I have no idea why the
 	 * assertion is placed there, in stead of a normal return, though) */
  
-	g_ptr_array_foreach (priv->items, (GFunc) g_object_unref, NULL);
+	copy_items = priv->items;
+	priv->registered = 0;
+	priv->items = g_ptr_array_sized_new (tny_folder_get_all_count (folder));
 	if (priv->folder)
 		g_object_unref (priv->folder);
 	priv->folder = TNY_FOLDER (g_object_ref (folder));
-	priv->registered = 0;
-	g_ptr_array_free (priv->items, TRUE);
-	priv->items = g_ptr_array_sized_new (tny_folder_get_all_count (folder));
-
 	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	/* Get a new list of headers */
@@ -1263,6 +1279,9 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 	path = tny_gtk_header_list_model_get_path ((GtkTreeModel *) self, &iter);
 
 	g_static_rec_mutex_lock (priv->iterator_lock);
+
+	g_ptr_array_foreach (copy_items, (GFunc) g_object_unref, NULL);
+	g_ptr_array_free (copy_items, TRUE);
 
 	/* Reference the new folder instance */
 

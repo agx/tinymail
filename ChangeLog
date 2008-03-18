@@ -2,6 +2,7 @@
 
 	* Non-initialization of a variable caused memory corruption on the
 	stack
+	* Fixed race condition in case re-selecting the same folder
 
 2008-03-17  Sergio Villar Senin  <svillar@igalia.com>
 
