@@ -1029,7 +1029,7 @@ haerror:
 
 exception:
 
-	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 		"Error storing the summary");
 	i = errno;
 	fclose (out);
@@ -1069,7 +1069,7 @@ camel_folder_summary_save_rewrite (CamelFolderSummary *s, CamelException *ex)
 
 	if (fd == -1) {
 	  g_static_rec_mutex_unlock (s->dump_lock);
-	  camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+	  camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 		"Error storing the summary");
 	  return -1;
 	}
@@ -1080,7 +1080,7 @@ camel_folder_summary_save_rewrite (CamelFolderSummary *s, CamelException *ex)
 		g_unlink(path);
 		close(fd);
 		errno = i;
- 		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+ 		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 			"Error storing the summary");
 		g_static_rec_mutex_unlock (s->dump_lock);
 		return -1;
@@ -1152,7 +1152,7 @@ haerror:
 		i = errno;
 		g_unlink(path);
 		errno = i;
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 			"Error storing the summary");
 		g_static_mutex_unlock (&global_lock2);
 		g_static_rec_mutex_unlock (&global_lock);
@@ -1177,7 +1177,7 @@ haerror:
 
 exception:
 
-	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 		"Error storing the summary");
 	i = errno;
 	fclose (out);
