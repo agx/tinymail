@@ -338,6 +338,8 @@ camel_folder_summary_finalize (CamelObject *obj)
 
 	p = _PRIVATE(obj);
 
+	g_static_rec_mutex_lock (&global_lock);
+
 	g_static_rec_mutex_lock (s->dump_lock);
 
 	g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
@@ -350,6 +352,9 @@ camel_folder_summary_finalize (CamelObject *obj)
 	camel_folder_summary_unload_mmap (s);
 
 	g_static_rec_mutex_unlock (s->dump_lock);
+
+	g_static_rec_mutex_unlock (&global_lock);
+
 	/**/
 	g_free (s->dump_lock);
 
@@ -1024,7 +1029,7 @@ haerror:
 
 exception:
 
-	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
 		"Error storing the summary");
 	i = errno;
 	fclose (out);
@@ -1064,7 +1069,7 @@ camel_folder_summary_save_rewrite (CamelFolderSummary *s, CamelException *ex)
 
 	if (fd == -1) {
 	  g_static_rec_mutex_unlock (s->dump_lock);
-	  camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
+	  camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
 		"Error storing the summary");
 	  return -1;
 	}
@@ -1075,7 +1080,7 @@ camel_folder_summary_save_rewrite (CamelFolderSummary *s, CamelException *ex)
 		g_unlink(path);
 		close(fd);
 		errno = i;
- 		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
+ 		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
 			"Error storing the summary");
 		g_static_rec_mutex_unlock (s->dump_lock);
 		return -1;
@@ -1147,7 +1152,7 @@ haerror:
 		i = errno;
 		g_unlink(path);
 		errno = i;
-		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
+		camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
 			"Error storing the summary");
 		g_static_mutex_unlock (&global_lock2);
 		g_static_rec_mutex_unlock (&global_lock);
@@ -1172,7 +1177,7 @@ haerror:
 
 exception:
 
-	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
+	camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM,
 		"Error storing the summary");
 	i = errno;
 	fclose (out);
@@ -2338,11 +2343,9 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		mi = (CamelMessageInfoBase *) camel_message_info_new (s);
 		*must_add = TRUE;
 
-		g_static_rec_mutex_lock (&global_lock);
 		if (mi->uid)
 			g_free (mi->uid);
 		mi->uid = g_strdup (theuid);
-		g_static_rec_mutex_unlock (&global_lock);
 
 	} else
 	{
@@ -2356,12 +2359,10 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 			destroy_possible_pstring_stuff (s, (CamelMessageInfo*) mi, FALSE);
 			*must_add = FALSE;
 
-			g_static_rec_mutex_lock (&global_lock);
 
 			if (mi->uid)
 				g_free (mi->uid);
 			mi->uid = g_strdup (theuid);
-			g_static_rec_mutex_unlock (&global_lock);
 
 			CAMEL_SUMMARY_UNLOCK(s, ref_lock);
 		} else
@@ -2377,11 +2378,9 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 		mi = (CamelMessageInfoBase *) camel_message_info_new(s);
 		*must_add = TRUE;
 
-		g_static_rec_mutex_lock (&global_lock);
 		if (mi->uid)
 			g_free (mi->uid);
 		mi->uid = g_strdup (theuid);
-		g_static_rec_mutex_unlock (&global_lock);
 
 	}
 
@@ -3430,6 +3429,7 @@ camel_message_info_free(void *o)
 	g_return_if_fail(mi != NULL);
 
 	if (mi->summary) {
+	  if (((CamelObject *)mi->summary)->ref_count > 0) {
 		CAMEL_SUMMARY_LOCK(mi->summary, ref_lock);
 
 		if (mi->refcount >= 1)
@@ -3448,6 +3448,7 @@ camel_message_info_free(void *o)
 		}
 
 		((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(mi->summary)))->message_info_free(mi->summary, mi);
+	  }
 	} else {
 		GLOBAL_INFO_LOCK(info);
 		mi->refcount--;
