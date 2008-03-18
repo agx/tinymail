@@ -194,6 +194,8 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 				item->func (item->data);
 			}
 
+			tny_debug ("TnyCamelQueue: user callback starts\n");
+
 			info->mutex = g_mutex_new ();
 			info->condition = g_cond_new ();
 			info->had_callback = FALSE;
@@ -214,6 +216,8 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 			if (!info->had_callback)
 				g_cond_wait (info->condition, info->mutex);
 			g_mutex_unlock (info->mutex);
+
+			tny_debug ("TnyCamelQueue: user callback finished\n");
 
 			g_mutex_free (info->mutex);
 			g_cond_free (info->condition);
