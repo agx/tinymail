@@ -588,9 +588,9 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->forced = FALSE;
 	priv->iap = NULL;
-	priv->is_online = dnsmasq_has_resolv ();
+	priv->is_online = FALSE;
 	priv->connect_slot = NULL;
-	
+
 	priv->cnx = con_ic_connection_new ();
 
 	if (!priv->cnx)
