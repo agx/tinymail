@@ -995,10 +995,12 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 
 			camel_pop3_store_destroy_lists (pop3_store);
 			pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
-			if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
+			if (pop3_store->engine && pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
 				pcu = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_uidl, folder, "UIDL\r\n");
-			while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0)
+			if (pop3_store->engine) {
+			  while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0)
 				;
+			}
 			fi = g_hash_table_lookup(pop3_store->uids_uid, uid);
 		}
 		g_static_rec_mutex_unlock (pop3_store->eng_lock);
