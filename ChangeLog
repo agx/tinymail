@@ -1,3 +1,7 @@
+2008-03-18  Sergio Villar Senin  <svillar@igalia.com>
+
+	* Small bugfix in libtinymail-maemo
+
 2008-03-18  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Non-initialization of a variable caused memory corruption on the
