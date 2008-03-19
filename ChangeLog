@@ -1,5 +1,9 @@
 2008-03-19  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Fast message moves when source and dest folder are both Maildir
+
+2008-03-19  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Bugfix when sending large E-mails to GMail's SMTP service
 	* When a large mail is being sent, it takes a long time to move it
 	from Outbox to Sentbox. If during that time a flush() is requested on

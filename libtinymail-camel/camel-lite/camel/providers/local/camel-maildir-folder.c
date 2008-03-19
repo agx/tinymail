@@ -58,6 +58,9 @@ static void maildir_append_message(CamelFolder * folder, CamelMimeMessage * mess
 static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar * uid, CamelFolderReceiveType type, gint param, CamelException * ex);
 static void maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
+static void maildir_transfer_messages_to (CamelFolder *source, GPtrArray *uids, CamelFolder *dest, GPtrArray **transferred_uids, gboolean delete_originals, CamelException *ex);
+
+
 static void maildir_finalize(CamelObject * object);
 
 static int
@@ -105,7 +108,69 @@ static void camel_maildir_folder_class_init(CamelObjectClass * camel_maildir_fol
 	camel_folder_class->get_message = maildir_get_message;
 	camel_folder_class->rewrite_cache = maildir_rewrite_cache;
 
+	camel_folder_class->transfer_messages_to = maildir_transfer_messages_to;
+
 	lclass->create_summary = maildir_create_summary;
+}
+
+
+static void 
+maildir_transfer_messages_to (CamelFolder *source, GPtrArray *uids, CamelFolder *dest, GPtrArray **transferred_uids, gboolean delete_originals, CamelException *ex)
+{
+	if (delete_originals && CAMEL_IS_MAILDIR_FOLDER (source) && CAMEL_IS_MAILDIR_FOLDER (dest)) {
+		gint i;
+		CamelLocalFolder *lf = (CamelLocalFolder *) source;
+		CamelLocalFolder *df = (CamelLocalFolder *) dest;
+
+		camel_operation_start(NULL, _("Moving messages"));
+
+		camel_folder_freeze(dest);
+		camel_folder_freeze(source);
+
+		for (i = 0; i < uids->len; i++) {
+			char *uid = (char *) uids->pdata[i];
+			char *s_filename, *d_filename, *tmp; 
+			CamelMaildirMessageInfo *mdi;
+			CamelMessageInfo *mi, *info;
+
+			if ((info = camel_folder_summary_uid (source->summary, uid)) == NULL) {
+				camel_exception_setv(ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,
+						     _("Cannot get message: %s from folder %s\n  %s"),
+						     uid, lf->folder_path, _("No such message"));
+				return;
+			}
+
+			mdi = (CamelMaildirMessageInfo *) info;
+			tmp = camel_maildir_summary_info_to_name (mdi);
+
+			d_filename = g_strdup_printf("%s/cur/%s", df->folder_path, tmp);
+			g_free (tmp);
+			s_filename = camel_maildir_get_filename (lf->folder_path, mdi, uid);
+			camel_message_info_free (info);
+
+			if (rename (s_filename, d_filename) != 0)
+				camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
+						     _("Cannot transfer message to destination folder"));
+			else {
+				camel_folder_set_message_flags (source, uid, 
+					CAMEL_MESSAGE_EXPUNGED|CAMEL_MESSAGE_DELETED|CAMEL_MESSAGE_SEEN, ~0);
+				((CamelMessageInfoBase *)info)->flags |= CAMEL_MESSAGE_EXPUNGED;
+				camel_folder_summary_remove (source->summary, info);
+			}
+
+			g_free (s_filename);
+			g_free (d_filename);
+		}
+
+		camel_folder_thaw(dest);
+		camel_folder_thaw(source);
+
+		camel_operation_end(NULL);
+
+	} else
+		((CamelFolderClass *)parent_class)->transfer_messages_to (source, uids, dest, transferred_uids, delete_originals, ex);
+
+	return;
 }
 
 static void maildir_init(gpointer object, gpointer klass)
