@@ -1433,11 +1433,11 @@ smtp_data (CamelSmtpTransport *transport, CamelMimeMessage *message, CamelExcept
 		mtry++;
 	} while ((!respbuf && mtry < 3) || (respbuf && *(respbuf+3) == '-')); /* if we got "250-" then loop again */
 
-	if (respbuf)
-		g_free (respbuf);
-
 	if (mtry == 3)
 		smtp_set_exception (transport, TRUE, respbuf, _("DATA command failed"), ex);
+
+	if (respbuf)
+		g_free (respbuf);
 
 	return (mtry != 3);
 }
