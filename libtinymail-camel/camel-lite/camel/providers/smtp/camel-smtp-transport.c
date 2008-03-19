@@ -1434,6 +1434,9 @@ smtp_data (CamelSmtpTransport *transport, CamelMimeMessage *message, CamelExcept
 	if (respbuf)
 		g_free (respbuf);
 
+	if (mtry == 3)
+		smtp_set_exception (transport, TRUE, respbuf, _("DATA command failed"), ex);
+
 	return (mtry != 3);
 }
 
