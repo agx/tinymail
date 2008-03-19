@@ -793,6 +793,8 @@ smtp_send_to (CamelTransport *transport, CamelMimeMessage *message,
 
 	camel_operation_end (NULL);
 
+	camel_exception_clear (ex);
+
 	return TRUE;
 }
 
