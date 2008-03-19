@@ -1310,7 +1310,7 @@ smtp_data (CamelSmtpTransport *transport, CamelMimeMessage *message, CamelExcept
 	char *cmdbuf, *respbuf = NULL;
 	CamelStreamFilter *filtered_stream;
 	CamelMimeFilter *crlffilter;
-	int ret;
+	int ret, mtry;
 
 	/* If the server doesn't support 8BITMIME, set our required encoding to be 7bit */
 	if (!(transport->flags & CAMEL_SMTP_TRANSPORT_8BITMIME))
@@ -1414,22 +1414,27 @@ smtp_data (CamelSmtpTransport *transport, CamelMimeMessage *message, CamelExcept
 		return FALSE;
 	}
 
+	mtry = 0;
 	do {
 		/* Check for "250 Sender OK..." */
-		g_free (respbuf);
+		if (respbuf)
+			g_free (respbuf);
 		respbuf = camel_stream_buffer_read_line (CAMEL_STREAM_BUFFER (transport->istream));
 
 		smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 
-		if (!respbuf || strncmp (respbuf, "250", 3)) {
+		if (respbuf && strncmp (respbuf, "250", 3)) {
 			smtp_set_exception (transport, TRUE, respbuf, _("DATA command failed"), ex);
 			g_free (respbuf);
 			return FALSE;
 		}
-	} while (*(respbuf+3) == '-'); /* if we got "250-" then loop again */
-	g_free (respbuf);
+		mtry++;
+	} while ((!respbuf && mtry < 3) || (respbuf && *(respbuf+3) == '-')); /* if we got "250-" then loop again */
 
-	return TRUE;
+	if (respbuf)
+		g_free (respbuf);
+
+	return (mtry != 3);
 }
 
 static gboolean
