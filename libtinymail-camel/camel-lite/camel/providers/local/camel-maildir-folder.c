@@ -117,6 +117,8 @@ static void camel_maildir_folder_class_init(CamelObjectClass * camel_maildir_fol
 static void 
 maildir_transfer_messages_to (CamelFolder *source, GPtrArray *uids, CamelFolder *dest, GPtrArray **transferred_uids, gboolean delete_originals, CamelException *ex)
 {
+	gboolean fallback = FALSE;
+
 	if (delete_originals && CAMEL_IS_MAILDIR_FOLDER (source) && CAMEL_IS_MAILDIR_FOLDER (dest)) {
 		gint i;
 		CamelLocalFolder *lf = (CamelLocalFolder *) source;
@@ -148,8 +150,12 @@ maildir_transfer_messages_to (CamelFolder *source, GPtrArray *uids, CamelFolder 
 			s_filename = camel_maildir_get_filename (lf->folder_path, mdi, uid);
 			camel_message_info_free (info);
 
-			if (rename (s_filename, d_filename) != 0)
-				camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
+			if (g_rename (s_filename, d_filename) != 0)
+				if (errno == EXDEV) {
+					i = uids->len + 1;
+					fallback = TRUE;
+				} else
+					camel_exception_setv(ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
 						     _("Cannot transfer message to destination folder"));
 			else {
 				camel_folder_set_message_flags (source, uid, 
@@ -168,6 +174,9 @@ maildir_transfer_messages_to (CamelFolder *source, GPtrArray *uids, CamelFolder 
 		camel_operation_end(NULL);
 
 	} else
+		fallback = TRUE;
+
+	if (fallback)
 		((CamelFolderClass *)parent_class)->transfer_messages_to (source, uids, dest, transferred_uids, delete_originals, ex);
 
 	return;
