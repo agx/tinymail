@@ -429,6 +429,7 @@ thread_main (gpointer data)
 				TnyHeaderFlags flags = tny_header_get_flags (curhdr);
 
 				if ((flags & TNY_HEADER_FLAG_SUSPENDED) ||
+				    (flags & TNY_HEADER_FLAG_ANSWERED) ||
 				    (g_hash_table_lookup_extended (failed_headers, 
 								   tny_header_get_uid (curhdr),
 								   NULL, NULL)))
@@ -507,11 +508,12 @@ thread_main (gpointer data)
 					GError *newerr = NULL;
 					priv->cur_i = i;
 					tny_header_set_flag (header, TNY_HEADER_FLAG_SEEN);
+					tny_header_set_flag (header, TNY_HEADER_FLAG_ANSWERED);
 					tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, &newerr);
 					if (newerr != NULL) {
 						emit_error (self, header, msg, newerr, i, priv->total);
 						g_error_free (newerr);
-					}
+					} 
 					priv->total--;
 				}
 			}
@@ -719,6 +721,11 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 		TnyFolder *outbox;
 		TnyList *headers = tny_simple_list_new ();
 		OnAddedInfo *info = NULL;
+		TnyHeader *hdr = tny_msg_get_header (msg);
+
+		tny_header_unset_flag (hdr, TNY_HEADER_FLAG_ANSWERED);
+
+		g_object_unref (hdr);
 
 		outbox = tny_send_queue_get_outbox (self);
 
