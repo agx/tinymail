@@ -315,7 +315,7 @@ connect_timeout (int soc, const struct sockaddr *addr, socklen_t addrlen)
   int valopt; 
   socklen_t lon; 
 
-  fcntl(soc, F_GETFL, NULL);
+  arg = fcntl(soc, F_GETFL, NULL);
   arg |= O_NONBLOCK;
   fcntl(soc, F_SETFL, arg);
 
