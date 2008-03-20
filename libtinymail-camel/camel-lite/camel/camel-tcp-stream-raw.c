@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <sys/socket.h>
 
 #include "camel-file-utils.h"
 #include "camel-operation.h"
@@ -304,6 +305,64 @@ stream_close (CamelStream *stream)
 	return 0;
 }
 
+static int 
+connect_timeout (int soc, const struct sockaddr *addr, socklen_t addrlen)
+{
+  int res = 1; 
+  long arg; 
+  fd_set myset; 
+  struct timeval tv; 
+  int valopt; 
+  socklen_t lon; 
+
+  fcntl(soc, F_GETFL, NULL);
+  arg |= O_NONBLOCK;
+  fcntl(soc, F_SETFL, arg);
+
+  res = connect(soc, addr, addrlen); 
+  if (res < 0) { 
+     if (errno == EINPROGRESS) { 
+        do { 
+           tv.tv_sec = CONNECT_TIMEOUT; 
+           tv.tv_usec = 0; 
+           FD_ZERO(&myset); 
+           FD_SET(soc, &myset); 
+           res = select(soc+1, NULL, &myset, NULL, &tv); 
+           if (res < 0 && errno != EINTR) {
+              res = -1;
+              goto err;
+           }
+           else if (res > 0) { 
+              lon = sizeof(int); 
+              if (getsockopt(soc, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon) < 0) {
+                 res = -1;
+                 goto err;
+              }
+              if (valopt) {
+                 res = -1;
+                 goto err;
+              }
+              break; 
+           } 
+           else {
+              res = -1;
+              goto err;
+           }
+        } while (1); 
+     } 
+     else
+       res = -1;
+  } 
+
+err:
+
+  arg = fcntl(soc, F_GETFL, NULL);
+  arg &= (~O_NONBLOCK); 
+  fcntl(soc, F_SETFL, arg);
+
+  return res;
+}
+
 /* this is a 'cancellable' connect, cancellable from camel_operation_cancel etc */
 /* returns -1 & errno == EINTR if the connection was cancelled */
 static int
@@ -331,7 +390,7 @@ socket_connect(struct addrinfo *h)
 
 	cancel_fd = camel_operation_cancel_fd (NULL);
 	if (cancel_fd == -1) {
-		if (connect (fd, h->ai_addr, h->ai_addrlen) == -1) {
+		if (connect_timeout (fd, h->ai_addr, h->ai_addrlen) == -1) {
 			/* Yeah, errno is meaningless on Win32 after a
 			 * Winsock call fails, but I doubt the callers
 			 * check errno anyway.

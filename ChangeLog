@@ -1,3 +1,8 @@
+2008-03-20  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Implementation of a connect() that will timeout within 15 seconds
+	for the non-SSL connection types. Experimental.
+
 2008-03-19  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fast message moves when source and dest folder are both Maildir
