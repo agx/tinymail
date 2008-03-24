@@ -486,7 +486,9 @@ thread_main (gpointer data)
 				_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->trans_account),
 									  NULL, NULL, "Sending message");
 
+				g_static_rec_mutex_unlock (priv->sending_lock);
 				tny_transport_account_send (priv->trans_account, msg, &err);
+				g_static_rec_mutex_lock (priv->sending_lock);
 
 				_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->trans_account));
 
