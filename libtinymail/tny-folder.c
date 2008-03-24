@@ -780,6 +780,41 @@ tny_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err)
 	return;
 }
 
+
+
+/**
+ * tny_folder_remove_msgs_async:
+ * @self: a #TnyFolder
+ * @headers: a #TnyList with #TnyHeader items of the messages to remove
+ * @callback: (null-ok): a #TnyFolderCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
+ *
+ * Remove messages from a folder. It will use the #TnyMsgRemoveStrategy of 
+ * @self to perform the removal itself. For more details, check out the 
+ * documentation of the used #TnyMsgRemoveStrategy type. The default 
+ * implementation for libtinymail-camel is the #TnyCamelMsgRemoveStrategy.
+ *
+ * Folder observers of @self will get only one header-removed trigger caused
+ * by this action (with all the removed headers in the #TnyFolderChange).
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+void 
+tny_folder_remove_msgs_async (TnyFolder *self, TnyList *headers, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER (self));
+	g_assert (headers);
+	g_assert (TNY_IS_LIST (headers));
+	g_assert (TNY_FOLDER_GET_IFACE (self)->remove_msgs_async!= NULL);
+#endif
+
+	TNY_FOLDER_GET_IFACE (self)->remove_msgs_async(self, headers, callback, status_callback, user_data);
+	return;
+}
+
 /**
  * tny_folder_refresh_async:
  * @self: a #TnyFolder

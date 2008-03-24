@@ -132,6 +132,8 @@ struct _TnyFolderIface
 	TnyFolderStats* (*get_stats) (TnyFolder *self);
 	gchar* (*get_url_string) (TnyFolder *self);
 	TnyFolderCaps (*get_caps) (TnyFolder *self);
+	void (*remove_msgs_async) (TnyFolder *self, TnyList *headers, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+
 };
 
 GType tny_folder_get_type (void);
@@ -175,6 +177,7 @@ TnyFolderStore* tny_folder_get_folder_store (TnyFolder *self);
 TnyFolderStats* tny_folder_get_stats (TnyFolder *self);
 TnyFolderCaps tny_folder_get_caps (TnyFolder *self);
 gchar* tny_folder_get_url_string (TnyFolder *self);
+void tny_folder_remove_msgs_async (TnyFolder *self, TnyList *headers, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 
 G_END_DECLS
 

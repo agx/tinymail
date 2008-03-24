@@ -1,6 +1,9 @@
 2008-03-24  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Rewrote tny_camel_folder_remove_msgs_default
+	* Added tny_folder_remove_msgs_async
+
+	* This was a minor API change
 
 2008-03-20  Philip Van Hoof <pvanhoof@gnome.org>
 

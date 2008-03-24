@@ -1107,6 +1107,132 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 	return;
 }
 
+
+
+
+typedef struct 
+{
+	TnyCamelQueueable parent;
+
+	GError *err;
+	TnyFolder *self;
+	TnyList *headers;
+	TnyFolderCallback callback;
+	gpointer user_data;
+	TnySessionCamel *session;
+	gboolean cancelled;
+
+} RemMsgsInfo;
+
+
+static void
+tny_camel_folder_remove_msgs_async_destroyer (gpointer thr_user_data)
+{
+	RemMsgsInfo *info = thr_user_data;
+
+	/* thread reference */
+	g_object_unref (info->self);
+	g_object_unref (info->headers);
+
+	if (info->err)
+		g_error_free (info->err);
+
+	return;
+}
+
+static gboolean
+tny_camel_folder_remove_msgs_async_callback (gpointer thr_user_data)
+{
+	RemMsgsInfo *info = thr_user_data;
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, info->cancelled, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+	return FALSE;
+}
+
+static gpointer 
+tny_camel_folder_remove_msgs_async_thread (gpointer thr_user_data)
+{
+	RemMsgsInfo *info = (RemMsgsInfo*) thr_user_data;
+	info->err = NULL;
+	tny_folder_remove_msgs (info->self, info->headers, &info->err);
+	info->cancelled = FALSE;
+
+	if (info->err != NULL) {
+		if (camel_strstrcase (info->err->message, "cancel") != NULL)
+			info->cancelled = TRUE;
+	}
+
+	return NULL;
+}
+
+static void
+tny_camel_folder_remove_msgs_async_cancelled_destroyer (gpointer thr_user_data)
+{
+	RemMsgsInfo *info = thr_user_data;
+	if (info->err)
+		g_error_free (info->err);
+	g_object_unref (info->self);
+	g_object_unref (info->headers);
+
+	return;
+}
+
+static gboolean
+tny_camel_folder_remove_msgs_async_cancelled_callback (gpointer thr_user_data)
+{
+	RemMsgsInfo *info = thr_user_data;
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, TRUE, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+	return FALSE;
+}
+
+static void 
+tny_camel_folder_remove_msgs_async (TnyFolder *self, TnyList *headers, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->remove_msgs_async(self, headers, callback, status_callback, user_data);
+	return;
+}
+
+
+static void 
+tny_camel_folder_remove_msgs_async_default (TnyFolder *self, TnyList *headers, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	RemMsgsInfo *info;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	
+	/* Idle info for the callbacks */
+	info = g_slice_new (RemMsgsInfo);
+	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	info->self = self;
+	info->headers = headers;
+	info->callback = callback;
+	info->user_data = user_data;
+	info->err = NULL;
+
+	/* thread reference */
+	g_object_ref (info->self);
+	g_object_ref (info->headers);
+
+	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+		tny_camel_folder_remove_msgs_async_thread, 
+		tny_camel_folder_remove_msgs_async_callback,
+		tny_camel_folder_remove_msgs_async_destroyer, 
+		tny_camel_folder_remove_msgs_async_cancelled_callback,
+		tny_camel_folder_remove_msgs_async_cancelled_destroyer, 
+		&info->cancelled,
+		info, sizeof (RemMsgsInfo), __FUNCTION__);
+
+	return;
+}
+
+
+
 static void 
 tny_camel_folder_remove_msgs (TnyFolder *self, TnyList *headers, GError **err)
 {
@@ -5620,6 +5746,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->get_stats= tny_camel_folder_get_stats;
 	klass->get_url_string= tny_camel_folder_get_url_string;
 	klass->get_caps= tny_camel_folder_get_caps;
+	klass->remove_msgs_async= tny_camel_folder_remove_msgs_async;
 
 	return;
 }
@@ -5685,6 +5812,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->get_stats= tny_camel_folder_get_stats_default;
 	class->get_url_string= tny_camel_folder_get_url_string_default;
 	class->get_caps= tny_camel_folder_get_caps_default;
+	class->remove_msgs_async= tny_camel_folder_remove_msgs_async_default;
 
 	class->get_folders_async= tny_camel_folder_get_folders_async_default;
 	class->get_folders= tny_camel_folder_get_folders_default;

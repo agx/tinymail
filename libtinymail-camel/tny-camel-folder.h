@@ -89,6 +89,7 @@ struct _TnyCamelFolderClass
 	TnyFolderStats* (*get_stats) (TnyFolder *self);
 	gchar* (*get_url_string) (TnyFolder *self);
 	TnyFolderCaps (*get_caps) (TnyFolder *self);
+	void (*remove_msgs_async) (TnyFolder *self, TnyList *headers, TnyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 
 	void (*get_folders_async) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*get_folders) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
