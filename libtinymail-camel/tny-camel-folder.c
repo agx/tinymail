@@ -1121,71 +1121,43 @@ tny_camel_folder_remove_msgs_default (TnyFolder *self, TnyList *headers, GError 
 	TnyFolderChange *change = NULL;
 	TnyIterator *iter = NULL;
 	TnyHeader *header = NULL;
+	TnyMsgRemoveStrategy *strat;
 
 	g_assert (TNY_IS_LIST (headers));
 
-	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
-			TNY_SERVICE_ERROR_REMOVE_MSG))
+	strat = tny_folder_get_msg_remove_strategy (self);
+
+	if (!strat)
 		return;
-
-	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
-			TNY_SERVICE_ERROR_REMOVE_MSG,
-			_("Folder not ready for removing"));
-		return;
-	}
-
-	if (!priv->remove_strat) {
-		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-		return;
-	}
-
-	g_static_rec_mutex_lock (priv->folder_lock);
-
-	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
-		if (!load_folder_no_lock (priv))
-		{
-			_tny_camel_exception_to_tny_error (&priv->load_ex, err);
-			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
-			g_static_rec_mutex_unlock (priv->folder_lock);
-			return;
-		}
 
 	change = tny_folder_change_new (self);
-	tny_folder_change_set_check_duplicates (change, TRUE);
 
+	tny_folder_change_set_check_duplicates (change, TRUE);
 	iter = tny_list_create_iterator (headers);
 	while (!tny_iterator_is_done (iter)) {
 		header = TNY_HEADER(tny_iterator_get_current (iter));
 		g_assert(TNY_IS_HEADER(header));
-
 		/* Performs remove */
-		tny_msg_remove_strategy_perform_remove (priv->remove_strat, self, header, err);
-
+		tny_msg_remove_strategy_perform_remove (strat, self, header, err);
 		/* Add expunged headers to change event */
 		tny_folder_change_add_expunged_header (change, header);
-
 		g_object_unref (header);
 		tny_iterator_next (iter);
 	}
 
+	g_object_unref (strat);
+
 	/* Notify about unread count */
 	_tny_camel_folder_check_unread_count (TNY_CAMEL_FOLDER (self));
-
 	/* Reset local size info */
 	reset_local_size (priv);
 
 	/* Notify header has been removed */
-	notify_folder_observers_about_in_idle (self, change);
+	notify_folder_observers_about (self, change);
 
 	/* Free */
 	g_object_unref (change);
 	g_object_unref (iter);
-
-	g_static_rec_mutex_unlock (priv->folder_lock);
-
-	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
 	return;
 }

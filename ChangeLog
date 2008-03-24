@@ -1,3 +1,7 @@
+2008-03-24  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Rewrote tny_camel_folder_remove_msgs_default
+
 2008-03-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Implementation of a connect() that will timeout within 15 seconds
