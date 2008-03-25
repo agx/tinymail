@@ -1,3 +1,8 @@
+2008-03-25  Alberto Garcia Gonzalez <agarcia@igalia.com>
+
+	* libtinymail-gnomevfs/tny-vfs-stream.c:
+	(tny_vfs_reset): Set priv->position to 0 after a successful reset
+
 2008-03-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Replaced a GByteArray with a EByteArray

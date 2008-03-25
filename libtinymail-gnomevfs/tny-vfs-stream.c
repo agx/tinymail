@@ -333,8 +333,9 @@ tny_vfs_reset (TnyStream *self)
 
 	res = gnome_vfs_seek (priv->handle, GNOME_VFS_SEEK_START, 0);
 
-	if (res != GNOME_VFS_OK)
-	{
+	if (res == GNOME_VFS_OK) {
+		priv->position = 0;
+	} else {
 		tny_vfs_stream_set_errno (res);
 		retval = -1;
 	}
