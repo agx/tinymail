@@ -1115,7 +1115,8 @@ tny_gtk_header_list_model_finalize (GObject *object)
 
 	g_ptr_array_foreach (priv->items, (GFunc) copy_them, copy);
 
-	g_timeout_add (5*1000, free_items, copy);
+	free_items (copy);
+	// g_timeout_add (5*100, free_items, copy);
 
 
 	if (priv->folder)
