@@ -3429,7 +3429,7 @@ camel_message_info_free(void *o)
 	g_return_if_fail(mi != NULL);
 
 	if (mi->summary) {
-	  if (((CamelObject *)mi->summary)->ref_count > 0) {
+	 // if (((CamelObject *)mi->summary)->ref_count > 0) {
 		CAMEL_SUMMARY_LOCK(mi->summary, ref_lock);
 
 		if (mi->refcount >= 1)
@@ -3448,7 +3448,7 @@ camel_message_info_free(void *o)
 		}
 
 		((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(mi->summary)))->message_info_free(mi->summary, mi);
-	  }
+	 // }
 	} else {
 		GLOBAL_INFO_LOCK(info);
 		mi->refcount--;

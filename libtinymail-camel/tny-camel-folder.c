@@ -4315,6 +4315,9 @@ tny_camel_folder_uncache_nl (TnyCamelFolder *self)
 
 	return;
 }
+
+#define DEBUG_EXTRA
+
 void 
 _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
 {
