@@ -3167,12 +3167,6 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 			}
 
 			/* This does a g_rename on the mmap()ed file! */
-camel_object_unref (priv->folder);
-camel_object_unref (priv->folder);
-camel_object_unref (priv->folder);
-camel_object_unref (priv->folder);
-camel_object_unref (priv->folder);
-
 			camel_store_rename_folder (CAMEL_STORE (apriv->service), from, to, &ex);
 
 			did_rename = TRUE;
