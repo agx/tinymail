@@ -768,7 +768,7 @@ camel_folder_summary_load(CamelFolderSummary *s)
 			CamelMessageInfo *ri = g_ptr_array_index (s->messages, r);
 			if (ri) {
 				((CamelMessageInfoBase *)ri)->flags |= CAMEL_MESSAGE_EXPUNGED;
-printf ("Removes %s\n", ri->uid);
+				printf ("Removes %s\n", ri->uid);
 				camel_folder_summary_remove (s, ri);
 			}
 		}
@@ -783,6 +783,8 @@ printf ("Removes %s\n", ri->uid);
 		s->idx = i;
 
 		ul = TRUE;
+
+		printf ("LOAD: %d of %d\n", s->idx, s->messages->len);
 
 		mi = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->message_info_load(s, &must_add);
 
@@ -998,7 +1000,7 @@ haerror:
 	g_static_rec_mutex_lock (&global_lock);
 	g_static_mutex_lock (&global_lock2);
 
-	for (i = 0; i < count; i++) {
+	for (i = 0; i < s->messages->len; i++) {
 		mi = s->messages->pdata[i];
 		flush_for_reload (s, (CamelMessageInfoBase *) mi);
 	}
@@ -1141,6 +1143,12 @@ haerror:
 	g_static_rec_mutex_lock (&global_lock);
 	g_static_mutex_lock (&global_lock2);
 
+	printf ("FLUSH: %d\n", s->messages->len);
+	for (i = 0; i < s->messages->len; i++) {
+		mi = s->messages->pdata[i];
+		flush_for_reload (s, (CamelMessageInfoBase *) mi);
+	}
+
 	camel_folder_summary_unload_mmap (s);
 
 
@@ -1161,6 +1169,8 @@ haerror:
 	}
 
 	camel_folder_summary_load (s);
+
+printf ("LOADED: %d\n", s->messages->len);
 
 	g_static_mutex_unlock (&global_lock2);
 	g_static_rec_mutex_unlock (&global_lock);

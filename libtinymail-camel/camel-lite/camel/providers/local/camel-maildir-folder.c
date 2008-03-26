@@ -108,7 +108,7 @@ static void camel_maildir_folder_class_init(CamelObjectClass * camel_maildir_fol
 	camel_folder_class->get_message = maildir_get_message;
 	camel_folder_class->rewrite_cache = maildir_rewrite_cache;
 
-	camel_folder_class->transfer_messages_to = maildir_transfer_messages_to;
+	//camel_folder_class->transfer_messages_to = maildir_transfer_messages_to;
 
 	lclass->create_summary = maildir_create_summary;
 }
