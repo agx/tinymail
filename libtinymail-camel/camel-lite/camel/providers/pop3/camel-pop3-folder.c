@@ -465,7 +465,7 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 		if (!found) {
 			/* Removed remotely (only if not cached locally) */
-			if (!camel_data_cache_exists (pop3_store->cache, "cache", info->uid, NULL)) {
+			if (info && info->uid && !camel_data_cache_exists (pop3_store->cache, "cache", info->uid, NULL)) {
 
 				camel_message_info_ref (info);
 				deleted = g_list_prepend (deleted, info);
@@ -612,7 +612,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 			if (!found) {
 				/* Removed remotely (only if not cached locally) */
-				if (!camel_data_cache_exists (pop3_store->cache, "cache", info->uid, NULL)) {
+				if (info && info->uid && !camel_data_cache_exists (pop3_store->cache, "cache", info->uid, NULL)) {
 					camel_message_info_ref (info);
 					deleted = g_list_prepend (deleted, info);
 				}
@@ -757,12 +757,12 @@ cmd_tocache(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 			break;
 
 		/* heuristics */
-		if (buffer && camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
+		if (camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
 			fi->has_attachments = TRUE;
-		else if (buffer && camel_strstrcase (buffer, "filename=") != NULL &&
+		else if (camel_strstrcase (buffer, "filename=") != NULL &&
 			 strchr (buffer, '.'))
 			fi->has_attachments = TRUE;
-		else if (buffer && camel_strstrcase (buffer, "Content-Type: message/rfc822") != NULL)
+		else if (camel_strstrcase (buffer, "Content-Type: message/rfc822") != NULL)
 			fi->has_attachments = TRUE;
 
 		w += n;

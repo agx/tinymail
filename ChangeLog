@@ -1,3 +1,12 @@
+2008-03-26  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed several problems like documentation problems in Jose's patch
+	* Review of Jose's patch
+	* Fixed several insignificant smaller robustness problems
+	* Fixed a major leak
+	* Fixed a regression due to a performance fix when moving and renaming
+	Maildir folders
+
 2008-03-26  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Replace old tny_header_get_ api for strings with

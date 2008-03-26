@@ -407,7 +407,7 @@ tny_vfs_set_bounds (TnySeekable *self, off_t start, off_t end)
 	TnyVfsStreamPriv *priv = TNY_VFS_STREAM_GET_PRIVATE (self);
 	priv->bound_end = end;
 	priv->bound_start = start;
-	return;
+	return 0;
 }
 
 static void

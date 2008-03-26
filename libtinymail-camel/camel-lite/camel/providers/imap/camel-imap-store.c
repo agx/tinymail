@@ -3988,8 +3988,10 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 			goto fail;
 	}
 
-	camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
-	camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
+	if (imap_store->summary) {
+		camel_store_summary_touch((CamelStoreSummary *)imap_store->summary);
+		camel_store_summary_save((CamelStoreSummary *)imap_store->summary, ex);
+	}
 
 	CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
 
