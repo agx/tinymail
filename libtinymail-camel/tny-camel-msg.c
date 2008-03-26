@@ -173,7 +173,7 @@ tny_camel_msg_get_url_string_default (TnyMsg *self)
 	if (priv->folder)
 	{
 		TnyHeader *header = tny_msg_get_header (self);
-		const gchar *uid = tny_header_get_uid (header);
+		gchar *uid = tny_header_dup_uid (header);
 
 		/* This is incorrect, the UID will always be NULL */
 
@@ -195,6 +195,7 @@ tny_camel_msg_get_url_string_default (TnyMsg *self)
 					g_free (urls);
 				}
 			}
+			g_free (uid);
 		}
 
 		g_object_unref (G_OBJECT (header));
@@ -210,10 +211,12 @@ tny_camel_msg_rewrite_cache_default (TnyMsg *self)
 	CamelMimeMessage *msg;
 	
 	if (priv->folder && priv->header) {
+		gchar *uid;
 		msg = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (self));
+		uid = tny_header_dup_uid (priv->header);
 		_tny_camel_folder_rewrite_cache (TNY_CAMEL_FOLDER(priv->folder),
-						 tny_header_get_uid (priv->header),
-						 msg);
+						 uid, msg);
+		g_free (uid);
 	}
 	return;
 }
@@ -264,9 +267,11 @@ tny_camel_msg_uncache_attachments_default (TnyMsg *self)
 
 	if (priv->folder && priv->header)
 	{
+		gchar *uid;
+		uid = tny_header_dup_uid (priv->header);
 		_tny_camel_folder_uncache_attachments (
-			TNY_CAMEL_FOLDER (priv->folder),
-			tny_header_get_uid (priv->header));
+			TNY_CAMEL_FOLDER (priv->folder), uid);
+		g_free (uid);
 		/* tny_header_set_flag (priv->header, TNY_HEADER_FLAG_PARTIAL); */
 	}
 }

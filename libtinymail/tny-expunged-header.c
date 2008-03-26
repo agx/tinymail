@@ -27,52 +27,52 @@
 
 static GObjectClass *parent_class = NULL;
 
-static const gchar*
-tny_expunged_header_get_uid (TnyHeader *self)
+static gchar*
+tny_expunged_header_dup_uid (TnyHeader *self)
 {
-	return "...";
+	return g_strdup ("...");
 }
 
-static const gchar*
-tny_expunged_header_get_bcc (TnyHeader *self)
+static gchar*
+tny_expunged_header_dup_bcc (TnyHeader *self)
 {
-	return "Expunged";
+	return g_strdup ("Expunged");
 }
 
-static const gchar*
-tny_expunged_header_get_cc (TnyHeader *self)
+static gchar*
+tny_expunged_header_dup_cc (TnyHeader *self)
 {
-	return "Expunged";
+	return g_strdup ("Expunged");
 }
 
-static const gchar*
-tny_expunged_header_get_subject (TnyHeader *self)
+static gchar*
+tny_expunged_header_dup_subject (TnyHeader *self)
 {
-	return "Expunged";
+	return g_strdup ("Expunged");
 }
 
-static const gchar*
-tny_expunged_header_get_to (TnyHeader *self)
+static gchar*
+tny_expunged_header_dup_to (TnyHeader *self)
 {
-	return "Expunged";
+	return g_strdup ("Expunged");
 }
 
-static const gchar*
-tny_expunged_header_get_from (TnyHeader *self)
+static gchar*
+tny_expunged_header_dup_from (TnyHeader *self)
 {
-	return "Expunged";
+	return g_strdup ("Expunged");
 }
 
-static const gchar*
-tny_expunged_header_get_replyto (TnyHeader *self)
+static gchar*
+tny_expunged_header_dup_replyto (TnyHeader *self)
 {
-	return "Expunged";
+	return g_strdup ("Expunged");
 }
 
-static const gchar*
-tny_expunged_header_get_message_id (TnyHeader *self)
+static gchar*
+tny_expunged_header_dup_message_id (TnyHeader *self)
 {
-	return "Expunged";
+	return g_strdup ("Expunged");
 }
 
 static guint
@@ -159,14 +159,14 @@ tny_expunged_header_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 tny_header_init (TnyHeaderIface *klass)
 {
-	klass->get_uid= tny_expunged_header_get_uid;
-	klass->get_bcc= tny_expunged_header_get_bcc;
-	klass->get_cc= tny_expunged_header_get_cc;
-	klass->get_subject= tny_expunged_header_get_subject;
-	klass->get_to= tny_expunged_header_get_to;
-	klass->get_from= tny_expunged_header_get_from;
-	klass->get_replyto= tny_expunged_header_get_replyto;
-	klass->get_message_id= tny_expunged_header_get_message_id;
+	klass->dup_uid= tny_expunged_header_dup_uid;
+	klass->dup_bcc= tny_expunged_header_dup_bcc;
+	klass->dup_cc= tny_expunged_header_dup_cc;
+	klass->dup_subject= tny_expunged_header_dup_subject;
+	klass->dup_to= tny_expunged_header_dup_to;
+	klass->dup_from= tny_expunged_header_dup_from;
+	klass->dup_replyto= tny_expunged_header_dup_replyto;
+	klass->dup_message_id= tny_expunged_header_dup_message_id;
 	klass->get_message_size= tny_expunged_header_get_message_size;
 	klass->get_date_received= tny_expunged_header_get_date_received;
 	klass->get_date_sent= tny_expunged_header_get_date_sent;

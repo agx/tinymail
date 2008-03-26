@@ -1303,7 +1303,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);    
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;    
 	CamelFolderInfo *iter=NULL; guint32 flags; CamelStore *store;
-
+	
 	g_assert (TNY_IS_LIST (list));
 	g_assert (CAMEL_IS_SESSION (apriv->session));
 

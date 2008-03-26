@@ -400,6 +400,9 @@ int camel_folder_summary_get_index_for (CamelFolderSummary *s, const char *uid);
 void camel_folder_summary_move_up (CamelFolderSummary *s);
 #endif
 
+void camel_folder_summary_lock ();
+void camel_folder_summary_unlock ();
+
 G_END_DECLS
 
 #endif /* ! _CAMEL_FOLDER_SUMMARY_H */

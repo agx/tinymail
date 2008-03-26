@@ -228,21 +228,26 @@ on_send_queue_error_happened (TnySendQueue *self, TnyHeader *header, TnyMsg *msg
 {
 	if (header)
 	{
-		gchar *str = g_strdup_printf ("%s. Do you want to remove the message (%s)?",
-			err->message, tny_header_get_subject (header));
+		gchar *subject;
+		gchar *str;
+		
+		subject = tny_header_dup_subject (header);
+		str = g_strdup_printf ("%s. Do you want to remove the message (%s)?",
+			err->message, subject);
+		g_free (subject);
 		OnResponseInfo *info = g_slice_new (OnResponseInfo);
 
 		if (!rem_dialog)
 		{
 			rem_dialog = gtk_message_dialog_new (NULL, 0,
 				GTK_MESSAGE_ERROR, GTK_BUTTONS_YES_NO, str);
-			g_free (str);
 			info->self = g_object_ref (user_data);
 			info->header = g_object_ref (header);
 			g_signal_connect (G_OBJECT (rem_dialog), "response",
 				G_CALLBACK (on_response), info);
 			gtk_widget_show_all (rem_dialog);
 		}
+		g_free (str);
 	}
 	return;
 }
@@ -632,11 +637,16 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 			if (header)
 			{
-				GtkWidget *dialog = gtk_message_dialog_new (NULL, 
+				gchar *subject;
+				GtkWidget *dialog;
+
+				subject = tny_header_dup_subject (header);
+				dialog = gtk_message_dialog_new (NULL, 
 					GTK_DIALOG_MODAL,
 					GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, 
 					_("This will remove the message with subject \"%s\""),
-					tny_header_get_subject (header));
+					subject);
+				g_free (subject);
 
 				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 				{
@@ -680,11 +690,16 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 			if (header)
 			{
-				GtkWidget *dialog = gtk_message_dialog_new (NULL, 
-					GTK_DIALOG_MODAL,
-					GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, 
-					_("This will uncache the message with subject \"%s\""),
-					tny_header_get_subject (header));
+				gchar *subject;
+				GtkWidget *dialog;
+
+				subject = tny_header_dup_subject (header);
+				dialog = gtk_message_dialog_new (NULL, 
+								 GTK_DIALOG_MODAL,
+								 GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, 
+								 _("This will uncache the message with subject \"%s\""),
+								 subject);
+				g_free (subject);
 
 				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
 				{
@@ -1626,11 +1641,15 @@ on_move_to_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 	if (folder) 
 	{
+		gchar *subject;
 		TnyList *headers = tny_simple_list_new ();
 
+		subject = tny_header_dup_subject (info->header);
+
 		g_print ("Transfering: %s to %s\n",
-			tny_header_get_subject (info->header), 
+			subject, 
 			tny_folder_get_name (info->to_folder));
+		g_free (subject);
 
 		tny_list_prepend (headers, (GObject *) info->header);
 		tny_folder_transfer_msgs_async (folder, headers, info->to_folder, 

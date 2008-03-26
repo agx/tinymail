@@ -80,7 +80,7 @@ tny_camel_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStrategy *self
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 	g_assert (TNY_IS_HEADER (header));
 
-	id = g_strdup (tny_header_get_uid (TNY_HEADER (header)));
+	id = tny_header_dup_uid (TNY_HEADER (header));
 	cfolder = _tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
 	camel_folder_delete_message (cfolder, id);
 	camel_object_unref (CAMEL_OBJECT (cfolder));

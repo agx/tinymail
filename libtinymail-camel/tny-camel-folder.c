@@ -3785,10 +3785,10 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 	while (!tny_iterator_is_done (iter)) 
 	{
 		TnyHeader *header;
-		const gchar *uid;
+		gchar *uid;
 
 		header = TNY_HEADER (tny_iterator_get_current (iter));
-		uid = tny_header_get_uid (header);
+		uid = tny_header_dup_uid (header);
 
 		if (G_UNLIKELY (uid == NULL)) 
 		{
@@ -3811,7 +3811,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 			_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 			return;
 		} else
-			g_ptr_array_add (uids, (gpointer) g_strdup (uid));
+			g_ptr_array_add (uids, (gpointer) uid);
 
 		g_object_unref (header);
 		tny_iterator_next (iter);

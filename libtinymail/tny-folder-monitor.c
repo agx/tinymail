@@ -156,12 +156,15 @@ tny_folder_monitor_update (TnyFolderObserver *self, TnyFolderChange *change)
 static gboolean 
 uid_matcher (TnyList *list, GObject *item, gpointer match_data)
 {
-	const char *uid = tny_header_get_uid ((TnyHeader *) item);
+	gboolean result = FALSE;
+	char *uid = tny_header_dup_uid ((TnyHeader *) item);
 
 	if (uid && !strcmp (uid, (const char*) match_data))
- 		return TRUE;
+ 		result = TRUE;
 
-	return FALSE;
+	g_free (uid);
+
+	return result;
 }
 
 
@@ -173,10 +176,11 @@ foreach_list_add_header (TnyFolderMonitorPriv *priv, TnyHeader *header, gint len
 	while (!tny_iterator_is_done (iter))
 	{
 		TnyList *list = TNY_LIST (tny_iterator_get_current (iter));
-		const gchar *uid = tny_header_get_uid (header);
+		gchar *uid = tny_header_dup_uid (header);
 
 		if (check_duplicates && uid)
 			tny_list_remove_matches (list, uid_matcher, (gpointer) uid); 
+		g_free (uid);
 
 		tny_list_prepend (list, (GObject *) header);
 
@@ -266,11 +270,9 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 		{
 			const gchar *uid;
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
-			uid = tny_header_get_uid (header);
-			if (uid) {
-				gchar *tuid = g_strdup (uid);
-				g_ptr_array_add (array, tuid);
-			}
+			uid = tny_header_dup_uid (header);
+			if (uid)
+				g_ptr_array_add (array, uid);
 			g_object_unref (header);
 			tny_iterator_next (iter);
 		}

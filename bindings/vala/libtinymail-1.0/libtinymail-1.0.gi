@@ -2153,13 +2153,13 @@
 			<requires>
 				<interface name="GObject"/>
 			</requires>
-			<method name="get_bcc" symbol="tny_header_get_bcc">
+			<method name="dup_bcc" symbol="tny_header_dup_bcc">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</method>
-			<method name="get_cc" symbol="tny_header_get_cc">
+			<method name="dup_cc" symbol="tny_header_dup_cc">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
@@ -2189,13 +2189,13 @@
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</method>
-			<method name="get_from" symbol="tny_header_get_from">
+			<method name="dup_from" symbol="tny_header_dup_from">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</method>
-			<method name="get_message_id" symbol="tny_header_get_message_id">
+			<method name="dup_message_id" symbol="tny_header_dup_message_id">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
@@ -2213,25 +2213,25 @@
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</method>
-			<method name="get_replyto" symbol="tny_header_get_replyto">
+			<method name="dup_replyto" symbol="tny_header_dup_replyto">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</method>
-			<method name="get_subject" symbol="tny_header_get_subject">
+			<method name="dup_subject" symbol="tny_header_dup_subject">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</method>
-			<method name="get_to" symbol="tny_header_get_to">
+			<method name="dup_to" symbol="tny_header_dup_to">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</method>
-			<method name="get_uid" symbol="tny_header_get_uid">
+			<method name="dup_uid" symbol="tny_header_dup_uid">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
@@ -2300,13 +2300,13 @@
 					<parameter name="mask" type="TnyHeaderFlags"/>
 				</parameters>
 			</method>
-			<vfunc name="get_bcc_func">
+			<vfunc name="dup_bcc_func">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_cc_func">
+			<vfunc name="dup_cc_func">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
@@ -2336,13 +2336,13 @@
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_from_func">
+			<vfunc name="dup_from_func">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_message_id_func">
+			<vfunc name="dup_message_id_func">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
@@ -2354,25 +2354,25 @@
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_replyto_func">
+			<vfunc name="dup_replyto_func">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_subject_func">
+			<vfunc name="dup_subject_func">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_to_func">
+			<vfunc name="dup_to_func">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_uid_func">
+			<vfunc name="dup_uid_func">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyHeader*"/>

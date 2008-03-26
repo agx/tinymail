@@ -1,3 +1,16 @@
+2008-03-26  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Replace old tny_header_get_ api for strings with
+	tny_header_dup_ api. This should be a bit better for
+	being thread safe. Also modified code using this. The
+	goal is being able to do the string copy in a lock.
+
+	* Now moving a folder copies all the cached messages,
+	but not the summaries, to avoid crashes trying to
+	reuse the old summary.
+
+	This is a major API change.
+
 2008-03-25  Alberto Garcia Gonzalez <agarcia@igalia.com>
 
 	* libtinymail-gnomevfs/tny-vfs-stream.c:

@@ -88,8 +88,8 @@ decode_it (CamelMimeMessage *msg, const char *str, gboolean is_addr)
 	return camel_header_decode_string (str, charset);
 }
 
-static const gchar*
-tny_camel_msg_header_get_replyto (TnyHeader *self)
+static gchar*
+tny_camel_msg_header_dup_replyto (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 	const gchar *enc;
@@ -99,7 +99,7 @@ tny_camel_msg_header_get_replyto (TnyHeader *self)
 		me->reply_to = decode_it (me->msg, enc, TRUE);
 	}
 
-	return (const gchar *) me->reply_to;
+	return g_strdup ((const gchar *) me->reply_to);
 }
 
 
@@ -204,8 +204,8 @@ tny_camel_msg_header_set_replyto (TnyHeader *self, const gchar *replyto)
 }
 
 
-static const gchar*
-tny_camel_msg_header_get_cc (TnyHeader *self)
+static gchar*
+tny_camel_msg_header_dup_cc (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 	const gchar *enc;
@@ -215,11 +215,11 @@ tny_camel_msg_header_get_cc (TnyHeader *self)
 		me->cc = decode_it (me->msg, enc, TRUE);
 	}
 
-	return (const gchar *) me->cc;
+	return g_strdup ((const gchar *) me->cc);
 }
 
-static const gchar*
-tny_camel_msg_header_get_bcc (TnyHeader *self)
+static gchar*
+tny_camel_msg_header_dup_bcc (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 	const gchar *enc;
@@ -229,7 +229,7 @@ tny_camel_msg_header_get_bcc (TnyHeader *self)
 		me->bcc = decode_it (me->msg, enc, TRUE);
 	}
 
-	return (const gchar *) me->bcc;
+	return g_strdup ((const gchar *) me->bcc);
 }
 
 static TnyHeaderFlags
@@ -386,8 +386,8 @@ tny_camel_msg_header_get_date_sent (TnyHeader *self)
 		return retval;
 }
 
-static const gchar*
-tny_camel_msg_header_get_from (TnyHeader *self)
+static gchar*
+tny_camel_msg_header_dup_from (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 	const gchar *enc;
@@ -397,11 +397,11 @@ tny_camel_msg_header_get_from (TnyHeader *self)
 		me->from = decode_it (me->msg, enc, TRUE);
 	}
 
-	return (const gchar *) me->from;
+	return g_strdup ((const gchar *) me->from);
 }
 
-static const gchar*
-tny_camel_msg_header_get_subject (TnyHeader *self)
+static gchar*
+tny_camel_msg_header_dup_subject (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 	const gchar *enc;
@@ -411,12 +411,12 @@ tny_camel_msg_header_get_subject (TnyHeader *self)
 		me->subject = decode_it (me->msg, enc, FALSE);
 	}
 
-	return (const gchar *) me->subject;
+	return g_strdup ((const gchar *) me->subject);
 }
 
 
-static const gchar*
-tny_camel_msg_header_get_to (TnyHeader *self)
+static gchar*
+tny_camel_msg_header_dup_to (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 	const gchar *enc;
@@ -426,17 +426,17 @@ tny_camel_msg_header_get_to (TnyHeader *self)
 		me->to = decode_it (me->msg, enc, TRUE);
 	}
 
-	return (const gchar *) me->to;
+	return g_strdup ((const gchar *) me->to);
 
 }
 
-static const gchar*
-tny_camel_msg_header_get_message_id (TnyHeader *self)
+static gchar*
+tny_camel_msg_header_dup_message_id (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
-	const gchar *retval = NULL;
+	gchar *retval = NULL;
 
-	retval = camel_mime_message_get_message_id (me->msg);
+	retval = g_strdup (camel_mime_message_get_message_id (me->msg));
 
 	return retval;
 }
@@ -458,19 +458,19 @@ tny_camel_msg_header_get_message_size (TnyHeader *self)
 	return retval;
 }
 
-static const gchar*
-tny_camel_msg_header_get_uid (TnyHeader *self)
+static gchar*
+tny_camel_msg_header_dup_uid (TnyHeader *self)
 {
 	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
 
 	if (!me->old_uid)
 	{
-		g_warning ("tny_header_get_uid: This is a header instance for a new message. "
+		g_warning ("tny_header_dup_uid: This is a header instance for a new message. "
 			"The uid of it is therefore not available. This indicates a problem "
 			"in the software.");
 	}
 
-	return me->old_uid;
+	return g_strdup (me->old_uid);
 }
 
 static void 
@@ -586,17 +586,17 @@ tny_header_init (gpointer g, gpointer iface_data)
 {
 	TnyHeaderIface *klass = (TnyHeaderIface *)g;
 
-	klass->get_from= tny_camel_msg_header_get_from;
-	klass->get_message_id= tny_camel_msg_header_get_message_id;
+	klass->dup_from= tny_camel_msg_header_dup_from;
+	klass->dup_message_id= tny_camel_msg_header_dup_message_id;
 	klass->get_message_size= tny_camel_msg_header_get_message_size;
-	klass->get_to= tny_camel_msg_header_get_to;
-	klass->get_subject= tny_camel_msg_header_get_subject;
+	klass->dup_to= tny_camel_msg_header_dup_to;
+	klass->dup_subject= tny_camel_msg_header_dup_subject;
 	klass->get_date_received= tny_camel_msg_header_get_date_received;
 	klass->get_date_sent= tny_camel_msg_header_get_date_sent;
-	klass->get_cc= tny_camel_msg_header_get_cc;
-	klass->get_bcc= tny_camel_msg_header_get_bcc;
-	klass->get_replyto= tny_camel_msg_header_get_replyto;
-	klass->get_uid= tny_camel_msg_header_get_uid;
+	klass->dup_cc= tny_camel_msg_header_dup_cc;
+	klass->dup_bcc= tny_camel_msg_header_dup_bcc;
+	klass->dup_replyto= tny_camel_msg_header_dup_replyto;
+	klass->dup_uid= tny_camel_msg_header_dup_uid;
 	klass->get_folder= tny_camel_msg_header_get_folder;
 	klass->set_bcc= tny_camel_msg_header_set_bcc;
 	klass->set_cc= tny_camel_msg_header_set_cc;

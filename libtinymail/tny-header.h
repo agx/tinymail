@@ -77,14 +77,14 @@ struct _TnyHeaderIface
 {
 	GTypeInterface g;
 
-	const gchar* (*get_uid) (TnyHeader *self);
-	const gchar* (*get_bcc) (TnyHeader *self);
-	const gchar* (*get_cc) (TnyHeader *self);
-	const gchar* (*get_subject) (TnyHeader *self);
-	const gchar* (*get_to) (TnyHeader *self);
-	const gchar* (*get_from) (TnyHeader *self);
-	const gchar* (*get_replyto) (TnyHeader *self);
-	const gchar* (*get_message_id) (TnyHeader *self);
+	gchar* (*dup_uid) (TnyHeader *self);
+	gchar* (*dup_bcc) (TnyHeader *self);
+	gchar* (*dup_cc) (TnyHeader *self);
+	gchar* (*dup_subject) (TnyHeader *self);
+	gchar* (*dup_to) (TnyHeader *self);
+	gchar* (*dup_from) (TnyHeader *self);
+	gchar* (*dup_replyto) (TnyHeader *self);
+	gchar* (*dup_message_id) (TnyHeader *self);
 	guint (*get_message_size) (TnyHeader *self);
 	time_t (*get_date_received) (TnyHeader *self);
 	time_t (*get_date_sent) (TnyHeader *self);
@@ -103,17 +103,17 @@ struct _TnyHeaderIface
 GType tny_header_get_type (void);
 GType tny_header_flags_get_type (void);
 
-const gchar* tny_header_get_uid (TnyHeader *self);
-const gchar* tny_header_get_bcc (TnyHeader *self);
-const gchar* tny_header_get_cc (TnyHeader *self);
+gchar* tny_header_dup_uid (TnyHeader *self);
+gchar* tny_header_dup_bcc (TnyHeader *self);
+gchar* tny_header_dup_cc (TnyHeader *self);
 time_t tny_header_get_date_received (TnyHeader *self);
 time_t tny_header_get_date_sent (TnyHeader *self);
-const gchar* tny_header_get_message_id (TnyHeader *self);
+gchar* tny_header_dup_message_id (TnyHeader *self);
 guint tny_header_get_message_size (TnyHeader *self);
-const gchar* tny_header_get_from (TnyHeader *self);
-const gchar* tny_header_get_to (TnyHeader *self);
-const gchar* tny_header_get_subject (TnyHeader *self);
-const gchar* tny_header_get_replyto (TnyHeader *self);
+gchar* tny_header_dup_from (TnyHeader *self);
+gchar* tny_header_dup_to (TnyHeader *self);
+gchar* tny_header_dup_subject (TnyHeader *self);
+gchar* tny_header_dup_replyto (TnyHeader *self);
 void tny_header_set_bcc (TnyHeader *self, const gchar *bcc);
 void tny_header_set_cc (TnyHeader *self, const gchar *cc);
 void tny_header_set_from (TnyHeader *self, const gchar *from);

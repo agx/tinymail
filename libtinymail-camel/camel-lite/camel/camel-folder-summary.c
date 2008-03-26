@@ -4034,6 +4034,17 @@ camel_message_info_dump (CamelMessageInfo *mi)
 	/*camel_content_info_dump(mi->content, 0);*/
 }
 
+void
+camel_folder_summary_lock ()
+{
+	g_static_rec_mutex_lock (&global_lock);	
+}
+
+void
+camel_folder_summary_unlock ()
+{
+	g_static_rec_mutex_unlock (&global_lock);	
+}
 
 static void
 camel_folder_summary_class_init (CamelFolderSummaryClass *klass)

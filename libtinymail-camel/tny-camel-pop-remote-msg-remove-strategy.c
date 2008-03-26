@@ -78,13 +78,13 @@ tny_camel_pop_remote_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStr
 {
 	TnyCamelFolderPriv *fpriv = NULL;
 	TnyAccount *acc = NULL;
-	const gchar *uid;
+	gchar *uid;
 	CamelFolder *cfolder;
 
 	g_assert (TNY_IS_CAMEL_FOLDER (folder));
 	g_assert (TNY_IS_HEADER (header));
 
-	uid = tny_header_get_uid (header);
+	uid = tny_header_dup_uid (header);
 	fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 	acc = fpriv->account;
 
@@ -92,24 +92,23 @@ tny_camel_pop_remote_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStr
 	{
 		const CamelService *service = _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (acc));
 		CamelPOP3Store *pop3_store = (CamelPOP3Store *) service;
-		gchar *expunged_path = NULL, *id = NULL;
+		gchar *expunged_path = NULL;
 		FILE *file = NULL;
 
-		id = g_strdup (uid);
 		/* camel-pop3-folder.c:455 + 490 is also interesting code! */
-		expunged_path = g_strdup_printf ("%s/%s.expunged", pop3_store->storage_path, id);
+		expunged_path = g_strdup_printf ("%s/%s.expunged", pop3_store->storage_path, uid);
 		cfolder = _tny_camel_folder_get_folder (TNY_CAMEL_FOLDER (folder));
-		camel_folder_delete_message (cfolder, id);
-		g_free (id);
+		camel_folder_delete_message (cfolder, uid);
 		camel_object_unref (CAMEL_OBJECT (cfolder));
 		file = fopen (expunged_path, "w");
 		g_free (expunged_path);
 		if (file != NULL)
 		{
-			fprintf (file, "%s", id);
+			fprintf (file, "%s", uid);
 			fclose (file);
 		}
 	}
+	g_free (uid);
 
 	return;
 }

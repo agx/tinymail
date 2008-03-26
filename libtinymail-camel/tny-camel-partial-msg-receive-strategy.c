@@ -75,7 +75,7 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 	if (!priv->strict_retrieval)
 		mtype = CAMEL_FOLDER_RECEIVE_ANY_OR_PARTIAL;
 
-	id = g_strdup (tny_header_get_uid (TNY_HEADER (header)));
+	id = tny_header_dup_uid (TNY_HEADER (header));
 
 	message = NULL;
 	camel_message = camel_folder_get_message (priv->folder, (const char *) id, mtype, -1, &ex);
@@ -97,7 +97,7 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 			_tny_camel_msg_set_received (TNY_CAMEL_MSG (message), 
 				tny_header_get_date_received (header));
 			_tny_camel_msg_set_folder (TNY_CAMEL_MSG (message), folder);
-			TNY_CAMEL_MSG_HEADER (nheader)->old_uid = g_strdup (tny_header_get_uid (header));
+			TNY_CAMEL_MSG_HEADER (nheader)->old_uid = tny_header_dup_uid (header);
 			_tny_camel_msg_set_header (TNY_CAMEL_MSG (message), nheader);
 			_tny_camel_mime_part_set_part (TNY_CAMEL_MIME_PART (message), 
 						CAMEL_MIME_PART (camel_message)); 

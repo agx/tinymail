@@ -3032,6 +3032,41 @@ make_path (char *path, int nmode, int parent_mode)
   return 0;
 }
 
+static void
+move_cache (const gchar *oldpath, const gchar *newpath)
+{
+	GDir *dir;
+
+	dir = g_dir_open (oldpath, 0, NULL);
+	if (dir) {
+		const gchar *file;
+		gchar *new_summary;
+
+		g_mkdir (newpath, S_IRWXU);
+
+		while (file = g_dir_read_name (dir)) {
+			gchar *old_fullname;
+			gchar *new_fullname;
+			old_fullname = g_strdup_printf ("%s/%s", oldpath, file);
+			new_fullname = g_strdup_printf ("%s/%s", newpath, file);
+			if (g_file_test (old_fullname, G_FILE_TEST_IS_DIR)) {
+				move_cache (old_fullname, new_fullname);
+			} else if (g_file_test (old_fullname, G_FILE_TEST_EXISTS)) {
+				/* we don't move the summary */
+				if (strcmp (old_fullname, "summary.mmap")!=0)
+					g_rename (old_fullname, new_fullname);
+			}
+
+			g_free (old_fullname);
+			g_free (new_fullname);
+		}
+		g_dir_close (dir);
+		new_summary = g_strdup_printf ("%s/summary.mmap", newpath);
+		if (g_file_test (new_summary, G_FILE_TEST_EXISTS)) {
+			g_unlink (new_summary);
+		}
+	}
+}
 
 static void
 rename_folder (CamelStore *store, const char *old_name, const char *new_name_in, CamelException *ex)
@@ -3123,10 +3158,7 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 	}
 	g_free (tpath);
 
-	if (g_rename (oldpath, newpath) == -1) {
-		g_warning ("Could not rename message cache '%s' to '%s': %s: cache reset",
-			   oldpath, newpath, strerror (errno));
-	}
+ 	move_cache (oldpath, newpath);
 
 	g_free (oldpath);
 	g_free (newpath);

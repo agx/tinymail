@@ -427,13 +427,17 @@ thread_main (gpointer data)
 			{
 				TnyHeader *curhdr = TNY_HEADER (tny_iterator_get_current (giter));
 				TnyHeaderFlags flags = tny_header_get_flags (curhdr);
+				gchar *uid;
+
+				uid = tny_header_dup_uid (curhdr);
 
 				if ((flags & TNY_HEADER_FLAG_SUSPENDED) ||
 				    (flags & TNY_HEADER_FLAG_ANSWERED) ||
 				    (g_hash_table_lookup_extended (failed_headers, 
-								   tny_header_get_uid (curhdr),
+								   uid,
 								   NULL, NULL)))
 					to_remove = g_list_prepend (to_remove, curhdr);
+				g_free (uid);
 
 				g_object_unref (curhdr);
 				tny_iterator_next (giter);
@@ -495,12 +499,12 @@ thread_main (gpointer data)
 				if (err != NULL) {
 					emit_error (self, header, msg, err, i, priv->total);
 					g_hash_table_insert (failed_headers, 
-							     g_strdup (tny_header_get_uid (header)), NULL);
+							     tny_header_dup_uid (header), NULL);
 				}
 			} else {
 				emit_error (self, header, msg, err, i, priv->total);
 				g_hash_table_insert (failed_headers, 
-						     g_strdup (tny_header_get_uid (header)), NULL);
+						     tny_header_dup_uid (header), NULL);
 			}
 
 			g_static_rec_mutex_lock (priv->todo_lock);

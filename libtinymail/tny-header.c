@@ -63,24 +63,24 @@ tny_header_set_replyto (TnyHeader *self, const gchar *to)
 }
 
 /**
- * tny_header_get_replyto:
+ * tny_header_dup_replyto:
  * @self: a #TnyHeader
  * 
  * Get the reply-to header
  * 
- * returns: (null-ok): reply-to header or NULL
+ * returns: (null-ok) (caller-owns): reply-to header or NULL
  * since: 1.0
  * audience: application-developer
  **/
-const gchar*
-tny_header_get_replyto (TnyHeader *self)
+gchar*
+tny_header_dup_replyto (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_replyto!= NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->dup_replyto!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_replyto(self);
+	return TNY_HEADER_GET_IFACE (self)->dup_replyto(self);
 }
 
 /**
@@ -221,45 +221,45 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
 }
 
 /**
- * tny_header_get_cc:
+ * tny_header_dup_cc:
  * @self: a #TnyHeader
  * 
  * Get the CC header. The returned value should not be freed.
  * 
- * returns: (null-ok): CC header as a read-only string or NULL
+ * returns: (null-ok) (caller-owns): CC header as a alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
-const gchar*
-tny_header_get_cc (TnyHeader *self)
+gchar*
+tny_header_dup_cc (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_cc!= NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->dup_cc!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_cc(self);
+	return TNY_HEADER_GET_IFACE (self)->dup_cc(self);
 }
 
 /**
- * tny_header_get_bcc:
+ * tny_header_dup_bcc:
  * @self: a #TnyHeader
  * 
  * Get the BCC header. The returned value should not be freed.
  * 
- * returns: (null-ok): BCC header as a read-only string or NULL
+ * returns: (null-ok) (caller-owns): BCC header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
-const gchar*
-tny_header_get_bcc (TnyHeader *self)
+gchar*
+tny_header_dup_bcc (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_bcc!= NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->dup_bcc!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_bcc(self);
+	return TNY_HEADER_GET_IFACE (self)->dup_bcc(self);
 }
 
 /**
@@ -306,49 +306,49 @@ tny_header_get_date_sent (TnyHeader *self)
 
 
 /**
- * tny_header_get_uid:
+ * tny_header_dup_uid:
  * @self: a #TnyHeader
  * 
- * Get an unique id of the message of which @self is a message header. The 
- * returned value should not be freed. The UID corresponds to the UID in
+ * Get an unique id of the message of which @self is a message header. The UID
+ * corresponds to the UID in
  * IMAP and the UIDL in POP if UIDL is supported or the UID if not.
  * 
- * returns: (null-ok): unique follow-up uid as a read-only string or NULL
+ * returns: (null-ok) (caller-owns): unique follow-up uid as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
-const gchar*
-tny_header_get_uid (TnyHeader *self)
+gchar*
+tny_header_dup_uid (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_uid!= NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->dup_uid!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_uid(self);
+	return TNY_HEADER_GET_IFACE (self)->dup_uid(self);
 }
 
 /**
- * tny_header_get_message_id:
+ * tny_header_dup_message_id:
  * @self: a #TnyHeader
  * 
  * Get an unique id of the message of which self is a message header. The 
- * returned value should not be freed. The message-id corresponds to the
+ * returned value should be freed. The message-id corresponds to the
  * message-id header in the MIME message.
  * 
- * returns: (null-ok): message-id header as a read-only string or NULL
+ * returns: (null-ok) (caller-owns): message-id header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
-const gchar*
-tny_header_get_message_id (TnyHeader *self)
+gchar*
+tny_header_dup_message_id (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_message_id!= NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->dup_message_id!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_message_id(self);
+	return TNY_HEADER_GET_IFACE (self)->dup_message_id(self);
 }
 
 
@@ -377,67 +377,67 @@ tny_header_get_message_size (TnyHeader *self)
 
 
 /**
- * tny_header_get_from:
+ * tny_header_dup_from:
  * @self: a #TnyHeader
  * 
- * Get the from header. The returned value should not be freed.
+ * Get the from header. The returned value should be freed.
  * 
- * returns: (null-ok): from header as a read-only string or NULL
+ * returns: (null-ok) (caller-owns): from header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
-const gchar* 
-tny_header_get_from (TnyHeader *self)
+gchar* 
+tny_header_dup_from (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_from!= NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->dup_from!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_from(self);
+	return TNY_HEADER_GET_IFACE (self)->dup_from(self);
 }
 
 /**
- * tny_header_get_subject:
+ * tny_header_dup_subject:
  * @self: a #TnyHeader
  * 
- * Get the subject header. The returned value should not be freed.
+ * Get the subject header. The returned value should be freed.
  * 
- * returns: (null-ok): subject header as a read-only string or NULL
+ * returns: (null-ok) (caller-owns): subject header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
-const gchar*
-tny_header_get_subject (TnyHeader *self)
+gchar*
+tny_header_dup_subject (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_subject!= NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->dup_subject!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_subject(self);
+	return TNY_HEADER_GET_IFACE (self)->dup_subject(self);
 }
 
 
 /**
- * tny_header_get_to:
+ * tny_header_dup_to:
  * @self: a #TnyHeader
  * 
- * Get the to header. The returned value should not be freed.
+ * Get the to header. The returned value should be freed.
  * 
- * returns: (null-ok): to header as a read-only string or NULL
+ * returns: (null-ok) (caller-owns): to header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
-const gchar* 
-tny_header_get_to (TnyHeader *self)
+gchar* 
+tny_header_dup_to (TnyHeader *self)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_HEADER (self));
-	g_assert (TNY_HEADER_GET_IFACE (self)->get_to!= NULL);
+	g_assert (TNY_HEADER_GET_IFACE (self)->dup_to!= NULL);
 #endif
 
-	return TNY_HEADER_GET_IFACE (self)->get_to(self);
+	return TNY_HEADER_GET_IFACE (self)->dup_to(self);
 }
 
 /**

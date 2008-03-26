@@ -111,7 +111,7 @@ tny_camel_bs_msg_get_url_string_default (TnyMsg *self)
 
 	if (priv->folder) {
 		TnyHeader *header = tny_msg_get_header (self);
-		const gchar *uid = tny_header_get_uid (header);
+		gchar *uid = tny_header_dup_uid (header);
 
 		if (uid) {
 			TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->folder);
@@ -128,6 +128,7 @@ tny_camel_bs_msg_get_url_string_default (TnyMsg *self)
 					g_free (urls);
 				}
 			}
+			g_free (uid);
 		}
 
 		g_object_unref (header);

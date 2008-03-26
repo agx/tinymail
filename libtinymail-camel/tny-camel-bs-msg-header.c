@@ -36,11 +36,11 @@
 static GObjectClass *parent_class = NULL;
 
 
-static const gchar*
-tny_camel_bs_msg_header_get_replyto (TnyHeader *self)
+static gchar*
+tny_camel_bs_msg_header_dup_replyto (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return me->envelope->reply_to;
+	return g_strdup (me->envelope->reply_to);
 }
 
 
@@ -88,18 +88,18 @@ tny_camel_bs_msg_header_set_replyto (TnyHeader *self, const gchar *replyto)
 }
 
 
-static const gchar*
-tny_camel_bs_msg_header_get_cc (TnyHeader *self)
+static gchar*
+tny_camel_bs_msg_header_dup_cc (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return me->envelope->cc;
+	return g_strdup (me->envelope->cc);
 }
 
-static const gchar*
-tny_camel_bs_msg_header_get_bcc (TnyHeader *self)
+static gchar*
+tny_camel_bs_msg_header_dup_bcc (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return me->envelope->bcc;
+	return g_strdup (me->envelope->bcc);
 }
 
 static TnyHeaderFlags
@@ -136,33 +136,33 @@ tny_camel_bs_msg_header_get_date_sent (TnyHeader *self)
 	return camel_header_decode_date (me->envelope->date, NULL);
 }
 
-static const gchar*
-tny_camel_bs_msg_header_get_from (TnyHeader *self)
+static gchar*
+tny_camel_bs_msg_header_dup_from (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return me->envelope->from;
+	return g_strdup (me->envelope->from);
 }
 
-static const gchar*
-tny_camel_bs_msg_header_get_subject (TnyHeader *self)
+static gchar*
+tny_camel_bs_msg_header_dup_subject (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return me->envelope->subject;
+	return g_strdup (me->envelope->subject);
 }
 
 
-static const gchar*
-tny_camel_bs_msg_header_get_to (TnyHeader *self)
+static gchar*
+tny_camel_bs_msg_header_dup_to (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return me->envelope->to;
+	return g_strdup (me->envelope->to);
 }
 
-static const gchar*
-tny_camel_bs_msg_header_get_message_id (TnyHeader *self)
+static gchar*
+tny_camel_bs_msg_header_dup_message_id (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return me->envelope->message_id;
+	return g_strdup (me->envelope->message_id);
 }
 
 
@@ -174,10 +174,10 @@ tny_camel_bs_msg_header_get_message_size (TnyHeader *self)
 	return me->msg_size;
 }
 
-static const gchar*
-tny_camel_bs_msg_header_get_uid (TnyHeader *self)
+static gchar*
+tny_camel_bs_msg_header_dup_uid (TnyHeader *self)
 {
-	g_warning ("tny_header_get_uid: This is a header instance for a RFC822 message. "
+	g_warning ("tny_header_dup_uid: This is a header instance for a RFC822 message. "
 		"The uid of it is therefore not available. This indicates a problem "
 		"in the software.");
 
@@ -214,17 +214,17 @@ tny_header_init (gpointer g, gpointer iface_data)
 {
 	TnyHeaderIface *klass = (TnyHeaderIface *)g;
 
-	klass->get_from= tny_camel_bs_msg_header_get_from;
-	klass->get_message_id= tny_camel_bs_msg_header_get_message_id;
+	klass->dup_from= tny_camel_bs_msg_header_dup_from;
+	klass->dup_message_id= tny_camel_bs_msg_header_dup_message_id;
 	klass->get_message_size= tny_camel_bs_msg_header_get_message_size;
-	klass->get_to= tny_camel_bs_msg_header_get_to;
-	klass->get_subject= tny_camel_bs_msg_header_get_subject;
+	klass->dup_to= tny_camel_bs_msg_header_dup_to;
+	klass->dup_subject= tny_camel_bs_msg_header_dup_subject;
 	klass->get_date_received= tny_camel_bs_msg_header_get_date_received;
 	klass->get_date_sent= tny_camel_bs_msg_header_get_date_sent;
-	klass->get_cc= tny_camel_bs_msg_header_get_cc;
-	klass->get_bcc= tny_camel_bs_msg_header_get_bcc;
-	klass->get_replyto= tny_camel_bs_msg_header_get_replyto;
-	klass->get_uid= tny_camel_bs_msg_header_get_uid;
+	klass->dup_cc= tny_camel_bs_msg_header_dup_cc;
+	klass->dup_bcc= tny_camel_bs_msg_header_dup_bcc;
+	klass->dup_replyto= tny_camel_bs_msg_header_dup_replyto;
+	klass->dup_uid= tny_camel_bs_msg_header_dup_uid;
 	klass->get_folder= tny_camel_bs_msg_header_get_folder;
 	klass->set_bcc= tny_camel_bs_msg_header_set_bcc;
 	klass->set_cc= tny_camel_bs_msg_header_set_cc;

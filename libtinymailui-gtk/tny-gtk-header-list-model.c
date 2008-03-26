@@ -260,11 +260,14 @@ tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, GtkTreeI
 	 * the GPtrArray. This must be quite efficient, as this is called lots
 	 * of times while you are sorting things. */
 
+	g_static_rec_mutex_lock (priv->iterator_lock);
+
 	hdr_a = priv->items->pdata[(gint)a->user_data];
 	hdr_b = priv->items->pdata[(gint)b->user_data];
 
 	recv_a = tny_header_get_date_received (hdr_a);
 	recv_b = tny_header_get_date_received (hdr_b);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return (recv_a - recv_b);
 }
@@ -294,11 +297,15 @@ tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter 
 	 * the GPtrArray. This must be quite efficient, as this is called lots
 	 * of times while you are sorting things. */
 
+	g_static_rec_mutex_lock (priv->iterator_lock);
+
 	hdr_a = priv->items->pdata[(gint)a->user_data];
 	hdr_b = priv->items->pdata[(gint)b->user_data];
 
 	recv_a = tny_header_get_date_sent (hdr_a);
 	recv_b = tny_header_get_date_sent (hdr_b);
+
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	return (recv_a - recv_b);
 }
@@ -345,7 +352,7 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 {
 	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 
-	const gchar *str;
+	gchar *str;
 	gchar *rdate = NULL;
 	gint i;
 
@@ -392,9 +399,9 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 	{
 		case TNY_GTK_HEADER_LIST_MODEL_CC_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_cc ((TnyHeader*) priv->items->pdata[i]);
+			str = tny_header_dup_cc ((TnyHeader*) priv->items->pdata[i]);
 			if (str)
-				g_value_set_string (value, str);
+				g_value_take_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_DATE_SENT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
@@ -433,21 +440,21 @@ tny_gtk_header_list_model_get_value (GtkTreeModel *self, GtkTreeIter *iter, gint
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_to ((TnyHeader*) priv->items->pdata[i]);
+			str = tny_header_dup_to ((TnyHeader*) priv->items->pdata[i]);
 			if (str)
-				g_value_set_string (value, str);
+				g_value_take_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_subject ((TnyHeader*) priv->items->pdata[i]);
+			str = tny_header_dup_subject ((TnyHeader*) priv->items->pdata[i]);
 			if (str)
-				g_value_set_string (value, str);
+				g_value_take_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN:
 			g_value_init (value, G_TYPE_STRING);
-			str = tny_header_get_from ((TnyHeader*) priv->items->pdata[i]);
+			str = tny_header_dup_from ((TnyHeader*) priv->items->pdata[i]);
 			if (str)
-				g_value_set_string (value, str);
+				g_value_take_string (value, str);
 			break;
 		case TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN:
 			g_value_init (value, G_TYPE_INT);
@@ -659,10 +666,13 @@ notify_views_add (gpointer data)
 	GtkTreePath *path;
 	GtkTreeIter iter;
 
+	g_static_rec_mutex_lock (priv->iterator_lock);
+
 	g_mutex_lock (priv->ra_lock);
 	priv->updating_views++;
 	if (priv->registered >= priv->items->len) {
 		g_mutex_unlock (priv->ra_lock);
+		g_static_rec_mutex_unlock (priv->iterator_lock);
 		return FALSE;
 	}
 
@@ -681,6 +691,7 @@ notify_views_add (gpointer data)
 		needmore = TRUE;
 
 	g_mutex_unlock (priv->ra_lock);
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 	gdk_threads_enter();
 
@@ -702,12 +713,15 @@ notify_views_add (gpointer data)
 static gboolean 
 uid_matcher (TnyList *list, GObject *item, gpointer match_data)
 {
-	const char *uid = tny_header_get_uid ((TnyHeader *) item);
+	gboolean result = FALSE;
+	char *uid = tny_header_dup_uid ((TnyHeader *) item);
 
 	if (uid && !strcmp (uid, (const char*) match_data))
- 		return TRUE;
+ 		result = TRUE;
 
-	return FALSE;
+	g_free (uid);
+
+	return result;
 }
 
 
@@ -722,9 +736,11 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 	g_static_rec_mutex_lock (priv->iterator_lock);
 
 	if (priv->no_duplicates) {
-		const gchar *uid = tny_header_get_uid ((TnyHeader *) item);
-		if (uid)
+		gchar *uid = tny_header_dup_uid ((TnyHeader *) item);
+		if (uid) {
 			tny_list_remove_matches (self, uid_matcher, (gpointer) uid); 
+			g_free (uid);
+		}
 	}
 
 	/* Prepend something to the list itself. The get_length will auto update
@@ -964,10 +980,13 @@ tny_gtk_header_list_model_remove_matches (TnyList *self, TnyListMatcher matcher,
 	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
 	int i; GList *items = NULL;
 
+	g_static_rec_mutex_lock (priv->iterator_lock);
+
 	for (i=0; i < priv->items->len; i++) {
 		if (matcher (self, priv->items->pdata[i], match_data))
 			items = g_list_append (items, g_object_ref (priv->items->pdata[i]));
 	}
+	g_static_rec_mutex_unlock (priv->iterator_lock);
 
 
 	if (items) 
@@ -1191,7 +1210,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
  * @self: a #TnyGtkHeaderListModel
  *
  * Gets whether or not @self allows duplicates of #TnyHeader instances to be
- * added. The duplicates will be tested by tny_header_get_uid uniqueness.
+ * added. The duplicates will be tested by tny_header_dup_uid uniqueness.
  * 
  * returns: whether or not to allow duplicates
  * since: 1.0
@@ -1210,7 +1229,7 @@ tny_gtk_header_list_model_get_no_duplicates (TnyGtkHeaderListModel *self)
  * @setting: whether or not to allow duplicates
  *
  * Sets whether or not @self allows duplicates of #TnyHeader instances to be
- * added. The duplicates will be tested by tny_header_get_uid uniqueness.
+ * added. The duplicates will be tested by tny_header_dup_uid uniqueness.
  * Setting this property to TRUE will negatively impact performance of @self.
  * It'll also influence behaviour of tny_list_prepend and tny_list_append.
  *

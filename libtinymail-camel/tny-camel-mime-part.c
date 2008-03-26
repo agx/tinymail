@@ -352,22 +352,35 @@ recreate_part (TnyMimePart *orig)
 	if (TNY_IS_MSG (orig)) {
 		TnyHeader *hdr = NULL;
 		TnyHeader *dest_header;
+		gchar *str;
 
 		hdr = tny_msg_get_header (TNY_MSG (orig));
 		retval = TNY_MIME_PART (tny_camel_msg_new ());
  		dest_header = tny_msg_get_header (TNY_MSG (retval));
-		if (tny_header_get_bcc (hdr))
-			tny_header_set_bcc (dest_header, tny_header_get_bcc (hdr));
-		if (tny_header_get_cc (hdr))
-			tny_header_set_cc (dest_header, tny_header_get_cc (hdr));
-		if (tny_header_get_from (hdr))
-			tny_header_set_from (dest_header, tny_header_get_from (hdr));
-		if (tny_header_get_replyto (hdr))
-			tny_header_set_replyto (dest_header, tny_header_get_replyto (hdr));
-		if (tny_header_get_subject (hdr))
-			tny_header_set_subject (dest_header, tny_header_get_subject (hdr));
-		if (tny_header_get_to (hdr))
-			tny_header_set_to (dest_header, tny_header_get_to (hdr));
+		if (str = tny_header_dup_bcc (hdr)) {
+			tny_header_set_bcc (dest_header, str);
+			g_free (str);
+		}
+		if (str = tny_header_dup_cc (hdr)) {
+			tny_header_set_cc (dest_header, str);
+			g_free (str);
+		}
+		if (str = tny_header_dup_from (hdr)) {
+			tny_header_set_from (dest_header, str);
+			g_free (str);
+		}
+		if (str = tny_header_dup_replyto (hdr)) {
+			tny_header_set_replyto (dest_header, str);
+			g_free (str);
+		}
+		if (str = tny_header_dup_subject (hdr)) {
+			tny_header_set_subject (dest_header, str);
+			g_free (str);
+		}
+		if (str = tny_header_dup_to (hdr)) {
+			tny_header_set_to (dest_header, str);
+			g_free (str);
+		}
 		/* tny_header_set_priority (dest_header, tny_header_get_priority (hdr)); */
 		g_object_unref (hdr);
 		g_object_unref (dest_header);
@@ -695,7 +708,7 @@ camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 
 	if (dw->mime_type && (charset = camel_content_type_param 
 			(dw->mime_type, "charset")) && 
-		g_ascii_strncasecmp(charset, "iso-8859-", 9) == 0) 
+		g_ascii_strncasecmp(charset, "iso-8859+-", 9) == 0) 
 	{
 		CamelStream *null;
 

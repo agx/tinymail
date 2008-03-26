@@ -119,7 +119,7 @@ tny_camel_bs_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrategy
 	GError *parse_err = NULL;
 	CamelFolder *cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (folder));
 
-	uid = g_strdup (tny_header_get_uid (TNY_HEADER (header)));
+	uid = tny_header_dup_uid (TNY_HEADER (header));
 	structure_str = camel_folder_fetch_structure (cfolder, (const char *) uid, &ex);
 
 	if (camel_exception_is_set (&ex)) {
