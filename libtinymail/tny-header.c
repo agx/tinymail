@@ -224,7 +224,7 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
  * tny_header_dup_cc:
  * @self: a #TnyHeader
  * 
- * Get the CC header. The returned value should not be freed.
+ * Get the CC header. If not NULL, the returned value must be freed.
  * 
  * returns: (null-ok) (caller-owns): CC header as a alloc'd string or NULL
  * since: 1.0
@@ -245,7 +245,7 @@ tny_header_dup_cc (TnyHeader *self)
  * tny_header_dup_bcc:
  * @self: a #TnyHeader
  * 
- * Get the BCC header. The returned value should not be freed.
+ * Get the BCC header. If not NULL, the returned value must be freed.
  * 
  * returns: (null-ok) (caller-owns): BCC header as an alloc'd string or NULL
  * since: 1.0
@@ -310,8 +310,8 @@ tny_header_get_date_sent (TnyHeader *self)
  * @self: a #TnyHeader
  * 
  * Get an unique id of the message of which @self is a message header. The UID
- * corresponds to the UID in
- * IMAP and the UIDL in POP if UIDL is supported or the UID if not.
+ * corresponds to the UID in IMAP and the UIDL in POP if UIDL is supported or 
+ * the UID if not. If not NULL, the returned value must be freed.
  * 
  * returns: (null-ok) (caller-owns): unique follow-up uid as an alloc'd string or NULL
  * since: 1.0
@@ -333,8 +333,8 @@ tny_header_dup_uid (TnyHeader *self)
  * @self: a #TnyHeader
  * 
  * Get an unique id of the message of which self is a message header. The 
- * returned value should be freed. The message-id corresponds to the
- * message-id header in the MIME message.
+ * message-id corresponds to the message-id header in the MIME message.
+ * If not NULL, the returned value must be freed.
  * 
  * returns: (null-ok) (caller-owns): message-id header as an alloc'd string or NULL
  * since: 1.0
@@ -380,7 +380,7 @@ tny_header_get_message_size (TnyHeader *self)
  * tny_header_dup_from:
  * @self: a #TnyHeader
  * 
- * Get the from header. The returned value should be freed.
+ * Get the from header. If not NULL, the returned value must be freed.
  * 
  * returns: (null-ok) (caller-owns): from header as an alloc'd string or NULL
  * since: 1.0
@@ -401,7 +401,7 @@ tny_header_dup_from (TnyHeader *self)
  * tny_header_dup_subject:
  * @self: a #TnyHeader
  * 
- * Get the subject header. The returned value should be freed.
+ * Get the subject header. If not NULL, the returned value must be freed.
  * 
  * returns: (null-ok) (caller-owns): subject header as an alloc'd string or NULL
  * since: 1.0
@@ -423,7 +423,7 @@ tny_header_dup_subject (TnyHeader *self)
  * tny_header_dup_to:
  * @self: a #TnyHeader
  * 
- * Get the to header. The returned value should be freed.
+ * Get the to header. If not NULL, the returned value must be freed.
  * 
  * returns: (null-ok) (caller-owns): to header as an alloc'd string or NULL
  * since: 1.0
