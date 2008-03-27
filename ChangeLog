@@ -1,3 +1,7 @@
+2008-03-27  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Support for Importance header
+
 2008-03-26  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed several problems like documentation problems in Jose's patch

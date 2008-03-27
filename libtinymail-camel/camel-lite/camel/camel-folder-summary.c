@@ -2225,6 +2225,8 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	prio = camel_header_raw_find(&h, "X-Priority", NULL);
 	if (!prio)
 		prio = camel_header_raw_find(&h, "X-MSMail-Priority", NULL);
+	if (!prio)
+		prio = camel_header_raw_find(&h, "Importance", NULL);
 
 	if (prio)
 	{
