@@ -1192,6 +1192,7 @@ rfail:
 
 		/* Check to see we have safely written flag set */
 		if (fi->err != 0) {
+			CamelException iex = CAMEL_EXCEPTION_INITIALISER;
 			if (fi->err == EINTR)
 				camel_exception_setv (ex, CAMEL_EXCEPTION_USER_CANCEL,
 					"User canceled message retrieval");
@@ -1199,6 +1200,11 @@ rfail:
 				camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
 					"Failure while retrieving message %s from POP server: %s",
 					uid, g_strerror (fi->err));
+
+			camel_data_cache_remove (pop3_store->cache, "cache", fi->uid, &iex);
+			camel_exception_clear (&iex);
+			message = NULL;
+
 			goto done;
 		}
 

@@ -1,3 +1,7 @@
+2008-03-28  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Cleaning up cache when canceling a POP message download
+
 2008-03-27  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Support for Importance header
