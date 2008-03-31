@@ -81,11 +81,25 @@ static int pop3_get_local_size (CamelFolder *folder);
 
 static void pop3_delete_attachments (CamelFolder *folder, const char *uid);
 
+static void
+check_dir (CamelPOP3Store *store, CamelFolder *folder)
+{
+	if (!store && !folder)
+		return;
+
+	if (!store && folder)
+		store = (CamelPOP3Store *) folder->parent_store;
+
+	if (!g_file_test (store->storage_path, G_FILE_TEST_IS_DIR)) 
+		g_mkdir_with_parents (store->storage_path, S_IRUSR | S_IWUSR | S_IXUSR);
+}
 
 static void
 pop3_finalize (CamelObject *object)
 {
 	CamelFolder *folder = (CamelFolder *) object;
+
+	check_dir (NULL, folder);
 
 	camel_folder_summary_save (folder->summary, NULL);
 
@@ -112,8 +126,9 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 	folder = CAMEL_FOLDER (camel_object_new (CAMEL_POP3_FOLDER_TYPE));
 	pop3_folder = CAMEL_POP3_FOLDER (folder);
 
-
 	camel_folder_construct (folder, parent, "inbox", "inbox");
+
+	check_dir (p3store, NULL);
 
 	summary_file = g_strdup_printf ("%s/summary.mmap", p3store->storage_path);
 	folder->summary = camel_folder_summary_new (folder);
@@ -155,6 +170,7 @@ pop3_get_local_size (CamelFolder *folder)
 {
 	CamelPOP3Store *p3store = CAMEL_POP3_STORE (folder->parent_store);
 	int msize = 0;
+	check_dir (p3store, NULL);
 	camel_du (p3store->storage_path , &msize);
 	return msize;
 }
@@ -333,6 +349,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 	/* Update the summary.mmap file */
 
+	check_dir (pop3_store, NULL);
+
 	camel_folder_summary_prepare_hash (folder->summary);
 
 	camel_pop3_logbook_open (pop3_store->book);
@@ -501,6 +519,8 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 
 
 	camel_pop3_logbook_close (pop3_store->book);
+
+	check_dir (pop3_store, NULL);
 	camel_folder_summary_save (folder->summary, ex);
 	camel_folder_summary_kill_hash (folder->summary);
 
@@ -530,6 +550,8 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	pop3_folder = CAMEL_POP3_FOLDER (folder);
 	pop3_store = CAMEL_POP3_STORE (folder->parent_store);
+
+	check_dir (pop3_store, NULL);
 
 	if (!pop3_store->delete_after && !expunge)
 		return;
@@ -940,6 +962,8 @@ pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 		goto do_free_ex;
 
 	pop3_debug ("%s requested\n", uid);
+
+	check_dir (pop3_store, NULL);
 
 	stream = camel_data_cache_get (pop3_store->cache, "cache", uid, NULL);
 	if (stream)
@@ -1466,6 +1490,8 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 		camel_object_unref((CamelObject *)message);
 		message = NULL;
 	}
+
+	check_dir (pop3_store, NULL);
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
 	if (!mi && !camel_pop3_logbook_is_registered (pop3_store->book, uid)) {
