@@ -1058,6 +1058,9 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 
 #ifdef HAVE_SSL
 
+	/* as soon as we send a STARTTLS command, all hope is lost of a clean QUIT if problems arise */
+	clean_quit = FALSE;
+
 	if (!(store->capabilities & IMAP_CAPABILITY_STARTTLS))
 	{
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
@@ -1065,9 +1068,6 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 			service->url->host, _("STARTTLS not supported"));
 		goto exception;
 	}
-
-	/* as soon as we send a STARTTLS command, all hope is lost of a clean QUIT if problems arise */
-	clean_quit = FALSE;
 
 	response = camel_imap_command (store, NULL, ex, "STARTTLS");
 	if (!response)

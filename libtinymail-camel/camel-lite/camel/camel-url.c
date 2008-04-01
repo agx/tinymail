@@ -302,8 +302,8 @@ camel_url_new (const char *url_string, CamelException *ex)
 {
 	CamelURL *url;
 
-	g_return_val_if_fail (url_string != NULL, NULL);
-	g_return_val_if_fail (*url_string != 0, NULL);
+	if (!url_string || !*url_string)
+		return NULL;
 
 	url = camel_url_new_with_base (NULL, url_string);
 
@@ -352,7 +352,7 @@ camel_url_to_string (CamelURL *url, guint32 flags)
 		g_string_append (str, "//");
 		if (url->user) {
 			append_url_encoded (str, url->user, ":;@/");
-			if (url->authmech && *url->authmech) {
+			if (url->authmech && *url->authmech && !(flags & CAMEL_URL_HIDE_AUTH)) {
 				g_string_append (str, ";auth=");
 				append_url_encoded (str, url->authmech, ":@/");
 			}

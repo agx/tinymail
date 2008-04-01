@@ -291,8 +291,8 @@ libcamel_lite_1_2_la_LIBADD =				\
 	$(SSL_LIBS)                                                     \
 	$(top_builddir)/bs/libbodystruct.la 
 
-camel-mime-tables.c: gentables.pl
-	perl gentables.pl > $@
+camel-mime-tables.c: $(srcdir)/gentables.pl
+	perl $(srcdir)/gentables.pl > $@
 
 noinst_HEADERS =				\
 	broken-date-parser.h			\

@@ -2,6 +2,14 @@ Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog
 
+2008-04-01  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Merged with Camel upstream rev. 8605
+	  Note that a few major patches have been excluded from this
+	  merge. Including the patch by Matthew Barnes that replaces
+	  all MD5 related things to the new glib API for this, and
+	  several patches related to custom and junk/non-junk flags
+
 2008-01-27  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Merged with Camel upstream rev. 8428
