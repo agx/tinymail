@@ -817,6 +817,67 @@ done:
 }
 
 
+
+
+static int
+cmd_totop(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
+{
+	CamelPOP3Store *tstore = (CamelPOP3Store *) pe->store;
+	CamelPOP3FolderInfo *fi = data;
+	char buffer[2048];
+	int w = 0, n;
+	int retval = 1;
+
+	/* What if it fails? */
+	/* We write an '*' to the start of the stream to say its not complete yet */
+	/* This should probably be part of the cache code */
+
+	if ((n = camel_stream_write(fi->stream, "*", 1)) == -1)
+		goto done;
+
+	while ((n = camel_stream_read((CamelStream *)stream, buffer, sizeof(buffer))) > 0) {
+		n = camel_stream_write(fi->stream, buffer, n);
+		if (n == -1)
+			break;
+
+		/* heuristics */
+		if (camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
+			fi->has_attachments = TRUE;
+		else if (camel_strstrcase (buffer, "filename=") != NULL &&
+			 strchr (buffer, '.'))
+			fi->has_attachments = TRUE;
+		else if (camel_strstrcase (buffer, "Content-Type: message/rfc822") != NULL)
+			fi->has_attachments = TRUE;
+
+		w += n;
+		if (w > fi->size)
+			w = fi->size;
+/*		if (fi->size != 0)
+			camel_operation_progress(NULL, w , fi->size);*/
+	}
+
+	/* it all worked, output a '#' to say we're a-ok */
+	if (n != -1) {
+		camel_stream_reset(fi->stream);
+		n = camel_stream_write(fi->stream, "#", 1);
+
+		camel_data_cache_set_partial (tstore->cache, "cache", fi->uid, FALSE);
+	}
+done:
+	if (n == -1) {
+		fi->err = errno;
+		retval = 0;
+		g_warning("POP3 retrieval failed: %s", strerror(errno));
+	} else {
+		fi->err = 0;
+	}
+
+	camel_object_unref((CamelObject *)fi->stream);
+	fi->stream = NULL;
+
+	return retval;
+}
+
 static int
 cmd_tocache_partial (CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 {
@@ -1355,7 +1416,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 	/* Sigh, most of the crap in this function is so that the cancel button
 	   returns the proper exception code.  Sigh. */
 
-	camel_operation_start_transient(NULL, "Retrieving summary info for %d", fi->id);
+	/*camel_operation_start_transient(NULL, "Retrieving summary info for %d", fi->id);*/
 
 	/* If we have an oustanding retrieve message running, wait for that to complete
 	   & then retrieve from cache, otherwise, start a new one, and similar */
@@ -1439,7 +1500,7 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 		}
 
 		pcr = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI,
-			cmd_tocache, fi, "TOP %u 0\r\n", fi->id);
+			cmd_totop, fi, "TOP %u 0\r\n", fi->id);
 		while ((i = camel_pop3_engine_iterate(pop3_store->engine, pcr)) > 0)
 			;
 		if (i == -1)
@@ -1506,7 +1567,8 @@ pop3_get_top (CamelFolder *folder, const char *uid, CamelException *ex)
 done:
 	camel_object_unref((CamelObject *)stream);
 fail:
-	camel_operation_end(NULL);
+	
+	/*camel_operation_end(NULL);*/
 
 
 	return message;

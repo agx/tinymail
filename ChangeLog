@@ -3,6 +3,7 @@
 	* Storing certificate fingerprints in cache_dir
 	* Writing a file called url_string in the account's cache dir, to make
 	it more easy for searchers and meta indexers to identify this account
+	* Status reporting fix for POP accounts
 
 2008-03-31  Philip Van Hoof <pvanhoof@gnome.org>
 
