@@ -844,9 +844,9 @@ ssl_auth_cert (void *data, PRFileDesc *sockfd, PRBool checksig, PRBool is_server
 }
 #endif
 
-CamelCert *camel_certdb_nss_cert_get(CamelCertDB *certdb, CERTCertificate *cert);
-CamelCert *camel_certdb_nss_cert_add(CamelCertDB *certdb, CERTCertificate *cert);
-void camel_certdb_nss_cert_set(CamelCertDB *certdb, CamelCert *ccert, CERTCertificate *cert);
+static CamelCert *camel_certdb_nss_cert_get(CamelCertDB *certdb, CERTCertificate *cert, CamelSession *session);
+static CamelCert *camel_certdb_nss_cert_add(CamelCertDB *certdb, CERTCertificate *cert, CamelSession *session);
+static void camel_certdb_nss_cert_set(CamelCertDB *certdb, CamelCert *ccert, CERTCertificate *cert, CamelSession *session);
 
 static char *
 cert_fingerprint(CERTCertificate *cert)
@@ -873,8 +873,8 @@ cert_fingerprint(CERTCertificate *cert)
 }
 
 /* lookup a cert uses fingerprint to index an on-disk file */
-CamelCert *
-camel_certdb_nss_cert_get(CamelCertDB *certdb, CERTCertificate *cert)
+static CamelCert *
+camel_certdb_nss_cert_get(CamelCertDB *certdb, CERTCertificate *cert, CamelSession *session)
 {
 	char *fingerprint;
 	CamelCert *ccert;
@@ -894,7 +894,7 @@ camel_certdb_nss_cert_get(CamelCertDB *certdb, CERTCertificate *cert)
 		GError *error = NULL;
 
 		filename = g_build_filename (
-			g_get_home_dir (), ".camel_certs", fingerprint, NULL);
+			session->storage_path, ".camel_certs", fingerprint, NULL);
 		g_file_get_contents (filename, &contents, &length, &error);
 		if (error != NULL) {
 			g_warning (
@@ -931,8 +931,8 @@ camel_certdb_nss_cert_get(CamelCertDB *certdb, CERTCertificate *cert)
 }
 
 /* add a cert to the certdb */
-CamelCert *
-camel_certdb_nss_cert_add(CamelCertDB *certdb, CERTCertificate *cert)
+static CamelCert *
+camel_certdb_nss_cert_add(CamelCertDB *certdb, CERTCertificate *cert, CamelSession *session)
 {
 	CamelCert *ccert;
 	char *fingerprint;
@@ -948,7 +948,7 @@ camel_certdb_nss_cert_add(CamelCertDB *certdb, CERTCertificate *cert)
 	camel_cert_set_trust(certdb, ccert, CAMEL_CERT_TRUST_UNKNOWN);
 	g_free(fingerprint);
 
-	camel_certdb_nss_cert_set(certdb, ccert, cert);
+	camel_certdb_nss_cert_set(certdb, ccert, cert, session);
 
 	camel_certdb_add(certdb, ccert);
 
@@ -956,8 +956,8 @@ camel_certdb_nss_cert_add(CamelCertDB *certdb, CERTCertificate *cert)
 }
 
 /* set the 'raw' cert (& save it) */
-void
-camel_certdb_nss_cert_set(CamelCertDB *certdb, CamelCert *ccert, CERTCertificate *cert)
+static void
+camel_certdb_nss_cert_set(CamelCertDB *certdb, CamelCert *ccert, CERTCertificate *cert, CamelSession *session)
 {
 	char *dir, *path, *fingerprint;
 	CamelStream *stream;
@@ -971,11 +971,8 @@ camel_certdb_nss_cert_set(CamelCertDB *certdb, CamelCert *ccert, CERTCertificate
 	g_byte_array_set_size (ccert->rawcert, cert->derCert.len);
 	memcpy (ccert->rawcert->data, cert->derCert.data, cert->derCert.len);
 
-#ifndef G_OS_WIN32
-	dir = g_strdup_printf ("%s/.camel_certs", getenv ("HOME"));
-#else
-	dir = g_build_filename (g_get_home_dir (), ".camel_certs", NULL);
-#endif
+	dir = g_build_filename (session->storage_path, ".camel_certs", NULL);
+
 	if (g_stat (dir, &st) == -1 && g_mkdir (dir, 0700) == -1) {
 		g_warning ("Could not create cert directory '%s': %s", dir, strerror (errno));
 		g_free (dir);
@@ -1051,9 +1048,9 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 		return SECFailure;
 
 	certdb = camel_certdb_get_default();
-	ccert = camel_certdb_nss_cert_get(certdb, cert);
+	ccert = camel_certdb_nss_cert_get(certdb, cert, priv->session);
 	if (ccert == NULL) {
-		ccert = camel_certdb_nss_cert_add(certdb, cert);
+		ccert = camel_certdb_nss_cert_add(certdb, cert, priv->session);
 		camel_cert_set_hostname(certdb, ccert, ssl->priv->expected_host);
 	}
 
@@ -1078,7 +1075,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 		accept = camel_session_alert_user_with_id (ssl->priv->session, CAMEL_SESSION_ALERT_WARNING, CAMEL_EXCEPTION_SERVICE_CERTIFICATE, prompt, TRUE, priv->service);
 		g_free(prompt);
 		if (accept) {
-			camel_certdb_nss_cert_set(certdb, ccert, cert);
+			camel_certdb_nss_cert_set(certdb, ccert, cert, ssl->priv->session);
 			camel_cert_set_trust(certdb, ccert, CAMEL_CERT_TRUST_FULLY);
 			camel_certdb_touch(certdb);
 		}
