@@ -491,6 +491,22 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 		} 
 
 		if (new_service && !camel_exception_is_set (apriv->ex)) {
+			char *str = camel_service_get_url (new_service);
+			if (str) {
+				char *urlsfilep = camel_session_get_storage_path ((CamelSession *)apriv->session, new_service, NULL);
+				if (urlsfilep) {
+					
+					char *urlsfile = g_strdup_printf ("%s/url_string", urlsfilep);
+					FILE *f = fopen (urlsfile, "w");
+					if (f) {
+						fputs (str, f);
+						fclose (f);
+					}
+					g_free (urlsfile);
+					g_free (urlsfilep);
+				}
+				g_free (str);
+			}
 			apriv->service = new_service;
 			apriv->service->data = self;
 			apriv->service->connecting = (con_op) connection;
