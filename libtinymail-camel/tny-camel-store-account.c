@@ -497,16 +497,27 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 				if (urlsfilep) {
 					
 					char *urlsfile = g_strdup_printf ("%s/url_string", urlsfilep);
-					FILE *f = fopen (urlsfile, "w");
-					if (f) {
-						fputs (str, f);
-						fclose (f);
+					char *namefile = g_strdup_printf ("%s/name", urlsfilep);
+					FILE *f1 = fopen (urlsfile, "w");
+					FILE *f2 = fopen (namefile, "w");
+					if (f1) {
+						fputs (str, f1);
+						fclose (f1);
 					}
+					if (f2) {
+						if (apriv->name)
+							fputs (apriv->name, f2);
+						else
+							fputs ("No name", f2);
+						fclose (f2);
+					}
+					g_free (namefile);
 					g_free (urlsfile);
 					g_free (urlsfilep);
 				}
 				g_free (str);
 			}
+
 			apriv->service = new_service;
 			apriv->service->data = self;
 			apriv->service->connecting = (con_op) connection;

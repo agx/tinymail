@@ -1,3 +1,8 @@
+2008-04-02  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Added a name file, just like the url_string file, to each account
+	* Moved the sendqueue's outbox and sentbox under a sendqueue subdir
+
 2008-04-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Storing certificate fingerprints in cache_dir

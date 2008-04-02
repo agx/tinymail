@@ -858,7 +858,7 @@ create_maildir (TnySendQueue *self, const gchar *name)
 
 	g_assert (aname);
 
-	full_path = g_strdup_printf ("maildir://%s/%s/maildir", session->storage_path, aname);
+	full_path = g_strdup_printf ("maildir://%s/sendqueue/%s/maildir", session->storage_path, aname);
 
 	mdstore = camel_session_get_store(session, full_path, &ex);
 
