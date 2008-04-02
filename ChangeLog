@@ -1,3 +1,8 @@
+2008-04-02  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Respect better the attachment flag headers also in POP (equivalent
+	to previous change in imap.
+
 2008-04-02  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Added a name file, just like the url_string file, to each account
