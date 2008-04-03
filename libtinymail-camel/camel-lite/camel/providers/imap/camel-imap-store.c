@@ -218,8 +218,8 @@ let_idle_die (CamelImapStore *store, gboolean connect_buz)
 
 	idle_debug ("let_idle_die starts\n");
 
-	g_static_rec_mutex_lock (store->idle_prefix_lock);
 	g_static_rec_mutex_lock (store->idle_lock);
+	g_static_rec_mutex_lock (store->idle_prefix_lock);
 
 	store->idle_kill = TRUE;
 	store->idle_cont = FALSE;
@@ -250,8 +250,8 @@ let_idle_die (CamelImapStore *store, gboolean connect_buz)
 		store->idle_prefix=NULL;
 	}
 
-	g_static_rec_mutex_unlock (store->idle_lock);
 	g_static_rec_mutex_unlock (store->idle_prefix_lock);
+	g_static_rec_mutex_unlock (store->idle_lock);
 
 	idle_debug ("let_idle_die finished\n");
 
@@ -264,8 +264,8 @@ camel_imap_store_stop_idle (CamelImapStore *store)
 	if (store->current_folder && CAMEL_IS_IMAP_FOLDER (store->current_folder))
 		camel_imap_folder_stop_idle (store->current_folder);
 	else {
-		g_static_rec_mutex_lock (store->idle_prefix_lock);
 		g_static_rec_mutex_lock (store->idle_lock);
+		g_static_rec_mutex_lock (store->idle_prefix_lock);
 
 		store->idle_kill = TRUE;
 		store->idle_cont = FALSE;
@@ -295,8 +295,8 @@ camel_imap_store_stop_idle (CamelImapStore *store)
 			store->idle_prefix = NULL;
 		}
 
-		g_static_rec_mutex_unlock (store->idle_lock);
 		g_static_rec_mutex_unlock (store->idle_prefix_lock);
+		g_static_rec_mutex_unlock (store->idle_lock);
 	}
 }
 

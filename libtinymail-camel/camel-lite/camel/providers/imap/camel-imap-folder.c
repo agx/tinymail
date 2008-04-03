@@ -4159,14 +4159,17 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 			IdleResponse *idle_resp = NULL;
 			store->idle_cont = FALSE;
 			idle_resp = g_thread_join (store->idle_thread);
-			g_static_rec_mutex_lock (store->idle_prefix_lock);
+
 			g_static_rec_mutex_lock (store->idle_lock);
+			g_static_rec_mutex_lock (store->idle_prefix_lock);
+
 			store->in_idle = FALSE;
 			store->idle_thread = NULL;
 			if (store->idle_prefix)
 				g_free (store->idle_prefix);
-			g_static_rec_mutex_unlock (store->idle_lock);
+
 			g_static_rec_mutex_unlock (store->idle_prefix_lock);
+			g_static_rec_mutex_unlock (store->idle_lock);
 
 			/* We are doing this here because here we wont hit the
 			 * priv->folder's lock of TnyCamelFolder during its
