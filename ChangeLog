@@ -2,6 +2,7 @@
 
 	* Merged patch for upstream camel-lite bug #257361
 	* Bugfix for ticket #76
+	* Added some robustness code
 
 2008-04-02  Jose Dapena Paz  <jdapena@igalia.com>
 

@@ -3196,10 +3196,16 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 					int flags = CAMEL_STORE_FOLDER_INFO_RECURSIVE|CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL;
 
 					iter = camel_store_get_folder_info (store, to, flags, &ex);
-					if (camel_exception_is_set (&ex))
+					if (camel_exception_is_set (&ex) || !iter)
 					{
-						_tny_camel_exception_to_tny_error (&ex, &terr);
-						camel_exception_clear (&ex);
+						if (!camel_exception_is_set (&ex))
+							g_set_error (&terr, TNY_SERVICE_ERROR, 
+								TNY_SERVICE_ERROR_COPY, 
+								_("Folder not ready for copy"));
+						else {
+							_tny_camel_exception_to_tny_error (&ex, &terr);
+							camel_exception_clear (&ex);
+						}
 						succeeded = FALSE; tried=TRUE;
 					}
 					if (succeeded) {
@@ -4626,6 +4632,12 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 void
 _tny_camel_folder_set_folder_info (TnyFolderStore *self, TnyCamelFolder *folder, CamelFolderInfo *info)
 {
+	if (!info) {
+		g_critical ("Creating invalid folder. This indicates a problem "
+			    "in the software\n");
+		return;
+	}
+
 	_tny_camel_folder_set_id (folder, info->full_name);
 	_tny_camel_folder_set_folder_type (folder, info);
 	_tny_camel_folder_set_unread_count (folder, info->unread);
