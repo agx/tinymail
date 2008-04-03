@@ -605,7 +605,7 @@ _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperatio
 
 	g_static_rec_mutex_lock (priv->cancel_lock);
 
-	while (priv->inuse_spin); 
+	//while (priv->inuse_spin); 
 
 	priv->inuse_spin = TRUE;
 
