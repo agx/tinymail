@@ -2,6 +2,10 @@ Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog
 
+2008-04-03  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Merged patch for upstream bug #257361
+
 2008-04-01  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Merged with Camel upstream rev. 8605
