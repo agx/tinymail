@@ -2102,7 +2102,7 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 
 	imap_debug ("imap_disconnect_offline\n");
 
-	let_idle_die (store, TRUE);
+	/*let_idle_die (store, TRUE);*/
 
 	if (store->istream) {
 		camel_stream_close(store->istream);
