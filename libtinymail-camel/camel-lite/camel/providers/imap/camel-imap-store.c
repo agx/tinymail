@@ -4383,7 +4383,7 @@ camel_imap_store_readline_nl (CamelImapStore *store, char **dest, CamelException
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_LOST_CONNECTION,
 					      _("Server unexpectedly disconnected: %s"),
 					      g_strerror (errno));
-			camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
+			camel_service_disconnect_r (CAMEL_SERVICE (store), FALSE, NULL);
 		}
 
 		g_byte_array_free (ba, TRUE);
