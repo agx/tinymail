@@ -633,7 +633,8 @@ tny_maemo_conic_device_finalize (GObject *obj)
 	g_return_if_fail (obj && G_IS_OBJECT(obj));
 	
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
-	g_signal_handler_disconnect (obj, priv->signal1);
+	if (g_signal_handler_is_connected (priv->cnx, priv->signal1))
+		g_signal_handler_disconnect (priv->cnx, priv->signal1);
 
 	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {
 		tny_maemo_conic_device_disconnect (TNY_MAEMO_CONIC_DEVICE(obj),priv->iap);
