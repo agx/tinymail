@@ -249,7 +249,8 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 		char *name = (char*)tok, *lname = NULL;
 		char *email = stfnd+1, *gtfnd = NULL;
 
-		lname = stfnd-1;
+		if (stfnd != tok)
+			lname = stfnd-1;
 
 		gtfnd = strchr (stfnd, '>');
 	
@@ -265,7 +266,7 @@ _string_to_camel_inet_addr (gchar *tok, CamelInternetAddress *target)
 		if (G_LIKELY (*name == ' '))
 			name++;
 	
-		if (G_LIKELY (*lname == ' '))
+		if (G_LIKELY (lname && *lname == ' '))
 			*lname-- = '\0';
 		remove_quotes (name);
 		camel_internet_address_add (target, name, email);

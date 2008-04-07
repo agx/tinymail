@@ -1,3 +1,9 @@
+2008-04-07  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-common.c
+	(_string_to_camel_inet_addr): fixes an small memory issue when the
+	email address starts with an "<"
+
 2008-04-07  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Refcount problem in async contexts
