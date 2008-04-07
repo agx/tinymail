@@ -1218,6 +1218,8 @@ tny_camel_store_account_create_folder_async_destroyer (gpointer thr_user_data)
 
 	_tny_session_stop_operation (info->session);
 
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -1237,6 +1239,7 @@ tny_camel_store_account_create_folder_async_default (TnyFolderStore *self, const
 	/* Idle info for the callbacks */
 	info = g_slice_new (CreateFolderInfo);
 	info->session = apriv->session;
+	camel_object_ref (info->session);
 	info->self = self;
 	info->name = g_strdup (name);
 	info->callback = callback;
@@ -1463,6 +1466,8 @@ tny_camel_store_account_get_folders_async_destroyer (gpointer thr_user_data)
 	if (info->err)
 		g_error_free (info->err);
 
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -1508,6 +1513,8 @@ tny_camel_store_account_get_folders_async_cancelled_destroyer (gpointer thr_user
 	if (info->err)
 		g_error_free (info->err);
 
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -1541,6 +1548,8 @@ tny_camel_store_account_get_folders_async_default (TnyFolderStore *self, TnyList
 	/* Idle info for the callbacks */
 	info = g_slice_new0 (GetFoldersInfo);
 	info->session = apriv->session;
+	camel_object_ref (info->session);
+
 	info->err = NULL;
 	info->self = self;
 	info->list = list;
@@ -1933,6 +1942,7 @@ tny_camel_store_account_queue_going_online_destroy (gpointer user_data)
 
 	camel_object_unref (info->service);
 	g_object_unref (info->self);
+
 	camel_object_unref (info->session);
 
 	return;
@@ -1963,6 +1973,7 @@ tny_camel_store_account_queue_going_online_cancelled_destroy (gpointer user_data
 	/* thread reference */
 	camel_object_unref (info->service);
 	g_object_unref (info->self);
+
 	camel_object_unref (info->session);
 
 	return;
