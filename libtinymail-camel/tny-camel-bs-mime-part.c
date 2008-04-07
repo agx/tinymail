@@ -679,7 +679,7 @@ tny_camel_bs_mime_part_get_transfer_encoding_default (TnyMimePart *self)
 static void
 tny_camel_bs_mime_part_set_transfer_encoding (TnyMimePart *self, const gchar *transfer_encoding)
 {
-	return TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_transfer_encoding(self, transfer_encoding);
+	TNY_CAMEL_BS_MIME_PART_GET_CLASS (self)->set_transfer_encoding(self, transfer_encoding);
 }
 
 static void

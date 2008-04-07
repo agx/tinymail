@@ -1,3 +1,12 @@
+2008-04-07 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
+	* libtinymail-camel:
+		- fix some compiler warnings (return in void functions)
+		- move declarations to start of block
+		- fix CAMEL_POP3_CAP_LOGIN_DELAY (copy-paste bug where to
+		enum items had same value)
+		- some g_error => g_warning
+		- DELE %u => DELE %s
+
 2008-04-07  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-common.c

@@ -68,7 +68,7 @@ enum {
 	CAMEL_POP3_CAP_TOP  = 1<<3,
 	CAMEL_POP3_CAP_PIPE = 1<<4,
 	CAMEL_POP3_CAP_STLS = 1<<5,
-	CAMEL_POP3_CAP_LOGIN_DELAY = 1<<5
+	CAMEL_POP3_CAP_LOGIN_DELAY = 1<<6
 };
 
 /* enable/disable flags for the engine itself */

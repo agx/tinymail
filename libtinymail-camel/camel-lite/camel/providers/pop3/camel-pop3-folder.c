@@ -620,7 +620,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 			}
 
 			g_unlink (expunged_path);
-			cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %u\r\n", info->uid);
+			cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %s\r\n", info->uid);
 			while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
 			if (pop3_store->cache && info->uid)
 				camel_data_cache_remove(pop3_store->cache, "cache", info->uid, NULL);

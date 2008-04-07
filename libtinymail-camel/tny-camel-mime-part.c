@@ -665,8 +665,8 @@ tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *strea
 	wrapper = camel_medium_get_content_object (medium);
 
 	if (!wrapper) {
-		g_error (_("Mime part does not yet have a source stream, use "
-			"tny_mime_part_construct first"));
+		g_warning (_("Mime part does not yet have a source stream, use "
+			     "tny_mime_part_construct first"));
 		camel_object_unref (cstream);
 		g_set_error (err, TNY_MIME_ERROR, 
 				TNY_MIME_ERROR_STATE,
@@ -759,6 +759,7 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
 	CamelStream *cstream;
+	gssize bytes = -1;
 
 	g_assert (TNY_IS_STREAM (stream));
 
@@ -772,13 +773,11 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 	wrapper = camel_medium_get_content_object (medium);
 
 	if (G_UNLIKELY (!wrapper)) {
-		g_error (_("Mime part does not yet have a source stream, use "
-			"tny_mime_part_construct first"));
+		g_warning (_("Mime part does not yet have a source stream, use "
+			     "tny_mime_part_construct first"));
 		camel_object_unref (CAMEL_OBJECT (cstream));
 		return -1;
 	}
-
-	gssize bytes = -1;
 	
 	if (camel_content_type_is (wrapper->mime_type, "text", "*"))
 		bytes = (gssize) camel_stream_format_text (wrapper, cstream);

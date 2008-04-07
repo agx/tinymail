@@ -4934,7 +4934,7 @@ tny_camel_folder_create_folder_async_destroyer (gpointer thr_user_data)
 static void
 tny_camel_folder_create_folder_async (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	return TNY_CAMEL_FOLDER_GET_CLASS (self)->create_folder_async(self, name, callback, status_callback, user_data);
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->create_folder_async(self, name, callback, status_callback, user_data);
 }
 
 static void
@@ -5668,10 +5668,11 @@ tny_camel_folder_get_url_string_default (TnyFolder *self)
 	} else if (priv->account) {
 		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 		if (apriv->service) {
+			const char *foln;
 			char *urls = camel_service_get_url (apriv->service);
 			if (!priv->folder)
 				load_folder_no_lock (priv);
-			const char *foln = camel_folder_get_full_name (priv->folder);
+			foln = camel_folder_get_full_name (priv->folder);
 			retval = g_strdup_printf ("%s/%s", urls, foln);
 			g_free (urls);
 		}
