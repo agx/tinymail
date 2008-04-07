@@ -843,6 +843,8 @@ tny_merge_folder_get_id (TnyFolder *self)
 			}
 			g_string_append (ids, tny_folder_get_id (cur));
 			g_object_unref (cur);
+			if (account)
+				g_object_unref (account);
 			first = FALSE;
 			tny_iterator_next (iter);
 		}

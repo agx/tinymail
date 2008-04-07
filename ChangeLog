@@ -12,6 +12,8 @@
 	* libtinymail-camel/tny-camel-common.c
 	(_string_to_camel_inet_addr): fixes an small memory issue when the
 	email address starts with an "<"
+	* libtinymail/tny-merge-folder.c
+	(tny_merge_folder_get_id): fixed a reference leak
 
 2008-04-07  Philip Van Hoof <pvanhoof@gnome.org>
 
