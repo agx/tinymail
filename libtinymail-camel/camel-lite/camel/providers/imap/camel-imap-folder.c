@@ -1916,6 +1916,15 @@ do_append (CamelFolder *folder, CamelMimeMessage *message,
 	camel_mime_message_encode_8bit_parts (message);
 
 	/* FIXME: We could avoid this if we knew how big the message was. */
+
+/**
+ * TNY TODO: Tny REMARK, by Philip Van Hoof:
+ * In stead of copying it to a memstream, we could do this write-to-stream and
+ * count it in a stream that just does counting. Then we'd have ba->len too.
+ * We could then during the actual append, repeat the write-to-stream, and that
+ * way avoid the copying into memory.
+ **/
+
 	memstream = camel_stream_mem_new ();
 	ba = g_byte_array_new ();
 	camel_stream_mem_set_byte_array (CAMEL_STREAM_MEM (memstream), ba);
