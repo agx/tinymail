@@ -803,6 +803,9 @@ tny_camel_folder_add_msg_async_destroyer (gpointer thr_user_data)
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
 
+	/**/
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -904,6 +907,8 @@ tny_camel_folder_add_msg_async_cancelled_destroyer (gpointer thr_user_data)
 	AddMsgFolderInfo *info = thr_user_data;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
 
+	camel_object_unref (info->session);
+
 	if (info->adding_msg)
 		g_object_unref (info->adding_msg);
 
@@ -950,6 +955,7 @@ tny_camel_folder_add_msg_async_default (TnyFolder *self, TnyMsg *msg, TnyFolderC
 	/* Idle info for the callbacks */
 	info = g_slice_new (AddMsgFolderInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
 	info->self = self;
 	info->callback = callback;
 	info->status_callback = status_callback;
@@ -1137,6 +1143,10 @@ tny_camel_folder_remove_msgs_async_destroyer (gpointer thr_user_data)
 	if (info->err)
 		g_error_free (info->err);
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -1177,6 +1187,8 @@ tny_camel_folder_remove_msgs_async_cancelled_destroyer (gpointer thr_user_data)
 	g_object_unref (info->self);
 	g_object_unref (info->headers);
 
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -1209,6 +1221,8 @@ tny_camel_folder_remove_msgs_async_default (TnyFolder *self, TnyList *headers, T
 	/* Idle info for the callbacks */
 	info = g_slice_new (RemMsgsInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
+
 	info->self = self;
 	info->headers = headers;
 	info->callback = callback;
@@ -1580,6 +1594,10 @@ tny_camel_folder_sync_async_destroyer (gpointer thr_user_data)
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -1699,6 +1717,10 @@ tny_camel_folder_sync_async_cancelled_destroyer (gpointer thr_user_data)
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -1723,6 +1745,7 @@ tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnyFolde
 	/* Idle info for the callbacks */
 	info = g_slice_new (SyncFolderInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
 	info->self = self;
 	info->callback = callback;
 	info->status_callback = status_callback;
@@ -1790,6 +1813,10 @@ tny_camel_folder_refresh_async_destroyer (gpointer thr_user_data)
 
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
+
+	/**/
+
+	camel_object_unref (info->session);
 
 	return;
 }
@@ -1919,6 +1946,10 @@ tny_camel_folder_refresh_async_cancelled_destroyer (gpointer thr_user_data)
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -1958,6 +1989,7 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyFolderCallback callb
 	/* Idle info for the callbacks */
 	info = g_slice_new (RefreshFolderInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
 	info->self = self;
 	info->callback = callback;
 	info->status_callback = status_callback;
@@ -2121,6 +2153,10 @@ tny_camel_folder_get_headers_async_destroyer (gpointer thr_user_data)
 	if (info->err)
 		g_error_free (info->err);
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -2156,10 +2192,15 @@ static void
 tny_camel_folder_get_headers_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	GetHeadersInfo *info = thr_user_data;
+
 	if (info->err)
 		g_error_free (info->err);
 	g_object_unref (info->self);
 	g_object_unref (info->headers);
+
+	/**/
+
+	camel_object_unref (info->session);
 
 	return;
 }
@@ -2193,6 +2234,7 @@ tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, g
 	/* Idle info for the callbacks */
 	info = g_slice_new (GetHeadersInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
 	info->self = self;
 	info->headers = headers;
 	info->refresh = refresh;
@@ -2333,6 +2375,10 @@ tny_camel_folder_get_msg_async_destroyer (gpointer thr_user_data)
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -2467,6 +2513,10 @@ tny_camel_folder_get_msg_async_cancelled_destroyer (gpointer thr_user_data)
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -2500,6 +2550,7 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 	info = g_slice_new (GetMsgInfo);
 	info->cancelled = FALSE;
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
 	info->self = self;
 	info->header = header;
 	info->callback = callback;
@@ -3410,6 +3461,10 @@ tny_camel_folder_copy_async_destroyer (gpointer thr_user_data)
 	if (info->new_name)
 		g_free (info->new_name);
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -3541,6 +3596,10 @@ tny_camel_folder_copy_async_cancelled_destroyer (gpointer thr_user_data)
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -3573,6 +3632,7 @@ tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, cons
 	info = g_slice_new (CopyFolderInfo);
 	info->cancelled = FALSE;
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
 	info->self = self;
 	info->new_folder = NULL;
 	info->into = into;
@@ -3624,6 +3684,7 @@ typedef struct
 	gint from_unread;
 	gint to_unread;
 	gboolean cancelled;
+	TnySessionCamel *dsession;
 
 } TransferMsgsInfo;
 
@@ -3692,6 +3753,11 @@ tny_camel_folder_transfer_msgs_async_destroyer (gpointer thr_user_data)
 
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
+
+	/**/
+
+	camel_object_unref (info->session);
+	camel_object_unref (info->dsession);
 
 	return;
 }
@@ -4130,6 +4196,11 @@ tny_camel_folder_transfer_msgs_async_cancelled_destroyer (gpointer thr_user_data
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
 
+	/**/
+
+	camel_object_unref (info->session);
+	camel_object_unref (info->dsession);
+
 	return;
 }
 
@@ -4165,6 +4236,9 @@ tny_camel_folder_transfer_msgs_async_default (TnyFolder *self, TnyList *header_l
 	info = g_slice_new (TransferMsgsInfo);
 	info->cancelled = FALSE;
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
+	info->dsession = TNY_FOLDER_PRIV_GET_SESSION (priv_dst);
+	camel_object_ref (info->dsession);
 	info->self = self;
 	info->new_header_list = tny_simple_list_new ();
 	info->header_list = header_list; 
@@ -4823,6 +4897,8 @@ tny_camel_folder_create_folder_async_destroyer (gpointer thr_user_data)
 
 	_tny_session_stop_operation (info->session);
 
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -4841,6 +4917,7 @@ tny_camel_folder_create_folder_async_default (TnyFolderStore *self, const gchar 
 	/* Idle info for the callbacks */
 	info = g_slice_new (CreateFolderInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
 	info->self = self;
 	info->name = g_strdup (name);
 	info->callback = callback;
@@ -5061,6 +5138,8 @@ tny_camel_folder_get_folders_async_destroyer (gpointer thr_user_data)
 
 	_tny_session_stop_operation (info->session);
 
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -5110,6 +5189,10 @@ tny_camel_folder_get_folders_async_cancelled_destroyer (gpointer thr_user_data)
 	if (info->query)
 		g_object_unref (info->query);
 
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -5141,6 +5224,7 @@ tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list,
 	/* Idle info for the callbacks */
 	info = g_slice_new (GetFoldersInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
 	info->self = self;
 	info->list = list;
 	info->callback = callback;
@@ -5226,6 +5310,7 @@ typedef struct {
 	gint unread;
 	gint total;
 	gboolean do_status;
+	TnySessionCamel *session;
 } PokeStatusInfo;
 
 static gboolean
@@ -5263,6 +5348,11 @@ tny_camel_folder_poke_status_destroyer (gpointer data)
 	PokeStatusInfo *info = (PokeStatusInfo *) data;
 	/* Thread reference */
 	g_object_unref (info->self);
+
+	/**/
+
+	camel_object_unref (info->session);
+
 	return;
 }
 
@@ -5312,6 +5402,8 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 	info->do_status = FALSE;
 	/* Thread reference */
 	info->self = TNY_FOLDER (g_object_ref (self));
+	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
 
 	if (priv->folder)
 	{
