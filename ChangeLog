@@ -1,6 +1,7 @@
 2008-04-07  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Refcount problem in async contexts
+	* Fixing the actual problem, too
 
 2008-04-03  Philip Van Hoof <pvanhoof@gnome.org>
 
