@@ -4122,11 +4122,9 @@ idle_thread (gpointer data)
 		/* TNY TODO: try to use the select() of the non-blocking read
 		 * for this usleep() and cnt stuff. */
 
-		if (store->idle_cont && my_cont) {
+		if (my_cont)
 			usleep (500000);
-			if (!store->idle_cont)
-				my_cont = FALSE;
-		}
+
 		cnt++;
 	}
 
