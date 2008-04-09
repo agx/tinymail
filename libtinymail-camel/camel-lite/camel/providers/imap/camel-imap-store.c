@@ -2143,7 +2143,8 @@ imap_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 
 	imap_debug ("imap_disconnect_online\n");
 
-	let_idle_die (store, TRUE);
+	if (clean)
+		let_idle_die (store, TRUE);
 
 	if (store->connected && clean) {
 		response = camel_imap_command (store, NULL, NULL, "LOGOUT");
