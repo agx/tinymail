@@ -131,7 +131,9 @@ else
      have_cst=no
 fi
 AM_CONDITIONAL([HAVE_CST],[test x"$have_cst" == "xyes"])
-AC_DEFINE_UNQUOTED(ENABLE_CST, "$have_cst", [Is libcst enabled])
+if test x"$have_cst" == "xyes"; then
+	AC_DEFINE(ENABLE_CST, [], [Enable libcst])
+fi
 AC_SUBST(LIBCST_CFLAGS)
 AC_SUBST(LIBCST_LIBS)
 
