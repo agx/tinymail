@@ -478,6 +478,8 @@ certdb_cert_new (CamelCertDB *certdb)
 {
 	CamelCert *cert;
 
+	/* we set 0 to trust level this way (unknown) */
+
 	if (certdb->cert_chunks)
 		cert = e_memchunk_alloc0 (certdb->cert_chunks);
 	else

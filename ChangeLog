@@ -1,3 +1,23 @@
+2008-04-09  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Added libtinymail-camel/camel-lite/camel/camel-certdb-cst.c.
+	Implementation of certificates database using maemo libcst. This
+	makes you can manage certificates using the maemo tablet certificate
+	manager.
+	
+	* libtinymail-camel/camel-lite/camel/camel-certdb.h,
+	libtinymail-camel/camel-lite/camel/camel-private.h: modified to
+	have a pointer to the CST object in certdb and certificate id in
+	certificate object in case we compile with CST support.
+	
+	* libtinymail-camel/camel-lite/camel/camel-tcp-stream-ssl.c:
+	Modified a bit the code for proper integration with cst (mainly
+	removing direct access to internal fields).
+	
+	* libtinymail-camel/camel-lite/configure.ac,
+	libtinymail-camel/camel-lite/camel/Makefile.am:
+	Added support for detection and configuration of libcst.
+
 2008-04-07 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 	* libtinymail-camel:
 		- fix some compiler warnings (return in void functions)

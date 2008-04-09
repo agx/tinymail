@@ -6,6 +6,9 @@
 /* Base version (Major.Minor) */
 #undef BASE_VERSION
 
+/* Is libcst enabled */
+#undef ENABLE_CST
+
 /* Really don't try this at home */
 #undef ENABLE_IMAPP
 

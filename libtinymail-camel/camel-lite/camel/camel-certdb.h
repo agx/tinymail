@@ -26,6 +26,9 @@
 
 #include <stdio.h>
 #include <camel/camel-object.h>
+#ifdef ENABLE_CST
+#include <cst.h>
+#endif
 
 #define CAMEL_CERTDB_TYPE         (camel_certdb_get_type ())
 #define CAMEL_CERTDB(obj)         (CAMEL_CHECK_CAST (obj, camel_certdb_get_type (), CamelCertDB))
@@ -65,6 +68,9 @@ typedef struct {
 	char *fingerprint;
 
 	CamelCertTrust trust;
+#ifdef ENABLE_CST
+	cst_t_seqnum certID;
+#endif
 	GByteArray *rawcert;
 } CamelCert;
 

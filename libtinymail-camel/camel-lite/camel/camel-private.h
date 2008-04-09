@@ -32,6 +32,9 @@
 
 #include <pthread.h>
 #include <libedataserver/e-msgport.h>
+#ifdef ENABLE_CST
+#include <cst.h>
+#endif
 
 G_BEGIN_DECLS
 
@@ -182,6 +185,9 @@ struct _CamelCertDBPrivate {
 	GMutex *io_lock;	/* load/save lock, for access to saved_count, etc */
 	GMutex *alloc_lock;	/* for setting up and using allocators */
 	GMutex *ref_lock;	/* for reffing/unreffing certs */
+#ifdef ENABLE_CST
+	CST    *cst;            /* Certificate storage */
+#endif
 };
 
 #define CAMEL_CERTDB_LOCK(db, l) \

@@ -146,7 +146,6 @@ libcamel_lite_1_2_la_SOURCES = 			\
 	camel-address.c				\
 	camel-arg.c				\
 	camel-block-file.c			\
-	camel-certdb.c				\
 	camel-charset-map.c			\
 	camel-data-cache.c			\
 	camel-data-wrapper.c			\
@@ -207,6 +206,13 @@ libcamel_lite_1_2_la_SOURCES = 			\
 	camel-utf8.c				\
 	camel.c					\
 	$(LIBCAMEL_PLATFORM_DEP_SOURCES)
+
+if HAVE_CST
+libcamel_lite_1_2_la_SOURCES +=	camel-certdb-cst.c
+else
+libcamel_lite_1_2_la_SOURCES +=	camel-certdb.c
+endif
+
 
 libcamel_liteinclude_HEADERS =			\
 	$(providerinclude_headers)		\

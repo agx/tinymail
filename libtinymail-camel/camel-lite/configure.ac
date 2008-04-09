@@ -83,6 +83,7 @@ AC_HELP_STRING([--with-ssl],
 		mozilla_nspr_eds=$mozilla_nspr
 		msg_ssl="yes (Mozilla NSS)"
 		msg_smime="yes (Mozilla NSS)"
+		has_nss=yes
 		AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
 	        AC_DEFINE(HAVE_NSS,1,[Define if you have NSS])
         	AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
@@ -96,6 +97,7 @@ AC_HELP_STRING([--with-ssl],
 	    AC_CHECK_LIB(crypto, EVP_md5, [
                 SSL_LIBS="-lcrypto -lssl"
                 msg_ssl="yes (OpenSSL)"
+		has_nss=no
                 AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
                 AC_DEFINE(HAVE_OPENSSL,1,[Define if you want to use OpenSSL as SSL library])
         	],,)
@@ -111,6 +113,7 @@ AC_HELP_STRING([--with-ssl],
 		mozilla_nss_eds=$mozilla_nss
                 msg_ssl="yes (Mozilla NSS)"
                 msg_smime="yes (Mozilla NSS)"
+		has_nss=yes
                 AC_DEFINE(ENABLE_SMIME,1,[Define if SMIME should be enabled])
                 AC_DEFINE(HAVE_NSS,1,[Define if you have NSS])
                 AC_DEFINE(HAVE_SSL,1,[Define if you have a supported SSL library])
@@ -118,6 +121,19 @@ AC_HELP_STRING([--with-ssl],
         fi
    ])
 
+if test x$has_nss = xyes; then
+     AC_MSG_CHECKING(Support for libCST)
+     PKG_CHECK_MODULES(LIBCST, cst, have_cst=yes, have_cst=no)
+     AC_MSG_RESULT($have_cst)
+else
+     LIBCST_CFLAGS=
+     LIBCST_LIBS=
+     have_cst=no
+fi
+AM_CONDITIONAL([HAVE_CST],[test x"$have_cst" == "xyes"])
+AC_DEFINE_UNQUOTED(ENABLE_CST, "$have_cst", [Is libcst enabled])
+AC_SUBST(LIBCST_CFLAGS)
+AC_SUBST(LIBCST_LIBS)
 
 AC_SUBST(msg_smime)
 AC_SUBST(msg_ssl)
@@ -208,8 +224,8 @@ if test "x$zlib_found" = "xfalse"; then
 fi
 
 PKG_CHECK_MODULES(CAMEL, gthread-2.0 gmodule-2.0 gobject-2.0 $mozilla_nss_eds $mozilla_nspr_eds)
-CAMEL_CFLAGS="$CAMEL_CFLAGS $THREADS_CFLAGS $KRB4_CFLAGS $KRB5_CFLAGS"
-CAMEL_LIBS="$CAMEL_LIBS -lz $THREADS_LIBS $KRB4_LDFLAGS $KRB5_LDFLAGS"
+CAMEL_CFLAGS="$CAMEL_CFLAGS $LIBCST_CFLAGS $THREADS_CFLAGS $KRB4_CFLAGS $KRB5_CFLAGS"
+CAMEL_LIBS="$CAMEL_LIBS -lz $LIBCST_LIBS $THREADS_LIBS $KRB4_LDFLAGS $KRB5_LDFLAGS"
 
 AC_SUBST(CAMEL_CFLAGS)
 AC_SUBST(CAMEL_LIBS)

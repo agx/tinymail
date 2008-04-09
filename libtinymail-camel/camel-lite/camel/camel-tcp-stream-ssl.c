@@ -902,8 +902,6 @@ camel_certdb_nss_cert_get(CamelCertDB *certdb, CERTCertificate *cert, CamelSessi
 				filename, error->message);
 			g_error_free (error);
 
-			camel_cert_set_trust (
-				certdb, ccert, CAMEL_CERT_TRUST_UNKNOWN);
 			camel_certdb_touch (certdb);
 			g_free (fingerprint);
 			g_free (filename);
@@ -923,7 +921,6 @@ camel_certdb_nss_cert_get(CamelCertDB *certdb, CERTCertificate *cert, CamelSessi
 	if (ccert->rawcert->len != cert->derCert.len
 	    || memcmp(ccert->rawcert->data, cert->derCert.data, cert->derCert.len) != 0) {
 		g_warning("rawcert != derCer");
-		camel_cert_set_trust(certdb, ccert, CAMEL_CERT_TRUST_UNKNOWN);
 		camel_certdb_touch(certdb);
 	}
 
@@ -945,7 +942,6 @@ camel_certdb_nss_cert_add(CamelCertDB *certdb, CERTCertificate *cert, CamelSessi
 	/* hostname is set in caller */
 	/*camel_cert_set_hostname(certdb, ccert, ssl->priv->expected_host);*/
 	camel_cert_set_fingerprint(certdb, ccert, fingerprint);
-	camel_cert_set_trust(certdb, ccert, CAMEL_CERT_TRUST_UNKNOWN);
 	g_free(fingerprint);
 
 	camel_certdb_nss_cert_set(certdb, ccert, cert, session);
@@ -1036,6 +1032,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 	CERTCertificate *cert;
 	SECStatus status = SECFailure;
 	struct _CamelTcpStreamSSLPrivate *priv;
+	CamelCertTrust trust;
 
 	g_return_val_if_fail (data != NULL, SECFailure);
 	g_return_val_if_fail (CAMEL_IS_TCP_STREAM_SSL (data), SECFailure);
@@ -1054,15 +1051,16 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 		camel_cert_set_hostname(certdb, ccert, ssl->priv->expected_host);
 	}
 
-	if (ccert->trust == CAMEL_CERT_TRUST_UNKNOWN) {
+	trust = camel_cert_get_trust (certdb, ccert);
+	if (trust == CAMEL_CERT_TRUST_UNKNOWN) {
 		status = CERT_VerifyCertNow(cert->dbhandle, cert, TRUE, certUsageSSLClient, NULL);
 		fingerprint = cert_fingerprint(cert);
 		cert_str = g_strdup_printf (_("Issuer:            %s\n"
 					      "Subject:           %s\n"
 					      "Fingerprint:       %s\n"
 					      "Signature:         %s"),
-					    CERT_NameToAscii (&cert->issuer),
-					    CERT_NameToAscii (&cert->subject),
+					    ccert?camel_cert_get_issuer (certdb, ccert):CERT_NameToAscii (&cert->issuer),
+					    ccert?camel_cert_get_subject (certdb, ccert):CERT_NameToAscii (&cert->subject),
 					    fingerprint, status == SECSuccess?_("GOOD"):_("BAD"));
 		g_free(fingerprint);
 
@@ -1080,7 +1078,7 @@ ssl_bad_cert (void *data, PRFileDesc *sockfd)
 			camel_certdb_touch(certdb);
 		}
 	} else {
-		accept = ccert->trust != CAMEL_CERT_TRUST_NEVER;
+		accept = trust != CAMEL_CERT_TRUST_NEVER;
 	}
 
 	camel_certdb_cert_unref(certdb, ccert);
