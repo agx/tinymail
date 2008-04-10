@@ -1588,6 +1588,16 @@ done:
  * The @callback will be invoke as soon as the account is actually online. It's
  * guaranteed that the @callback will happen in the mainloop, if available.
  *
+ * This is a cancelable operation which means that if another cancelable 
+ * operation executes, this operation will be aborted. Being aborted means that
+ * the callback will still be called, but with cancelled=TRUE.
+ *
+ * Only one instance of @tny_camel_account_set_online for folder @self can run
+ * at the same time. If you call for another, the first will be aborted. This
+ * means that it's callback will be called with cancelled=TRUE. If the 
+ * TnyDevice's online state changes while operation is taking place, the 
+ * behaviour is undefined. Although the @callback will always happen and in that
+ * case with cancelled=TRUE.
  **/
 void 
 tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data)

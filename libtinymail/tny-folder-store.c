@@ -378,6 +378,10 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * }
  * </programlisting></informalexample>
  *
+ * This is a cancelable operation which means that if another cancelable 
+ * operation executes, this operation will be aborted. Being aborted means that
+ * the callback will still be called, but with cancelled=TRUE.
+ *
  * since: 1.0
  * audience: application-developer
  **/

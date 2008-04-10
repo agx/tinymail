@@ -1,3 +1,8 @@
+2008-04-10  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed a glitch in Jose Dapena Paz's patch of yesterday
+	* Added API documentation about cancelling
+
 2008-04-09  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Added libtinymail-camel/camel-lite/camel/camel-certdb-cst.c.

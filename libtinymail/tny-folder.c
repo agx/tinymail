@@ -600,6 +600,10 @@ tny_folder_sync (TnyFolder *self, gboolean expunge, GError **err)
  * messages (the ones marked with TNY_HEADER_FLAG_DELETED) as well if @expunge
  * is TRUE.
  *
+ * This is a cancelable operation which means that if another cancelable 
+ * operation executes, this operation will be aborted. Being aborted means that
+ * the callback will still be called, but with cancelled=TRUE.
+ *
  * since: 1.0
  * audience: application-developer
  **/
@@ -870,6 +874,10 @@ tny_folder_remove_msgs_async (TnyFolder *self, TnyList *headers, TnyFolderCallba
  *          status_update_cb, NULL); 
  * </programlisting></informalexample>
  *
+ * This is a cancelable operation which means that if another cancelable 
+ * operation executes, this operation will be aborted. Being aborted means that
+ * the callback will still be called, but with cancelled=TRUE.
+ *
  * since: 1.0
  * audience: application-developer
  **/
@@ -1097,6 +1105,10 @@ tny_folder_transfer_msgs (TnyFolder *self, TnyList *headers, TnyFolder *folder_d
  * You must not use header instances that you got from tny_msg_get_header()
  * with this API. You must only use instances that you got from 
  * tny_folder_get_headers().
+ *
+ * This is a cancelable operation which means that if another cancelable 
+ * operation executes, this operation will be aborted. Being aborted means that
+ * the callback will still be called, but with cancelled=TRUE.
  *
  * since: 1.0
  * audience: application-developer
@@ -1352,6 +1364,10 @@ tny_folder_get_headers (TnyFolder *self, TnyList *headers, gboolean refresh, GEr
  * API warning: it's possible that between the @refresh and @callback, a pointer
  * to a query object will be placed. This will introduce both an API and ABI 
  * breakage.
+ *
+ * Only one instance of @tny_folder_get_headers_async for folder @self can run
+ * at the same time. If you call for another, the first will be aborted. This
+ * means that it's callback will be called with cancelled=TRUE.
  *
  * since: 1.0
  * audience: application-developer
