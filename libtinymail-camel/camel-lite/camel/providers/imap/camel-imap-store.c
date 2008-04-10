@@ -3795,7 +3795,7 @@ get_folders_sync_ns_only_lsub (CamelImapStore *imap_store, struct _namespace *na
 	camel_imap_store_stop_idle (imap_store);
 
 	response = camel_imap_command (imap_store, NULL, ex,
-		"LSUB \"%s\" *", namespace->prefix, 
+		"LSUB \"%s\" %G", namespace->prefix, 
 		(strlen (namespace->prefix) > 0)?"*":"%");
 
 	if (!response)
