@@ -3709,7 +3709,7 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 
 			response = camel_imap_command (imap_store, NULL, ex,
 				"%s \"%s\" %s", j==1 ? "LSUB" : "LIST", 
-				prefix, lst);
+				prefix, (j!=1)?lst:"*");
 
 			if (!response)
 				goto fail;
@@ -3723,17 +3723,9 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 
 					hfi = g_hash_table_lookup(present, fi->full_name);
 					if (hfi == NULL) {
-
-						if (j == 1 || j == 3) {
-							/* It's in LSUB but not in LIST, so it's 
-							 * a \ NonExistent (like above in LIST-EXTENDED) */
-							fi->flags |= CAMEL_FOLDER_SUBSCRIBED | CAMEL_FOLDER_NONEXISTENT;
-							camel_folder_info_free(fi);
-						} else {
-							g_hash_table_insert(present, fi->full_name, fi);
-							if (!first)
-								first = fi;
-						}
+						g_hash_table_insert(present, fi->full_name, fi);
+						if (!first)
+							first = fi;
 					} else {
 						/* It's in LSUB and in LIST, so subscribed */
 						if (j == 1 || j == 3) {
@@ -3803,7 +3795,7 @@ get_folders_sync_ns_only_lsub (CamelImapStore *imap_store, struct _namespace *na
 	camel_imap_store_stop_idle (imap_store);
 
 	response = camel_imap_command (imap_store, NULL, ex,
-		"LSUB \"%s\" %G", namespace->prefix, 
+		"LSUB \"%s\" *", namespace->prefix, 
 		(strlen (namespace->prefix) > 0)?"*":"%");
 
 	if (!response)

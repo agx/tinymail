@@ -2,6 +2,7 @@
 
 	* Fixed a glitch in Jose Dapena Paz's patch of yesterday
 	* Added API documentation about cancelling
+	* Bugfix in folder listing
 
 2008-04-09  Jose Dapena Paz  <jdapena@igalia.com>
 
