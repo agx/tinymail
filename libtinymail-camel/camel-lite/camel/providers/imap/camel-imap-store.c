@@ -447,6 +447,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 {
 	CamelImapStore *imap_store = CAMEL_IMAP_STORE (object);
 
+	imap_store->needs_lsub = TRUE;
 	imap_store->authtypes = NULL;
 	imap_store->got_online = FALSE;
 	imap_store->going_online = FALSE;
@@ -3128,7 +3129,7 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 		if (imap_store->parameters & IMAP_PARAM_SUBSCRIPTIONS)
 			manage_subscriptions(store, old_name, TRUE);
 		goto fail;
-	} else {
+	} else if (imap_store->needs_lsub) {
 		CamelImapResponse *response3 = camel_imap_command (imap_store, NULL, ex, "SUBSCRIBE %F", new_name_in);
 		camel_imap_response_free (imap_store, response3);
 	}
@@ -3602,6 +3603,7 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 		if (has_other || has_shared) {
 			bah = TRUE;
 			lst = "%";
+			imap_store->needs_lsub = TRUE;
 		}
 
 	} else if (namespace->prefix[strlen(namespace->prefix)-1] == namespace->delim) {
@@ -3711,8 +3713,8 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 			}
 
 			response = camel_imap_command (imap_store, NULL, ex,
-				"%s \"%s\" %s", j==1 ? "LSUB" : "LIST", 
-				prefix, (j!=1)?lst:"*");
+				"%s \"%s\" %s", (j==1 || j==3) ? "LSUB" : "LIST", 
+				prefix, (j!=1 && j!=3) ? lst : "*");
 
 			if (!response)
 				goto fail;
@@ -3726,6 +3728,10 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 
 					hfi = g_hash_table_lookup(present, fi->full_name);
 					if (hfi == NULL) {
+						if (j == 1 || j == 3) {
+							fi->flags |= CAMEL_FOLDER_SUBSCRIBED | CAMEL_FOLDER_NONEXISTENT | CAMEL_FOLDER_NOSELECT; 
+							imap_store->needs_lsub = TRUE;
+						}
 						g_hash_table_insert(present, fi->full_name, fi);
 						if (!first)
 							first = fi;
