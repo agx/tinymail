@@ -339,6 +339,7 @@ tny_folder_set_msg_receive_strategy (TnyFolder *self, TnyMsgReceiveStrategy *st)
  * If @new_name already exists in @into and @err is not NULL, then an error will
  * be set in @err and no further action will be performed.
  * 
+ * Deprecated: 1.0: Use tny_folder_copy_async in stead
  * returns: (null-ok) (caller-owns): a new folder instance to whom was copied or NULL
  * since: 1.0
  * audience: application-developer
@@ -568,6 +569,7 @@ tny_folder_set_msg_remove_strategy (TnyFolder *self, TnyMsgRemoveStrategy *st)
  * g_object_unref (folder);
  * </programlisting></informalexample>
  *
+ * Deprecated: 1.0: Use tny_folder_sync_async in stead
  * since: 1.0
  * audience: application-developer
  **/
@@ -680,6 +682,7 @@ tny_folder_add_msg_async (TnyFolder *self, TnyMsg *msg, TnyFolderCallback callba
  * Folder observers of @self will get a header-added event caused by this
  * action.
  *
+ * Deprecated: 1.0: Use tny_folder_add_msg_async in stead
  * since: 1.0
  * audience: application-developer
  **/
@@ -736,6 +739,7 @@ tny_folder_add_msg (TnyFolder *self, TnyMsg *msg, GError **err)
  * }
  * </programlisting></informalexample>
  *
+ * Deprecated: 1.0: Use tny_folder_remove_msgs_async in stead
  * since: 1.0
  * audience: application-developer
  **/
@@ -767,6 +771,7 @@ tny_folder_remove_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * Folder observers of @self will get only one header-removed trigger caused
  * by this action (with all the removed headers in the #TnyFolderChange).
  *
+ * Deprecated: 1.0: Use tny_folder_remove_msgs_async in stead
  * since: 1.0
  * audience: application-developer
  **/
@@ -915,6 +920,7 @@ tny_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, TnyStatus
  * This function can take a very long time. You are advised to consider using
  * tny_folder_refresh_async() in stead.
  *
+ * Deprecated: 1.0: Use tny_folder_refresh_async in stead
  * since: 1.0
  * audience: application-developer
  **/
@@ -1069,6 +1075,7 @@ tny_folder_get_account (TnyFolder *self)
  * with this API. You must only use instances that you got from 
  * tny_folder_get_headers().
  *
+ * Deprecated: 1.0: Use tny_folder_transfer_msgs_async in stead
  * since: 1.0
  * audience: application-developer
  **/
@@ -1157,6 +1164,7 @@ tny_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, TnyFolder
  * other #TnyFolder methods. The message's instance nor its header will receive 
  * updates from the observable folder.
  * 
+ * Deprecated: 1.0: Use tny_folder_get_msg_async in stead
  * returns: (null-ok) (caller-owns): The message instance or NULL
  * since: 1.0
  * audience: application-developer

@@ -179,6 +179,7 @@ tny_folder_store_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError 
  *      g_object_unref (createfol);
  * </programlisting></informalexample>
  * 
+ * Deprecated: 1.0: Use tny_folder_store_create_folder_async in stead
  * returns: (null-ok) (caller-owns): the folder that was created or NULL
  * since: 1.0
  * audience: application-developer
@@ -289,6 +290,7 @@ tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, T
  * g_object_unref (folders);
  * </programlisting></informalexample>
  *
+ * Deprecated: 1.0: Use tny_folder_store_get_folders_async in stead
  * since: 1.0
  * audience: application-developer
  **/
