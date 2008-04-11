@@ -1522,7 +1522,25 @@ cancel_button_clicked (GtkWidget *button, gpointer user_data)
 	}
 }
 
+static void
+create_cb (TnyFolderStore *store, gboolean cancelled, TnyFolder *new_folder, GError *err, gpointer user_data)
+{
+	TnyDemouiSummaryView *self = user_data;
+	if (err != NULL) {
+		GtkWidget *edialog;
+		edialog = gtk_message_dialog_new (
+						  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
+						  GTK_DIALOG_DESTROY_WITH_PARENT,
+						  GTK_MESSAGE_ERROR,
+						  GTK_BUTTONS_CLOSE,
+						  err->message);
+		g_signal_connect_swapped (edialog, "response",
+			G_CALLBACK (gtk_widget_destroy), edialog);
+		gtk_widget_show_all (edialog);
+	}
 
+	g_object_unref (self);
+}
 static void 
 on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 {
@@ -1572,29 +1590,10 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 					GError *err = NULL;
 					const gchar *newname = gtk_entry_get_text (GTK_ENTRY (entry));
 
-					TnyFolder *created = tny_folder_store_create_folder (folderstore, newname, &err);
+					tny_folder_store_create_folder_async (folderstore, newname, 
+						create_cb, status_update, 
+						g_object_ref (self));
 
-					if (created) /* Can be NULL on failure */
-						g_object_unref (G_OBJECT (created));
-
-					if (err != NULL)
-					{
-						GtkWidget *edialog;
-
-						gtk_widget_destroy (dialog);
-						dialog = NULL;
-
-						edialog = gtk_message_dialog_new (
-										  GTK_WINDOW (gtk_widget_get_parent (GTK_WIDGET (self))),
-										  GTK_DIALOG_DESTROY_WITH_PARENT,
-										  GTK_MESSAGE_ERROR,
-										  GTK_BUTTONS_CLOSE,
-										  err->message);
-						g_signal_connect_swapped (edialog, "response",
-							G_CALLBACK (gtk_widget_destroy), edialog);
-						gtk_widget_show_all (edialog);
-						g_error_free (err);
-					}
 				}
 				break;
 
@@ -1604,7 +1603,7 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 			if (dialog)
 				gtk_widget_destroy (dialog);
-			g_object_unref (G_OBJECT (folderstore));
+			g_object_unref (folderstore);
 		}
 
 	}
