@@ -3128,6 +3128,9 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 		if (imap_store->parameters & IMAP_PARAM_SUBSCRIPTIONS)
 			manage_subscriptions(store, old_name, TRUE);
 		goto fail;
+	} else {
+		CamelImapResponse *response3 = camel_imap_command (imap_store, NULL, ex, "SUBSCRIBE %F", new_name_in);
+		camel_imap_response_free (imap_store, response3);
 	}
 
 	/* Undefined progress */
