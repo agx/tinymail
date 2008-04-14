@@ -179,7 +179,7 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
 
-		if (!apriv->service) {
+		if (!apriv->service || !apriv->service->url) {
 			url = camel_url_new (proto, apriv->ex);
 			urlneedfree = TRUE;
 		} else
