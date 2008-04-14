@@ -1996,7 +1996,7 @@ tny_camel_account_finalize (GObject *object)
 	if (priv->service && CAMEL_IS_OBJECT (priv->service)) {
 		if (priv->service->url) {
 			/* known leak to enforce creating a new service */
-			priv->service->url->user = NULL;
+			priv->service->url->user = g_strdup ("non existing dummy user");
 		}
 		camel_object_unref (CAMEL_OBJECT (priv->service));
 	}

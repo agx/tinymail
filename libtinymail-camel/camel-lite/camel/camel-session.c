@@ -192,11 +192,7 @@ get_service (CamelSession *session, const char *url_string,
 
 	/* Now look up the service in the provider's cache */
 	service = camel_object_bag_reserve(provider->service_cache[type], url);
-	if (service == NULL || service->url == NULL) {
-
-		if (service) /* url was NULL :-\ */
-			((CamelObject *)service)->ref_count--;
-
+	if (service == NULL) {
 		service = (CamelService *)camel_object_new (provider->object_types[type]);
 		camel_exception_init (&internal_ex);
 		camel_service_construct (service, session, provider, url, &internal_ex);
@@ -208,7 +204,6 @@ get_service (CamelSession *session, const char *url_string,
 		} else {
 			camel_object_bag_add(provider->service_cache[type], url, service);
 		}
-	} else {
 	}
 
 	camel_url_free (url);
@@ -281,7 +276,6 @@ camel_session_get_service_connected (CamelSession *session,
 			camel_object_unref (svc);
 			return NULL;
 		}
-	} else {
 	}
 
 	return svc;
