@@ -1967,20 +1967,19 @@ co_bag_unreserve(CamelObjectBag *bag, const void *key)
 		res = res->next;
 	}
 
-	if (res) {
-		g_assert(res->have_owner && pthread_equal(res->owner, pthread_self()));
+	g_assert(res != NULL);
+	g_assert(res->have_owner && pthread_equal(res->owner, pthread_self()));
 
-		if (res->waiters > 0) {
-			b(printf("unreserve bag '%s', waking waiters\n", (char *)key));
-			res->have_owner = FALSE;
-			g_cond_signal(res->cond);
-		} else {
-			b(printf("unreserve bag '%s', no waiters, freeing reservation\n", (char *)key));
-			resp->next = res->next;
-			bag->free_key(res->key);
-			g_cond_free(res->cond);
-			g_free(res);
-		}
+	if (res->waiters > 0) {
+		b(printf("unreserve bag '%s', waking waiters\n", (char *)key));
+		res->have_owner = FALSE;
+		g_cond_signal(res->cond);
+	} else {
+		b(printf("unreserve bag '%s', no waiters, freeing reservation\n", (char *)key));
+		resp->next = res->next;
+		bag->free_key(res->key);
+		g_cond_free(res->cond);
+		g_free(res);
 	}
 }
 
