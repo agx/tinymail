@@ -196,6 +196,7 @@ get_service (CamelSession *session, const char *url_string,
 		gboolean dontres = FALSE;
 
 		if (service) {
+			camel_object_bag_abort(provider->service_cache[type], url);
 			((CamelObject *)service)->ref_count--;
 			dontres = TRUE;
 		}
