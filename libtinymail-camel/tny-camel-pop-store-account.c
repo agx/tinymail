@@ -90,6 +90,17 @@ tny_camel_pop_store_account_create_folder (TnyFolderStore *self, const gchar *na
 }
 
 
+static void 
+notify_factory_del (TnyCamelStoreAccount *self, GObject *folder)
+{
+	if (self && TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
+		TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+		g_static_rec_mutex_lock (priv->factory_lock);
+		priv->managed_folders = g_list_remove_all (priv->managed_folders, folder);
+		g_static_rec_mutex_unlock (priv->factory_lock);
+	}
+}
+
 static TnyFolder * 
 tny_camel_pop_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)
 {
@@ -102,6 +113,7 @@ tny_camel_pop_store_account_factor_folder (TnyCamelStoreAccount *self, const gch
 	{
 		*was_new = TRUE;
 		ppriv->inbox = TNY_FOLDER (_tny_camel_pop_folder_new ());
+		g_object_weak_ref (G_OBJECT (ppriv->inbox), (GWeakNotify) notify_factory_del, self);
 		priv->managed_folders = g_list_prepend (priv->managed_folders, ppriv->inbox);
 	}
 

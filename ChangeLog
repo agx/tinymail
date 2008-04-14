@@ -1,3 +1,7 @@
+2008-04-14  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Weak referenced folders in the folder-factor methods
+
 2008-04-11  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed a bug in case LIST and LSUB are not in agreement

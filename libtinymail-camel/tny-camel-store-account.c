@@ -1289,6 +1289,19 @@ tny_camel_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *
 	return TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->factor_folder(self, full_name, was_new);
 }
 
+
+static void 
+notify_factory_del (TnyCamelStoreAccount *self, GObject *folder)
+{
+	if (self && TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
+		TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+		g_static_rec_mutex_lock (priv->factory_lock);
+		priv->managed_folders = g_list_remove_all (priv->managed_folders, folder);
+		g_static_rec_mutex_unlock (priv->factory_lock);
+	}
+}
+
+
 static TnyFolder * 
 tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)
 {
@@ -1316,8 +1329,8 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 
 	if (!folder) {
 		folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
+		g_object_weak_ref (G_OBJECT (folder), (GWeakNotify) notify_factory_del, self);
 		priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
-
 		*was_new = TRUE;
 	}
 
