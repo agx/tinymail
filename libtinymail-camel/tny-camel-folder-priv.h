@@ -53,6 +53,7 @@ struct _TnyCamelFolderPriv
 	TnyFolderCaps caps; 
 	CamelException load_ex;
 	GList *obs, *sobs;
+	gboolean cant_reuse_iter;
 };
 
 CamelFolder* _tny_camel_folder_get_camel_folder (TnyCamelFolder *self);

@@ -3,6 +3,7 @@
 	* Weak referenced folders in the folder-factor methods
 	* Handling uncaching the password during account finalization
 	* mlock-ing the password memory of accounts
+	* Uncaching of the folder-list in case of tree-changing operations
 
 2008-04-11  Philip Van Hoof <pvanhoof@gnome.org>
 

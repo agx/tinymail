@@ -3213,9 +3213,13 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 			if (TNY_IS_CAMEL_FOLDER (into)) {
 				TnyCamelFolderPriv *tpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (into);
+				tpriv->cant_reuse_iter = TRUE;
 				to = g_strdup_printf ("%s/%s", tpriv->folder_name, new_name);
-			} else
+			} else {
+				TnyCamelStoreAccountPriv *sapriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (into);
+				sapriv->cant_reuse_iter = TRUE;
 				to = g_strdup (new_name);
+			}
 
 			tny_debug ("tny_folder_copy: rename %s to %s\n", from, to);
 
@@ -5033,6 +5037,7 @@ _tny_camel_folder_set_iter (TnyCamelFolder *folder, CamelFolderInfo *iter)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 
+	priv->cant_reuse_iter = FALSE;
 	priv->iter = iter;
 
 	if (iter->flags & CAMEL_FOLDER_NOCHILDREN)
@@ -5054,15 +5059,29 @@ tny_camel_folder_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
 static void 
 tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
+	gboolean cant_reuse_iter = TRUE;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CamelFolderInfo *iter;
+	TnyAccount *account = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
 			priv->account, err, TNY_SERVICE_ERROR, 
 			TNY_SERVICE_ERROR_GET_FOLDERS))
 		return;
 
-	if (!priv->iter && priv->iter_parented)
+	account = tny_folder_get_account (TNY_FOLDER (self));
+
+	if (account) {
+		TnyCamelStoreAccountPriv *aspriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (account);
+		if (aspriv)
+			cant_reuse_iter = aspriv->cant_reuse_iter;
+		g_object_unref (account);
+	}
+
+	if (!cant_reuse_iter)
+		cant_reuse_iter = cant_reuse_iter;
+
+	if ((!priv->iter && priv->iter_parented) || cant_reuse_iter)
 	{
 		CamelStore *store = priv->store;
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
@@ -5070,6 +5089,8 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 		g_return_if_fail (priv->folder_name != NULL);
 
 		priv->iter = camel_store_get_folder_info (store, priv->folder_name, 0, &ex);
+
+		priv->cant_reuse_iter = FALSE;
 
 		if (camel_exception_is_set (&ex))
 		{
@@ -5992,6 +6013,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyCamelFolder *self = (TnyCamelFolder *)instance;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+	priv->cant_reuse_iter = TRUE;
 	priv->unread_read = FALSE;
 	priv->account = NULL;
 	priv->store = NULL;
