@@ -306,8 +306,9 @@ static void free_o_name(void *key, void *value, void *data)
 static void
 foreach_msginfo (gpointer data, gpointer user_data)
 {
+	CamelMessageInfoBase *base = data;
 	camel_message_info_free (data);
-	/* g_slice_free1 ((gint)user_data, data); */
+	base->summary = NULL;
 }
 
 static inline
