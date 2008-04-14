@@ -179,7 +179,7 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 		if (camel_exception_is_set (apriv->ex))
 			camel_exception_clear (apriv->ex);
 
-		if (!apriv->service || !apriv->service->url) {
+		if (!apriv->service) {
 			url = camel_url_new (proto, apriv->ex);
 			urlneedfree = TRUE;
 		} else
@@ -1994,9 +1994,10 @@ tny_camel_account_finalize (GObject *object)
 	g_static_rec_mutex_lock (priv->service_lock);
 
 	if (priv->service && CAMEL_IS_OBJECT (priv->service)) {
-		if (priv->service->url)
-			camel_url_free (priv->service->url);
-		priv->service->url = NULL;
+		if (priv->service->url) {
+			/* known leak to enforce creating a new service */
+			priv->service->url->user = NULL;
+		}
 		camel_object_unref (CAMEL_OBJECT (priv->service));
 	}
 
