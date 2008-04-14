@@ -73,6 +73,8 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 
 			retval = gnome_password_dialog_get_password (dialog);
 
+			mlock (retval, strlen (retval));
+
 			r = gnome_password_dialog_get_remember (dialog);
 
 			if (r == GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER)

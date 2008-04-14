@@ -115,6 +115,8 @@ camel_url_new_with_base (CamelURL *base, const char *url_string)
 			if (colon && colon < at) {
 				url->passwd = g_strndup (colon + 1,
 							 at - colon - 1);
+				if (url->passwd)
+					mlock (url->passwd, strlen (url->passwd));
 				camel_url_decode (url->passwd);
 			} else {
 				url->passwd = NULL;
@@ -209,7 +211,11 @@ camel_url_new_with_base (CamelURL *base, const char *url_string)
 		url->protocol = g_strdup (base->protocol);
 		url->user = g_strdup (base->user);
 		url->authmech = g_strdup (base->authmech);
-		url->passwd = g_strdup (base->passwd);
+		if (base->passwd) {
+			url->passwd = g_strdup (base->passwd);
+			mlock (url->passwd, strlen (url->passwd));
+		} else 
+			url->passwd = NULL;
 		url->host = g_strdup (base->host);
 		url->port = base->port;
 
@@ -735,7 +741,11 @@ camel_url_copy(const CamelURL *in)
 	out->protocol = g_strdup(in->protocol);
 	out->user = g_strdup(in->user);
 	out->authmech = g_strdup(in->authmech);
-	out->passwd = g_strdup(in->passwd);
+	if (in->passwd) {
+		out->passwd = g_strdup(in->passwd);
+		mlock (out->passwd, strlen (out->passwd));
+	} else 
+		out->passwd = NULL;
 	out->host = g_strdup(in->host);
 	out->port = in->port;
 	out->path = g_strdup(in->path);
