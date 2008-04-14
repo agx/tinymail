@@ -413,7 +413,6 @@ camel_url_free (CamelURL *url)
 	if (url) {
 		if (url->passwd)
 			memset(url->passwd, 0, strlen(url->passwd));
-		url->passwd = NULL;
 		if (url->user)
 			memset(url->user, 0, strlen(url->user));
 		if (url->host)
@@ -427,7 +426,7 @@ camel_url_free (CamelURL *url)
 		g_datalist_clear (&url->params);
 		g_free (url->query);
 		g_free (url->fragment);
-
+		url->passwd = NULL;
 		memset (url, 0, sizeof (CamelURL));
 		g_free (url);
 	}
