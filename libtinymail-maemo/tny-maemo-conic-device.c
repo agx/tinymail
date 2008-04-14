@@ -431,7 +431,7 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 				   __FUNCTION__, iap_id);
 			return FALSE;
 		}
-	} else 
+	} else {
 		if (!con_ic_connection_disconnect (priv->cnx))
 			g_warning ("Could not send disconnect dbus message");
 		return FALSE;
