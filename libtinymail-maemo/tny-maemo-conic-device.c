@@ -85,14 +85,17 @@ conic_emit_status_idle (gpointer user_data)
 	
 	info  = (EmitStatusInfo *) user_data;
 
+	g_debug ("%s: destroying %p (idle)", __FUNCTION__, user_data);
+
 	/* We lock the gdk thread because tinymail wants implementations to do
 	 * this before emitting signals from within a g_idle_add_full callback.
 	 * See http://www.tinymail.org/trac/tinymail/wiki/HowTnyLockable */
-
 	gdk_threads_enter ();
 	g_signal_emit (info->self, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED],
 		0, info->status);
 	gdk_threads_leave ();
+
+	g_debug ("%s: emitted tny-device-connection-changed signal", __FUNCTION__);
 
 	return FALSE;
 }
@@ -106,10 +109,14 @@ conic_emit_status_destroy (gpointer user_data)
 
 	info = (EmitStatusInfo *) user_data;
 	
+	g_debug ("%s: destroying status info (%p)", __FUNCTION__, user_data);
+
 	if (G_IS_OBJECT(info->self))
 		g_object_unref (info->self);
 	
 	g_slice_free (EmitStatusInfo, info);
+
+	g_debug ("%s: destroyed %p", __FUNCTION__, user_data);
 }
 
 static void 
@@ -128,6 +135,9 @@ conic_emit_status (TnyDevice *self, gboolean status)
 
 	if (!dnsmasq_has_resolv())
 		time = 5000;
+
+	g_debug ("%s: emitting status (%s, %s) in %d ms", 
+		   __FUNCTION__, info, status ? "true" : "false", time);
 
 	g_timeout_add_full (G_PRIORITY_DEFAULT, time, conic_emit_status_idle,
 		info, conic_emit_status_destroy);
@@ -211,7 +221,7 @@ typedef struct {
 	int con_state;
 } HandleConnInfo;
 
-static gboolean /* FIXME: this function will always return FALSE, is that correct? */
+static gboolean 
 handle_con_idle (gpointer data)
 {
 	HandleConnInfo *info;
@@ -417,12 +427,13 @@ tny_maemo_conic_device_disconnect (TnyMaemoConicDevice *self, const gchar* iap_i
 
 	if (iap_id) {
 		if (!con_ic_connection_disconnect_by_id (priv->cnx, iap_id)) {
-			g_warning ("Could not send disconnect_by_id dbus message");
+			g_warning ("%s: disconnect_by_id failed (%s)", 
+				   __FUNCTION__, iap_id);
 			return FALSE;
 		}
-	} else {
-		/* don't try to disconnect if iap_id==NULL, or conic will crash... */
-		g_warning ("Could not send disconnect dbus message");
+	} else 
+		if (!con_ic_connection_disconnect (priv->cnx))
+			g_warning ("Could not send disconnect dbus message");
 		return FALSE;
 	}
 
@@ -593,8 +604,10 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	priv->cnx = con_ic_connection_new ();
 
-	if (!priv->cnx)
-		g_warning ("con_ic_connection_new failed. The TnyMaemoConicDevice will be useless.");
+	if (!priv->cnx) {	
+		g_warning ("%s: con_ic_connection_new failed.", __FUNCTION__);
+		return;
+	}
 
 	/* This might be necessary to make the connection object actually emit 
 	 * the signal, though the documentation says that they should be sent 
@@ -608,9 +621,8 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	/* This will get us in connected state only if there is already a connection.
 	 * thus, this will setup our state correctly when we receive the signals. */
 	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
-		g_warning ("could not send connect dbus message");
-
-	return;
+		g_warning ("%s: could not send connect dbus message",
+			__FUNCTION__);	
 }
 
 
@@ -631,13 +643,17 @@ tny_maemo_conic_device_finalize (GObject *obj)
 	TnyMaemoConicDevicePriv *priv;
 
 	g_return_if_fail (obj && G_IS_OBJECT(obj));
+
+	g_debug ("%s", __FUNCTION__);
 	
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
+
 	if (g_signal_handler_is_connected (priv->cnx, priv->signal1))
 		g_signal_handler_disconnect (priv->cnx, priv->signal1);
 
 	if (priv->cnx && CON_IC_IS_CONNECTION(priv->cnx)) {
-		tny_maemo_conic_device_disconnect (TNY_MAEMO_CONIC_DEVICE(obj),priv->iap);
+		tny_maemo_conic_device_disconnect (TNY_MAEMO_CONIC_DEVICE(obj),
+						   priv->iap);
 		g_object_unref (priv->cnx);
 		priv->cnx = NULL;
 	}
