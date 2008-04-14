@@ -484,11 +484,10 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 			apriv->type, apriv->ex);
 
 		if (apriv->service && CAMEL_IS_SERVICE (apriv->service) && 
-		  new_service && !camel_exception_is_set (apriv->ex)) 
-		{
+		  new_service && !camel_exception_is_set (apriv->ex)) {
 			camel_object_unref (apriv->service);
 			apriv->service = NULL;
-		} 
+		}
 
 		if (new_service && !camel_exception_is_set (apriv->ex)) {
 			char *str = camel_service_get_url (new_service);
@@ -517,6 +516,9 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 				}
 				g_free (str);
 			}
+
+			if (apriv->service && CAMEL_IS_SERVICE (apriv->service))
+				camel_object_unref (apriv->service);
 
 			apriv->service = new_service;
 			apriv->service->data = self;

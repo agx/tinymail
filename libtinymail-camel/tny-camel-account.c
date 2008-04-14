@@ -1993,8 +1993,12 @@ tny_camel_account_finalize (GObject *object)
 
 	g_static_rec_mutex_lock (priv->service_lock);
 
-	if (priv->service && CAMEL_IS_OBJECT (priv->service))
+	if (priv->service && CAMEL_IS_OBJECT (priv->service)) {
+		if (priv->service->url)
+			camel_url_free (priv->service->url);
+		priv->service->url = NULL;
 		camel_object_unref (CAMEL_OBJECT (priv->service));
+	}
 
 	if (G_LIKELY (priv->cache_location))
 		g_free (priv->cache_location);

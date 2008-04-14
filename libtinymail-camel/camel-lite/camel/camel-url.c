@@ -413,6 +413,7 @@ camel_url_free (CamelURL *url)
 	if (url) {
 		if (url->passwd)
 			memset(url->passwd, 0, strlen(url->passwd));
+		url->passwd = NULL;
 		if (url->user)
 			memset(url->user, 0, strlen(url->user));
 		if (url->host)

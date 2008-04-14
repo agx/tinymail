@@ -129,6 +129,8 @@ camel_service_finalize (CamelObject *object)
 
 	if (service->url)
 		camel_url_free (service->url);
+	service->url = NULL;
+
 	if (service->session)
 		camel_object_unref (service->session);
 	service->data = NULL;
