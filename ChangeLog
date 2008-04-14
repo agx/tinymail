@@ -4,6 +4,7 @@
 	* Handling uncaching the password during account finalization
 	* mlock-ing the password memory of accounts
 	* Uncaching of the folder-list in case of tree-changing operations
+	* Experimentally nuked the caching of services ...
 
 2008-04-11  Philip Van Hoof <pvanhoof@gnome.org>
 
