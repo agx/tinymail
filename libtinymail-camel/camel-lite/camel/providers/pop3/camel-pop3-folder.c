@@ -1287,6 +1287,7 @@ rfail:
 		if (pop3_store->cache == NULL
 		    || (stream = camel_data_cache_add(pop3_store->cache, "cache", fi->uid, ex)) == NULL) {
 			/* stream = camel_stream_mem_new(); */
+			g_static_rec_mutex_unlock (pop3_store->uidl_lock);
 			goto do_free_ex;
 		}
 
