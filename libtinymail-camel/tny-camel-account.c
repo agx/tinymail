@@ -223,6 +223,48 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 
 		if (urlneedfree)
 			camel_url_free (url);
+	} else if (apriv->url_string) {
+		CamelException uex = CAMEL_EXCEPTION_INITIALISER;
+		CamelURL *url = camel_url_new (apriv->url_string, &uex);
+		if (camel_exception_is_set (&uex))
+			camel_exception_clear (&uex);
+
+		if (url) {
+			if (apriv->proto)
+				g_free (apriv->proto);
+			if (url->protocol)
+				apriv->proto = g_strdup (url->protocol);
+			else
+				apriv->proto = NULL;
+
+			if (apriv->user)
+				g_free (apriv->user);
+			if (url->user)
+				apriv->user = g_strdup (url->user);
+			else
+				apriv->user = NULL;
+
+			if (url->port != -1)
+				apriv->port = url->port;
+
+			if (apriv->host)
+				g_free (apriv->host);
+			if (url->host)
+				apriv->host = g_strdup (url->host);
+			else
+				apriv->host = NULL;
+
+			if (apriv->mech)
+				g_free (apriv->mech);
+			if (url->authmech)
+				apriv->mech = g_strdup (url->authmech);
+			else
+				apriv->mech = NULL;
+
+
+			camel_url_free (url);
+		}
+
 	}
 
 	if (recon_if && (apriv->status != TNY_CONNECTION_STATUS_DISCONNECTED))
