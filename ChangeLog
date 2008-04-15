@@ -1,3 +1,8 @@
+2008-04-15  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed alerts when get-msg-async takes place to have their account
+	not set to NULL
+
 2008-04-14  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Weak referenced folders in the folder-factor methods

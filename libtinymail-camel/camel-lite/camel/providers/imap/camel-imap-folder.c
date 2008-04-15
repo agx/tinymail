@@ -4544,6 +4544,8 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 			camel_service_get_provider (CAMEL_SERVICE (folder->parent_store)),
 			CAMEL_SERVICE (folder->parent_store)->url, ex);
 
+		CAMEL_SERVICE (store)->data = CAMEL_SERVICE (folder->parent_store)->data;
+
 		if (camel_exception_is_set (ex))
 		{
 			g_critical ("Severe interal error while trying to construct a new connection\n");
