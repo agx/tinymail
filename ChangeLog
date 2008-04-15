@@ -2,6 +2,7 @@
 
 	* Fixed alerts when get-msg-async takes place to have their account
 	not set to NULL
+	* Moved the POP's get-msg-qasync queue to its normal interactive queue
 
 2008-04-14  Philip Van Hoof <pvanhoof@gnome.org>
 

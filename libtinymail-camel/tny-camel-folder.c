@@ -48,6 +48,9 @@
 #include <tny-merge-folder.h>
 #include <tny-connection-policy.h>
 
+#include <tny-camel-imap-folder.h>
+#include <tny-camel-pop-folder.h>
+
 
 #define TINYMAIL_ENABLE_PRIVATE_API
 #include "tny-common-priv.h"
@@ -2553,6 +2556,7 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 {
 	GetMsgInfo *info;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelQueue *queue;
 
 	/* Idle info for the callbacks */
 	info = g_slice_new (GetMsgInfo);
@@ -2575,7 +2579,12 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 	/* thread reference header */
 	g_object_ref (info->header);
 
-	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_MSG_QUEUE (priv), 
+	if (!TNY_IS_CAMEL_POP_FOLDER (self))
+		queue = TNY_FOLDER_PRIV_GET_MSG_QUEUE (priv);
+	else
+		queue = TNY_FOLDER_PRIV_GET_QUEUE (priv);
+
+	_tny_camel_queue_launch (queue, 
 		tny_camel_folder_get_msg_async_thread, 
 		tny_camel_folder_get_msg_async_callback,
 		tny_camel_folder_get_msg_async_destroyer, 
