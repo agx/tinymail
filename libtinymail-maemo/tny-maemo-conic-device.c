@@ -111,12 +111,12 @@ conic_emit_status_destroy (gpointer user_data)
 	
 	g_debug ("%s: destroying status info (%p)", __FUNCTION__, user_data);
 
-	if (G_IS_OBJECT(info->self))
+	if (G_IS_OBJECT(info->self)) {
 		g_object_unref (info->self);
-	
-	g_slice_free (EmitStatusInfo, info);
-
-	g_debug ("%s: destroyed %p", __FUNCTION__, user_data);
+		g_slice_free (EmitStatusInfo, info);
+		g_debug ("%s: destroyed %p", __FUNCTION__, user_data);
+	} else
+		g_warning ("%s: BUG: not a valid info", __FUNCTION__);
 }
 
 static void 
@@ -209,9 +209,13 @@ handle_connect (TnyMaemoConicDevice *self, int con_err, int con_state)
 		if (err)
 			g_error_free (err);
 
-		g_object_unref (info->self);
-		g_free (info->iap_id);
-		g_slice_free (ConnectInfo, info);
+		if (G_IS_OBJECT(info->self)) {
+			g_object_unref (info->self);
+			g_free (info->iap_id);
+			info->iap_id = NULL;
+			g_slice_free (ConnectInfo, info);
+		} else
+			g_warning ("%s: BUG: info seems b0rked", __FUNCTION__);
 	}
 }
 
@@ -243,10 +247,11 @@ handle_con_idle_destroy (gpointer data)
 	
 	info = (HandleConnInfo *) data;
 
-	if (G_IS_OBJECT(info->self))
+	if (G_IS_OBJECT(info->self)) {
 		g_object_unref (info->self);
-	
-	g_slice_free (HandleConnInfo, data); 
+		g_slice_free (HandleConnInfo, data);
+	} else
+		g_warning ("%s: BUG: data seems b0rked", __FUNCTION__);
 }
 
 
@@ -331,13 +336,16 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 				 handle_con_idle_destroy);
 	}
 
-	if (emit)
+	if (emit) {
+		g_debug ("%s: emiting is_online (%s)",
+			 __FUNCTION__, is_online ? "true" : "false");
 		conic_emit_status (TNY_DEVICE (device), is_online);
+	}
 }
 
 
 /**
- * tny_maemo_conic_device_connect:
+ * tny_maemo_conic_device_connect_async:
  * @self: a #TnyDevice object
  * @iap_id: the id of the Internet Access Point (IAP), or NULL for 'any;
  * @user_requested: whether or not the connection was automatically requested or by an user action
@@ -396,11 +404,16 @@ tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self,
 
 	if (request_failed) {
 		priv->connect_slot = NULL;
-		if (info->callback)
-			info->callback (info->self, iap_id, FALSE, err, info->user_data);
-		g_free (info->iap_id);
-		g_object_unref (info->self);
-		g_slice_free (ConnectInfo, info);
+		if (G_IS_OBJECT(info->self)) {
+			if (info->callback)
+				info->callback (info->self, iap_id, FALSE, err, info->user_data);
+			g_free (info->iap_id);
+			info->iap_id = NULL;
+			g_object_unref (info->self);
+			info->self = NULL;
+			g_slice_free (ConnectInfo, info);
+		} else 
+			g_warning ("%s: BUG: info seems b0rked", __FUNCTION__);
 	}
 }
 
@@ -520,6 +533,16 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 	return con_ic_connection_get_all_iaps (priv->cnx);
 }
 
+static void
+unref_gobject (GObject *obj)
+{
+	if (G_IS_OBJECT(obj))
+		g_object_unref(obj);
+	else
+		g_warning ("%s: not a valid GObject (%p)",
+			   __FUNCTION__, obj);
+}
+
 
 /**
  * tny_maemo_conic_device_free_iap_list:
@@ -531,7 +554,7 @@ tny_maemo_conic_device_get_iap_list (TnyMaemoConicDevice *self)
 void
 tny_maemo_conic_device_free_iap_list (TnyMaemoConicDevice *self, GSList* cnx_list)
 {
-	g_slist_foreach (cnx_list, (GFunc)g_object_unref, NULL);
+	g_slist_foreach (cnx_list, (GFunc)unref_gobject, NULL);
 	g_slist_free (cnx_list);
 }
 
@@ -554,8 +577,11 @@ tny_maemo_conic_device_force_online (TnyDevice *device)
 	priv->is_online = TRUE;
 
 	/* Signal if it changed: */
-	if (!already_online)
+	if (!already_online) {
+		g_debug ("%s: emiting connection-changed signal",
+			 __FUNCTION__);
 		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
+	}
 }
 
 
@@ -597,9 +623,9 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	/* We should not have a real is_online, based on what libconic has told us: */
 
-	priv->forced = FALSE;
-	priv->iap = NULL;
-	priv->is_online = FALSE;
+	priv->forced       = FALSE;
+	priv->iap          = NULL;
+	priv->is_online    = FALSE;
 	priv->connect_slot = NULL;
 
 	priv->cnx = con_ic_connection_new ();
@@ -620,7 +646,8 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	/* This will get us in connected state only if there is already a connection.
 	 * thus, this will setup our state correctly when we receive the signals. */
-	if (!con_ic_connection_connect (priv->cnx, CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
+	if (!con_ic_connection_connect (priv->cnx, 
+					CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
 		g_warning ("%s: could not send connect dbus message",
 			__FUNCTION__);	
 }
@@ -642,9 +669,9 @@ tny_maemo_conic_device_finalize (GObject *obj)
 {
 	TnyMaemoConicDevicePriv *priv;
 
-	g_return_if_fail (obj && G_IS_OBJECT(obj));
+	g_return_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(obj));
 
-	g_debug ("%s", __FUNCTION__);
+	g_debug ("%s: shutting the device down...", __FUNCTION__);
 	
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
 
@@ -656,12 +683,12 @@ tny_maemo_conic_device_finalize (GObject *obj)
 						   priv->iap);
 		g_object_unref (priv->cnx);
 		priv->cnx = NULL;
-	}
-
-	if (priv->iap) {
-		g_free (priv->iap);
-		priv->iap = NULL;
-	}
+	} else
+		g_warning ("%s: BUG: priv->cnx is not a valid connection",
+			   __FUNCTION__);
+	
+	g_free (priv->iap);
+	priv->iap = NULL;
 
 	(*parent_class->finalize) (obj);
 }
@@ -762,6 +789,9 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self,
 	gboolean request_failed = FALSE;
 	ConIcConnectFlags flags;
 
+	g_warning ("%s: you should tny_maemo_conic_device_connect_async",
+		   __FUNCTION__);
+
 	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
@@ -787,7 +817,7 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self,
 	}
 
 	if (request_failed) {
-		g_object_unref (priv->loop);
+		g_main_loop_unref (priv->loop);
 		priv->loop = NULL;
 	}
 	
@@ -801,8 +831,10 @@ tny_maemo_conic_device_connect (TnyMaemoConicDevice *self,
 		g_main_loop_run (priv->loop);
 	GDK_THREADS_ENTER();
 
-	g_main_loop_unref (priv->loop);
-	priv->loop = NULL;
+	if (priv->loop) {
+		g_main_loop_unref (priv->loop);
+		priv->loop = NULL;
+	}
 
 	return priv->is_online;
 }
