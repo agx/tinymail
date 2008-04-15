@@ -121,15 +121,24 @@ AC_HELP_STRING([--with-ssl],
         fi
    ])
 
-if test x$has_nss = xyes; then
-     AC_MSG_CHECKING(Support for libCST)
-     PKG_CHECK_MODULES(LIBCST, cst, have_cst=yes, have_cst=no)
-     AC_MSG_RESULT($have_cst)
+want_cst=no
+AC_ARG_ENABLE(cst,
+[  --enable-cst=[no/yes]      Build with libcst support, incomplete and not supported yet],want_cst=$enableval,,)
+
+if test "x$want_cst" = "xyes"; then
+   if test x$has_nss = xyes; then
+        AC_MSG_CHECKING(Support for libCST)
+     	PKG_CHECK_MODULES(LIBCST, cst, have_cst=yes, have_cst=no)
+     	AC_MSG_RESULT($have_cst)
+   else
+	LIBCST_CFLAGS=
+     	LIBCST_LIBS=
+     	have_cst=no
+   fi
 else
-     LIBCST_CFLAGS=
-     LIBCST_LIBS=
-     have_cst=no
+   have_cst=no
 fi
+
 AM_CONDITIONAL([HAVE_CST],[test x"$have_cst" == "xyes"])
 if test x"$have_cst" == "xyes"; then
 	AC_DEFINE(ENABLE_CST, [], [Enable libcst])
