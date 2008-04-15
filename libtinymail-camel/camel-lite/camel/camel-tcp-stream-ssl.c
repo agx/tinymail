@@ -969,7 +969,7 @@ camel_certdb_nss_cert_set(CamelCertDB *certdb, CamelCert *ccert, CERTCertificate
 
 	dir = g_build_filename (session->storage_path, ".camel_certs", NULL);
 
-	if (g_stat (dir, &st) == -1 && g_mkdir (dir, 0700) == -1) {
+	if (g_stat (dir, &st) == -1 && g_mkdir_with_parents (dir, 0700) == -1) {
 		g_warning ("Could not create cert directory '%s': %s", dir, strerror (errno));
 		g_free (dir);
 		return;

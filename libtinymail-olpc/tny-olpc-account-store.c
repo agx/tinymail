@@ -66,7 +66,6 @@ struct _TnyOlpcAccountStorePriv
 
 
 static gchar* 
-
 per_account_get_pass(TnyAccount *account, const gchar *prompt, gboolean *cancel)
 {
 	TnyPlatformFactory *platfact = tny_olpc_platform_factory_get_instance ();
@@ -76,7 +75,7 @@ per_account_get_pass(TnyAccount *account, const gchar *prompt, gboolean *cancel)
 	pwdgetter = tny_platform_factory_new_password_getter (platfact);
 	retval = (gchar*) tny_password_getter_get_password (pwdgetter, 
 		tny_account_get_id (account), prompt, cancel);
-	g_object_unref (G_OBJECT (pwdgetter));
+	g_object_unref (pwdgetter);
 
 	return retval;
 }
@@ -90,7 +89,7 @@ per_account_forget_pass(TnyAccount *account)
 
 	pwdgetter = tny_platform_factory_new_password_getter (platfact);
 	tny_password_getter_forget_password (pwdgetter, tny_account_get_id (account));
-	g_object_unref (G_OBJECT (pwdgetter));
+	g_object_unref (pwdgetter);
 
 	return;
 }
@@ -165,7 +164,7 @@ load_accounts (TnyAccountStore *self)
 		gchar *proto, *type, *key, *name, *mech;
 		TnyAccount *account = NULL; gint port = 0;
 		gchar *fullfilen = g_build_filename (g_get_home_dir(), 
-			".tinymail", "accounts", filen);
+			".tinymail", "accounts", filen, NULL);
 		keyfile = g_key_file_new ();
 
 		if (!g_key_file_load_from_file (keyfile, fullfilen, G_KEY_FILE_NONE, NULL))
@@ -364,7 +363,7 @@ tny_olpc_account_store_get_device (TnyAccountStore *self)
 {
 	TnyOlpcAccountStorePriv *priv = TNY_OLPC_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	return g_object_ref (G_OBJECT (priv->device));
+	return g_object_ref (priv->device);
 }
 
 /**
@@ -393,6 +392,7 @@ tny_olpc_account_store_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyPlatformFactory *platfact = TNY_PLATFORM_FACTORY (
 		tny_olpc_platform_factory_get_instance ());
 
+	priv->cache_dir = NULL;
 	priv->accounts = NULL;
 	priv->device = tny_platform_factory_new_device (platfact);
 
@@ -410,6 +410,8 @@ tny_olpc_account_store_finalize (GObject *object)
 
 	if (priv->cache_dir)
 		g_free (priv->cache_dir);
+
+	g_object_unref (priv->device);
 
 	(*parent_class->finalize) (object);
 

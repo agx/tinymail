@@ -357,21 +357,7 @@ tny_gnome_account_store_get_cache_dir (TnyAccountStore *self)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 
-	if (G_UNLIKELY (!priv->cache_dir))
-	{
-		/* Note that there's no listener for this key. If it changes,
-		   the camelsession should be destroyed and rebuild from scratch.
-		   Which basically means reloading the accounts aswell. 
-		  
-		   So say you're a nut who wants this key to be updatable at 
-		   runtime, you'll have to unload all the accounts here, and of
-		   course reload them. All the functionality for that is already
-		   available. Perhaps I should just do it ... hmm, maybe another
-		   day. Soon. Perhaps. I don't know. Probably . . . . bleh. 
-
-		   Oh and, not to forget! You should probably also move the old
-		   cache location to the new one. Or cleanup the old one. */
-
+	if (!priv->cache_dir) {
 		gchar *cache_dir = gconf_client_get_string (priv->client, 
 			"/apps/tinymail/cache_dir", NULL);
 		priv->cache_dir = g_build_filename (g_get_home_dir (), 
@@ -393,23 +379,18 @@ tny_gnome_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyG
 	if (!priv->accounts)
 		load_accounts (self);
 
-	if (priv->accounts)
-	{
+	if (priv->accounts) {
 		GList *copy = priv->accounts;
-		while (copy)
-		{
+		while (copy) {
 			TnyAccount *account = copy->data;
 
-			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS)
-			{
+			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_STORE_ACCOUNTS) {
 				if (TNY_IS_STORE_ACCOUNT (account))
 					tny_list_prepend (list, (GObject*)account);
-			} else if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
-			{
+			} else if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS) {
 				if (TNY_IS_TRANSPORT_ACCOUNT (account))
 					tny_list_prepend (list, (GObject*)account);
 			}
-
 			copy = g_list_next (copy);
 		}
 	}
@@ -447,43 +428,6 @@ or
 	gconftool-2 -s /apps/tinymail/accounts/0/url_string -t string url_string
 
 */
-#if 0
-static void
-tny_gnome_account_store_add_account (TnyAccountStore *self, TnyAccount *account, const gchar *type)
-{
-	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
-	gchar *key = NULL;
-	gint count = gconf_client_get_int (priv->client, "/apps/tinymail/accounts/count", NULL);
-
-	g_assert (TNY_IS_ACCOUNT (account));
-
-	key = g_strdup_printf ("/apps/tinymail/accounts/%d/hostname", count);
-	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_get_hostname (account), NULL);
-	g_free (key); 
-
-	key = g_strdup_printf ("/apps/tinymail/accounts/%d/proto", count);
-	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_get_proto (account), NULL);
-	g_free (key); 
-
-	key = g_strdup_printf ("/apps/tinymail/accounts/%d/type", count);
-	gconf_client_set_string (priv->client, (const gchar*) key, type, NULL);
-	g_free (key); 
-
-	key = g_strdup_printf ("/apps/tinymail/accounts/%d/user", count);
-	gconf_client_set_string (priv->client, (const gchar*) key, 
-		tny_account_get_user (account), NULL);
-	g_free (key); 
-
-	count++;
-
-	gconf_client_set_int (priv->client, "/apps/tinymail/accounts/count", 
-		count, NULL);
-
-	return;
-}
-#endif
 
 
 static TnyDevice*
@@ -522,6 +466,7 @@ tny_gnome_account_store_instance_init (GTypeInstance *instance, gpointer g_class
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
 	TnyPlatformFactory *platfact;
 
+	priv->cache_dir = NULL;
 	priv->accounts = NULL;
 	priv->client = gconf_client_get_default ();
 
@@ -548,7 +493,7 @@ tny_gnome_account_store_finalize (GObject *object)
 
 	kill_stored_accounts (priv);
 
-	if (G_LIKELY (priv->cache_dir))
+	if (priv->cache_dir)
 		g_free (priv->cache_dir);
 
 	(*parent_class->finalize) (object);
@@ -569,7 +514,6 @@ TnySessionCamel*
 tny_gnome_account_store_get_session (TnyGnomeAccountStore *self)
 {
 	TnyGnomeAccountStorePriv *priv = TNY_GNOME_ACCOUNT_STORE_GET_PRIVATE (self);
-    
 	return priv->session;
 }
 

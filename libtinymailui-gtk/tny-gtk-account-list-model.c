@@ -213,8 +213,9 @@ tny_gtk_account_list_model_remove (TnyList *self, GObject* item)
 	me->first = g_list_remove (me->first, (gconstpointer)item);
 
 	if (gtk_tree_model_get_iter_first (model, &iter))
-	  while (gtk_tree_model_iter_next (model, &iter))
+	  do 
 	  {
+
 		GObject *citem;
 
 		gtk_tree_model_get (model, &iter, 
@@ -228,7 +229,7 @@ tny_gtk_account_list_model_remove (TnyList *self, GObject* item)
 			break;
 		}
 		g_object_unref (citem);
-	  }
+	  } while (gtk_tree_model_iter_next (model, &iter));
 
 	g_mutex_unlock (me->iterator_lock);
 }
