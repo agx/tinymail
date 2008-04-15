@@ -627,6 +627,7 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->iap          = NULL;
 	priv->is_online    = FALSE;
 	priv->connect_slot = NULL;
+	priv->loop         = NULL;
 
 	priv->cnx = con_ic_connection_new ();
 
