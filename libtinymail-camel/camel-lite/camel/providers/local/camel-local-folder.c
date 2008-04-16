@@ -503,6 +503,12 @@ local_refresh_info(CamelFolder *folder, CamelException *ex)
 {
 	CamelLocalFolder *lf = (CamelLocalFolder *)folder;
 
+	if (!folder->summary)
+		folder->summary = (CamelFolderSummary *)CLOCALF_CLASS(lf)->create_summary(lf, lf->summary_path, lf->folder_path, lf->index);
+
+	if (!folder->summary)
+		return;
+
 	if (camel_local_summary_check((CamelLocalSummary *)folder->summary, lf->changes, ex) == -1)
 		return;
 
