@@ -178,7 +178,9 @@ tny_vfs_stream_read  (TnyStream *self, char *buffer, gsize n)
 	if (nread > 0 && result == GNOME_VFS_OK)
 		priv->position += nread;
 	else { 
-		if (nread == 0)
+		if ((result != GNOME_VFS_OK) && (result != GNOME_VFS_ERROR_EOF))
+			nread = -1;
+		else if (nread == 0)
 			priv->eos = TRUE;
 		tny_vfs_stream_set_errno (result);
 	}

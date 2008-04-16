@@ -925,6 +925,7 @@ tny_camel_mime_part_get_decoded_stream_default (TnyMimePart *self)
 	CamelDataWrapper *wrapper;
 	CamelMedium *medium;
 	CamelStream *stream = camel_stream_mem_new ();
+	gssize bytes = -1;
 
 	g_mutex_lock (priv->part_lock);
 	medium =  CAMEL_MEDIUM (priv->part);
@@ -943,15 +944,17 @@ tny_camel_mime_part_get_decoded_stream_default (TnyMimePart *self)
 		camel_stream_reset (wrapper->stream);
 
 		if (camel_content_type_is (wrapper->mime_type, "text", "*"))
-			camel_stream_format_text (wrapper, stream);
+			bytes = camel_stream_format_text (wrapper, stream);
 		else
-			camel_data_wrapper_decode_to_stream (wrapper, stream);
+			bytes = camel_data_wrapper_decode_to_stream (wrapper, stream);
 	}
 
-	retval = TNY_STREAM (tny_camel_stream_new (stream));
-	camel_object_unref (stream);
+	if (bytes >= 0) {
+		retval = TNY_STREAM (tny_camel_stream_new (stream));
+		tny_stream_reset (retval);
+	}
 
-	tny_stream_reset (retval);
+	camel_object_unref (stream);
 	camel_object_unref (medium);
 
 	return retval;
