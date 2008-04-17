@@ -272,7 +272,7 @@ tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *cha
 			TnyHeader *header = TNY_HEADER (tny_iterator_get_current (iter));
 			uid = tny_header_dup_uid (header);
 			if (uid)
-				g_ptr_array_add (array, uid);
+				g_ptr_array_add (array, (gpointer) uid);
 			g_object_unref (header);
 			tny_iterator_next (iter);
 		}

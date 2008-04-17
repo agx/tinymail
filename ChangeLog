@@ -1,3 +1,7 @@
+2008-04-17  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Corrections to reference handling for TnyCamelSendQueue
+
 2008-04-16  José Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c

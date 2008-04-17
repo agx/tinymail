@@ -20,6 +20,7 @@
 #include <config.h>
 #include <glib.h>
 #include <glib/gi18n-lib.h>
+#include <string.h>
 
 #include <tny-gnome-keyring-password-getter.h>
 

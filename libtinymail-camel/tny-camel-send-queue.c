@@ -329,6 +329,8 @@ emit_queue_control_signals (TnySendQueue *self, guint signal_id)
 typedef struct {
 	TnySendQueue *self;
 	TnyDevice *device;
+	TnyAccount *outbox_account, *sentbox_account;
+	TnyFolder *outbox, *sentbox;
 } MainThreadInfo;
 
 static gpointer
@@ -337,7 +339,6 @@ thread_main (gpointer data)
 	MainThreadInfo *info = (MainThreadInfo *) data;
 	TnySendQueue *self = info->self;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
-	TnyFolder *sentbox = NULL, *outbox = NULL;
 	guint i = 0, length = 0;
 	TnyList *list = NULL;
 	TnyDevice *device = info->device;
@@ -349,24 +350,7 @@ thread_main (gpointer data)
 	g_static_rec_mutex_lock (priv->todo_lock);
 	{
 		GError *terror = NULL;
-		sentbox = get_sentbox (self);
-		outbox = tny_send_queue_get_outbox (self);
-
-		if (!outbox || !sentbox) {
-			if (outbox)
-				g_object_unref (outbox);
-			if (sentbox)
-				g_object_unref (sentbox);
-			g_warning ("tny_send_queue_get_outbox and "
-				"tny_send_queue_get_sentbox are not allowed to "
-				"return NULL. This indicates a problem in the "
-				"software.");
-			priv->is_running = FALSE;
-			g_static_rec_mutex_unlock (priv->todo_lock);
-			goto errorhandler;
-		}
-
-		tny_folder_get_headers (outbox, list, TRUE, &terror);
+		tny_folder_get_headers (info->outbox, list, TRUE, &terror);
 
 		if (terror != NULL)
 		{
@@ -402,7 +386,7 @@ thread_main (gpointer data)
 			TnyIterator *giter = NULL;
 
 			if (tny_device_is_online (device))
-				tny_folder_get_headers (outbox, headers, TRUE, &ferror);
+				tny_folder_get_headers (info->outbox, headers, TRUE, &ferror);
 			else {
 				priv->is_running = FALSE;
 				g_static_rec_mutex_unlock (priv->todo_lock);
@@ -480,7 +464,7 @@ thread_main (gpointer data)
 			GError *err = NULL;
 
 			tny_list_prepend (hassent, G_OBJECT (header));
-			msg = tny_folder_get_msg (outbox, header, &err);
+			msg = tny_folder_get_msg (info->outbox, header, &err);
 
 			/* Emits msg-sending signal to inform a new msg is being sent */
 			emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENDING, i, priv->total);
@@ -515,7 +499,7 @@ thread_main (gpointer data)
 					priv->cur_i = i;
 					tny_header_set_flag (header, TNY_HEADER_FLAG_SEEN);
 					tny_header_set_flag (header, TNY_HEADER_FLAG_ANSWERED);
-					tny_folder_transfer_msgs (outbox, hassent, sentbox, TRUE, &newerr);
+					tny_folder_transfer_msgs (info->outbox, hassent, info->sentbox, TRUE, &newerr);
 					if (newerr != NULL) {
 						emit_error (self, header, msg, newerr, i, priv->total);
 						g_error_free (newerr);
@@ -559,13 +543,19 @@ errorhandler:
 	if (failed_headers)
 		g_hash_table_destroy (failed_headers);
 
-	g_object_unref (sentbox);
-	g_object_unref (outbox);
-
 	priv->thread = NULL;
 
 	g_object_unref (info->device);
 	g_object_unref (info->self);
+
+	if (info->outbox_account)
+		g_object_unref (info->outbox_account);
+	if (info->sentbox_account)
+		g_object_unref (info->sentbox_account);
+
+	g_object_unref (info->outbox);
+	g_object_unref (info->sentbox);
+
 	g_slice_free (MainThreadInfo, info);
 
 	/* Emit the queue-stop signal */
@@ -574,8 +564,10 @@ errorhandler:
 	return NULL;
 }
 
+#define FOLDERSNOTREADY 	_("tny_send_queue_get_outbox and tny_send_queue_get_sentbox are not allowed to return NULL. This indicates a problem in the software.")
+
 static void 
-create_worker (TnySendQueue *self)
+create_worker (TnySendQueue *self, GError **err)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
@@ -590,6 +582,28 @@ create_worker (TnySendQueue *self)
 			info = g_slice_new0 (MainThreadInfo);
 			info->self = g_object_ref (self);
 			info->device = g_object_ref (spriv->device);
+
+			info->outbox = tny_send_queue_get_outbox (self);
+			info->sentbox = get_sentbox (self);
+
+			if (!info->outbox || !info->sentbox) {
+
+				g_set_error (err, TNY_SERVICE_ERROR, 
+					TNY_SERVICE_ERROR_ADD_MSG, FOLDERSNOTREADY);
+				g_warning (FOLDERSNOTREADY);
+
+				g_object_unref (info->self);
+				g_object_unref (info->device);
+				if (info->sentbox)
+					g_object_unref (info->sentbox);
+				if (info->outbox)
+					g_object_unref (info->outbox);
+				g_slice_free (MainThreadInfo, info);
+				return;
+			}
+
+			info->sentbox_account = tny_folder_get_account (info->sentbox);
+			info->outbox_account = tny_folder_get_account (info->outbox);
 
 			emit_queue_control_signals (self, TNY_SEND_QUEUE_START);
 
@@ -697,14 +711,22 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 {
 	OnAddedInfo *info = (OnAddedInfo *) user_data;
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
+	GError *new_err = NULL;
+
+	if (!err) {
+		priv->total++;
+		if (priv->total >= 1 && !priv->is_running)
+			create_worker (info->self, &new_err);
+	}
 
 	/* Call user callback after msg has beed added to OUTBOX, waiting to be sent*/
 	if (info->callback)
-		info->callback (info->self, info->cancelled, info->msg, info->user_data, err);
+		info->callback (info->self, info->cancelled, info->msg, info->user_data, 
+			new_err?new_err:err);
 
-	priv->total++;
-	if (priv->total >= 1 && !priv->is_running)
-		create_worker (info->self);
+	if (new_err)
+		g_error_free (new_err);
+
 	if (info->self)
 		g_object_unref (info->self);
 	if (info->msg)
@@ -1106,8 +1128,11 @@ tny_camel_send_queue_get_transport_account (TnyCamelSendQueue *self)
 void
 tny_camel_send_queue_flush (TnyCamelSendQueue *self)
 {
+	GError *err = NULL;
 	g_return_if_fail (TNY_IS_CAMEL_SEND_QUEUE(self));
-	create_worker (TNY_SEND_QUEUE (self));
+	create_worker (TNY_SEND_QUEUE (self), &err);
+	if (err)
+		g_error_free (err);
 }
 
 
