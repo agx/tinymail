@@ -333,6 +333,62 @@ typedef struct {
 	TnyFolder *outbox, *sentbox;
 } MainThreadInfo;
 
+typedef struct {
+	TnyFolder *folder;
+	TnyList *list;
+	gboolean refresh;
+	GError **err;
+
+	GCond* condition;
+	gboolean had_callback;
+	GMutex *mutex;
+
+} GetHeadersSync;
+
+static void 
+get_headers_async (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data)
+{
+	GetHeadersSync *info = (GetHeadersSync *) user_data;
+
+	if (err && info->err)
+		*info->err = g_error_copy (err);
+
+	g_mutex_lock (info->mutex);
+	g_cond_broadcast (info->condition);
+	info->had_callback = TRUE;
+	g_mutex_unlock (info->mutex);
+}
+
+static void
+get_headers_sync (TnyFolder *folder, TnyList *list, gboolean refresh, GError **err)
+{
+	GetHeadersSync *info = g_slice_new0 (GetHeadersSync);
+
+	info->mutex = g_mutex_new ();
+	info->condition = g_cond_new ();
+	info->had_callback = FALSE;
+
+	info->folder = g_object_ref (folder);
+	info->list = g_object_ref (list);
+	info->refresh = refresh;
+	info->err = err;
+
+	tny_folder_get_headers_async (folder, list, refresh, 
+			get_headers_async, NULL, info);
+
+	g_mutex_lock (info->mutex);
+	if (!info->had_callback)
+		g_cond_wait (info->condition, info->mutex);
+	g_mutex_unlock (info->mutex);
+
+	g_mutex_free (info->mutex);
+	g_cond_free (info->condition);
+
+	g_object_unref (info->folder);
+	g_object_unref (info->list);
+	g_slice_free (GetHeadersSync, info);
+}
+
 static gpointer
 thread_main (gpointer data)
 {
@@ -350,7 +406,7 @@ thread_main (gpointer data)
 	g_static_rec_mutex_lock (priv->todo_lock);
 	{
 		GError *terror = NULL;
-		tny_folder_get_headers (info->outbox, list, TRUE, &terror);
+		get_headers_sync (info->outbox, list, TRUE, &terror);
 
 		if (terror != NULL)
 		{
@@ -385,8 +441,8 @@ thread_main (gpointer data)
 			GList *to_remove = NULL, *copy;
 			TnyIterator *giter = NULL;
 
-			if (tny_device_is_online (device))
-				tny_folder_get_headers (info->outbox, headers, TRUE, &ferror);
+			if (tny_device_is_online (device)) 
+				get_headers_sync (info->outbox, headers, TRUE, &ferror);
 			else {
 				priv->is_running = FALSE;
 				g_static_rec_mutex_unlock (priv->todo_lock);

@@ -1,6 +1,7 @@
 2008-04-17  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Corrections to reference handling for TnyCamelSendQueue
+	* Removed a tny_folder_get_headers (deprecated API)
 
 2008-04-16  José Dapena Paz  <jdapena@igalia.com>
 
