@@ -132,6 +132,7 @@ tny_send_queue_get_outbox (TnySendQueue *self)
  *
  * Add a message to the send queue, usually adding it to the outbox too.
  *
+ * Deprecated: 1.0: Use tny_send_queue_add_async in stead
  * since: 1.0
  * audience: application-developer
  **/

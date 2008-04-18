@@ -769,11 +769,8 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
 	GError *new_err = NULL;
 
-	if (!err) {
-		priv->total++;
-		if (priv->total >= 1 && !priv->is_running)
-			create_worker (info->self, &new_err);
-	}
+	if (!err & !priv->is_running)
+		create_worker (info->self, &new_err);
 
 	/* Call user callback after msg has beed added to OUTBOX, waiting to be sent*/
 	if (info->callback)
@@ -865,54 +862,33 @@ tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySend
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	GError *err = NULL;
+	OnAddedInfo *info = NULL;
+	TnyFolder *outbox;
 
 	g_assert (TNY_IS_CAMEL_MSG (msg));
 
-	g_static_rec_mutex_lock (priv->todo_lock);
-	{
-		TnyFolder *outbox;
-		TnyList *headers = tny_simple_list_new ();
-		OnAddedInfo *info = NULL;
+	outbox = tny_send_queue_get_outbox (TNY_SEND_QUEUE (self));
 
-		outbox = tny_send_queue_get_outbox (TNY_SEND_QUEUE (self));
+	if (!outbox || !TNY_IS_FOLDER (outbox)) {
+		g_set_error (&err, TNY_SERVICE_ERROR, 
+			TNY_SERVICE_ERROR_ADD_MSG,
+			_("Operating can't continue: send queue not ready "
+			"because it does not have a valid outbox. "
+			"This problem indicates a bug in the software."));
 
-		if (!outbox || !TNY_IS_FOLDER (outbox))
-		{
-			g_set_error (&err, TNY_SERVICE_ERROR, 
-				TNY_SERVICE_ERROR_ADD_MSG,
-				_("Operating can't continue: send queue not ready "
-				"because it does not have a valid outbox. "
-				"This problem indicates a bug in the software."));
-			g_object_unref (headers);
-			g_static_rec_mutex_unlock (priv->todo_lock);
-			return;
-		}
-
-		tny_folder_get_headers (outbox, headers, TRUE, &err);
-
-		if (err!= NULL)
-		{
-			g_object_unref (headers);
-			g_object_unref (outbox);
-			g_static_rec_mutex_unlock (priv->todo_lock);
-			return;
-		}
-
-		priv->total = tny_list_get_length (headers);
-		g_object_unref (headers);
-
-		info = g_slice_new0 (OnAddedInfo);
-
-		info->msg = TNY_MSG (g_object_ref (msg));
-		info->self = TNY_SEND_QUEUE (g_object_ref (self));
-		info->callback = callback;
-		info->user_data = user_data;
-
-		tny_folder_add_msg_async (outbox, msg, on_added, on_status, info);
-
-		g_object_unref (outbox);
+		return;
 	}
-	g_static_rec_mutex_unlock (priv->todo_lock);
+
+	info = g_slice_new0 (OnAddedInfo);
+
+	info->msg = TNY_MSG (g_object_ref (msg));
+	info->self = TNY_SEND_QUEUE (g_object_ref (self));
+	info->callback = callback;
+	info->user_data = user_data;
+
+	tny_folder_add_msg_async (outbox, msg, on_added, on_status, info);
+
+	g_object_unref (outbox);
 
 	return;
 }

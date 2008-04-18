@@ -1,3 +1,9 @@
+2008-04-18  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Removed unnecessary old code rot in TnyCamelSendQueue that might
+	cause a deathlock
+	* Decprecated tny_send_queue_add, use tny_send_queue_add_async
+
 2008-04-17  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Corrections to reference handling for TnyCamelSendQueue
