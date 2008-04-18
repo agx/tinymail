@@ -769,6 +769,9 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (info->self);
 	GError *new_err = NULL;
 
+	if (!err)
+		priv->total++;
+
 	if (!err & !priv->is_running)
 		create_worker (info->self, &new_err);
 
