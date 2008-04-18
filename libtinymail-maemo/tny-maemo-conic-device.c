@@ -264,6 +264,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	gboolean emit = FALSE;
 	HandleConnInfo *iinfo;
 	int con_err, con_state;
+	const gchar *event_iap_id;
 	
 	/* we don't need cnx in this function */
 	g_return_if_fail (user_data && TNY_IS_MAEMO_CONIC_DEVICE(user_data));
@@ -279,6 +280,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 	con_err = con_ic_connection_event_get_error (event);
 	con_state = con_ic_connection_event_get_status (event);
+	event_iap_id = con_ic_event_get_iap_id ((ConIcEvent *) event);
 
 	switch (con_err) {
 		case CON_IC_CONNECTION_ERROR_NONE:
@@ -299,7 +301,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 	switch (con_state) {
 		case CON_IC_STATUS_CONNECTED:
 			g_free (priv->iap);
-			priv->iap = g_strdup (con_ic_event_get_iap_id ((ConIcEvent*)(event)));
+			priv->iap = g_strdup (event_iap_id);
 			if (!priv->is_online)
 				emit = TRUE;
 			is_online = TRUE;
@@ -312,6 +314,10 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 			priv->iap = NULL;
 			if (priv->is_online)
 				emit = TRUE;
+			/* if iap is "" then connection attempt has been canceled */
+			if ((con_err == CON_IC_CONNECTION_ERROR_NONE) &&
+			    (!event_iap_id || (strlen (event_iap_id)== 0)))
+				con_err = CON_IC_CONNECTION_ERROR_USER_CANCELED;
 			is_online = FALSE;
 			/* Stop blocking tny_maemo_conic_device_connect(), if we are: */
 			stop_loop (device);
