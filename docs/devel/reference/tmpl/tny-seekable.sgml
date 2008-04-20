@@ -1,12 +1,12 @@
 <!-- ##### SECTION Title ##### -->
-tny-seekable
+TnySeekable
 
 <!-- ##### SECTION Short_Description ##### -->
-
+Makes a #TnyStream seekable
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
-
+Interface for making a stream seekable
 </para>
 
 <!-- ##### SECTION See_Also ##### -->
