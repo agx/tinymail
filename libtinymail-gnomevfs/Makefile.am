@@ -1,5 +1,5 @@
 INCLUDES = $(LIBTINYMAIL_GNOMEVFS_CFLAGS) \
-	-I. -I$(top_srcdir)		  \
+	-I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 	-I$(top_srcdir)/libtinymail
 
 lib_LTLIBRARIES = libtinymail-gnomevfs-1.0.la 
@@ -21,7 +21,7 @@ libtinymail_gnomevfs_1_0_la_LDFLAGS = -export-dynamic \
 libtinymail_gnomevfs_1_0includedir = $(includedir)/libtinymail-gnomevfs-$(API_VERSION)
 libtinymail_gnomevfs_1_0include_HEADERS = $(libtinymail_gnomevfs_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymail-gnomevfs-$(API_VERSION).pc: libtinymail-gnomevfs.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig

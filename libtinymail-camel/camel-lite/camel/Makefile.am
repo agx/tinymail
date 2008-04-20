@@ -14,8 +14,11 @@ LIBCAMEL_PROVIDER_PLATFORM_DEP_SOURCES =	\
 	camel-sasl-kerberos4.c
 endif
 
-%-$(API_VERSION).pc: %.pc
-	 cp $< $@
+camel-lite-$(API_VERSION).pc:camel-lite.pc
+	cp $< $@
+
+camel-lite-provider-$(API_VERSION).pc:camel-lite-provider.pc
+	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_in_files = camel-lite.pc.in camel-lite-provider.pc.in

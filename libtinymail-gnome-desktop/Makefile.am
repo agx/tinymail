@@ -1,4 +1,4 @@
-INCLUDES = -I. -I$(top_srcdir) \
+INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 	$(LIBTINYMAIL_GNOME_DESKTOP_CFLAGS) \
 	$(LIBTINYMAIL_CAMEL_CFLAGS) \
 	-I$(top_srcdir)/libtinymail \
@@ -45,7 +45,7 @@ libtinymail_gnome_desktop_1_0_la_LDFLAGS = -export-dynamic \
 	-version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
 
 if BUILD_GNOME
-libtinymail_gnome_desktop_1_0_la_LIBADD += $(top_builddir)/libtinymailui-gnome-keyring/libtinymailui-gnome-keyring.a
+libtinymail_gnome_desktop_1_0_la_LIBADD += $(top_builddir)/libtinymailui-gnome-keyring/libtinymailui-gnome-keyring.la
 endif
 
 if BUILD_MOZEMBED
@@ -59,7 +59,7 @@ endif
 libtinymailgnomedesktopincludedir = $(includedir)/libtinymail-gnome-desktop-$(API_VERSION)
 libtinymailgnomedesktopinclude_HEADERS = $(libtinymail_gnome_desktop_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymail-gnome-desktop-$(API_VERSION).pc: libtinymail-gnome-desktop.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig

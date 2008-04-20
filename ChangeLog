@@ -1,3 +1,17 @@
+2008-04-20  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* These problems got highlighted during pre-release 0.0.9
+	* Build environment improvements
+	* Added --enable-debug=yes (default is no), 
+	adds -g -ggdb -O0 -DDEBUG -DDBC to the CFLAGS
+	* Added --enable-deprecated=no (default is yes),
+	adds -DTNY_DISABLE_DEPRECATED to the CFLAGS
+	* Removed all %-names in the Makefile.am files since these are a GNU
+	make ism. There are a few remaining GNU make isms like $(subst ...)
+	and $(addsuffix ...) who are to be removed / replaced soon
+	* Added deprecation marker to gtk-doc-scan's command line
+	* Attempt at fixing TnyHeader's documentation
+
 2008-04-18  Jose Dapena Paz  <jose@gondomar.wired.citic.igalia.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c: add a simple hack to
@@ -9,6 +23,7 @@
 	* Removed unnecessary old code rot in TnyCamelSendQueue that might
 	cause a deathlock
 	* Decprecated tny_send_queue_add, use tny_send_queue_add_async
+	* Pre-release 0.0.9 preparations
 
 2008-04-17  Philip Van Hoof <pvanhoof@gnome.org>
 

@@ -71,6 +71,16 @@ mozilla_nss_eds=""
 
 AC_TNY_MOZ_CHECK
 
+dnl ### Debugging ###
+AC_ARG_ENABLE(debug,
+AC_HELP_STRING([--enable-debug],
+  [Enable debugging (yes, no)]),
+[case "${enableval}" in
+  yes) debug=true ;;
+  no)  debug=false ;;
+esac],[debug=$debug])
+
+
 dnl ### Select the SSL implementation ##
 AC_ARG_WITH(ssl,
 AC_HELP_STRING([--with-ssl],
@@ -237,6 +247,10 @@ fi
 PKG_CHECK_MODULES(CAMEL, gthread-2.0 gmodule-2.0 gobject-2.0 $mozilla_nss_eds $mozilla_nspr_eds)
 CAMEL_CFLAGS="$CAMEL_CFLAGS $LIBCST_CFLAGS $THREADS_CFLAGS $KRB4_CFLAGS $KRB5_CFLAGS"
 CAMEL_LIBS="$CAMEL_LIBS -lz $LIBCST_LIBS $THREADS_LIBS $KRB4_LDFLAGS $KRB5_LDFLAGS"
+
+if test x$debug == xtrue; then
+	CAMEL_CFLAGS="$CAMEL_CFLAGS -ggdb -O0 -DDEBUG"
+fi
 
 AC_SUBST(CAMEL_CFLAGS)
 AC_SUBST(CAMEL_LIBS)

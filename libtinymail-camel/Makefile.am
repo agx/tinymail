@@ -1,7 +1,7 @@
 SUBDIRS = camel-lite .
 
 INCLUDES = $(LIBTINYMAIL_CAMEL_CFLAGS)  	\
-	-I. -I$(top_srcdir)			\
+	-I. -I$(top_srcdir)  $(EXTRA_CFLAGS)	\
 	-I$(top_srcdir)/libtinymail		\
 	-I$(top_srcdir)/libtinymail-camel/camel-lite 
 
@@ -108,7 +108,7 @@ libtinymail_camel_1_0_la_LDFLAGS = -export-dynamic -version-info \
 libtinymail_camel_1_0includedir = $(includedir)/libtinymail-camel-$(API_VERSION)
 libtinymail_camel_1_0include_HEADERS = $(libtinymail_camel_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymail-camel-$(API_VERSION).pc: libtinymail-camel.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig

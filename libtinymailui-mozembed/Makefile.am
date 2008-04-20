@@ -1,4 +1,4 @@
-INCLUDES = -I. -I$(top_srcdir) \
+INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 	$(LIBTINYMAILUI_MOZEMBED_CFLAGS) \
 	-I$(top_srcdir)/libtinymail \
 	-I$(top_srcdir)/libtinymailui \
@@ -39,7 +39,7 @@ endif
 libtinymailuimozembedincludedir = $(includedir)/libtinymailui-mozembed-$(API_VERSION)
 libtinymailuimozembedinclude_HEADERS = $(libtinymailui_mozembed_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymailui-mozembed-$(API_VERSION).pc: libtinymailui-mozembed.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig

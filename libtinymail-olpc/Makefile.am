@@ -1,4 +1,4 @@
-INCLUDES = -I. -I$(top_srcdir) \
+INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 	$(LIBTINYMAIL_OLPC_CFLAGS) \
 	$(LIBTINYMAIL_CAMEL_CFLAGS) \
 	-I$(top_srcdir)/libtinymail \
@@ -36,7 +36,7 @@ libtinymail_olpc_1_0_la_LDFLAGS = -export-dynamic \
 libtinymailolpcincludedir = $(includedir)/libtinymail-olpc-$(API_VERSION)
 libtinymailolpcinclude_HEADERS = $(libtinymail_olpc_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymail-olpc-$(API_VERSION).pc: libtinymail-olpc.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig

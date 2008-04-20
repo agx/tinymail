@@ -1,4 +1,4 @@
-INCLUDES = -I. -I$(top_srcdir) \
+INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 	$(LIBTINYMAIL_GPE_CFLAGS) \
 	$(LIBTINYMAIL_CAMEL_CFLAGS) \
 	-I$(top_srcdir)/libtinymail \
@@ -36,7 +36,7 @@ libtinymail_gpe_1_0_la_LDFLAGS = -export-dynamic \
 libtinymailgpeincludedir = $(includedir)/libtinymail-gpe-$(API_VERSION)
 libtinymailgpeinclude_HEADERS = $(libtinymail_gpe_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymail-gpe-$(API_VERSION).pc: libtinymail-gpe.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig

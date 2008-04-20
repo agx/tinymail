@@ -69,9 +69,30 @@ build_tests=false
 build_unittests=false
 build_tp=false
 have_conic=false
+debug=false
+enable_deprecated=true
 PLATFORMDIR=libtinymail-gnome-desktop
 PLATFORMSPECIFICNAME=Gnome
 PLATFORM=1
+
+dnl ### Debugging ###
+AC_ARG_ENABLE(debug,
+AC_HELP_STRING([--enable-debug],
+  [Enable debugging (yes, no)]),
+[case "${enableval}" in
+  yes) debug=true ;;
+  no)  debug=false ;;
+esac],[debug=$debug])
+
+dnl ### Deprecated disable ###
+AC_ARG_ENABLE(deprecated,
+  AC_HELP_STRING([--enable-deprecated],
+  [Enable deprecated symbols (yes, no)]),
+[case "${enableval}" in
+  yes) enable_deprecated=true ;;
+  no)  enable_deprecated=false ;;
+esac],[enable_deprecated=$enable_deprecated])
+
 
 dnl ### Select the platform library ##
 AC_ARG_WITH(platform,
@@ -329,18 +350,26 @@ GTK_DOC_CHECK([1.0])
 
 dnl ### libtinymail, the abstraction library ##
 PKG_CHECK_MODULES(LIBTINYMAIL, glib-2.0 >= 2.8 gobject-2.0)
-AC_SUBST(LIBTINYMAIL_CFLAGS)
-AC_SUBST(LIBTINYMAIL_LIBS)
-
 dnl ### libtinymailui, the ui abstraction library ##
 PKG_CHECK_MODULES(LIBTINYMAILUI, glib-2.0 >= 2.8 gobject-2.0)
-AC_SUBST(LIBTINYMAILUI_CFLAGS)
-AC_SUBST(LIBTINYMAILUI_LIBS)
-
 dnl ### libtinymail-camel, a camel implementation of libtinymail ##
 PKG_CHECK_MODULES(LIBTINYMAIL_CAMEL, glib-2.0 >= 2.8 gobject-2.0)
+
+if test x$debug == xtrue; then
+	EXTRA_CFLAGS="-DDEBUG -DDBC -g -ggdb -O0"
+fi
+
+if test x$enable_deprecated == xfalse; then
+	EXTRA_CFLAGS="$EXTRA_CFLAGS -DTNY_DISABLE_DEPRECATED"
+fi
+
+AC_SUBST(EXTRA_CFLAGS)
 AC_SUBST(LIBTINYMAIL_CAMEL_CFLAGS)
 AC_SUBST(LIBTINYMAIL_CAMEL_LIBS)
+AC_SUBST(LIBTINYMAILUI_CFLAGS)
+AC_SUBST(LIBTINYMAILUI_LIBS)
+AC_SUBST(LIBTINYMAIL_CFLAGS)
+AC_SUBST(LIBTINYMAIL_LIBS)
 
 dnl ### libtinymail-tp, integration with telepathy
 if test x$build_tp = xtrue; then

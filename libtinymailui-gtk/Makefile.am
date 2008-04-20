@@ -1,4 +1,4 @@
-INCLUDES = -I. -I$(top_srcdir)		\
+INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 	$(LIBTINYMAILUI_GTK_CFLAGS)	\
 	-I$(top_srcdir)/libtinymail	\
 	-I$(top_srcdir)/libtinymailui 
@@ -70,7 +70,7 @@ endif
 libtinymailuigtkincludedir = $(includedir)/libtinymailui-gtk-$(API_VERSION)
 libtinymailuigtkinclude_HEADERS = $(libtinymailui_gtk_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymailui-gtk-$(API_VERSION).pc: libtinymailui-gtk.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig

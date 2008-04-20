@@ -1,5 +1,5 @@
 INCLUDES = $(LIBTINYMAIL_CFLAGS) -I. -I$(top_srcdir) \
-	-I$(top_srcdir)/libtinymail
+	-I$(top_srcdir)/libtinymail $(EXTRA_CFLAGS)
 
 lib_LTLIBRARIES = libtinymail-acap-1.0.la
 
@@ -15,7 +15,7 @@ libtinymail_acap_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INF
 libtinymail_acap_1_0_includedir = $(includedir)/libtinymail-$(API_VERSION)
 libtinymail_acap_1_0_include_HEADERS = $(libtinymail_acap_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymail-acap-$(API_VERSION).pc: libtinymail-acap.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig

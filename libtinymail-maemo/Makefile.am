@@ -1,4 +1,4 @@
-INCLUDES = -I. -I$(top_srcdir) \
+INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 	$(LIBTINYMAIL_MAEMO_CFLAGS) \
 	$(LIBTINYMAIL_CAMEL_CFLAGS) \
 	$(LIBTINYMAIL_MAEMO_CONIC_CFLAGS) \
@@ -56,7 +56,7 @@ libtinymail_maemo_1_0_la_LDFLAGS = -export-dynamic \
 libtinymailmaemoincludedir = $(includedir)/libtinymail-maemo-$(API_VERSION)
 libtinymailmaemoinclude_HEADERS = $(libtinymail_maemo_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymail-maemo-$(API_VERSION).pc: libtinymail-maemo.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig

@@ -41,14 +41,14 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 </para>
 
 @g: 
-@get_uid: 
-@get_bcc: 
-@get_cc: 
-@get_subject: 
-@get_to: 
-@get_from: 
-@get_replyto: 
-@get_message_id: 
+@dup_uid: 
+@dup_bcc: 
+@dup_cc: 
+@dup_subject: 
+@dup_to: 
+@dup_from: 
+@dup_replyto: 
+@dup_message_id: 
 @get_message_size: 
 @get_date_received: 
 @get_date_sent: 
@@ -78,7 +78,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_get_uid ##### -->
+<!-- ##### FUNCTION tny_header_dup_uid ##### -->
 <para>
 
 </para>
@@ -87,7 +87,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_get_bcc ##### -->
+<!-- ##### FUNCTION tny_header_dup_bcc ##### -->
 <para>
 
 </para>
@@ -96,7 +96,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_get_cc ##### -->
+<!-- ##### FUNCTION tny_header_dup_cc ##### -->
 <para>
 
 </para>
@@ -123,7 +123,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_get_message_id ##### -->
+<!-- ##### FUNCTION tny_header_dup_message_id ##### -->
 <para>
 
 </para>
@@ -141,7 +141,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_get_from ##### -->
+<!-- ##### FUNCTION tny_header_dup_from ##### -->
 <para>
 
 </para>
@@ -150,7 +150,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_get_to ##### -->
+<!-- ##### FUNCTION tny_header_dup_to ##### -->
 <para>
 
 </para>
@@ -159,7 +159,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_get_subject ##### -->
+<!-- ##### FUNCTION tny_header_dup_subject ##### -->
 <para>
 
 </para>
@@ -168,7 +168,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_get_replyto ##### -->
+<!-- ##### FUNCTION tny_header_dup_replyto ##### -->
 <para>
 
 </para>

@@ -1,4 +1,4 @@
-INCLUDES = -I. -I$(top_srcdir) \
+INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 	$(LIBTINYMAILUI_WEBKIT_CFLAGS) \
 	-I$(top_srcdir)/libtinymail \
 	-I$(top_srcdir)/libtinymailui \
@@ -37,7 +37,7 @@ endif
 libtinymailuiwebkitincludedir = $(includedir)/libtinymailui-webkit-$(API_VERSION)
 libtinymailuiwebkitinclude_HEADERS = $(libtinymailui_webkit_1_0_headers)
 
-%-$(API_VERSION).pc: %.pc
+libtinymailui-webkit-$(API_VERSION).pc: libtinymailui-webkit.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig
