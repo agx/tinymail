@@ -106,6 +106,14 @@ typedef struct _TnySeekable TnySeekable;
 typedef struct _TnySeekableIface TnySeekableIface;
 
 
+/** 
+ * TnyStatusCallback:
+ * @self: The sender of the status
+ * @status: a #TnyStatus object
+ * @user_data: user data passed by the caller
+ * 
+ * A method that gets called whenever there's a status event
+ **/
 typedef void (*TnyStatusCallback) (GObject *self, TnyStatus *status, gpointer user_data);
 
 typedef gchar* (*TnyGetPassFunc) (TnyAccount *self, const gchar *prompt, gboolean *cancel);

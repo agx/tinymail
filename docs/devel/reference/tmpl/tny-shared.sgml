@@ -804,54 +804,6 @@ This method happens in case the password was wrong. Also take a look at tny_acco
 @err: 
 @user_data: 
 
-
-<!-- ##### USER_FUNCTION TnyGetMsgCallback ##### -->
-<para>
-A method that gets called after tny_folder_get_msg_async is finished
-getting the message or in case there was an error.
-</para>
-
-@folder: the #TnyFolder instance from which the message was requested
-@cancelled: 
-@msg: the #TnyMsg instance that was requested
-@err: in case there was an error, this !GError instance is not NULL
-@user_data: user data passed at the caller
-
-
-<!-- ##### USER_FUNCTION TnyTransferMsgsCallback ##### -->
-<para>
-A method that gets called after tny_folder_transfer_msgs_async is finished
-transferring the messages.
-</para>
-
-@folder: the #TnyFolder instance from which the messages where transferred
-@cancelled: 
-@err: in case there was an error, this !GError instance is not NULL
-@user_data: user data passed at the caller
-
-
-<!-- ##### USER_FUNCTION TnyStatusCallback ##### -->
-<para>
-A method that gets called whenever there's a status event
-</para>
-
-@self: The sender of the status
-@status: a #TnyStatus object
-@user_data: user data passed by the caller
-
-
-<!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
-<para>
-A method that happens after tny_folder_store_get_folders_async is finished
-</para>
-
-@self: the #TnyFolderStore from which the child folders where requested
-@cancelled: 
-@list: a #TnyList with #TnyFolder instances (the requested children of @self)
-@err: in case there was an error, this !GError instance is not NULL
-@user_data: user data passed at the caller
-
-
 <!-- ##### USER_FUNCTION TnyCopyFolderCallback ##### -->
 <para>
 
