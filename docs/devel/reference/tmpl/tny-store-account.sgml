@@ -35,9 +35,6 @@ A store account contains the folders of an E-mail service and handles the authen
 
 </para>
 
-@: 
-@:
-
 @tnystoreaccount: the object which received the signal.
 @arg1: 
 
