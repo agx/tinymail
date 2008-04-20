@@ -16,7 +16,7 @@ sources =
 customs =
 
 
-%-$(API_VERSION).pc: %.pc
+libtinymail-camel-sharp-$(API_VERSION).pc: libtinymail-camel-sharp.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig
