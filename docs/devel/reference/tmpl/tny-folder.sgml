@@ -65,6 +65,7 @@ A abstract type that defines a folder
 @get_stats: 
 @get_url_string: 
 @get_caps: 
+@remove_msgs_async: 
 
 <!-- ##### MACRO TNY_TYPE_FOLDER_SIGNAL ##### -->
 <para>

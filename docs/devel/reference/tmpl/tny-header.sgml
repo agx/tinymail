@@ -78,33 +78,6 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_dup_uid ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_header_dup_bcc ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_header_dup_cc ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_header_get_date_received ##### -->
 <para>
 
@@ -123,52 +96,7 @@ implement an API in #TnyMsg as you will need to fetch the entire message for tha
 @Returns: 
 
 
-<!-- ##### FUNCTION tny_header_dup_message_id ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
 <!-- ##### FUNCTION tny_header_get_message_size ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_header_dup_from ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_header_dup_to ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_header_dup_subject ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION tny_header_dup_replyto ##### -->
 <para>
 
 </para>
