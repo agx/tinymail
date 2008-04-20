@@ -23,6 +23,25 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 
+<!-- ##### SIGNAL TnyAccount::changed ##### -->
+<para>
+
+</para>
+
+@:
+
+@tnyaccount: the object which received the signal.
+
+<!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
+<para>
+
+</para>
+
+@:
+
+@Param2: 
+@Param2: 
+
 <!-- ##### STRUCT TnyAccountIface ##### -->
 <para>
 
@@ -292,7 +311,7 @@ A abstract type that contains shared functionality of the #TnyStoreAccount and t
 </para>
 
 @self: 
-@forget_pass: 
+@forget_pass_func: 
 
 
 <!-- ##### FUNCTION tny_account_get_forget_pass_func ##### -->

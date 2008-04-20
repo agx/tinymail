@@ -148,36 +148,6 @@ A abstract type that defines a folder
 @st: 
 
 
-<!-- ##### FUNCTION tny_folder_remove_msg ##### -->
-<para>
-
-</para>
-
-@self: 
-@header: 
-@err: 
-
-
-<!-- ##### FUNCTION tny_folder_remove_msgs ##### -->
-<para>
-
-</para>
-
-@self: 
-@headers: 
-@err: 
-
-
-<!-- ##### FUNCTION tny_folder_add_msg ##### -->
-<para>
-
-</para>
-
-@self: 
-@msg: 
-@err: 
-
-
 <!-- ##### FUNCTION tny_folder_add_msg_async ##### -->
 <para>
 
@@ -190,16 +160,6 @@ A abstract type that defines a folder
 @user_data: 
 
 
-<!-- ##### FUNCTION tny_folder_sync ##### -->
-<para>
-
-</para>
-
-@self: 
-@expunge: 
-@err: 
-
-
 <!-- ##### FUNCTION tny_folder_sync_async ##### -->
 <para>
 
@@ -210,17 +170,6 @@ A abstract type that defines a folder
 @callback: 
 @status_callback: 
 @user_data: 
-
-
-<!-- ##### FUNCTION tny_folder_get_msg ##### -->
-<para>
-
-</para>
-
-@self: 
-@header: 
-@err: 
-@Returns: 
 
 
 <!-- ##### FUNCTION tny_folder_find_msg ##### -->
@@ -244,17 +193,6 @@ A abstract type that defines a folder
 @callback: 
 @status_callback: 
 @user_data: 
-
-
-<!-- ##### FUNCTION tny_folder_get_headers ##### -->
-<para>
-
-</para>
-
-@self: 
-@headers: 
-@refresh: 
-@err: 
 
 
 <!-- ##### FUNCTION tny_folder_get_headers_async ##### -->
@@ -353,27 +291,6 @@ A abstract type that defines a folder
 @user_data: 
 
 
-<!-- ##### FUNCTION tny_folder_refresh ##### -->
-<para>
-
-</para>
-
-@self: 
-@err: 
-
-
-<!-- ##### FUNCTION tny_folder_transfer_msgs ##### -->
-<para>
-
-</para>
-
-@self: 
-@header_list: 
-@folder_dst: 
-@delete_originals: 
-@err: 
-
-
 <!-- ##### FUNCTION tny_folder_transfer_msgs_async ##### -->
 <para>
 
@@ -386,19 +303,6 @@ A abstract type that defines a folder
 @callback: 
 @status_callback: 
 @user_data: 
-
-
-<!-- ##### FUNCTION tny_folder_copy ##### -->
-<para>
-
-</para>
-
-@self: 
-@into: 
-@new_name: 
-@del: 
-@err: 
-@Returns: 
 
 
 <!-- ##### FUNCTION tny_folder_copy_async ##### -->
@@ -475,5 +379,113 @@ A abstract type that defines a folder
 
 @self: 
 @Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_remove_msgs_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@headers: 
+@callback: 
+@status_callback: 
+@user_data: 
+
+
+<!-- ##### FUNCTION tny_folder_copy ##### -->
+<para>
+
+</para>
+
+@self: 
+@into: 
+@new_name: 
+@del: 
+@err: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_add_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+@err: 
+
+
+<!-- ##### FUNCTION tny_folder_remove_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+@err: 
+
+
+<!-- ##### FUNCTION tny_folder_remove_msgs ##### -->
+<para>
+
+</para>
+
+@self: 
+@headers: 
+@err: 
+
+
+<!-- ##### FUNCTION tny_folder_get_msg ##### -->
+<para>
+
+</para>
+
+@self: 
+@header: 
+@err: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_folder_refresh ##### -->
+<para>
+
+</para>
+
+@self: 
+@err: 
+
+
+<!-- ##### FUNCTION tny_folder_transfer_msgs ##### -->
+<para>
+
+</para>
+
+@self: 
+@header_list: 
+@folder_dst: 
+@delete_originals: 
+@err: 
+
+
+<!-- ##### FUNCTION tny_folder_get_headers ##### -->
+<para>
+
+</para>
+
+@self: 
+@headers: 
+@refresh: 
+@err: 
+
+
+<!-- ##### FUNCTION tny_folder_sync ##### -->
+<para>
+
+</para>
+
+@self: 
+@expunge: 
+@err: 
 
 

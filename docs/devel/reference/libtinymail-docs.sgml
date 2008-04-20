@@ -14,6 +14,7 @@
 <!ENTITY libtinymail-TnyMsg SYSTEM "xml/tny-msg.xml">
 <!ENTITY libtinymail-TnyMimePart SYSTEM "xml/tny-mime-part.xml">
 <!ENTITY libtinymail-TnyStream SYSTEM "xml/tny-stream.xml">
+<!ENTITY libtinymail-TnySeekable SYSTEM "xml/tny-seekable.xml">
 <!ENTITY libtinymail-TnyFsStream SYSTEM "xml/tny-fs-stream.xml">
 <!ENTITY libtinymail-TnyFolder SYSTEM "xml/tny-folder.xml">
 <!ENTITY libtinymail-TnyDevice SYSTEM "xml/tny-device.xml">
@@ -148,6 +149,7 @@
 		&libtinymail-TnyMsgReceiveStrategy;
 		&libtinymail-TnyHeader;
 		&libtinymail-TnyStream;
+		&libtinymail-TnySeekable;
 		&libtinymail-TnyFsStream;
 		&libtinymail-TnyDevice;
 		&libtinymail-TnyList;

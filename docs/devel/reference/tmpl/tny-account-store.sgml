@@ -43,6 +43,14 @@ A abstract type that defines a store for accounts
 
 </para>
 
+
+<!-- ##### SIGNAL TnyAccountStore::connecting-started ##### -->
+<para>
+
+</para>
+
+@tnyaccountstore: the object which received the signal.
+
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
 

@@ -85,6 +85,15 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_mime_part_get_decoded_stream ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_mime_part_write_to_stream ##### -->
 <para>
 
@@ -283,5 +292,23 @@ A mime part is a part of a message. Like the body, an attachment or the PGP key 
 @callback: 
 @status_callback: 
 @user_data: 
+
+
+<!-- ##### FUNCTION tny_mime_part_get_transfer_encoding ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_mime_part_set_transfer_encoding ##### -->
+<para>
+
+</para>
+
+@self: 
+@transfer_encoding: 
 
 

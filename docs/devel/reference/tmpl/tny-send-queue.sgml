@@ -34,6 +34,69 @@ shutdown obviously lose the unsent messages.
 </para>
 
 
+<!-- ##### SIGNAL TnySendQueue::error-happened ##### -->
+<para>
+
+</para>
+
+@: 
+@: 
+@: 
+@:
+
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+
+<!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
+<para>
+
+</para>
+
+@: 
+@: 
+@: 
+@: 
+@:
+
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
+
+<!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
+<para>
+
+</para>
+
+@: 
+@: 
+@: 
+@: 
+@:
+
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
+
+<!-- ##### SIGNAL TnySendQueue::queue-start ##### -->
+<para>
+
+</para>
+
+@tnysendqueue: the object which received the signal.
+
+<!-- ##### SIGNAL TnySendQueue::queue-stop ##### -->
+<para>
+
+</para>
+
+@tnysendqueue: the object which received the signal.
+
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
 
@@ -58,6 +121,14 @@ shutdown obviously lose the unsent messages.
 
 
 
+<!-- ##### ENUM TnySendQueueCancelAction ##### -->
+<para>
+
+</para>
+
+@TNY_SEND_QUEUE_CANCEL_ACTION_SUSPEND: 
+@TNY_SEND_QUEUE_CANCEL_ACTION_REMOVE: 
+
 <!-- ##### FUNCTION tny_send_queue_add ##### -->
 <para>
 
@@ -66,6 +137,18 @@ shutdown obviously lose the unsent messages.
 @self: 
 @msg: 
 @err: 
+
+
+<!-- ##### FUNCTION tny_send_queue_add_async ##### -->
+<para>
+
+</para>
+
+@self: 
+@msg: 
+@callback: 
+@status_callback: 
+@user_data: 
 
 
 <!-- ##### FUNCTION tny_send_queue_get_sentbox ##### -->

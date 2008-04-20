@@ -31,6 +31,30 @@ tny-error
 
 
 
+<!-- ##### TYPEDEF TError ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION tny_error_get_message ##### -->
+<para>
+
+</para>
+
+@err: 
+@Returns: 
+
+
+<!-- ##### FUNCTION tny_error_get_code ##### -->
+<para>
+
+</para>
+
+@err: 
+@Returns: 
+
+
 <!-- ##### FUNCTION tny_error_domain_get_type ##### -->
 <para>
 

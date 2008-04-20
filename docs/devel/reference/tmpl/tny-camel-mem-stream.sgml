@@ -31,3 +31,13 @@ TnyCamelMemStream
 @Returns: 
 
 
+<!-- ##### FUNCTION tny_camel_mem_stream_new_with_buffer ##### -->
+<para>
+
+</para>
+
+@buffer: 
+@len: 
+@Returns: 
+
+

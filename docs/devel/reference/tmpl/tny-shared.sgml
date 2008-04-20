@@ -53,7 +53,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnyaccountstore: the object which received the signal.
+@: 
 
 <!-- ##### STRUCT TnyAccountStoreIface ##### -->
 <para>
@@ -262,7 +262,7 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
+@tnyaccount: the object which received the signal.
 
 <!-- ##### SIGNAL TnyAccount::connection-status-changed ##### -->
 <para>
@@ -321,8 +321,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@tnydevice: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### STRUCT TnyDeviceIface ##### -->
 <para>
@@ -347,8 +347,8 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
-@: 
+@tnystoreaccount: the object which received the signal.
+@arg1: 
 
 <!-- ##### STRUCT TnyStoreAccountIface ##### -->
 <para>
@@ -493,46 +493,46 @@ Shared include file with forward typedefs
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sending ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### SIGNAL TnySendQueue::msg-sent ##### -->
 <para>
 
 </para>
 
-@: 
-@: 
-@: 
-@: 
-@: 
+@tnysendqueue: the object which received the signal.
+@arg1: 
+@arg2: 
+@arg3: 
+@arg4: 
 
 <!-- ##### SIGNAL TnySendQueue::queue-start ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL TnySendQueue::queue-stop ##### -->
 <para>
 
 </para>
 
-@tnysendqueue: the object which received the signal.
+@: 
 
 <!-- ##### STRUCT TnySendQueueIface ##### -->
 <para>
@@ -737,6 +737,32 @@ Shared include file with forward typedefs
 @on_disconnect: 
 @set_current: 
 
+<!-- ##### STRUCT TnySeekable ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT TnySeekableIface ##### -->
+<para>
+
+</para>
+
+@parent: 
+@seek: 
+@tell: 
+@set_bounds: 
+
+<!-- ##### USER_FUNCTION TnyStatusCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@status: 
+@user_data: 
+
+
 <!-- ##### USER_FUNCTION TnyGetPassFunc ##### -->
 <para>
 This method happens whenever the password must be requested from the user. You must return the password for #TnyAccount self.
@@ -758,13 +784,26 @@ This method happens in case the password was wrong. Also take a look at tny_acco
 @self: the #TnyAccount instance of which the password was wrong
 
 
-<!-- ##### USER_FUNCTION TnyFolderCallback ##### -->
+<!-- ##### USER_FUNCTION TnyMimePartCallback ##### -->
 <para>
 
 </para>
 
 @self: 
 @cancelled: 
+@stream: 
+@err: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyGetFoldersCallback ##### -->
+<para>
+
+</para>
+
+@self: 
+@cancelled: 
+@list: 
 @err: 
 @user_data: 
 
@@ -781,14 +820,13 @@ This method happens in case the password was wrong. Also take a look at tny_acco
 @user_data: 
 
 
-<!-- ##### USER_FUNCTION TnyMimePartCallback ##### -->
+<!-- ##### USER_FUNCTION TnyFolderCallback ##### -->
 <para>
 
 </para>
 
 @self: 
 @cancelled: 
-@stream: 
 @err: 
 @user_data: 
 
@@ -803,6 +841,30 @@ This method happens in case the password was wrong. Also take a look at tny_acco
 @headers: 
 @err: 
 @user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyGetMsgCallback ##### -->
+<para>
+
+</para>
+
+@folder: 
+@cancelled: 
+@msg: 
+@err: 
+@user_data: 
+
+
+<!-- ##### USER_FUNCTION TnyTransferMsgsCallback ##### -->
+<para>
+
+</para>
+
+@folder: 
+@cancelled: 
+@err: 
+@user_data: 
+
 
 <!-- ##### USER_FUNCTION TnyCopyFolderCallback ##### -->
 <para>
