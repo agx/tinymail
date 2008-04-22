@@ -24,6 +24,7 @@
 #include <glib-object.h>
 #include <tny-camel-shared.h>
 #include <tny-account.h>
+#include <tny-pair.h>
 
 G_BEGIN_DECLS
 
