@@ -3,6 +3,7 @@
 	* tny_camel_account_add_option changed !!
 	* tny_camel_account_clear_options added
 	* tny_camel_account_get_options added
+	* Support for value-less cameloptions
 
 	* This was a major API change in libtinymail-camel
 

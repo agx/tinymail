@@ -222,8 +222,13 @@ load_accounts (TnyAccountStore *self)
 				for (i=0; i < options_len; i++) {
 					gchar *key = options[i];
 					gchar *value = strchr (options[i], '=');
-					*value = '\0';
-					value++;
+
+					if (value) {
+						*value = '\0';
+						value++;
+					} else
+						value = "";
+
 					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), 
 						tny_pair_new (key, value));
 				}

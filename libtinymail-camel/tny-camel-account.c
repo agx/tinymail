@@ -445,6 +445,13 @@ tny_camel_account_get_account_type_default (TnyAccount *self)
  * tny_camel_account_add_option (account, tny_pair_new ("use_ssl", "tls"))
  * </programlisting></informalexample>
  *
+ * If the Camel option is a single word, just use "" for the value part of the 
+ * pair:
+ *
+ * <informalexample><programlisting>
+ * tny_camel_account_add_option (account, tny_pair_new ("use_lsub", ""))
+ * </programlisting></informalexample>
+ *
  * use_ssl=wrapped will wrap the connection on default port 993 with IMAP and
  * defualt port 995 with POP3 with SSL or also called "imaps" or "pops".
  *
@@ -488,7 +495,7 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, TnyPair *option)
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	GList *copy = priv->options;
 	gboolean found = FALSE;
-	gchar *option_str;
+	gchar *option_str, *val;
 
 	if (!option)
 		return;
@@ -500,9 +507,15 @@ tny_camel_account_add_option_default (TnyCamelAccount *self, TnyPair *option)
 
 	g_assert (TNY_IS_PAIR (option));
 
-	option_str = g_strdup_printf ("%s=%s",
-		tny_pair_get_name (option), 
-		tny_pair_get_value (option));
+	val = (gchar *) tny_pair_get_value (option);
+
+	if (val && strlen (val) > 0)
+		option_str = g_strdup_printf ("%s=%s",
+			tny_pair_get_name (option), 
+			tny_pair_get_value (option));
+	else
+		option_str = g_strdup_printf ("%s",
+			tny_pair_get_name (option));
 
 	while (copy)  {
 		gchar *str = (gchar *) copy->data;
@@ -557,8 +570,11 @@ tny_camel_account_get_options_default (TnyCamelAccount *self, TnyList *options)
 		gchar *value = strchr (str, '=');
 		TnyPair *pair;
 
-		*value = '\0';
-		value++;
+		if (value) {
+			*value = '\0';
+			value++;
+		} else 
+			value = "";
 
 		pair = tny_pair_new (key, value);
 		g_free (str);

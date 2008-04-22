@@ -258,8 +258,12 @@ load_accounts (TnyAccountStore *self)
 				while (options) {
 					gchar *key = options->data;
 					gchar *value = strchr (options->data, '=');
-					*value = '\0';
-					value++;
+
+					if (value) {
+						*value = '\0';
+						value++;
+					} else
+						value = "";
 
 					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), 
 						tny_pair_new (key, value));
