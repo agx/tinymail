@@ -136,7 +136,7 @@ conic_emit_status (TnyDevice *self, gboolean status)
 	if (!dnsmasq_has_resolv())
 		time = 5000;
 
-	g_debug ("%s: emitting status (%s, %s) in %d ms", 
+	g_debug ("%s: emitting status (%p, %s) in %d ms", 
 		   __FUNCTION__, info, status ? "true" : "false", time);
 
 	g_timeout_add_full (G_PRIORITY_DEFAULT, time, conic_emit_status_idle,
