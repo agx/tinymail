@@ -73,13 +73,22 @@ A abstract account type implemented for Camel
 </para>
 
 
-<!-- ##### SIGNAL TnyCamelAccount::set-online-happened ##### -->
+<!-- ##### FUNCTION tny_camel_account_get_options ##### -->
 <para>
 
 </para>
 
-@tnycamelaccount: the object which received the signal.
-@arg1: 
+@self: 
+@options: 
+
+
+<!-- ##### FUNCTION tny_camel_account_clear_options ##### -->
+<para>
+
+</para>
+
+@self: 
+
 
 <!-- ##### FUNCTION tny_camel_account_add_option ##### -->
 <para>

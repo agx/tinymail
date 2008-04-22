@@ -22,7 +22,6 @@ A #TnyPlatformFactory implementation for a GNOME desktop that can give you a #Tn
 
 </para>
 
-@parent: 
 
 <!-- ##### FUNCTION tny_gnome_platform_factory_get_instance ##### -->
 <para>

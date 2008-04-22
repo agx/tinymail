@@ -81,7 +81,10 @@ struct _TnySendQueueIface
 
 GType tny_send_queue_get_type (void);
 
+#ifndef TNY_DISABLE_DEPRECATED
 void tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err);
+#endif
+
 void tny_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 TnyFolder* tny_send_queue_get_sentbox (TnySendQueue *self);
 TnyFolder* tny_send_queue_get_outbox (TnySendQueue *self);
