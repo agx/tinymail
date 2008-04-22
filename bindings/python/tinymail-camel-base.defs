@@ -190,7 +190,7 @@
   (c-name "tny_camel_account_add_option")
   (return-type "none")
   (parameters
-    '("const-gchar*" "option")
+    '("TnyPair" "option")
   )
 )
 

@@ -65,7 +65,7 @@ per_account_forget_pass(TnyAccount *account)
 
 
 static gboolean
-tny_test_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, gboolean question, const GError *error)
+tny_test_account_store_alert (TnyAccountStore *self, TnyAccount *account, TnyAlertType type, gboolean question, GError *error)
 {
 	return TRUE;
 }
@@ -295,7 +295,7 @@ tny_account_store_init (gpointer g, gpointer iface_data)
 	klass->get_cache_dir= tny_test_account_store_get_cache_dir;
 	klass->alert= tny_test_account_store_alert;
 	klass->get_device= tny_test_account_store_get_device;
-    
+
 	return;
 }
 

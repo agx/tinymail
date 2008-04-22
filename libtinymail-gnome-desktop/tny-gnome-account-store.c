@@ -246,12 +246,17 @@ load_accounts (TnyAccountStore *self)
 				(const gchar*) key, GCONF_VALUE_STRING, NULL);
 			g_free (key);
 
-			if (options)
-			{
+			if (options) {
 				GSList *tmp = options;
-				while (options)
-				{
-					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), options->data);
+				while (options) {
+					gchar *key = options->data;
+					gchar *value = strchr (options->data, '=');
+					*value = '\0';
+					value++;
+
+					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), 
+						tny_pair_new (key, value));
+
 					g_free (options->data);
 					options = g_slist_next (options);
 				}

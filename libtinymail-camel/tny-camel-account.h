@@ -88,7 +88,10 @@ struct _TnyCamelAccountClass
 	void (*start_operation) (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data);
 	void (*stop_operation) (TnyAccount *self, gboolean *canceled);
 
-	void (*add_option) (TnyCamelAccount *self, const gchar *option);
+	void (*add_option) (TnyCamelAccount *self, TnyPair *option);
+	void (*clear_options) (TnyCamelAccount *self);
+	void (*get_options) (TnyCamelAccount *self, TnyList *options);
+
 	void (*set_online) (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data);
 
 	/* Abstract methods */
@@ -101,7 +104,9 @@ struct _TnyCamelAccountClass
 
 GType tny_camel_account_get_type (void);
 
-void tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option);
+void tny_camel_account_get_options (TnyCamelAccount *self, TnyList *options);
+void tny_camel_account_clear_options (TnyCamelAccount *self);
+void tny_camel_account_add_option (TnyCamelAccount *self, TnyPair *option);
 void tny_camel_account_set_session (TnyCamelAccount *self, TnySessionCamel *session);
 void tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data);
 

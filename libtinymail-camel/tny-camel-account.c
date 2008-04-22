@@ -157,6 +157,19 @@ cancelled_refresh_destroy (gpointer user_data)
 	return;
 }
 
+static void
+output_param (GQuark key_id, gpointer data, gpointer user_data)
+{
+	TnyCamelAccountPriv *apriv = user_data;
+
+	if (*(char *)data) {
+		apriv->options = g_list_prepend (apriv->options, 
+			g_strdup_printf ("%s=%s", 
+				g_quark_to_string (key_id), 
+				(const gchar*) data));
+	}
+}
+
 void
 _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 {
@@ -230,6 +243,9 @@ _tny_camel_account_refresh (TnyCamelAccount *self, gboolean recon_if)
 			camel_exception_clear (&uex);
 
 		if (url) {
+			if (url->params)
+				g_datalist_foreach (&url->params, output_param, apriv);
+
 			if (apriv->proto)
 				g_free (apriv->proto);
 			if (url->protocol)
@@ -417,13 +433,17 @@ tny_camel_account_get_account_type_default (TnyAccount *self)
 /**
  * tny_camel_account_add_option:
  * @self: a #TnyCamelAccount object
- * @option: a "key=value" Camel option
+ * @option: a #TnyPair Camel option
  *
  * Add a Camel option to this #TnyCamelAccount instance. 
-
+ *
  * An often used option is the use_ssl one. For example "use_ssl=wrapped" or 
  * "use_ssl=tls" are the typical options added. Other possibilities for the 
  * "use_ssl" option are "never" and "when-possible":
+ *
+ * <informalexample><programlisting>
+ * tny_camel_account_add_option (account, tny_pair_new ("use_ssl", "tls"))
+ * </programlisting></informalexample>
  *
  * use_ssl=wrapped will wrap the connection on default port 993 with IMAP and
  * defualt port 995 with POP3 with SSL or also called "imaps" or "pops".
@@ -457,36 +477,124 @@ tny_camel_account_get_account_type_default (TnyAccount *self)
  * example getsrv_delay=100. The default value is 100.
  **/
 void 
-tny_camel_account_add_option (TnyCamelAccount *self, const gchar *option)
+tny_camel_account_add_option (TnyCamelAccount *self, TnyPair *option)
 {
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->add_option(self, option);
 }
 
-void 
-tny_camel_account_add_option_default (TnyCamelAccount *self, const gchar *option)
+static void 
+tny_camel_account_add_option_default (TnyCamelAccount *self, TnyPair *option)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 	GList *copy = priv->options;
 	gboolean found = FALSE;
+	gchar *option_str;
 
 	if (!option)
 		return;
 
-	while (copy) 
-	{
+	if (!TNY_IS_PAIR (option)) {
+		g_critical ("The tny_camel_account_add_option API has changed. "
+		"Instead of a string you must now pass a TnyPair instance");
+	}
+
+	g_assert (TNY_IS_PAIR (option));
+
+	option_str = g_strdup_printf ("%s=%s",
+		tny_pair_get_name (option), 
+		tny_pair_get_value (option));
+
+	while (copy)  {
 		gchar *str = (gchar *) copy->data;
 
-		if (str && !strcmp (option, str))
-		{
+		if (str && !strcmp (option_str, str)) {
 			found = TRUE;
 			break;
 		}
 		copy = g_list_next (copy);
 	}
 
-	if (!found)
-	{
-		priv->options = g_list_prepend (priv->options, g_strdup (option));
+	if (!found) {
+		priv->options = g_list_prepend (priv->options, g_strdup (option_str));
+		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare(self, TRUE, FALSE);
+		_tny_camel_account_emit_changed (self);
+	}
+
+	g_free (option_str);
+
+	return;
+}
+
+
+/**
+ * tny_camel_account_get_options:
+ * @self: a #TnyCamelAccount object
+ * @options: a #TnyList 
+ *
+ * Get options of this #TnyCamelAccount instance. @options will be filled with
+ * #TnyPair instances.
+ **/
+void 
+tny_camel_account_get_options (TnyCamelAccount *self, TnyList *options)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->get_options (self, options);
+}
+
+
+
+static void 
+tny_camel_account_get_options_default (TnyCamelAccount *self, TnyList *options)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	GList *copy = priv->options;
+
+	if (!options)
+		return;
+
+	while (copy)  {
+		gchar *str = g_strdup (copy->data);
+		gchar *key = str;
+		gchar *value = strchr (str, '=');
+		TnyPair *pair;
+
+		*value = '\0';
+		value++;
+
+		pair = tny_pair_new (key, value);
+		g_free (str);
+
+		tny_list_prepend (options, (GObject *) pair);
+
+		copy = g_list_next (copy);
+	}
+
+	return;
+}
+
+
+/**
+ * tny_camel_account_clear_options:
+ * @self: a #TnyCamelAccount object
+ *
+ * Clear options of this #TnyCamelAccount instance.
+ **/
+void 
+tny_camel_account_clear_options (TnyCamelAccount *self)
+{
+	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->clear_options (self);
+}
+
+
+static void 
+tny_camel_account_clear_options_default (TnyCamelAccount *self)
+{
+	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	if (priv->options) {
+		g_list_foreach (priv->options, (GFunc)g_free, NULL);
+		g_list_free (priv->options);
+		priv->options = NULL;
+
 		TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare(self, TRUE, FALSE);
 		_tny_camel_account_emit_changed (self);
 	}
@@ -623,8 +731,7 @@ tny_camel_account_get_name_default (TnyAccount *self)
 static void 
 tny_camel_account_stop_camel_operation_priv (TnyCamelAccountPriv *priv)
 {
-	if (priv->cancel)
-	{
+	if (priv->cancel) {
 		camel_operation_unregister (priv->cancel);
 		camel_operation_end (priv->cancel);
 		if (priv->cancel)
@@ -679,8 +786,7 @@ _tny_camel_account_stop_camel_operation (TnyCamelAccount *self)
 {
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
-	if (priv->cancel)
-	{
+	if (priv->cancel) {
 		g_static_rec_mutex_lock (priv->cancel_lock);
 		tny_camel_account_stop_camel_operation_priv (priv);
 		g_static_rec_mutex_unlock (priv->cancel_lock);
@@ -2027,8 +2133,7 @@ tny_camel_account_finalize (GObject *object)
 	priv->cancel_lock = NULL;
 	priv->inuse_spin = FALSE;
 
-	if (priv->options)
-	{
+	if (priv->options) {
 		g_list_foreach (priv->options, (GFunc)g_free, NULL);
 		g_list_free (priv->options);
 	}
@@ -2191,6 +2296,9 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->stop_operation=  tny_camel_account_stop_operation_default;
 
 	class->add_option= tny_camel_account_add_option_default;
+	class->clear_options= tny_camel_account_clear_options_default;
+	class->get_options= tny_camel_account_get_options_default;
+
 	class->set_online= tny_camel_account_set_online_default;
 
 	object_class->finalize = tny_camel_account_finalize;

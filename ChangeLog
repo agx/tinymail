@@ -1,3 +1,11 @@
+2008-04-22  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* tny_camel_account_add_option changed !!
+	* tny_camel_account_clear_options added
+	* tny_camel_account_get_options added
+
+	* This was a major API change in libtinymail-camel
+
 2008-04-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* These problems got highlighted during pre-release 0.0.9

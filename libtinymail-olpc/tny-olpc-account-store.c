@@ -218,10 +218,15 @@ load_accounts (TnyAccountStore *self)
 				tny_account_set_secure_auth_mech (TNY_ACCOUNT (account), mech);
 
 			options = g_key_file_get_string_list (keyfile, "tinymail", "options", &options_len, NULL);
-			if (options)
-			{
-				for (i=0; i<options_len; i++)
-					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), options[i]);
+			if (options) {
+				for (i=0; i < options_len; i++) {
+					gchar *key = options[i];
+					gchar *value = strchr (options[i], '=');
+					*value = '\0';
+					value++;
+					tny_camel_account_add_option (TNY_CAMEL_ACCOUNT (account), 
+						tny_pair_new (key, value));
+				}
 				g_strfreev (options);
 			}
 
