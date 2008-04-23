@@ -618,10 +618,10 @@ tny_camel_mime_part_is_attachment_default (TnyMimePart *self)
 	 * not actually have this header, as not all E-mail clients add it) */
 
 	if (contdisp) {
-		if (camel_strstrcase (contdisp, "inline"))
-			return FALSE;
 		if (camel_strstrcase (contdisp, "attachment"))
 			return TRUE;
+		if (camel_strstrcase (contdisp, "inline") && (camel_strstrcase (contdisp, "filename=") == NULL))
+			return FALSE;
 	}
 
 	/* Check the old fashioned way */

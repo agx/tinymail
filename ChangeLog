@@ -1,3 +1,10 @@
+2008-04-23  José Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-mime-part.c:
+          (tny_camel_mime_part_is_attachment_default): consider as
+          attachments parts that have filename= in disposition even
+          if they're "inline".
+
 2008-04-23  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Reference count fix in TnyCamelSendQueue
