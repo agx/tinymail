@@ -1479,11 +1479,11 @@ transfer_message_to (CamelFolder *source, const char *uid, CamelFolder *dest,
 		return;
 
 	/* if its deleted we poke the flags, so we need to copy the messageinfo */
-	if ((source->folder_flags & CAMEL_FOLDER_HAS_SUMMARY_CAPABILITY)
+	/* if ((source->folder_flags & CAMEL_FOLDER_HAS_SUMMARY_CAPABILITY)
 	    && (minfo = camel_folder_get_message_info(source, uid))) {
 		info = camel_message_info_clone(minfo);
 		camel_folder_free_message_info(source, minfo);
-	} else
+	} else */
 		info = camel_message_info_new_from_header(NULL, ((CamelMimePart *)msg)->headers);
 
 	/* we don't want to retain the deleted flag */

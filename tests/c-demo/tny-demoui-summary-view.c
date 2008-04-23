@@ -1652,7 +1652,7 @@ on_move_to_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 		tny_list_prepend (headers, (GObject *) info->header);
 		tny_folder_transfer_msgs_async (folder, headers, info->to_folder, 
-			FALSE, NULL, NULL, user_data);
+			TRUE, NULL, NULL, user_data);
 		g_object_unref (headers);
 	}
 
