@@ -4086,8 +4086,8 @@ err_goto_lbl:
 		_tny_camel_exception_to_tny_error (&ex, err);
 	} else 
 	{
-		if (delete_originals) 
-			camel_folder_sync (cfol_src, TRUE, &ex);
+		/* if (delete_originals) 
+			camel_folder_sync (cfol_src, TRUE, &ex); */
 
 		if (camel_exception_is_set (&ex))
 			_tny_camel_exception_to_tny_error (&ex, err);
