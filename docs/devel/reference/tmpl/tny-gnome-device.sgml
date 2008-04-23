@@ -22,6 +22,7 @@ A #TnyDevice implementation that represents a GNOME desktop
 
 </para>
 
+@parent: 
 
 <!-- ##### FUNCTION tny_gnome_device_new ##### -->
 <para>

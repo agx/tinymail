@@ -1,3 +1,7 @@
+2008-04-23  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Reference count fix in TnyCamelSendQueue
+
 2008-04-23  Jürg Billeter  <j@bitron.ch>
 
 	* Update Vala bindings and demo app

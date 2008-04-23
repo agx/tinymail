@@ -331,6 +331,7 @@ typedef struct {
 	TnyDevice *device;
 	TnyAccount *outbox_account, *sentbox_account;
 	TnyFolder *outbox, *sentbox;
+	TnyTransportAccount *trans_account;
 } MainThreadInfo;
 
 typedef struct {
@@ -527,14 +528,14 @@ thread_main (gpointer data)
 
 			if (err == NULL) 
 			{
-				_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->trans_account),
+				_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (info->trans_account),
 									  NULL, NULL, "Sending message");
 
 				g_static_rec_mutex_unlock (priv->sending_lock);
-				tny_transport_account_send (priv->trans_account, msg, &err);
+				tny_transport_account_send (info->trans_account, msg, &err);
 				g_static_rec_mutex_lock (priv->sending_lock);
 
-				_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->trans_account));
+				_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (info->trans_account));
 
 				if (err != NULL) {
 					emit_error (self, header, msg, err, i, priv->total);
@@ -611,6 +612,7 @@ errorhandler:
 
 	g_object_unref (info->outbox);
 	g_object_unref (info->sentbox);
+	g_object_unref (info->trans_account);
 
 	g_slice_free (MainThreadInfo, info);
 
@@ -660,6 +662,8 @@ create_worker (TnySendQueue *self, GError **err)
 
 			info->sentbox_account = tny_folder_get_account (info->sentbox);
 			info->outbox_account = tny_folder_get_account (info->outbox);
+			info->trans_account = (TnyTransportAccount *) g_object_ref (priv->trans_account);
+
 
 			emit_queue_control_signals (self, TNY_SEND_QUEUE_START);
 

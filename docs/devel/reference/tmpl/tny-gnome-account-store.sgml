@@ -22,6 +22,7 @@ A #TnyAccountStore implementation using GNOME's GConf and libtinymail-camel
 
 </para>
 
+@parent: 
 
 <!-- ##### FUNCTION tny_gnome_account_store_new ##### -->
 <para>
