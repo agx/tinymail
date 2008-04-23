@@ -1,3 +1,7 @@
+2008-04-23  Jürg Billeter  <j@bitron.ch>
+
+	* Update Vala bindings and demo app
+
 2008-04-22  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* tny_camel_account_add_option changed !!

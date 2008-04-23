@@ -6,18 +6,18 @@ namespace Tny {
 	public enum AccountSignal {
 		CONNECTION_STATUS_CHANGED,
 		CHANGED,
-		LAST_SIGNAL,
+		LAST_SIGNAL
 	}
 	[CCode (cprefix = "TNY_ACCOUNT_TYPE_", cheader_filename = "tny.h")]
 	public enum AccountType {
 		STORE,
-		TRANSPORT,
+		TRANSPORT
 	}
 	[CCode (cprefix = "TNY_ALERT_TYPE_", cheader_filename = "tny.h")]
 	public enum AlertType {
 		INFO,
 		WARNING,
-		ERROR,
+		ERROR
 	}
 	[CCode (cprefix = "TNY_CONNECTION_STATUS_", cheader_filename = "tny.h")]
 	public enum ConnectionStatus {
@@ -26,53 +26,19 @@ namespace Tny {
 		CONNECTED_BROKEN,
 		CONNECTED,
 		RECONNECTING,
-		INIT,
+		INIT
 	}
-	[CCode (cprefix = "TNY_", cheader_filename = "tny.h")]
+	[CCode (cprefix = "TNY_ERROR_", cheader_filename = "tny.h")]
 	public enum Error {
-		ERROR_UNSPEC,
-		FOLDER_ERROR_SYNC,
-		FOLDER_ERROR_REMOVE_MSG,
-		FOLDER_ERROR_REMOVE_MSGS,
-		FOLDER_ERROR_ADD_MSG,
-		FOLDER_ERROR_REFRESH,
-		FOLDER_ERROR_GET_MSG,
-		FOLDER_ERROR_TRANSFER_MSGS,
-		FOLDER_ERROR_SET_NAME,
-		FOLDER_ERROR_COPY,
-		FOLDER_STORE_ERROR_REMOVE_FOLDER,
-		FOLDER_STORE_ERROR_GET_FOLDERS,
-		FOLDER_STORE_ERROR_CREATE_FOLDER,
-		TRANSPORT_ACCOUNT_ERROR_SEND,
-		TRANSPORT_ACCOUNT_ERROR_SEND_HOST_LOOKUP_FAILED,
-		TRANSPORT_ACCOUNT_ERROR_SEND_SERVICE_UNAVAILABLE,
-		TRANSPORT_ACCOUNT_ERROR_SEND_AUTHENTICATION_NOT_SUPPORTED,
-		ACCOUNT_ERROR_TRY_CONNECT_SEND_USER_CANCEL,
-		ACCOUNT_ERROR_TRY_CONNECT,
-		ACCOUNT_ERROR_TRY_CONNECT_HOST_LOOKUP_FAILED,
-		ACCOUNT_ERROR_TRY_CONNECT_SERVICE_UNAVAILABLE,
-		ACCOUNT_ERROR_TRY_CONNECT_AUTHENTICATION_NOT_SUPPORTED,
-		ACCOUNT_ERROR_TRY_CONNECT_CERTIFICATE,
-		ACCOUNT_ERROR_TRY_CONNECT_USER_CANCEL,
-		ACCOUNT_STORE_ERROR_UNKNOWN_ALERT,
-		SEND_QUEUE_ERROR_ADD,
-		ACCOUNT_STORE_ERROR_CANCEL_ALERT,
-		ACCOUNT_ERROR_GET_SUPPORTED_AUTH,
 	}
-	[CCode (cprefix = "TNY_", cheader_filename = "tny.h")]
+	[CCode (cprefix = "TNY_ERROR_DOMAIN_", cheader_filename = "tny.h")]
 	public enum ErrorDomain {
-		FOLDER_ERROR,
-		FOLDER_STORE_ERROR,
-		TRANSPORT_ACCOUNT_ERROR,
-		ACCOUNT_ERROR,
-		ACCOUNT_STORE_ERROR,
-		SEND_QUEUE_ERROR,
 	}
 	[CCode (cprefix = "TNY_FOLDER_", cheader_filename = "tny.h")]
 	public enum FolderSignal {
 		FOLDER_INSERTED,
 		FOLDERS_RELOADED,
-		LAST_SIGNAL,
+		LAST_SIGNAL
 	}
 	[CCode (cprefix = "TNY_FOLDER_TYPE_", cheader_filename = "tny.h")]
 	public enum FolderType {
@@ -89,13 +55,18 @@ namespace Tny {
 		CONTACTS,
 		CALENDAR,
 		ARCHIVE,
-		MERGE,
+		MERGE
 	}
 	[CCode (cprefix = "TNY_ACCOUNT_STORE_", cheader_filename = "tny.h")]
 	public enum GetAccountsRequestType {
 		TRANSPORT_ACCOUNTS,
 		STORE_ACCOUNTS,
-		BOTH,
+		BOTH
+	}
+	[CCode (cprefix = "TNY_SEND_QUEUE_CANCEL_ACTION_", has_type_id = "0", cheader_filename = "tny.h")]
+	public enum SendQueueCancelAction {
+		SUSPEND,
+		REMOVE
 	}
 	[CCode (cprefix = "TNY_", cheader_filename = "tny.h")]
 	public enum StatusCode {
@@ -105,19 +76,19 @@ namespace Tny {
 		FOLDER_STATUS_CODE_XFER_MSGS,
 		FOLDER_STATUS_CODE_COPY_FOLDER,
 		GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH,
-		FOLDER_STATUS_CODE_SYNC,
+		FOLDER_STATUS_CODE_SYNC
 	}
 	[CCode (cprefix = "TNY_", cheader_filename = "tny.h")]
 	public enum StatusDomain {
 		FOLDER_STATUS,
 		GET_MSG_QUEUE_STATUS,
-		GET_SUPPORTED_SECURE_AUTH_STATUS,
+		GET_SUPPORTED_SECURE_AUTH_STATUS
 	}
 	[CCode (cprefix = "TNY_FOLDER_CAPS_", cheader_filename = "tny.h")]
 	[Flags]
 	public enum FolderCaps {
 		WRITABLE,
-		PUSHEMAIL,
+		PUSHEMAIL
 	}
 	[CCode (cprefix = "TNY_FOLDER_CHANGE_CHANGED_", cheader_filename = "tny.h")]
 	[Flags]
@@ -127,13 +98,13 @@ namespace Tny {
 		ADDED_HEADERS,
 		EXPUNGED_HEADERS,
 		FOLDER_RENAME,
-		MSG_RECEIVED,
+		MSG_RECEIVED
 	}
 	[CCode (cprefix = "TNY_FOLDER_STORE_CHANGE_CHANGED_", cheader_filename = "tny.h")]
 	[Flags]
 	public enum FolderStoreChangeChanged {
 		CREATED_FOLDERS,
-		REMOVED_FOLDERS,
+		REMOVED_FOLDERS
 	}
 	[CCode (cprefix = "TNY_FOLDER_STORE_QUERY_OPTION_", cheader_filename = "tny.h")]
 	[Flags]
@@ -143,7 +114,7 @@ namespace Tny {
 		MATCH_ON_NAME,
 		MATCH_ON_ID,
 		PATTERN_IS_CASE_INSENSITIVE,
-		PATTERN_IS_REGEX,
+		PATTERN_IS_REGEX
 	}
 	[CCode (cprefix = "TNY_HEADER_FLAG_", cheader_filename = "tny.h")]
 	[Flags]
@@ -160,7 +131,10 @@ namespace Tny {
 		HIGH_PRIORITY,
 		NORMAL_PRIORITY,
 		LOW_PRIORITY,
-		SUSPENDED,
+		SUSPENDED
+	}
+	[CCode (cheader_filename = "tny.h")]
+	public class TError {
 	}
 	[CCode (copy_function = "tny_status_copy", cheader_filename = "tny.h")]
 	public class Status {
@@ -177,7 +151,7 @@ namespace Tny {
 		public void set_fraction (double fraction);
 	}
 	[CCode (cheader_filename = "tny.h")]
-	public class CombinedAccount : GLib.Object, Tny.Account, Tny.FolderStore, Tny.StoreAccount, Tny.TransportAccount {
+	public class CombinedAccount : GLib.Object, Tny.FolderStore, Tny.Account, Tny.TransportAccount, Tny.StoreAccount {
 		public weak Tny.StoreAccount get_store_account ();
 		public weak Tny.TransportAccount get_transport_account ();
 		public CombinedAccount (Tny.TransportAccount ta, Tny.StoreAccount sa);
@@ -188,6 +162,7 @@ namespace Tny {
 		public void add_expunged_header (Tny.Header header);
 		public void get_added_headers (Tny.List headers);
 		public Tny.FolderChangeChanged get_changed ();
+		public bool get_check_duplicates ();
 		public void get_expunged_headers (Tny.List headers);
 		public weak Tny.Folder get_folder ();
 		public uint get_new_all_count ();
@@ -196,6 +171,7 @@ namespace Tny {
 		public weak string get_rename (string oldname);
 		public FolderChange (Tny.Folder folder);
 		public void reset ();
+		public void set_check_duplicates (bool check_duplicates);
 		public void set_new_all_count (uint new_all_count);
 		public void set_new_unread_count (uint new_unread_count);
 		public void set_received_msg (Tny.Msg msg);
@@ -203,12 +179,14 @@ namespace Tny {
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public class FolderMonitor : GLib.Object, Tny.FolderObserver {
-		public void add_list (Tny.List list);
 		public FolderMonitor (Tny.Folder folder);
-		public void poke_status ();
-		public void remove_list (Tny.List list);
-		public void start ();
-		public void stop ();
+		public virtual void add_list (Tny.List list);
+		public virtual void poke_status ();
+		public virtual void remove_list (Tny.List list);
+		public virtual void start ();
+		public virtual void stop ();
+		[NoWrapper]
+		public virtual void update (Tny.FolderChange change);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public class FolderStats : GLib.Object {
@@ -240,14 +218,14 @@ namespace Tny {
 	[CCode (cheader_filename = "tny.h")]
 	public class FolderStoreQueryItem : GLib.Object {
 		public Tny.FolderStoreQueryOption options;
-		public pointer regex;
+		public void* regex;
 		public weak string pattern;
 		public Tny.FolderStoreQueryOption get_options ();
 		public weak string get_pattern ();
-		public pointer get_regex ();
+		public void* get_regex ();
 	}
 	[CCode (cheader_filename = "tny.h")]
-	public class FsStream : GLib.Object, Tny.Stream {
+	public class FsStream : GLib.Object, Tny.Stream, Tny.Seekable {
 		public FsStream (int fd);
 		public void set_fd (int fd);
 	}
@@ -279,269 +257,302 @@ namespace Tny {
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface Account : GLib.Object {
-		public void cancel ();
-		public Tny.AccountType get_account_type ();
-		public weak Tny.ConnectionPolicy get_connection_policy ();
-		public Tny.ConnectionStatus get_connection_status ();
-		public Tny.ForgetPassFunc get_forget_pass_func ();
-		public weak string get_hostname ();
-		public weak string get_id ();
-		public weak string get_name ();
-		public Tny.GetPassFunc get_pass_func ();
-		public uint get_port ();
-		public weak string get_proto ();
-		public weak string get_secure_auth_mech ();
-		public weak string get_url_string ();
-		public weak string get_user ();
-		public bool is_ready ();
-		public bool matches_url_string (string url_string);
-		public void set_connection_policy (Tny.ConnectionPolicy policy);
-		public void set_forget_pass_func (Tny.ForgetPassFunc forget_pass_func);
-		public void set_hostname (string host);
-		public void set_id (string id);
-		public void set_name (string name);
-		public void set_pass_func (Tny.GetPassFunc get_pass_func);
-		public void set_port (uint port);
-		public void set_proto (string proto);
-		public void set_secure_auth_mech (string mech);
-		public void set_url_string (string url_string);
-		public void set_user (string user);
-		public void start_operation (Tny.StatusDomain domain, Tny.StatusCode code, Tny.StatusCallback status_callback, pointer status_user_data);
-		public void stop_operation (bool cancelled);
+		public abstract void cancel ();
+		public abstract Tny.AccountType get_account_type ();
+		public abstract weak Tny.ConnectionPolicy get_connection_policy ();
+		public abstract Tny.ConnectionStatus get_connection_status ();
+		public abstract Tny.ForgetPassFunc get_forget_pass_func ();
+		public abstract weak string get_hostname ();
+		public abstract weak string get_id ();
+		public abstract weak string get_name ();
+		public abstract Tny.GetPassFunc get_pass_func ();
+		public abstract uint get_port ();
+		public abstract weak string get_proto ();
+		public abstract weak string get_secure_auth_mech ();
+		public abstract weak string get_url_string ();
+		public abstract weak string get_user ();
+		public abstract bool is_ready ();
+		public abstract bool matches_url_string (string url_string);
+		public abstract void set_connection_policy (Tny.ConnectionPolicy policy);
+		public abstract void set_forget_pass_func (Tny.ForgetPassFunc forget_pass_func);
+		public abstract void set_hostname (string host);
+		public abstract void set_id (string id);
+		public abstract void set_name (string name);
+		public abstract void set_pass_func (Tny.GetPassFunc get_pass_func);
+		public abstract void set_port (uint port);
+		public abstract void set_proto (string proto);
+		public abstract void set_secure_auth_mech (string mech);
+		public abstract void set_url_string (string url_string);
+		public abstract void set_user (string user);
+		public abstract void start_operation (Tny.StatusDomain domain, Tny.StatusCode code, Tny.StatusCallback status_callback, void* status_user_data);
+		public abstract void stop_operation (bool cancelled);
 		public signal void changed ();
 		public signal void connection_status_changed (int status);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface AccountStore : GLib.Object {
-		public bool alert (Tny.Account account, Tny.AlertType type, bool question) throws GLib.Error;
-		public weak Tny.Account find_account (string url_string);
-		public void get_accounts (Tny.List list, Tny.GetAccountsRequestType types);
-		public weak string get_cache_dir ();
-		public weak Tny.Device get_device ();
+		public abstract bool alert (Tny.Account account, Tny.AlertType type, bool question, GLib.Error error);
+		public abstract weak Tny.Account find_account (string url_string);
+		public abstract void get_accounts (Tny.List list, Tny.GetAccountsRequestType types);
+		public abstract weak string get_cache_dir ();
+		public abstract weak Tny.Device get_device ();
 		public signal void connecting_started ();
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface ConnectionPolicy {
-		public void on_connect (Tny.Account account);
-		public void on_connection_broken (Tny.Account account);
-		public void on_disconnect (Tny.Account account);
-		public void set_current (Tny.Account account, Tny.Folder folder);
+		public abstract void on_connect (Tny.Account account);
+		public abstract void on_connection_broken (Tny.Account account);
+		public abstract void on_disconnect (Tny.Account account);
+		public abstract void set_current (Tny.Account account, Tny.Folder folder);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface Device : GLib.Object {
-		public void force_offline ();
-		public void force_online ();
-		public bool is_online ();
-		public void reset ();
+		public abstract void force_offline ();
+		public abstract void force_online ();
+		public abstract bool is_online ();
+		public abstract void reset ();
 		public signal void connection_changed (bool online);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface Folder : GLib.Object {
-		public void add_msg (Tny.Msg msg) throws GLib.Error;
-		public void add_msg_async (Tny.Msg msg, Tny.FolderCallback callback, Tny.StatusCallback status_callback, pointer user_data);
-		public void add_observer (Tny.FolderObserver observer);
-		public weak Tny.Folder copy (Tny.FolderStore into, string new_name, bool del) throws GLib.Error;
-		public void copy_async (Tny.FolderStore into, string new_name, bool del, Tny.CopyFolderCallback callback, Tny.StatusCallback status_callback, pointer user_data);
-		public weak Tny.Msg find_msg (string url_string) throws GLib.Error;
-		public weak Tny.Account get_account ();
-		public uint get_all_count ();
-		public Tny.FolderCaps get_caps ();
-		public weak Tny.FolderStore get_folder_store ();
-		public Tny.FolderType get_folder_type ();
-		public void get_headers (Tny.List headers, bool refresh) throws GLib.Error;
-		public void get_headers_async (Tny.List headers, bool refresh, Tny.GetHeadersCallback callback, Tny.StatusCallback status_callback, pointer user_data);
-		public weak string get_id ();
-		public uint get_local_size ();
-		public weak Tny.Msg get_msg (Tny.Header header) throws GLib.Error;
-		public void get_msg_async (Tny.Header header, Tny.GetMsgCallback callback, Tny.StatusCallback status_callback, pointer user_data);
-		public weak Tny.MsgReceiveStrategy get_msg_receive_strategy ();
-		public weak Tny.MsgRemoveStrategy get_msg_remove_strategy ();
-		public weak string get_name ();
-		public weak Tny.FolderStats get_stats ();
-		public uint get_unread_count ();
-		public weak string get_url_string ();
-		public bool is_subscribed ();
-		public void poke_status ();
-		public void refresh () throws GLib.Error;
-		public void refresh_async (Tny.FolderCallback callback, Tny.StatusCallback status_callback, pointer user_data);
-		public void remove_msg (Tny.Header header) throws GLib.Error;
-		public void remove_msgs (Tny.List headers) throws GLib.Error;
-		public void remove_observer (Tny.FolderObserver observer);
-		public void set_msg_receive_strategy (Tny.MsgReceiveStrategy st);
-		public void set_msg_remove_strategy (Tny.MsgRemoveStrategy st);
-		public void sync (bool expunge) throws GLib.Error;
-		public void sync_async (bool expunge, Tny.FolderCallback callback, Tny.StatusCallback status_callback, pointer user_data);
-		public void transfer_msgs (Tny.List header_list, Tny.Folder folder_dst, bool delete_originals) throws GLib.Error;
-		public void transfer_msgs_async (Tny.List header_list, Tny.Folder folder_dst, bool delete_originals, Tny.TransferMsgsCallback callback, Tny.StatusCallback status_callback, pointer user_data);
+		public abstract void add_msg (Tny.Msg msg) throws GLib.Error;
+		public abstract void add_msg_async (Tny.Msg msg, Tny.FolderCallback callback, Tny.StatusCallback status_callback);
+		public abstract void add_observer (Tny.FolderObserver observer);
+		public abstract weak Tny.Folder copy (Tny.FolderStore into, string new_name, bool del) throws GLib.Error;
+		public abstract void copy_async (Tny.FolderStore into, string new_name, bool del, Tny.CopyFolderCallback callback, Tny.StatusCallback status_callback);
+		public abstract weak Tny.Msg find_msg (string url_string) throws GLib.Error;
+		public abstract weak Tny.Account get_account ();
+		public abstract uint get_all_count ();
+		public abstract Tny.FolderCaps get_caps ();
+		public abstract weak Tny.FolderStore get_folder_store ();
+		public abstract Tny.FolderType get_folder_type ();
+		public abstract void get_headers (Tny.List headers, bool refresh) throws GLib.Error;
+		public abstract void get_headers_async (Tny.List headers, bool refresh, Tny.GetHeadersCallback callback, Tny.StatusCallback status_callback);
+		public abstract weak string get_id ();
+		public abstract uint get_local_size ();
+		public abstract weak Tny.Msg get_msg (Tny.Header header) throws GLib.Error;
+		public abstract void get_msg_async (Tny.Header header, Tny.GetMsgCallback callback, Tny.StatusCallback status_callback);
+		public abstract weak Tny.MsgReceiveStrategy get_msg_receive_strategy ();
+		public abstract weak Tny.MsgRemoveStrategy get_msg_remove_strategy ();
+		public abstract weak string get_name ();
+		public abstract weak Tny.FolderStats get_stats ();
+		public abstract uint get_unread_count ();
+		public abstract weak string get_url_string ();
+		public abstract bool is_subscribed ();
+		public abstract void poke_status ();
+		public abstract void refresh () throws GLib.Error;
+		public abstract void refresh_async ([CCode (delegate_target_pos = 2.1)] Tny.FolderCallback callback, Tny.StatusCallback status_callback);
+		public abstract void remove_msg (Tny.Header header) throws GLib.Error;
+		public abstract void remove_msgs (Tny.List headers) throws GLib.Error;
+		public abstract void remove_msgs_async (Tny.List headers, Tny.FolderCallback callback, Tny.StatusCallback status_callback);
+		public abstract void remove_observer (Tny.FolderObserver observer);
+		public abstract void set_msg_receive_strategy (Tny.MsgReceiveStrategy st);
+		public abstract void set_msg_remove_strategy (Tny.MsgRemoveStrategy st);
+		public abstract void sync (bool expunge) throws GLib.Error;
+		public abstract void sync_async (bool expunge, Tny.FolderCallback callback, Tny.StatusCallback status_callback);
+		public abstract void transfer_msgs (Tny.List header_list, Tny.Folder folder_dst, bool delete_originals) throws GLib.Error;
+		public abstract void transfer_msgs_async (Tny.List header_list, Tny.Folder folder_dst, bool delete_originals, Tny.TransferMsgsCallback callback, Tny.StatusCallback status_callback);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface FolderObserver {
-		public void update (Tny.FolderChange change);
+		public abstract void update (Tny.FolderChange change);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface FolderStore {
-		public void add_observer (Tny.FolderStoreObserver observer);
-		public weak Tny.Folder create_folder (string name) throws GLib.Error;
-		public void create_folder_async (string name, Tny.CreateFolderCallback callback, Tny.StatusCallback status_callback, pointer user_data);
-		public void get_folders (Tny.List list, Tny.FolderStoreQuery query) throws GLib.Error;
-		public void get_folders_async (Tny.List list, Tny.FolderStoreQuery query, Tny.GetFoldersCallback callback, Tny.StatusCallback status_callback, pointer user_data);
-		public void remove_folder (Tny.Folder folder) throws GLib.Error;
-		public void remove_observer (Tny.FolderStoreObserver observer);
+		public abstract void add_observer (Tny.FolderStoreObserver observer);
+		public abstract weak Tny.Folder create_folder (string name) throws GLib.Error;
+		public abstract void create_folder_async (string name, Tny.CreateFolderCallback callback, Tny.StatusCallback status_callback);
+		public abstract void get_folders (Tny.List list, Tny.FolderStoreQuery query) throws GLib.Error;
+		public abstract void get_folders_async (Tny.List list, Tny.FolderStoreQuery query, Tny.GetFoldersCallback callback, Tny.StatusCallback status_callback);
+		public abstract void remove_folder (Tny.Folder folder) throws GLib.Error;
+		public abstract void remove_observer (Tny.FolderStoreObserver observer);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface FolderStoreObserver {
-		public void update (Tny.FolderStoreChange change);
+		public abstract void update (Tny.FolderStoreChange change);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface Header : GLib.Object {
-		public weak string get_bcc ();
-		public weak string get_cc ();
-		public ulong get_date_received ();
-		public ulong get_date_sent ();
-		public Tny.HeaderFlags get_flags ();
-		public weak Tny.Folder get_folder ();
-		public weak string get_from ();
-		public weak string get_message_id ();
-		public uint get_message_size ();
 		public Tny.HeaderFlags get_priority ();
-		public weak string get_replyto ();
-		public weak string get_subject ();
-		public weak string get_to ();
-		public weak string get_uid ();
-		public void set_bcc (string bcc);
-		public void set_cc (string cc);
-		public void set_flag (Tny.HeaderFlags mask);
-		public void set_from (string from);
 		public void set_priority (Tny.HeaderFlags priority);
-		public void set_replyto (string to);
-		public void set_subject (string subject);
-		public void set_to (string to);
-		public void unset_flag (Tny.HeaderFlags mask);
+		public abstract string dup_bcc ();
+		public abstract string dup_cc ();
+		public abstract string dup_from ();
+		public abstract string dup_message_id ();
+		public abstract string dup_replyto ();
+		public abstract string dup_subject ();
+		public abstract string dup_to ();
+		public abstract string dup_uid ();
+		public abstract ulong get_date_received ();
+		public abstract ulong get_date_sent ();
+		public abstract Tny.HeaderFlags get_flags ();
+		public abstract weak Tny.Folder get_folder ();
+		public abstract uint get_message_size ();
+		public abstract void set_bcc (string bcc);
+		public abstract void set_cc (string cc);
+		public abstract void set_flag (Tny.HeaderFlags mask);
+		public abstract void set_from (string from);
+		public abstract void set_replyto (string to);
+		public abstract void set_subject (string subject);
+		public abstract void set_to (string to);
+		public abstract void unset_flag (Tny.HeaderFlags mask);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface Iterator {
-		public void first ();
-		public weak GLib.Object get_current ();
-		public weak Tny.List get_list ();
+		public abstract void first ();
+		public abstract weak GLib.Object get_current ();
+		public abstract weak Tny.List get_list ();
 		public abstract bool is_done ();
-		public void next ();
-		public void nth (uint nth);
-		public void prev ();
+		public abstract void next ();
+		public abstract void nth (uint nth);
+		public abstract void prev ();
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface List {
-		public void append (GLib.Object item);
-		public weak Tny.List copy ();
-		public weak Tny.Iterator create_iterator ();
-		public void @foreach (GLib.Func func, pointer user_data);
-		public uint get_length ();
-		public void prepend (GLib.Object item);
-		public void remove (GLib.Object item);
-		public void remove_matches (Tny.ListMatcher matcher, pointer match_data);
+		public abstract void append (GLib.Object item);
+		public abstract weak Tny.List copy ();
+		public abstract weak Tny.Iterator create_iterator ();
+		public abstract void @foreach (GLib.Func func);
+		public abstract uint get_length ();
+		public abstract void prepend (GLib.Object item);
+		public abstract void remove (GLib.Object item);
+		public abstract void remove_matches (Tny.ListMatcher matcher, void* match_data);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface Lockable {
-		public void @lock ();
-		public void unlock ();
+		public abstract void @lock ();
+		public abstract void unlock ();
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface MimePart {
-		public int add_part (Tny.MimePart part);
-		public int @construct (Tny.Stream stream, string mime_type, string transfer_encoding);
-		public bool content_type_is (string type);
-		public long decode_to_stream (Tny.Stream stream) throws GLib.Error;
-		public void decode_to_stream_async (Tny.Stream stream, Tny.MimePartCallback callback, Tny.StatusCallback status_callback, pointer user_data);
-		public void del_part (Tny.MimePart part);
-		public weak string get_content_id ();
-		public weak string get_content_location ();
-		public weak string get_content_type ();
-		public weak string get_description ();
-		public weak string get_filename ();
-		public void get_header_pairs (Tny.List list);
-		public void get_parts (Tny.List list);
-		public weak Tny.Stream get_stream ();
-		public weak string get_transfer_encoding ();
-		public bool is_attachment ();
-		public bool is_purged ();
-		public void set_content_id (string content_id);
-		public void set_content_location (string content_location);
-		public void set_content_type (string contenttype);
-		public void set_description (string description);
-		public void set_filename (string filename);
-		public void set_header_pair (string name, string value);
-		public void set_purged ();
-		public long write_to_stream (Tny.Stream stream) throws GLib.Error;
+		public abstract int add_part (Tny.MimePart part);
+		public abstract int @construct (Tny.Stream stream, string mime_type, string transfer_encoding);
+		public abstract bool content_type_is (string type);
+		public abstract long decode_to_stream (Tny.Stream stream) throws GLib.Error;
+		public abstract void decode_to_stream_async (Tny.Stream stream, Tny.MimePartCallback callback, Tny.StatusCallback status_callback);
+		public abstract void del_part (Tny.MimePart part);
+		public abstract weak string get_content_id ();
+		public abstract weak string get_content_location ();
+		public abstract weak string get_content_type ();
+		public abstract weak Tny.Stream get_decoded_stream ();
+		public abstract weak string get_description ();
+		public abstract weak string get_filename ();
+		public abstract void get_header_pairs (Tny.List list);
+		public abstract void get_parts (Tny.List list);
+		public abstract weak Tny.Stream get_stream ();
+		public abstract weak string get_transfer_encoding ();
+		public abstract bool is_attachment ();
+		public abstract bool is_purged ();
+		public abstract void set_content_id (string content_id);
+		public abstract void set_content_location (string content_location);
+		public abstract void set_content_type (string contenttype);
+		public abstract void set_description (string description);
+		public abstract void set_filename (string filename);
+		public abstract void set_header_pair (string name, string value);
+		public abstract void set_purged ();
+		public abstract void set_transfer_encoding (string transfer_encoding);
+		public abstract long write_to_stream (Tny.Stream stream) throws GLib.Error;
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface Msg : Tny.MimePart, GLib.Object {
-		public weak Tny.Folder get_folder ();
-		public weak Tny.Header get_header ();
-		public weak string get_url_string ();
-		public void rewrite_cache ();
-		public void uncache_attachments ();
+		public abstract weak Tny.Folder get_folder ();
+		public abstract weak Tny.Header get_header ();
+		public abstract weak string get_url_string ();
+		public abstract void rewrite_cache ();
+		public abstract void uncache_attachments ();
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface MsgReceiveStrategy {
-		public weak Tny.Msg perform_get_msg (Tny.Folder folder, Tny.Header header) throws GLib.Error;
+		public abstract weak Tny.Msg perform_get_msg (Tny.Folder folder, Tny.Header header) throws GLib.Error;
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface MsgRemoveStrategy {
-		public void perform_remove (Tny.Folder folder, Tny.Header header) throws GLib.Error;
+		public abstract void perform_remove (Tny.Folder folder, Tny.Header header) throws GLib.Error;
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface PasswordGetter {
-		public void forget_password (string aid);
-		public weak string get_password (string aid, string prompt, bool cancel);
+		public abstract void forget_password (string aid);
+		public abstract weak string get_password (string aid, string prompt, bool cancel);
+	}
+	[CCode (cheader_filename = "tny.h")]
+	public interface Seekable {
+		public abstract int64 seek (int64 offset, int policy);
+		public abstract int set_bounds (int64 start, int64 end);
+		public abstract int64 tell ();
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface SendQueue : GLib.Object {
-		public void add (Tny.Msg msg) throws GLib.Error;
-		public void cancel (bool remove) throws GLib.Error;
-		public weak Tny.Folder get_outbox ();
-		public weak Tny.Folder get_sentbox ();
-		public signal void error_happened (Tny.Header header, Tny.Msg msg, pointer err);
+		public abstract void add (Tny.Msg msg) throws GLib.Error;
+		public abstract void add_async (Tny.Msg msg, Tny.SendQueueAddCallback callback, Tny.StatusCallback status_callback);
+		public abstract void cancel (Tny.SendQueueCancelAction cancel_action) throws GLib.Error;
+		public abstract weak Tny.Folder get_outbox ();
+		public abstract weak Tny.Folder get_sentbox ();
+		public signal void error_happened (Tny.Header header, Tny.Msg msg, void* err);
 		public signal void msg_sending (Tny.Header header, Tny.Msg msg, uint nth, uint total);
 		public signal void msg_sent (Tny.Header header, Tny.Msg msg, uint nth, uint total);
+		public signal void queue_start ();
+		public signal void queue_stop ();
 	}
 	[CCode (cheader_filename = "tny.h")]
-	public interface StoreAccount : Tny.Account, Tny.FolderStore, GLib.Object {
-		public void delete_cache ();
-		public weak Tny.Folder find_folder (string url_string) throws GLib.Error;
-		public void subscribe (Tny.Folder folder);
-		public void unsubscribe (Tny.Folder folder);
+	public interface StoreAccount : Tny.FolderStore, Tny.Account, GLib.Object {
+		public abstract void delete_cache ();
+		public abstract weak Tny.Folder find_folder (string url_string) throws GLib.Error;
+		public abstract void subscribe (Tny.Folder folder);
+		public abstract void unsubscribe (Tny.Folder folder);
 		public signal void subscription_changed (Tny.Folder folder);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface Stream {
-		public int close ();
-		public int flush ();
-		public bool is_eos ();
-		public long read (string buffer, ulong n);
-		public int reset ();
-		public long write (string buffer, ulong n);
-		public long write_to_stream (Tny.Stream output);
+		public abstract int close ();
+		public abstract int flush ();
+		public abstract bool is_eos ();
+		public abstract long read (string buffer, ulong n);
+		public abstract int reset ();
+		public abstract long write (string buffer, ulong n);
+		public abstract long write_to_stream (Tny.Stream output);
 	}
 	[CCode (cheader_filename = "tny.h")]
 	public interface TransportAccount : Tny.Account, GLib.Object {
-		public void send (Tny.Msg msg) throws GLib.Error;
+		public abstract void send (Tny.Msg msg) throws GLib.Error;
 	}
-	public static delegate void CopyFolderCallback (Tny.Folder self, bool cancelled, Tny.FolderStore into, Tny.Folder new_folder, GLib.Error err, pointer user_data);
-	public static delegate void CreateFolderCallback (Tny.FolderStore self, bool cancelled, Tny.Folder new_folder, GLib.Error err, pointer user_data);
-	public static delegate void FolderCallback (Tny.Folder self, bool cancelled, GLib.Error err, pointer user_data);
-	public static delegate void ForgetPassFunc (Tny.Account self);
-	public static delegate void GetFoldersCallback (Tny.FolderStore self, bool cancelled, Tny.List list, GLib.Error err, pointer user_data);
-	public static delegate void GetHeadersCallback (Tny.Folder self, bool cancelled, Tny.List headers, GLib.Error err, pointer user_data);
-	public static delegate void GetMsgCallback (Tny.Folder folder, bool cancelled, Tny.Msg msg, GLib.Error err, pointer user_data);
-	public static delegate weak string GetPassFunc (Tny.Account self, string prompt, bool cancel);
-	public static delegate bool ListMatcher (Tny.List list, GLib.Object item, pointer match_data);
-	public static delegate void MimePartCallback (Tny.MimePart self, bool cancelled, Tny.Stream stream, GLib.Error err, pointer user_data);
-	public static delegate void SendQueueAddCallback (Tny.SendQueue self, bool cancelled, Tny.Msg msg, GLib.Error err, pointer user_data);
-	public static delegate void StatusCallback (GLib.Object self, Tny.Status status, pointer user_data);
-	public static delegate void TransferMsgsCallback (Tny.Folder folder, bool cancelled, GLib.Error err, pointer user_data);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void CopyFolderCallback (Tny.Folder _self, bool cancelled, Tny.FolderStore into, Tny.Folder new_folder, GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void CreateFolderCallback (Tny.FolderStore _self, bool cancelled, Tny.Folder new_folder, GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void FolderCallback (Tny.Folder _self, bool cancelled, GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public static delegate void ForgetPassFunc (Tny.Account _self);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void GetFoldersCallback (Tny.FolderStore _self, bool cancelled, Tny.List list, GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void GetHeadersCallback (Tny.Folder _self, bool cancelled, Tny.List headers, GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void GetMsgCallback (Tny.Folder folder, bool cancelled, Tny.Msg msg, GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public static delegate weak string GetPassFunc (Tny.Account _self, string prompt, bool cancel);
+	[CCode (cheader_filename = "tny.h")]
+	public static delegate bool ListMatcher (Tny.List list, GLib.Object item, void* match_data);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void MimePartCallback (Tny.MimePart _self, bool cancelled, Tny.Stream stream, GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void SendQueueAddCallback (Tny.SendQueue _self, bool cancelled, Tny.Msg msg, GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void StatusCallback (GLib.Object _self, Tny.Status status);
+	[CCode (cheader_filename = "tny.h")]
+	public delegate void TransferMsgsCallback (Tny.Folder folder, bool cancelled, GLib.Error err);
 	public const int HEADER_FLAG_PRIORITY_MASK;
 	public const int PRIORITY_LOWER_THAN_GTK_REDRAWS;
+	[CCode (cheader_filename = "tny.h")]
 	public static void clear_status (out weak Tny.Status status);
-	public static void marshal_VOID__OBJECT_OBJECT_INT_INT (GLib.Closure closure, GLib.Value return_value, uint n_param_values, GLib.Value param_values, pointer invocation_hint, pointer marshal_data);
-	public static void marshal_VOID__OBJECT_OBJECT_POINTER (GLib.Closure closure, GLib.Value return_value, uint n_param_values, GLib.Value param_values, pointer invocation_hint, pointer marshal_data);
+	[CCode (cheader_filename = "tny.h")]
+	public static int error_get_code (GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public static weak string error_get_message (GLib.Error err);
+	[CCode (cheader_filename = "tny.h")]
+	public static void marshal_VOID__OBJECT_OBJECT_INT_INT (GLib.Closure closure, GLib.Value return_value, uint n_param_values, GLib.Value param_values, void* invocation_hint, void* marshal_data);
+	[CCode (cheader_filename = "tny.h")]
+	public static void marshal_VOID__OBJECT_OBJECT_POINTER (GLib.Closure closure, GLib.Value return_value, uint n_param_values, GLib.Value param_values, void* invocation_hint, void* marshal_data);
+	[CCode (cheader_filename = "tny.h")]
 	public static void set_status (out weak Tny.Status status, GLib.Quark domain, int code, uint position, uint of_total, string format);
 }

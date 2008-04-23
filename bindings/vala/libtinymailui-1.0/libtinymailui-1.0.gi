@@ -12,7 +12,7 @@
 					<parameter name="account_store" type="TnyAccountStore*"/>
 				</parameters>
 			</method>
-			<vfunc name="set_account_store_func">
+			<vfunc name="set_account_store">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccountStoreView*"/>
@@ -37,13 +37,13 @@
 					<parameter name="header" type="TnyHeader*"/>
 				</parameters>
 			</method>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyHeaderView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_header_func">
+			<vfunc name="set_header">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyHeaderView*"/>
@@ -62,7 +62,7 @@
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</method>
-			<vfunc name="perform_save_func">
+			<vfunc name="perform_save">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartSaveStrategy*"/>
@@ -91,20 +91,20 @@
 					<parameter name="strategy" type="TnyMimePartSaveStrategy*"/>
 				</parameters>
 			</method>
-			<vfunc name="get_save_strategy_func">
+			<vfunc name="get_save_strategy">
 				<return-type type="TnyMimePartSaveStrategy*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartSaver*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="save_func">
+			<vfunc name="save">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartSaver*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_save_strategy_func">
+			<vfunc name="set_save_strategy">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartSaver*"/>
@@ -132,19 +132,19 @@
 					<parameter name="mime_part" type="TnyMimePart*"/>
 				</parameters>
 			</method>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_part_func">
+			<vfunc name="get_part">
 				<return-type type="TnyMimePart*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_part_func">
+			<vfunc name="set_part">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
@@ -194,39 +194,39 @@
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</method>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_mime_part_view_for_func">
+			<vfunc name="create_mime_part_view_for">
 				<return-type type="TnyMimePartView*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_new_inline_viewer_func">
+			<vfunc name="create_new_inline_viewer">
 				<return-type type="TnyMsgView*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_msg_func">
+			<vfunc name="get_msg">
 				<return-type type="TnyMsg*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_msg_func">
+			<vfunc name="set_msg">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 					<parameter name="msg" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_unavailable_func">
+			<vfunc name="set_unavailable">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
@@ -279,37 +279,37 @@
 					<parameter name="self" type="TnyPlatformFactory*"/>
 				</parameters>
 			</method>
-			<vfunc name="new_account_store_func">
+			<vfunc name="new_account_store">
 				<return-type type="TnyAccountStore*"/>
 				<parameters>
 					<parameter name="self" type="TnyPlatformFactory*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="new_device_func">
+			<vfunc name="new_device">
 				<return-type type="TnyDevice*"/>
 				<parameters>
 					<parameter name="self" type="TnyPlatformFactory*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="new_mime_part_func">
+			<vfunc name="new_mime_part">
 				<return-type type="TnyMimePart*"/>
 				<parameters>
 					<parameter name="self" type="TnyPlatformFactory*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="new_msg_func">
+			<vfunc name="new_msg">
 				<return-type type="TnyMsg*"/>
 				<parameters>
 					<parameter name="self" type="TnyPlatformFactory*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="new_msg_view_func">
+			<vfunc name="new_msg_view">
 				<return-type type="TnyMsgView*"/>
 				<parameters>
 					<parameter name="self" type="TnyPlatformFactory*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="new_password_getter_func">
+			<vfunc name="new_password_getter">
 				<return-type type="TnyPasswordGetter*"/>
 				<parameters>
 					<parameter name="self" type="TnyPlatformFactory*"/>

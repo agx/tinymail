@@ -102,7 +102,7 @@ public class Tny.ValaMailWindow : Window {
 		if (folder_type != FolderType.ROOT) {
 			var folder = (Folder) folder_instance;
 			progressbar.show ();
-			folder.refresh_async (on_refresh_folder, on_status, (pointer) this);
+			folder.refresh_async (on_refresh_folder, on_status);
 		}
 	}
 
@@ -118,15 +118,13 @@ public class Tny.ValaMailWindow : Window {
 		}
 	}
 
-	[InstanceLast]
 	private void on_refresh_folder (Folder folder, bool cancelled, GLib.Error err) {
 		var listm = new GtkHeaderListModel ();
-		listm.set_folder (folder, false, null, null, null);
+		listm.set_folder (folder, false, null, null);
 		headerlist.model = listm;
 		progressbar.hide ();
 	}
 
-	[InstanceLast]
 	private void on_status (GLib.Object obj, Tny.Status status) {
 		progressbar.pulse ();
 	}

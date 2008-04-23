@@ -6,14 +6,14 @@ namespace Tny {
 	public enum GtkAccountListModelColumn {
 		NAME_COLUMN,
 		INSTANCE_COLUMN,
-		N_COLUMNS,
+		N_COLUMNS
 	}
 	[CCode (cprefix = "TNY_GTK_ATTACH_LIST_MODEL_", cheader_filename = "tnyui.h")]
 	public enum GtkAttachListModelColumn {
 		PIXBUF_COLUMN,
 		FILENAME_COLUMN,
 		INSTANCE_COLUMN,
-		N_COLUMNS,
+		N_COLUMNS
 	}
 	[CCode (cprefix = "TNY_GTK_FOLDER_STORE_TREE_MODEL_", cheader_filename = "tnyui.h")]
 	public enum GtkFolderStoreTreeModelColumn {
@@ -22,7 +22,7 @@ namespace Tny {
 		ALL_COLUMN,
 		TYPE_COLUMN,
 		INSTANCE_COLUMN,
-		N_COLUMNS,
+		N_COLUMNS
 	}
 	[CCode (cprefix = "TNY_GTK_HEADER_LIST_MODEL_", cheader_filename = "tnyui.h")]
 	public enum GtkHeaderListModelColumn {
@@ -37,7 +37,7 @@ namespace Tny {
 		DATE_RECEIVED_COLUMN,
 		INSTANCE_COLUMN,
 		FLAGS_COLUMN,
-		N_COLUMNS,
+		N_COLUMNS
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkAccountListModel : Gtk.ListStore, Gtk.Buildable, Gtk.TreeModel, Gtk.TreeDragSource, Gtk.TreeDragDest, Gtk.TreeSortable, Tny.List {
@@ -56,11 +56,23 @@ namespace Tny {
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkAttachmentMimePartView : GLib.Object, Tny.MimePartView {
 		public GtkAttachmentMimePartView (Tny.GtkAttachListModel iview);
+		[NoWrapper]
+		public virtual void clear ();
+		[NoWrapper]
+		public virtual weak Tny.MimePart get_part ();
+		[NoWrapper]
+		public virtual void set_part (Tny.MimePart part);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkExpanderMimePartView : Gtk.Expander, Atk.Implementor, Gtk.Buildable, Tny.MimePartView {
 		public GtkExpanderMimePartView (Tny.MimePartView view);
 		public void set_view (Tny.MimePartView view);
+		[NoWrapper]
+		public virtual void clear ();
+		[NoWrapper]
+		public virtual weak Tny.MimePart get_part ();
+		[NoWrapper]
+		public virtual void set_part (Tny.MimePart part);
 	}
 	[CCode (cheader_filename = "tny-gtk-folder-store-tree-model.h")]
 	public class GtkFolderStoreTreeModel : Gtk.TreeStore, Gtk.Buildable, Gtk.TreeModel, Gtk.TreeDragSource, Gtk.TreeDragDest, Gtk.TreeSortable, Tny.List, Tny.FolderStoreObserver, Tny.FolderObserver {
@@ -77,18 +89,30 @@ namespace Tny {
 	}
 	[CCode (cheader_filename = "tny-gtk-header-list-model.h")]
 	public class GtkHeaderListModel : GLib.Object, Gtk.TreeModel, Tny.List {
+		public bool get_no_duplicates ();
 		public GtkHeaderListModel ();
-		public static int received_date_sort_func (Gtk.TreeModel model, Gtk.TreeIter a, Gtk.TreeIter b, pointer user_data);
-		public static int sent_date_sort_func (Gtk.TreeModel model, Gtk.TreeIter a, Gtk.TreeIter b, pointer user_data);
-		public void set_folder (Tny.Folder folder, bool refresh, Tny.GetHeadersCallback callback, Tny.StatusCallback status_callback, pointer user_data);
+		public static int received_date_sort_func (Gtk.TreeModel model, Gtk.TreeIter a, Gtk.TreeIter b);
+		public static int sent_date_sort_func (Gtk.TreeModel model, Gtk.TreeIter a, Gtk.TreeIter b);
+		public void set_folder (Tny.Folder folder, bool refresh, [CCode (delegate_target_pos = 4.1)] Tny.GetHeadersCallback callback, Tny.StatusCallback status_callback);
+		public void set_no_duplicates (bool setting);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkHeaderView : Gtk.Table, Atk.Implementor, Gtk.Buildable, Tny.HeaderView {
 		public GtkHeaderView ();
+		[NoWrapper]
+		public virtual void clear ();
+		[NoWrapper]
+		public virtual void set_header (Tny.Header header);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkImageMimePartView : Gtk.Image, Atk.Implementor, Gtk.Buildable, Tny.MimePartView {
-		public GtkImageMimePartView (Tny.StatusCallback status_callback, pointer status_user_data);
+		public GtkImageMimePartView (Tny.StatusCallback status_callback, void* status_user_data);
+		[NoWrapper]
+		public virtual void clear ();
+		[NoWrapper]
+		public virtual weak Tny.MimePart get_part ();
+		[NoWrapper]
+		public virtual void set_part (Tny.MimePart part);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkLockable : GLib.Object, Tny.Lockable {
@@ -96,7 +120,9 @@ namespace Tny {
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkMimePartSaveStrategy : GLib.Object, Tny.MimePartSaveStrategy {
-		public GtkMimePartSaveStrategy (Tny.StatusCallback status_callback, pointer status_user_data);
+		public GtkMimePartSaveStrategy (Tny.StatusCallback status_callback, void* status_user_data);
+		[NoWrapper]
+		public virtual void perform_save (Tny.MimePart part);
 	}
 	[CCode (cheader_filename = "tny-gtk-msg-view.h")]
 	public class GtkMsgView : Gtk.Bin, Atk.Implementor, Gtk.Buildable, Tny.MimePartView, Tny.MsgView {
@@ -105,19 +131,53 @@ namespace Tny {
 		public bool get_display_html ();
 		public bool get_display_plain ();
 		public bool get_display_rfc822 ();
-		public void get_status_callback (Tny.StatusCallback status_callback, pointer status_user_data);
+		public void get_status_callback (Tny.StatusCallback status_callback, void* status_user_data);
 		public GtkMsgView ();
 		public void set_display_attachments (bool setting);
 		public void set_display_html (bool setting);
 		public void set_display_plain (bool setting);
 		public void set_display_rfc822 (bool setting);
 		public void set_parented (bool parented);
-		public void set_status_callback (Tny.StatusCallback status_callback, pointer status_user_data);
+		public void set_status_callback (Tny.StatusCallback status_callback, void* status_user_data);
+		[NoWrapper]
+		public virtual void clear ();
+		[NoWrapper]
+		public virtual weak Tny.HeaderView create_header_view ();
+		[NoWrapper]
+		public virtual weak Tny.MimePartView create_mime_part_view_for (Tny.MimePart part);
+		[NoWrapper]
+		public virtual weak Tny.MsgView create_new_inline_viewer ();
+		[NoWrapper]
+		public virtual weak Tny.Msg get_msg ();
+		[NoWrapper]
+		public virtual weak Tny.MimePart get_part ();
+		[NoWrapper]
+		public virtual void set_msg (Tny.Msg msg);
+		[NoWrapper]
+		public virtual void set_part (Tny.MimePart part);
+		[NoWrapper]
+		public virtual void set_unavailable ();
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkMsgWindow : Gtk.Window, Atk.Implementor, Gtk.Buildable, Tny.MimePartView, Tny.MsgView, Tny.MsgWindow {
 		public GtkMsgWindow (Tny.MsgView msgview);
 		public void set_view (Tny.MsgView view);
+		[NoWrapper]
+		public virtual void clear ();
+		[NoWrapper]
+		public virtual weak Tny.MimePartView create_mime_part_view_for (Tny.MimePart part);
+		[NoWrapper]
+		public virtual weak Tny.MsgView create_new_inline_viewer ();
+		[NoWrapper]
+		public virtual weak Tny.Msg get_msg ();
+		[NoWrapper]
+		public virtual weak Tny.MimePart get_part ();
+		[NoWrapper]
+		public virtual void set_msg (Tny.Msg msg);
+		[NoWrapper]
+		public virtual void set_part (Tny.MimePart part);
+		[NoWrapper]
+		public virtual void set_unavailable ();
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkPasswordDialog : GLib.Object, Tny.PasswordGetter {
@@ -127,14 +187,48 @@ namespace Tny {
 	public class GtkPixbufStream : GLib.Object, Tny.Stream {
 		public weak Gdk.Pixbuf get_pixbuf ();
 		public GtkPixbufStream (string mime_type);
+		[NoWrapper]
+		public virtual int close ();
+		[NoWrapper]
+		public virtual int flush ();
+		[NoWrapper]
+		public virtual bool is_eos ();
+		[NoWrapper]
+		public virtual long read (string buffer, ulong n);
+		[NoWrapper]
+		public virtual int reset ();
+		[NoWrapper]
+		public virtual long write (string buffer, ulong n);
+		[NoWrapper]
+		public virtual long write_to_stream (Tny.Stream output);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkTextBufferStream : GLib.Object, Tny.Stream {
 		public GtkTextBufferStream (Gtk.TextBuffer buffer);
 		public void set_text_buffer (Gtk.TextBuffer buffer);
+		[NoWrapper]
+		public virtual int close ();
+		[NoWrapper]
+		public virtual int flush ();
+		[NoWrapper]
+		public virtual bool is_eos ();
+		[NoWrapper]
+		public virtual long read (string buffer, ulong n);
+		[NoWrapper]
+		public virtual int reset ();
+		[NoWrapper]
+		public virtual long write (string buffer, ulong n);
+		[NoWrapper]
+		public virtual long write_to_stream (Tny.Stream output);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public class GtkTextMimePartView : Gtk.TextView, Atk.Implementor, Gtk.Buildable, Tny.MimePartView {
-		public GtkTextMimePartView (Tny.StatusCallback status_callback, pointer status_user_data);
+		public GtkTextMimePartView (Tny.StatusCallback status_callback, void* status_user_data);
+		[NoWrapper]
+		public virtual void clear ();
+		[NoWrapper]
+		public virtual weak Tny.MimePart get_part ();
+		[NoWrapper]
+		public virtual void set_part (Tny.MimePart part);
 	}
 }

@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <api version="1.0">
 	<namespace name="Tny">
-		<enum name="TnyGtkAccountListModelColumn">
+		<enum name="TnyGtkAccountListModelColumn" type-name="TnyGtkAccountListModelColumn" get-type="tny_gtk_account_list_model_column_get_type">
 			<member name="TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN" value="0"/>
 			<member name="TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN" value="1"/>
 			<member name="TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS" value="2"/>
 		</enum>
-		<enum name="TnyGtkAttachListModelColumn">
+		<enum name="TnyGtkAttachListModelColumn" type-name="TnyGtkAttachListModelColumn" get-type="tny_gtk_attach_list_model_column_get_type">
 			<member name="TNY_GTK_ATTACH_LIST_MODEL_PIXBUF_COLUMN" value="0"/>
 			<member name="TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN" value="1"/>
 			<member name="TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN" value="2"/>
 			<member name="TNY_GTK_ATTACH_LIST_MODEL_N_COLUMNS" value="3"/>
 		</enum>
-		<enum name="TnyGtkFolderStoreTreeModelColumn">
+		<enum name="TnyGtkFolderStoreTreeModelColumn" type-name="TnyGtkFolderStoreTreeModelColumn" get-type="tny_gtk_folder_store_tree_model_column_get_type">
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN" value="0"/>
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN" value="1"/>
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN" value="2"/>
@@ -20,7 +20,7 @@
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN" value="4"/>
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS" value="5"/>
 		</enum>
-		<enum name="TnyGtkHeaderListModelColumn">
+		<enum name="TnyGtkHeaderListModelColumn" type-name="TnyGtkHeaderListModelColumn" get-type="tny_gtk_header_list_model_column_get_type">
 			<member name="TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN" value="0"/>
 			<member name="TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN" value="1"/>
 			<member name="TNY_GTK_HEADER_LIST_MODEL_SUBJECT_COLUMN" value="2"/>
@@ -76,19 +76,19 @@
 					<parameter name="iview" type="TnyGtkAttachListModel*"/>
 				</parameters>
 			</constructor>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_part_func">
+			<vfunc name="get_part">
 				<return-type type="TnyMimePart*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_part_func">
+			<vfunc name="set_part">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
@@ -115,19 +115,19 @@
 					<parameter name="view" type="TnyMimePartView*"/>
 				</parameters>
 			</method>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_part_func">
+			<vfunc name="get_part">
 				<return-type type="TnyMimePart*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_part_func">
+			<vfunc name="set_part">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
@@ -181,6 +181,12 @@
 				<interface name="GtkTreeModel"/>
 				<interface name="TnyList"/>
 			</implements>
+			<method name="get_no_duplicates" symbol="tny_gtk_header_list_model_get_no_duplicates">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyGtkHeaderListModel*"/>
+				</parameters>
+			</method>
 			<constructor name="new" symbol="tny_gtk_header_list_model_new">
 				<return-type type="GtkTreeModel*"/>
 			</constructor>
@@ -213,6 +219,13 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</method>
+			<method name="set_no_duplicates" symbol="tny_gtk_header_list_model_set_no_duplicates">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyGtkHeaderListModel*"/>
+					<parameter name="setting" type="gboolean"/>
+				</parameters>
+			</method>
 		</object>
 		<object name="TnyGtkHeaderView" parent="GtkTable" type-name="TnyGtkHeaderView" get-type="tny_gtk_header_view_get_type">
 			<implements>
@@ -223,13 +236,13 @@
 			<constructor name="new" symbol="tny_gtk_header_view_new">
 				<return-type type="TnyHeaderView*"/>
 			</constructor>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyHeaderView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_header_func">
+			<vfunc name="set_header">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyHeaderView*"/>
@@ -250,19 +263,19 @@
 					<parameter name="status_user_data" type="gpointer"/>
 				</parameters>
 			</constructor>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_part_func">
+			<vfunc name="get_part">
 				<return-type type="TnyMimePart*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_part_func">
+			<vfunc name="set_part">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
@@ -289,7 +302,7 @@
 					<parameter name="status_user_data" type="gpointer"/>
 				</parameters>
 			</constructor>
-			<vfunc name="perform_save_func">
+			<vfunc name="perform_save">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartSaveStrategy*"/>
@@ -382,58 +395,58 @@
 					<parameter name="status_user_data" type="gpointer"/>
 				</parameters>
 			</method>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_header_view_func">
+			<vfunc name="create_header_view">
 				<return-type type="TnyHeaderView*"/>
 				<parameters>
 					<parameter name="self" type="TnyGtkMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_mime_part_view_for_func">
+			<vfunc name="create_mime_part_view_for">
 				<return-type type="TnyMimePartView*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_new_inline_viewer_func">
+			<vfunc name="create_new_inline_viewer">
 				<return-type type="TnyMsgView*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_msg_func">
+			<vfunc name="get_msg">
 				<return-type type="TnyMsg*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_part_func">
+			<vfunc name="get_part">
 				<return-type type="TnyMimePart*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_msg_func">
+			<vfunc name="set_msg">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 					<parameter name="msg" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_part_func">
+			<vfunc name="set_part">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_unavailable_func">
+			<vfunc name="set_unavailable">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
@@ -462,52 +475,52 @@
 					<parameter name="view" type="TnyMsgView*"/>
 				</parameters>
 			</method>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_mime_part_view_for_func">
+			<vfunc name="create_mime_part_view_for">
 				<return-type type="TnyMimePartView*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_new_inline_viewer_func">
+			<vfunc name="create_new_inline_viewer">
 				<return-type type="TnyMsgView*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_msg_func">
+			<vfunc name="get_msg">
 				<return-type type="TnyMsg*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_part_func">
+			<vfunc name="get_part">
 				<return-type type="TnyMimePart*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_msg_func">
+			<vfunc name="set_msg">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
 					<parameter name="msg" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_part_func">
+			<vfunc name="set_part">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_unavailable_func">
+			<vfunc name="set_unavailable">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgView*"/>
@@ -538,25 +551,25 @@
 					<parameter name="mime_type" type="gchar*"/>
 				</parameters>
 			</constructor>
-			<vfunc name="close_func">
+			<vfunc name="close">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="flush_func">
+			<vfunc name="flush">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="is_eos_func">
+			<vfunc name="is_eos">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="read_func">
+			<vfunc name="read">
 				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
@@ -564,13 +577,13 @@
 					<parameter name="n" type="gsize"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="reset_func">
+			<vfunc name="reset">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="write_func">
+			<vfunc name="write">
 				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
@@ -578,7 +591,7 @@
 					<parameter name="n" type="gsize"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="write_to_stream_func">
+			<vfunc name="write_to_stream">
 				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
@@ -603,25 +616,25 @@
 					<parameter name="buffer" type="GtkTextBuffer*"/>
 				</parameters>
 			</method>
-			<vfunc name="close_func">
+			<vfunc name="close">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="flush_func">
+			<vfunc name="flush">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="is_eos_func">
+			<vfunc name="is_eos">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="read_func">
+			<vfunc name="read">
 				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
@@ -629,13 +642,13 @@
 					<parameter name="n" type="gsize"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="reset_func">
+			<vfunc name="reset">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="write_func">
+			<vfunc name="write">
 				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
@@ -643,7 +656,7 @@
 					<parameter name="n" type="gsize"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="write_to_stream_func">
+			<vfunc name="write_to_stream">
 				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
@@ -664,19 +677,19 @@
 					<parameter name="status_user_data" type="gpointer"/>
 				</parameters>
 			</constructor>
-			<vfunc name="clear_func">
+			<vfunc name="clear">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_part_func">
+			<vfunc name="get_part">
 				<return-type type="TnyMimePart*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_part_func">
+			<vfunc name="set_part">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePartView*"/>

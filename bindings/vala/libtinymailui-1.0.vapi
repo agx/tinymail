@@ -4,49 +4,49 @@
 namespace Tny {
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface AccountStoreView : GLib.Object {
-		public void set_account_store (Tny.AccountStore account_store);
+		public abstract void set_account_store (Tny.AccountStore account_store);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface HeaderView : GLib.Object {
-		public void clear ();
-		public void set_header (Tny.Header header);
+		public abstract void clear ();
+		public abstract void set_header (Tny.Header header);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface MimePartSaveStrategy : GLib.Object {
-		public void perform_save (Tny.MimePart part);
+		public abstract void perform_save (Tny.MimePart part);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface MimePartSaver {
-		public weak Tny.MimePartSaveStrategy get_save_strategy ();
-		public void save (Tny.MimePart part);
-		public void set_save_strategy (Tny.MimePartSaveStrategy strategy);
+		public abstract weak Tny.MimePartSaveStrategy get_save_strategy ();
+		public abstract void save (Tny.MimePart part);
+		public abstract void set_save_strategy (Tny.MimePartSaveStrategy strategy);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface MimePartView {
-		public void clear ();
-		public weak Tny.MimePart get_part ();
-		public void set_part (Tny.MimePart mime_part);
+		public abstract void clear ();
+		public abstract weak Tny.MimePart get_part ();
+		public abstract void set_part (Tny.MimePart mime_part);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface MsgView : Tny.MimePartView {
-		public void clear ();
-		public weak Tny.MimePartView create_mime_part_view_for (Tny.MimePart part);
-		public weak Tny.MsgView create_new_inline_viewer ();
-		public weak Tny.Msg get_msg ();
-		public void set_msg (Tny.Msg msg);
-		public void set_unavailable ();
+		public abstract void clear ();
+		public abstract weak Tny.MimePartView create_mime_part_view_for (Tny.MimePart part);
+		public abstract weak Tny.MsgView create_new_inline_viewer ();
+		public abstract weak Tny.Msg get_msg ();
+		public abstract void set_msg (Tny.Msg msg);
+		public abstract void set_unavailable ();
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface MsgWindow : Tny.MimePartView, Tny.MsgView {
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface PlatformFactory : GLib.Object {
-		public weak Tny.AccountStore new_account_store ();
-		public weak Tny.Device new_device ();
-		public weak Tny.MimePart new_mime_part ();
-		public weak Tny.Msg new_msg ();
-		public weak Tny.MsgView new_msg_view ();
-		public weak Tny.PasswordGetter new_password_getter ();
+		public abstract weak Tny.AccountStore new_account_store ();
+		public abstract weak Tny.Device new_device ();
+		public abstract weak Tny.MimePart new_mime_part ();
+		public abstract weak Tny.Msg new_msg ();
+		public abstract weak Tny.MsgView new_msg_view ();
+		public abstract weak Tny.PasswordGetter new_password_getter ();
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface SummaryView : GLib.Object {

@@ -83,11 +83,11 @@
 					<parameter name="output" type="TnyStream*"/>
 				</parameters>
 			</method>
-			<field name="parent" type="CamelStream"/>
+			<field name="parent" type="CamelSeekableSubstream"/>
 			<field name="stream" type="TnyStream*"/>
 		</struct>
 		<struct name="TnyStreamCamelClass">
-			<field name="parent" type="CamelStreamClass"/>
+			<field name="parent" type="CamelSeekableSubstreamClass"/>
 		</struct>
 		<object name="TnyCamelAccount" parent="GObject" type-name="TnyCamelAccount" get-type="tny_camel_account_get_type">
 			<implements>
@@ -97,7 +97,20 @@
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyCamelAccount*"/>
-					<parameter name="option" type="gchar*"/>
+					<parameter name="option" type="TnyPair*"/>
+				</parameters>
+			</method>
+			<method name="clear_options" symbol="tny_camel_account_clear_options">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCamelAccount*"/>
+				</parameters>
+			</method>
+			<method name="get_options" symbol="tny_camel_account_get_options">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCamelAccount*"/>
+					<parameter name="options" type="TnyList*"/>
 				</parameters>
 			</method>
 			<method name="get_supported_secure_authentication" symbol="tny_camel_account_get_supported_secure_authentication">
@@ -128,103 +141,116 @@
 			<signal name="set-online-happened" when="FIRST">
 				<return-type type="void"/>
 				<parameters>
-					<parameter name="object" type="TnyCamelAccount*"/>
-					<parameter name="p0" type="gboolean"/>
+					<parameter name="self" type="TnyCamelAccount*"/>
+					<parameter name="online" type="gboolean"/>
 				</parameters>
 			</signal>
-			<vfunc name="add_option_func">
+			<vfunc name="add_option">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyCamelAccount*"/>
-					<parameter name="option" type="gchar*"/>
+					<parameter name="option" type="TnyPair*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="cancel_func">
+			<vfunc name="cancel">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_account_type_func">
+			<vfunc name="clear_options">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCamelAccount*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_account_type">
 				<return-type type="TnyAccountType"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_connection_status_func">
+			<vfunc name="get_connection_status">
 				<return-type type="TnyConnectionStatus"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_forget_pass_func_func">
+			<vfunc name="get_forget_pass_func">
 				<return-type type="TnyForgetPassFunc"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_hostname_func">
+			<vfunc name="get_hostname">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_id_func">
+			<vfunc name="get_id">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_name_func">
+			<vfunc name="get_name">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_pass_func_func">
+			<vfunc name="get_options">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCamelAccount*"/>
+					<parameter name="options" type="TnyList*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_pass_func">
 				<return-type type="TnyGetPassFunc"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_port_func">
+			<vfunc name="get_port">
 				<return-type type="guint"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_proto_func">
+			<vfunc name="get_proto">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_secure_auth_mech_func">
+			<vfunc name="get_secure_auth_mech">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_url_string_func">
+			<vfunc name="get_url_string">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_user_func">
+			<vfunc name="get_user">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="matches_url_string_func">
+			<vfunc name="matches_url_string">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="url_string" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="prepare_func">
+			<vfunc name="prepare">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyCamelAccount*"/>
@@ -232,35 +258,35 @@
 					<parameter name="reservice" type="gboolean"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_forget_pass_func_func">
+			<vfunc name="set_forget_pass_func">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="get_forget_pass_func" type="TnyForgetPassFunc"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_hostname_func">
+			<vfunc name="set_hostname">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="host" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_id_func">
+			<vfunc name="set_id">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="id" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_name_func">
+			<vfunc name="set_name">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="name" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_online_func">
+			<vfunc name="set_online">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyCamelAccount*"/>
@@ -269,56 +295,49 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_online_happened_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyCamelAccount*"/>
-					<parameter name="online" type="gboolean"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="set_pass_func_func">
+			<vfunc name="set_pass_func">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="get_pass_func" type="TnyGetPassFunc"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_port_func">
+			<vfunc name="set_port">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="port" type="guint"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_proto_func">
+			<vfunc name="set_proto">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="proto" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_secure_auth_mech_func">
+			<vfunc name="set_secure_auth_mech">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="name" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_url_string_func">
+			<vfunc name="set_url_string">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="url_string" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_user_func">
+			<vfunc name="set_user">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="user" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="start_operation_func">
+			<vfunc name="start_operation">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
@@ -328,14 +347,14 @@
 					<parameter name="status_user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="stop_operation_func">
+			<vfunc name="stop_operation">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
 					<parameter name="canceled" type="gboolean*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="try_connect_func">
+			<vfunc name="try_connect">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
@@ -347,14 +366,14 @@
 			<implements>
 				<interface name="TnyMimePart"/>
 			</implements>
-			<vfunc name="add_part_func">
+			<vfunc name="add_part">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="construct_func">
+			<vfunc name="construct">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
@@ -363,14 +382,22 @@
 					<parameter name="transfer_encoding" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="content_type_is_func">
+			<vfunc name="content_type_is">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="content_type" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="decode_to_stream_async_func">
+			<vfunc name="decode_to_stream">
+				<return-type type="gssize"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="decode_to_stream_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
@@ -380,125 +407,123 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="decode_to_stream_func">
-				<return-type type="gssize"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-					<parameter name="stream" type="TnyStream*"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="del_part_func">
+			<vfunc name="del_part">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_content_id_func">
+			<vfunc name="get_content_id">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_content_location_func">
+			<vfunc name="get_content_location">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_content_type_func">
+			<vfunc name="get_content_type">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_description_func">
-				<return-type type="gchar*"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_filename_func">
-				<return-type type="gchar*"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_header_pairs_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-					<parameter name="list" type="TnyList*"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_parts_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-					<parameter name="list" type="TnyList*"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_stream_func">
+			<vfunc name="get_decoded_stream">
 				<return-type type="TnyStream*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_transfer_encoding_func">
+			<vfunc name="get_description">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="is_attachment_func">
+			<vfunc name="get_filename">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_header_pairs">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+					<parameter name="list" type="TnyList*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_parts">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+					<parameter name="list" type="TnyList*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_stream">
+				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_transfer_encoding">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="is_attachment">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="is_purged_func">
+			<vfunc name="is_purged">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_content_id_func">
+			<vfunc name="set_content_id">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="content_id" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_content_location_func">
+			<vfunc name="set_content_location">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="content_location" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_content_type_func">
+			<vfunc name="set_content_type">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="contenttype" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_description_func">
+			<vfunc name="set_description">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="description" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_filename_func">
+			<vfunc name="set_filename">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="filename" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_header_pair_func">
+			<vfunc name="set_header_pair">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
@@ -506,13 +531,20 @@
 					<parameter name="value" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_purged_func">
+			<vfunc name="set_purged">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="write_to_stream_func">
+			<vfunc name="set_transfer_encoding">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+					<parameter name="transfer_encoding" type="gchar*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="write_to_stream">
 				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
@@ -526,31 +558,31 @@
 				<interface name="TnyMimePart"/>
 				<interface name="TnyMsg"/>
 			</implements>
-			<vfunc name="get_folder_func">
+			<vfunc name="get_folder">
 				<return-type type="TnyFolder*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_header_func">
+			<vfunc name="get_header">
 				<return-type type="TnyHeader*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_url_string_func">
+			<vfunc name="get_url_string">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="rewrite_cache_func">
+			<vfunc name="rewrite_cache">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="uncache_attachments_func">
+			<vfunc name="uncache_attachments">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
@@ -574,7 +606,7 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</method>
-			<vfunc name="perform_get_msg_func">
+			<vfunc name="perform_get_msg">
 				<return-type type="TnyMsg*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgReceiveStrategy*"/>
@@ -603,7 +635,15 @@
 					<parameter name="self" type="TnyCamelFolder*"/>
 				</parameters>
 			</method>
-			<vfunc name="add_msg_async_func">
+			<vfunc name="add_msg">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="msg" type="TnyMsg*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="add_msg_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -613,29 +653,31 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="add_msg_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyFolder*"/>
-					<parameter name="msg" type="TnyMsg*"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="add_observer_func">
+			<vfunc name="add_observer">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 					<parameter name="observer" type="TnyFolderObserver*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="add_store_observer_func">
+			<vfunc name="add_store_observer">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="observer" type="TnyFolderStoreObserver*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="copy_async_func">
+			<vfunc name="copy">
+				<return-type type="TnyFolder*"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="into" type="TnyFolderStore*"/>
+					<parameter name="new_name" type="gchar*"/>
+					<parameter name="del" type="gboolean"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="copy_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -647,17 +689,15 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="copy_func">
+			<vfunc name="create_folder">
 				<return-type type="TnyFolder*"/>
 				<parameters>
-					<parameter name="self" type="TnyFolder*"/>
-					<parameter name="into" type="TnyFolderStore*"/>
-					<parameter name="new_name" type="gchar*"/>
-					<parameter name="del" type="gboolean"/>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="name" type="gchar*"/>
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_folder_async_func">
+			<vfunc name="create_folder_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
@@ -667,15 +707,7 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_folder_func">
-				<return-type type="TnyFolder*"/>
-				<parameters>
-					<parameter name="self" type="TnyFolderStore*"/>
-					<parameter name="name" type="gchar*"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="find_msg_func">
+			<vfunc name="find_msg">
 				<return-type type="TnyMsg*"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -683,37 +715,46 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_account_func">
+			<vfunc name="get_account">
 				<return-type type="TnyAccount*"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_all_count_func">
+			<vfunc name="get_all_count">
 				<return-type type="guint"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_caps_func">
+			<vfunc name="get_caps">
 				<return-type type="TnyFolderCaps"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_folder_store_func">
+			<vfunc name="get_folder_store">
 				<return-type type="TnyFolderStore*"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_folder_type_func">
+			<vfunc name="get_folder_type">
 				<return-type type="TnyFolderType"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_folders_async_func">
+			<vfunc name="get_folders">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="list" type="TnyList*"/>
+					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_folders_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
@@ -724,16 +765,16 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_folders_func">
+			<vfunc name="get_headers">
 				<return-type type="void"/>
 				<parameters>
-					<parameter name="self" type="TnyFolderStore*"/>
-					<parameter name="list" type="TnyList*"/>
-					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="headers" type="TnyList*"/>
+					<parameter name="refresh" type="gboolean"/>
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_headers_async_func">
+			<vfunc name="get_headers_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -744,28 +785,27 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_headers_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyFolder*"/>
-					<parameter name="headers" type="TnyList*"/>
-					<parameter name="refresh" type="gboolean"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_id_func">
+			<vfunc name="get_id">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_local_size_func">
+			<vfunc name="get_local_size">
 				<return-type type="guint"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_msg_async_func">
+			<vfunc name="get_msg">
+				<return-type type="TnyMsg*"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="header" type="TnyHeader*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_msg_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -775,63 +815,62 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_msg_func">
-				<return-type type="TnyMsg*"/>
-				<parameters>
-					<parameter name="self" type="TnyFolder*"/>
-					<parameter name="header" type="TnyHeader*"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_msg_receive_strategy_func">
+			<vfunc name="get_msg_receive_strategy">
 				<return-type type="TnyMsgReceiveStrategy*"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_msg_remove_strategy_func">
+			<vfunc name="get_msg_remove_strategy">
 				<return-type type="TnyMsgRemoveStrategy*"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_name_func">
+			<vfunc name="get_name">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_stats_func">
+			<vfunc name="get_stats">
 				<return-type type="TnyFolderStats*"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_unread_count_func">
+			<vfunc name="get_unread_count">
 				<return-type type="guint"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_url_string_func">
+			<vfunc name="get_url_string">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="is_subscribed_func">
+			<vfunc name="is_subscribed">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="poke_status_func">
+			<vfunc name="poke_status">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="refresh_async_func">
+			<vfunc name="refresh">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="refresh_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -840,14 +879,7 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="refresh_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyFolder*"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="remove_folder_func">
+			<vfunc name="remove_folder">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
@@ -855,7 +887,7 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="remove_msg_func">
+			<vfunc name="remove_msg">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -863,7 +895,7 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="remove_msgs_func">
+			<vfunc name="remove_msgs">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -871,35 +903,53 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="remove_observer_func">
+			<vfunc name="remove_msgs_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="headers" type="TnyList*"/>
+					<parameter name="callback" type="TnyFolderCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="remove_observer">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 					<parameter name="observer" type="TnyFolderObserver*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="remove_store_observer_func">
+			<vfunc name="remove_store_observer">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="observer" type="TnyFolderStoreObserver*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_msg_receive_strategy_func">
+			<vfunc name="set_msg_receive_strategy">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 					<parameter name="st" type="TnyMsgReceiveStrategy*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_msg_remove_strategy_func">
+			<vfunc name="set_msg_remove_strategy">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
 					<parameter name="st" type="TnyMsgRemoveStrategy*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="sync_async_func">
+			<vfunc name="sync">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="expunge" type="gboolean"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="sync_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -909,15 +959,17 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="sync_func">
+			<vfunc name="transfer_msgs">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
-					<parameter name="expunge" type="gboolean"/>
+					<parameter name="headers" type="TnyList*"/>
+					<parameter name="folder_dst" type="TnyFolder*"/>
+					<parameter name="delete_originals" type="gboolean"/>
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="transfer_msgs_async_func">
+			<vfunc name="transfer_msgs_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolder*"/>
@@ -929,16 +981,6 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="transfer_msgs_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyFolder*"/>
-					<parameter name="headers" type="TnyList*"/>
-					<parameter name="folder_dst" type="TnyFolder*"/>
-					<parameter name="delete_originals" type="gboolean"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
 		</object>
 		<object name="TnyCamelFullMsgReceiveStrategy" parent="GObject" type-name="TnyCamelFullMsgReceiveStrategy" get-type="tny_camel_full_msg_receive_strategy_get_type">
 			<implements>
@@ -947,7 +989,7 @@
 			<constructor name="new" symbol="tny_camel_full_msg_receive_strategy_new">
 				<return-type type="TnyMsgReceiveStrategy*"/>
 			</constructor>
-			<vfunc name="perform_get_msg_func">
+			<vfunc name="perform_get_msg">
 				<return-type type="TnyMsg*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgReceiveStrategy*"/>
@@ -957,6 +999,11 @@
 				</parameters>
 			</vfunc>
 		</object>
+		<object name="TnyCamelHeader" parent="GObject" type-name="TnyCamelHeader" get-type="tny_camel_header_get_type">
+			<implements>
+				<interface name="TnyHeader"/>
+			</implements>
+		</object>
 		<object name="TnyCamelIMAPFolder" parent="TnyCamelFolder" type-name="TnyCamelIMAPFolder" get-type="tny_camel_imap_folder_get_type">
 			<implements>
 				<interface name="TnyFolderStore"/>
@@ -965,8 +1012,8 @@
 		</object>
 		<object name="TnyCamelIMAPStoreAccount" parent="TnyCamelStoreAccount" type-name="TnyCamelIMAPStoreAccount" get-type="tny_camel_imap_store_account_get_type">
 			<implements>
-				<interface name="TnyAccount"/>
 				<interface name="TnyFolderStore"/>
+				<interface name="TnyAccount"/>
 				<interface name="TnyStoreAccount"/>
 			</implements>
 			<constructor name="new" symbol="tny_camel_imap_store_account_new">
@@ -976,9 +1023,17 @@
 		<object name="TnyCamelMemStream" parent="TnyCamelStream" type-name="TnyCamelMemStream" get-type="tny_camel_mem_stream_get_type">
 			<implements>
 				<interface name="TnyStream"/>
+				<interface name="TnySeekable"/>
 			</implements>
 			<constructor name="new" symbol="tny_camel_mem_stream_new">
 				<return-type type="TnyStream*"/>
+			</constructor>
+			<constructor name="new_with_buffer" symbol="tny_camel_mem_stream_new_with_buffer">
+				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="buffer" type="char*"/>
+					<parameter name="len" type="size_t"/>
+				</parameters>
 			</constructor>
 		</object>
 		<object name="TnyCamelMimePart" parent="GObject" type-name="TnyCamelMimePart" get-type="tny_camel_mime_part_get_type">
@@ -1000,14 +1055,14 @@
 					<parameter name="part" type="CamelMimePart*"/>
 				</parameters>
 			</constructor>
-			<vfunc name="add_part_func">
+			<vfunc name="add_part">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="construct_func">
+			<vfunc name="construct">
 				<return-type type="gint"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
@@ -1016,14 +1071,22 @@
 					<parameter name="transfer_encoding" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="content_type_is_func">
+			<vfunc name="content_type_is">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="content_type" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="decode_to_stream_async_func">
+			<vfunc name="decode_to_stream">
+				<return-type type="gssize"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+					<parameter name="stream" type="TnyStream*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="decode_to_stream_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
@@ -1033,125 +1096,123 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="decode_to_stream_func">
-				<return-type type="gssize"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-					<parameter name="stream" type="TnyStream*"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="del_part_func">
+			<vfunc name="del_part">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="part" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_content_id_func">
+			<vfunc name="get_content_id">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_content_location_func">
+			<vfunc name="get_content_location">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_content_type_func">
+			<vfunc name="get_content_type">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_description_func">
-				<return-type type="gchar*"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_filename_func">
-				<return-type type="gchar*"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_header_pairs_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-					<parameter name="list" type="TnyList*"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_parts_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyMimePart*"/>
-					<parameter name="list" type="TnyList*"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_stream_func">
+			<vfunc name="get_decoded_stream">
 				<return-type type="TnyStream*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_transfer_encoding_func">
+			<vfunc name="get_description">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="is_attachment_func">
+			<vfunc name="get_filename">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_header_pairs">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+					<parameter name="list" type="TnyList*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_parts">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+					<parameter name="list" type="TnyList*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_stream">
+				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_transfer_encoding">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="is_attachment">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="is_purged_func">
+			<vfunc name="is_purged">
 				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_content_id_func">
+			<vfunc name="set_content_id">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="content_id" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_content_location_func">
+			<vfunc name="set_content_location">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="content_location" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_content_type_func">
+			<vfunc name="set_content_type">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="contenttype" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_description_func">
+			<vfunc name="set_description">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="description" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_filename_func">
+			<vfunc name="set_filename">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 					<parameter name="filename" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_header_pair_func">
+			<vfunc name="set_header_pair">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
@@ -1159,13 +1220,20 @@
 					<parameter name="value" type="gchar*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="set_purged_func">
+			<vfunc name="set_purged">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="write_to_stream_func">
+			<vfunc name="set_transfer_encoding">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMimePart*"/>
+					<parameter name="transfer_encoding" type="gchar*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="write_to_stream">
 				<return-type type="gssize"/>
 				<parameters>
 					<parameter name="self" type="TnyMimePart*"/>
@@ -1188,31 +1256,31 @@
 					<parameter name="part" type="CamelMimePart*"/>
 				</parameters>
 			</constructor>
-			<vfunc name="get_folder_func">
+			<vfunc name="get_folder">
 				<return-type type="TnyFolder*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_header_func">
+			<vfunc name="get_header">
 				<return-type type="TnyHeader*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_url_string_func">
+			<vfunc name="get_url_string">
 				<return-type type="gchar*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="rewrite_cache_func">
+			<vfunc name="rewrite_cache">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="uncache_attachments_func">
+			<vfunc name="uncache_attachments">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
@@ -1226,7 +1294,7 @@
 			<constructor name="new" symbol="tny_camel_msg_remove_strategy_new">
 				<return-type type="TnyMsgRemoveStrategy*"/>
 			</constructor>
-			<vfunc name="perform_remove_func">
+			<vfunc name="perform_remove">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgRemoveStrategy*"/>
@@ -1244,8 +1312,8 @@
 		</object>
 		<object name="TnyCamelNNTPStoreAccount" parent="TnyCamelStoreAccount" type-name="TnyCamelNNTPStoreAccount" get-type="tny_camel_nntp_store_account_get_type">
 			<implements>
-				<interface name="TnyAccount"/>
 				<interface name="TnyFolderStore"/>
+				<interface name="TnyAccount"/>
 				<interface name="TnyStoreAccount"/>
 			</implements>
 			<constructor name="new" symbol="tny_camel_nntp_store_account_new">
@@ -1260,8 +1328,8 @@
 		</object>
 		<object name="TnyCamelPOPStoreAccount" parent="TnyCamelStoreAccount" type-name="TnyCamelPOPStoreAccount" get-type="tny_camel_pop_store_account_get_type">
 			<implements>
-				<interface name="TnyAccount"/>
 				<interface name="TnyFolderStore"/>
+				<interface name="TnyAccount"/>
 				<interface name="TnyStoreAccount"/>
 			</implements>
 			<constructor name="new" symbol="tny_camel_pop_store_account_new">
@@ -1288,7 +1356,7 @@
 			<constructor name="new" symbol="tny_camel_partial_msg_receive_strategy_new">
 				<return-type type="TnyMsgReceiveStrategy*"/>
 			</constructor>
-			<vfunc name="perform_get_msg_func">
+			<vfunc name="perform_get_msg">
 				<return-type type="TnyMsg*"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgReceiveStrategy*"/>
@@ -1305,7 +1373,7 @@
 			<constructor name="new" symbol="tny_camel_pop_remote_msg_remove_strategy_new">
 				<return-type type="TnyMsgRemoveStrategy*"/>
 			</constructor>
-			<vfunc name="perform_remove_func">
+			<vfunc name="perform_remove">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsgRemoveStrategy*"/>
@@ -1339,19 +1407,9 @@
 		</object>
 		<object name="TnyCamelSendQueue" parent="GObject" type-name="TnyCamelSendQueue" get-type="tny_camel_send_queue_get_type">
 			<implements>
-				<interface name="TnySendQueue"/>
 				<interface name="TnyFolderObserver"/>
+				<interface name="TnySendQueue"/>
 			</implements>
-			<method name="add_async" symbol="tny_camel_send_queue_add_async">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyCamelSendQueue*"/>
-					<parameter name="msg" type="TnyMsg*"/>
-					<parameter name="callback" type="TnySendQueueAddCallback"/>
-					<parameter name="status_callback" type="TnyStatusCallback"/>
-					<parameter name="user_data" type="gpointer"/>
-				</parameters>
-			</method>
 			<method name="flush" symbol="tny_camel_send_queue_flush">
 				<return-type type="void"/>
 				<parameters>
@@ -1377,39 +1435,39 @@
 					<parameter name="trans_account" type="TnyCamelTransportAccount*"/>
 				</parameters>
 			</method>
-			<vfunc name="add_async_func">
+			<vfunc name="add">
 				<return-type type="void"/>
 				<parameters>
-					<parameter name="self" type="TnyCamelSendQueue*"/>
+					<parameter name="self" type="TnySendQueue*"/>
+					<parameter name="msg" type="TnyMsg*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="add_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnySendQueue*"/>
 					<parameter name="msg" type="TnyMsg*"/>
 					<parameter name="callback" type="TnySendQueueAddCallback"/>
 					<parameter name="status_callback" type="TnyStatusCallback"/>
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="add_func">
+			<vfunc name="cancel">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnySendQueue*"/>
-					<parameter name="msg" type="TnyMsg*"/>
+					<parameter name="cancel_action" type="TnySendQueueCancelAction"/>
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="cancel_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnySendQueue*"/>
-					<parameter name="remove" type="gboolean"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="get_outbox_func">
+			<vfunc name="get_outbox">
 				<return-type type="TnyFolder*"/>
 				<parameters>
 					<parameter name="self" type="TnySendQueue*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_sentbox_func">
+			<vfunc name="get_sentbox">
 				<return-type type="TnyFolder*"/>
 				<parameters>
 					<parameter name="self" type="TnySendQueue*"/>
@@ -1418,8 +1476,8 @@
 		</object>
 		<object name="TnyCamelStoreAccount" parent="TnyCamelAccount" type-name="TnyCamelStoreAccount" get-type="tny_camel_store_account_get_type">
 			<implements>
-				<interface name="TnyAccount"/>
 				<interface name="TnyFolderStore"/>
+				<interface name="TnyAccount"/>
 				<interface name="TnyStoreAccount"/>
 			</implements>
 			<method name="factor_folder" symbol="tny_camel_store_account_factor_folder">
@@ -1433,14 +1491,22 @@
 			<constructor name="new" symbol="tny_camel_store_account_new">
 				<return-type type="TnyStoreAccount*"/>
 			</constructor>
-			<vfunc name="add_observer_func">
+			<vfunc name="add_observer">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="observer" type="TnyFolderStoreObserver*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_folder_async_func">
+			<vfunc name="create_folder">
+				<return-type type="TnyFolder*"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="name" type="gchar*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="create_folder_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
@@ -1450,21 +1516,13 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="create_folder_func">
-				<return-type type="TnyFolder*"/>
-				<parameters>
-					<parameter name="self" type="TnyFolderStore*"/>
-					<parameter name="name" type="gchar*"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="delete_cache_func">
+			<vfunc name="delete_cache">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyStoreAccount*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="factor_folder_func">
+			<vfunc name="factor_folder">
 				<return-type type="TnyFolder*"/>
 				<parameters>
 					<parameter name="self" type="TnyCamelStoreAccount*"/>
@@ -1472,7 +1530,7 @@
 					<parameter name="was_new" type="gboolean*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="find_folder_func">
+			<vfunc name="find_folder">
 				<return-type type="TnyFolder*"/>
 				<parameters>
 					<parameter name="self" type="TnyStoreAccount*"/>
@@ -1480,7 +1538,16 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_folders_async_func">
+			<vfunc name="get_folders">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="list" type="TnyList*"/>
+					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_folders_async">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
@@ -1491,16 +1558,7 @@
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="get_folders_func">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyFolderStore*"/>
-					<parameter name="list" type="TnyList*"/>
-					<parameter name="query" type="TnyFolderStoreQuery*"/>
-					<parameter name="err" type="GError**"/>
-				</parameters>
-			</vfunc>
-			<vfunc name="remove_folder_func">
+			<vfunc name="remove_folder">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
@@ -1508,7 +1566,7 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="remove_observer_func">
+			<vfunc name="remove_observer">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyFolderStore*"/>
@@ -1519,6 +1577,7 @@
 		<object name="TnyCamelStream" parent="GObject" type-name="TnyCamelStream" get-type="tny_camel_stream_get_type">
 			<implements>
 				<interface name="TnyStream"/>
+				<interface name="TnySeekable"/>
 			</implements>
 			<method name="get_stream" symbol="tny_camel_stream_get_stream">
 				<return-type type="CamelStream*"/>
@@ -1541,7 +1600,7 @@
 			<constructor name="new" symbol="tny_camel_transport_account_new">
 				<return-type type="TnyTransportAccount*"/>
 			</constructor>
-			<vfunc name="send_func">
+			<vfunc name="send">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyTransportAccount*"/>
