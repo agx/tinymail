@@ -593,6 +593,9 @@ thread_main (gpointer data)
 
 	}
 
+	tny_folder_sync_async (info->sentbox, TRUE, NULL, NULL, NULL);
+	tny_folder_sync_async (info->outbox, TRUE, NULL, NULL, NULL);
+
 errorhandler:
 
 	priv->is_running = FALSE;
