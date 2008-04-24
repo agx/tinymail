@@ -1,3 +1,10 @@
+2008-04-24  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail/tny-merge-folder.c:
+	(tny_merge_folder_update): keep the original value for
+	check_duplicates that comes from the TnyFolderChange that comes from
+	a child folder
+
 2008-04-23  José Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c:

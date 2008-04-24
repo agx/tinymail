@@ -1524,6 +1524,7 @@ tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
 	TnyIterator *iter;
 	gint total = 0, unread = 0;
 	TnyList *copy;
+	gboolean check_duplicates;
 
 	g_static_rec_mutex_lock (priv->lock);
 	copy = tny_list_copy (priv->mothers);
@@ -1542,6 +1543,8 @@ tny_merge_folder_update (TnyFolderObserver *self, TnyFolderChange *change)
 	g_object_unref (iter);
 	g_object_unref (copy);
 
+	check_duplicates = tny_folder_change_get_check_duplicates (change);
+	tny_folder_change_set_check_duplicates (new_change, check_duplicates);
 	tny_folder_change_set_new_all_count (new_change, total);
 	tny_folder_change_set_new_unread_count (new_change, unread);
 
