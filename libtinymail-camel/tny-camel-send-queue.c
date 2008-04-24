@@ -734,7 +734,7 @@ thread_main (gpointer data)
 					priv->cur_i = i;
 					tny_header_set_flag (header, TNY_HEADER_FLAG_SEEN);
 					tny_header_set_flag (header, TNY_HEADER_FLAG_ANSWERED);
-					sync_sync (info->outbox, TRUE, &serr);
+					/* sync_sync (info->outbox, TRUE, &serr); */
 					if (serr)
 						g_error_free (serr);
 					transfer_sync (info->outbox, hassent, info->sentbox, TRUE, &newerr);
