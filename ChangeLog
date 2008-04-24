@@ -1,3 +1,7 @@
+2008-04-24  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Rmeoved all synchronous API usage in TnyCamelSendQueue
+
 2008-04-24  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail/tny-merge-folder.c:

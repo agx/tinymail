@@ -390,6 +390,183 @@ get_headers_sync (TnyFolder *folder, TnyList *list, gboolean refresh, GError **e
 	g_slice_free (GetHeadersSync, info);
 }
 
+
+
+typedef struct {
+	TnyFolder *from, *to;
+	TnyList *list;
+	GError **err;
+
+	GCond* condition;
+	gboolean had_callback;
+	GMutex *mutex;
+
+} TransferSync;
+
+static void 
+transfer_async (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data)
+{
+	TransferSync *info = (TransferSync *) user_data;
+
+	if (err && info->err)
+		*info->err = g_error_copy (err);
+
+	g_mutex_lock (info->mutex);
+	g_cond_broadcast (info->condition);
+	info->had_callback = TRUE;
+	g_mutex_unlock (info->mutex);
+}
+
+static void
+transfer_sync (TnyFolder *from, TnyList *list, TnyFolder *to, gboolean delete_originals, GError **err)
+{
+	TransferSync *info = g_slice_new0 (TransferSync);
+
+	info->mutex = g_mutex_new ();
+	info->condition = g_cond_new ();
+	info->had_callback = FALSE;
+
+	info->from = g_object_ref (from);
+	info->to = g_object_ref (from);
+	info->list = g_object_ref (list);
+	info->err = err;
+
+	tny_folder_transfer_msgs_async (info->from, info->list, info->to, 
+		delete_originals, transfer_async, NULL, info);
+
+	g_mutex_lock (info->mutex);
+	if (!info->had_callback)
+		g_cond_wait (info->condition, info->mutex);
+	g_mutex_unlock (info->mutex);
+
+	g_mutex_free (info->mutex);
+	g_cond_free (info->condition);
+
+	g_object_unref (info->from);
+	g_object_unref (info->to);
+	g_object_unref (info->list);
+	g_slice_free (TransferSync, info);
+}
+
+
+typedef struct {
+	TnyFolder *folder;
+	TnyHeader *header;
+	TnyMsg *msg;
+	GError **err;
+
+	GCond* condition;
+	gboolean had_callback;
+	GMutex *mutex;
+
+} GetSync;
+
+static void 
+get_async (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data)
+{
+	GetSync *info = (GetSync *) user_data;
+
+	if (err && info->err)
+		*info->err = g_error_copy (err);
+
+	if (msg)
+		info->msg = g_object_ref (msg);
+
+	g_mutex_lock (info->mutex);
+	g_cond_broadcast (info->condition);
+	info->had_callback = TRUE;
+	g_mutex_unlock (info->mutex);
+}
+
+static TnyMsg*
+get_sync (TnyFolder *folder, TnyHeader *header, GError **err)
+{
+	GetSync *info = g_slice_new0 (GetSync);
+	TnyMsg *retval = NULL;
+
+	info->mutex = g_mutex_new ();
+	info->condition = g_cond_new ();
+	info->had_callback = FALSE;
+
+	info->folder = g_object_ref (folder);
+	info->header = g_object_ref (header);
+	info->err = err;
+
+	tny_folder_get_msg_async (info->folder, info->header, 
+		get_async, NULL, info);
+
+	g_mutex_lock (info->mutex);
+	if (!info->had_callback)
+		g_cond_wait (info->condition, info->mutex);
+	g_mutex_unlock (info->mutex);
+
+	g_mutex_free (info->mutex);
+	g_cond_free (info->condition);
+
+	if (info->msg)
+		retval = g_object_ref (info->msg);
+
+	g_object_unref (info->folder);
+	g_object_unref (info->header);
+	g_object_unref (info->msg);
+
+	g_slice_free (GetSync, info);
+	return retval;
+}
+
+
+
+
+typedef struct {
+	TnyFolder *folder;
+	GError **err;
+
+	GCond* condition;
+	gboolean had_callback;
+	GMutex *mutex;
+
+} SyncSync;
+
+static void 
+sync_async (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data)
+{
+	SyncSync *info = (SyncSync *) user_data;
+
+	if (err && info->err)
+		*info->err = g_error_copy (err);
+
+	g_mutex_lock (info->mutex);
+	g_cond_broadcast (info->condition);
+	info->had_callback = TRUE;
+	g_mutex_unlock (info->mutex);
+}
+
+static void
+sync_sync (TnyFolder *self, gboolean expunge, GError **err)
+{
+	SyncSync *info = g_slice_new0 (SyncSync);
+
+	info->mutex = g_mutex_new ();
+	info->condition = g_cond_new ();
+	info->had_callback = FALSE;
+
+	info->folder = g_object_ref (self);
+	info->err = err;
+
+	tny_folder_sync_async (info->folder, expunge, sync_async, NULL, info);
+
+	g_mutex_lock (info->mutex);
+	if (!info->had_callback)
+		g_cond_wait (info->condition, info->mutex);
+	g_mutex_unlock (info->mutex);
+
+	g_mutex_free (info->mutex);
+	g_cond_free (info->condition);
+
+	g_object_unref (info->folder);
+	g_slice_free (SyncSync, info);
+}
+
 static gpointer
 thread_main (gpointer data)
 {
@@ -521,7 +698,7 @@ thread_main (gpointer data)
 			GError *err = NULL;
 
 			tny_list_prepend (hassent, G_OBJECT (header));
-			msg = tny_folder_get_msg (info->outbox, header, &err);
+			msg = get_sync (info->outbox, header, &err);
 
 			/* Emits msg-sending signal to inform a new msg is being sent */
 			emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENDING, i, priv->total);
@@ -553,10 +730,14 @@ thread_main (gpointer data)
 				if (err == NULL)
 				{
 					GError *newerr = NULL;
+					GError *serr = NULL;
 					priv->cur_i = i;
 					tny_header_set_flag (header, TNY_HEADER_FLAG_SEEN);
 					tny_header_set_flag (header, TNY_HEADER_FLAG_ANSWERED);
-					tny_folder_transfer_msgs (info->outbox, hassent, info->sentbox, TRUE, &newerr);
+					sync_sync (info->outbox, TRUE, &serr);
+					if (serr)
+						g_error_free (serr);
+					transfer_sync (info->outbox, hassent, info->sentbox, TRUE, &newerr);
 					if (newerr != NULL) {
 						emit_error (self, header, msg, newerr, i, priv->total);
 						g_error_free (newerr);
