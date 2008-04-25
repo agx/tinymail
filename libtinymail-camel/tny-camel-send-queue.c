@@ -607,7 +607,6 @@ thread_main (gpointer data)
 	while ((length - g_hash_table_size (failed_headers)) > 0 && tny_device_is_online (device))
 	{
 		TnyHeader *header = NULL;
-		TnyMsg *msg = NULL;
 
 		g_static_rec_mutex_lock (priv->sending_lock);
 
@@ -696,6 +695,7 @@ thread_main (gpointer data)
 		{
 			TnyList *hassent = tny_simple_list_new ();
 			GError *err = NULL;
+			TnyMsg *msg = NULL;
 
 			tny_list_prepend (hassent, G_OBJECT (header));
 			msg = get_sync (info->outbox, header, &err);
@@ -724,6 +724,9 @@ thread_main (gpointer data)
 						     tny_header_dup_uid (header), NULL);
 			}
 
+			g_object_unref (msg);
+			msg = NULL;
+
 			g_static_rec_mutex_lock (priv->todo_lock);
 			{
 				if (err == NULL) {
@@ -739,7 +742,7 @@ thread_main (gpointer data)
 
 					transfer_sync (info->outbox, hassent, info->sentbox, TRUE, &newerr);
 					if (newerr != NULL) {
-						emit_error (self, header, msg, newerr, i, priv->total);
+						emit_error (self, header, NULL, newerr, i, priv->total);
 						g_error_free (newerr);
 					} 
 					priv->total--;
