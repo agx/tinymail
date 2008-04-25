@@ -1,6 +1,11 @@
+2008-04-25  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Error reporting when sending a message without From, and a crash-fix
+	about it too
+
 2008-04-24  Philip Van Hoof <pvanhoof@gnome.org>
 
-	* Rmeoved all synchronous API usage in TnyCamelSendQueue
+	* Removed all synchronous API usage in TnyCamelSendQueue
 
 2008-04-24  Sergio Villar Senin  <svillar@igalia.com>
 

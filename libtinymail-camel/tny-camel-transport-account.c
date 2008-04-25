@@ -212,11 +212,13 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 	from = (CamelAddress *) camel_internet_address_new ();
 	resentfrom = camel_medium_get_header (CAMEL_MEDIUM (message), "Resent-From");
+
 	if (resentfrom) {
 		camel_address_decode (from, resentfrom);
 	} else {
 		miaddr = camel_mime_message_get_from (message);
-		camel_address_copy (from, CAMEL_ADDRESS (miaddr));
+		if (miaddr)
+			camel_address_copy (from, CAMEL_ADDRESS (miaddr));
 	}
 
 	recipients = (CamelAddress *) camel_internet_address_new ();
