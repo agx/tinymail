@@ -427,7 +427,7 @@ transfer_sync (TnyFolder *from, TnyList *list, TnyFolder *to, gboolean delete_or
 	info->had_callback = FALSE;
 
 	info->from = g_object_ref (from);
-	info->to = g_object_ref (from);
+	info->to = g_object_ref (to);
 	info->list = g_object_ref (list);
 	info->err = err;
 
@@ -700,11 +700,10 @@ thread_main (gpointer data)
 			tny_list_prepend (hassent, G_OBJECT (header));
 			msg = get_sync (info->outbox, header, &err);
 
-			/* Emits msg-sending signal to inform a new msg is being sent */
-			emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENDING, i, priv->total);
+			if (err == NULL) {
+				/* Emits msg-sending signal to inform a new msg is being sent */
+				emit_control (self, header, msg, TNY_SEND_QUEUE_MSG_SENDING, i, priv->total);
 
-			if (err == NULL) 
-			{
 				_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (info->trans_account),
 									  NULL, NULL, "Sending message");
 
@@ -727,16 +726,17 @@ thread_main (gpointer data)
 
 			g_static_rec_mutex_lock (priv->todo_lock);
 			{
-				if (err == NULL)
-				{
+				if (err == NULL) {
 					GError *newerr = NULL;
 					GError *serr = NULL;
 					priv->cur_i = i;
 					tny_header_set_flag (header, TNY_HEADER_FLAG_SEEN);
 					tny_header_set_flag (header, TNY_HEADER_FLAG_ANSWERED);
-					/* sync_sync (info->outbox, TRUE, &serr); */
+
+					/* sync_sync (info->outbox, TRUE, &serr); 
 					if (serr)
-						g_error_free (serr);
+						g_error_free (serr); */
+
 					transfer_sync (info->outbox, hassent, info->sentbox, TRUE, &newerr);
 					if (newerr != NULL) {
 						emit_error (self, header, msg, newerr, i, priv->total);
