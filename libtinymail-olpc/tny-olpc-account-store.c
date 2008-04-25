@@ -354,7 +354,9 @@ tny_olpc_account_store_get_accounts (TnyAccountStore *self, TnyList *list, TnyGe
 			{
 				if (TNY_IS_STORE_ACCOUNT (account))
 					tny_list_prepend (list, (GObject*)account);
-			} else if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
+			} 
+
+			if (types == TNY_ACCOUNT_STORE_BOTH || types == TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS)
 			{
 				if (TNY_IS_TRANSPORT_ACCOUNT (account))
 					tny_list_prepend (list, (GObject*)account);
