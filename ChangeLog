@@ -2,6 +2,10 @@
 
 	* Error reporting when sending a message without From, and a crash-fix
 	about it too
+	* Added tny_camel_transport_account_get_from and
+	tny_camel_transport_account_set_from
+
+	* This was a minor API change
 
 2008-04-24  Philip Van Hoof <pvanhoof@gnome.org>
 

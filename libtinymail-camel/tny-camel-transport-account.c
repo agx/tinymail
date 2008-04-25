@@ -263,13 +263,43 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	return;
 }
 
+/**
+ * tny_camel_transport_account_get_from:
+ * @self: a #TnyTransportAccount
+ * 
+ * Get the from of @self. Returned value must not be freed.
+ * 
+ * returns: (null-ok): a read-only string
+ **/
+const gchar *
+tny_camel_transport_account_get_from (TnyTransportAccount *self)
+{
+	TnyCamelTransportAccountPriv *priv = TNY_CAMEL_TRANSPORT_ACCOUNT_GET_PRIVATE (self);
+	return priv->from;
+}
+
+/**
+ * tny_camel_transport_account_set_from:
+ * @self: a #TnyTransportAccount
+ * @from: (null-ok): a string or NULL
+ * 
+ * Set the from of @self.
+ **/
+void
+tny_camel_transport_account_set_from (TnyTransportAccount *self, const gchar *from)
+{
+	TnyCamelTransportAccountPriv *priv = TNY_CAMEL_TRANSPORT_ACCOUNT_GET_PRIVATE (self);
+	if (priv->from)
+		g_free (priv->from);
+	priv->from = g_strdup (from);
+}
 
 /**
  * tny_camel_transport_account_new:
  * 
  * Create a new #TnyTransportAccount instance implemented for Camel
  * 
- * Return value: A new #TnyTransportAccount instance implemented for Camel
+ * returns: (caller-owns): A new #TnyTransportAccount instance implemented for Camel
  **/
 TnyTransportAccount*
 tny_camel_transport_account_new (void)
@@ -284,7 +314,9 @@ tny_camel_transport_account_instance_init (GTypeInstance *instance, gpointer g_c
 {
 	TnyCamelTransportAccount *self = (TnyCamelTransportAccount *)instance;
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+	TnyCamelTransportAccountPriv *priv = TNY_CAMEL_TRANSPORT_ACCOUNT_GET_PRIVATE (self);
 
+	priv->from = NULL;
 	apriv->service = NULL;
 	apriv->type = CAMEL_PROVIDER_TRANSPORT;
 	apriv->account_type = TNY_ACCOUNT_TYPE_TRANSPORT;
@@ -300,6 +332,11 @@ tny_camel_transport_account_instance_init (GTypeInstance *instance, gpointer g_c
 static void
 tny_camel_transport_account_finalize (GObject *object)
 {
+	TnyCamelTransportAccountPriv *priv = TNY_CAMEL_TRANSPORT_ACCOUNT_GET_PRIVATE (object);
+
+	if (priv->from)
+		g_free (priv->from);
+
 	(*parent_class->finalize) (object);
 
 	return;
