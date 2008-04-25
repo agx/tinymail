@@ -265,14 +265,14 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 /**
  * tny_camel_transport_account_get_from:
- * @self: a #TnyTransportAccount
+ * @self: a #TnyCamelTransportAccount
  * 
  * Get the from of @self. Returned value must not be freed.
  * 
  * returns: (null-ok): a read-only string
  **/
 const gchar *
-tny_camel_transport_account_get_from (TnyTransportAccount *self)
+tny_camel_transport_account_get_from (TnyCamelTransportAccount *self)
 {
 	TnyCamelTransportAccountPriv *priv = TNY_CAMEL_TRANSPORT_ACCOUNT_GET_PRIVATE (self);
 	return priv->from;
@@ -280,13 +280,13 @@ tny_camel_transport_account_get_from (TnyTransportAccount *self)
 
 /**
  * tny_camel_transport_account_set_from:
- * @self: a #TnyTransportAccount
+ * @self: a #TnyCamelTransportAccount
  * @from: (null-ok): a string or NULL
  * 
  * Set the from of @self.
  **/
 void
-tny_camel_transport_account_set_from (TnyTransportAccount *self, const gchar *from)
+tny_camel_transport_account_set_from (TnyCamelTransportAccount *self, const gchar *from)
 {
 	TnyCamelTransportAccountPriv *priv = TNY_CAMEL_TRANSPORT_ACCOUNT_GET_PRIVATE (self);
 	if (priv->from)

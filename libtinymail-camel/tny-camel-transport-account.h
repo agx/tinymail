@@ -54,8 +54,8 @@ struct _TnyCamelTransportAccountClass
 GType tny_camel_transport_account_get_type (void);
 TnyTransportAccount* tny_camel_transport_account_new (void);
 
-const gchar *tny_camel_transport_account_get_from (TnyTransportAccount *self);
-void tny_camel_transport_account_set_from (TnyTransportAccount *self, const gchar *from);
+const gchar *tny_camel_transport_account_get_from (TnyCamelTransportAccount *self);
+void tny_camel_transport_account_set_from (TnyCamelTransportAccount *self, const gchar *from);
 
 G_END_DECLS
 
