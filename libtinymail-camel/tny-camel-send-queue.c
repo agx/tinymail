@@ -724,7 +724,8 @@ thread_main (gpointer data)
 						     tny_header_dup_uid (header), NULL);
 			}
 
-			g_object_unref (msg);
+			if (msg)
+				g_object_unref (msg);
 			msg = NULL;
 
 			g_static_rec_mutex_lock (priv->todo_lock);
