@@ -1,3 +1,12 @@
+2008-04-28  Jose Dapena Paz  <jdapena@igalia.com>, Sergio Villar Senin <svillar@igalia.com>
+
+	* libtinymail/tny-folder.[ch]: new method find_msg_async. This makes find_msg synchronous
+	version be deprecated now.
+
+	* libtinymail-camel/tny-camel-folder.[ch],
+	libtinymail/tny-merge-folder.[ch]:
+	Added implementations of find_msg_async method.
+
 2008-04-25  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Error reporting when sending a message without From, and a crash-fix

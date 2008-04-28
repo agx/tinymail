@@ -638,6 +638,112 @@ tny_merge_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCal
 }
 
 
+typedef struct 
+{
+	TnyFolder *self;
+	TnyMsg *msg;
+	gchar *url_string;
+	GError *err;
+	gpointer user_data;
+	guint depth;
+	TnyGetMsgCallback callback;
+	TnyStatusCallback status_callback;
+} FindMsgInfo;
+
+static void
+find_msg_async_destroyer (gpointer thr_user_data)
+{
+	FindMsgInfo *info = (FindMsgInfo *) thr_user_data;
+
+	/* thread reference */
+	g_object_unref (info->self);
+
+	if (info->msg)
+		g_object_unref (info->msg);
+
+	if (info->url_string)
+		g_free (info->url_string);
+
+	if (info->err)
+		g_error_free (info->err);
+
+	g_slice_free (FindMsgInfo, info);
+}
+
+static gboolean
+find_msg_async_callback (gpointer thr_user_data)
+{
+	FindMsgInfo *info = (FindMsgInfo *) thr_user_data;
+	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (info->self);
+
+	if (info->callback) { 
+		/* TNY TODO: the cancelled field */
+		tny_lockable_lock (priv->ui_locker);
+		info->callback (info->self, FALSE, info->msg, info->err, info->user_data);
+		tny_lockable_unlock (priv->ui_locker);
+	}
+
+	return FALSE;
+}
+
+static gpointer 
+find_msg_async_thread (gpointer thr_user_data)
+{
+	FindMsgInfo *info = (FindMsgInfo *) thr_user_data;
+
+	info->msg = tny_folder_find_msg (info->self, info->url_string, &info->err);
+
+	if (info->err != NULL)
+	{
+		if (info->msg && G_IS_OBJECT (info->msg))
+			g_object_unref (info->msg);
+		info->msg = NULL;
+	}
+
+	if (info->callback)
+	{
+		if (info->depth > 0)
+		{
+			g_idle_add_full (G_PRIORITY_HIGH, 
+				find_msg_async_callback, 
+				info, find_msg_async_destroyer);
+		} else {
+			find_msg_async_callback (info);
+			find_msg_async_destroyer (info);
+		}
+	} else /* thread reference */
+		g_object_unref (info->self);
+
+	g_thread_exit (NULL);
+
+	return NULL;
+
+}
+
+static void
+tny_merge_folder_find_msg_async (TnyFolder *self, const gchar *url_string, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	FindMsgInfo *info;
+	GThread *thread;
+
+	info = g_slice_new (FindMsgInfo);
+	info->self = self;
+	info->url_string = g_strdup (url_string);
+	info->callback = callback;
+	info->status_callback = status_callback;
+	info->user_data = user_data;
+	info->depth = g_main_depth ();
+	info->err = NULL;
+
+	/* thread reference */
+	g_object_ref (info->self);
+
+	thread = g_thread_create (find_msg_async_thread, info, FALSE, NULL);
+
+	return;
+}
+
+
 
 typedef struct 
 {
@@ -1854,6 +1960,7 @@ tny_folder_init (TnyFolderIface *klass)
 	klass->get_msg= tny_merge_folder_get_msg;
 	klass->find_msg= tny_merge_folder_find_msg;
 	klass->get_msg_async= tny_merge_folder_get_msg_async;
+	klass->find_msg_async= tny_merge_folder_find_msg_async;
 	klass->get_headers= tny_merge_folder_get_headers;
 	klass->get_headers_async= tny_merge_folder_get_headers_async;
 	klass->get_name= tny_merge_folder_get_name;

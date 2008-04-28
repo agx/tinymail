@@ -1270,7 +1270,6 @@ tny_camel_folder_remove_msgs_default (TnyFolder *self, TnyList *headers, GError 
 	TnyFolderChange *change = NULL;
 	TnyIterator *iter = NULL;
 	TnyHeader *header = NULL;
-	TnyMsgRemoveStrategy *strat;
 
 	g_assert (TNY_IS_LIST (headers));
 
@@ -2598,6 +2597,180 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 }
 
 
+typedef struct 
+{
+	TnyCamelQueueable parent;
+
+	TnyFolder *self;
+	TnyMsg *msg;
+	gchar *url_string;
+	GError *err;
+	gpointer user_data;
+	TnyGetMsgCallback callback;
+	TnyStatusCallback status_callback;
+	TnySessionCamel *session;
+	TnyIdleStopper *stopper;
+	gboolean cancelled;
+
+} FindMsgInfo;
+
+static void
+tny_camel_folder_find_msg_async_destroyer (gpointer thr_user_data)
+{
+	FindMsgInfo *info = (FindMsgInfo *) thr_user_data;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
+
+	/* thread reference */
+	_tny_camel_folder_unreason (priv);
+	g_object_unref (info->self);
+
+	if (info->err)
+		g_error_free (info->err);
+
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
+	/**/
+
+	camel_object_unref (info->session);
+
+	return;
+}
+
+static gboolean
+tny_camel_folder_find_msg_async_callback (gpointer thr_user_data)
+{
+	FindMsgInfo *info = (FindMsgInfo *) thr_user_data;
+	TnyFolderChange *change;
+
+	if (info->msg) 
+	{
+		change = tny_folder_change_new (info->self);
+		tny_folder_change_set_check_duplicates (change, TRUE);
+		tny_folder_change_set_received_msg (change, info->msg);
+		notify_folder_observers_about (info->self, change, info->session);
+		g_object_unref (change);
+	}
+
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, info->cancelled, info->msg, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+
+	if (info->msg)
+		g_object_unref (info->msg);
+
+	tny_idle_stopper_stop (info->stopper);
+
+	return FALSE;
+}
+
+
+static void
+tny_camel_folder_find_msg_async_cancelled_destroyer (gpointer thr_user_data)
+{
+	FindMsgInfo *info = (FindMsgInfo *) thr_user_data;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
+
+	/* thread reference */
+	_tny_camel_folder_unreason (priv);
+	g_object_unref (info->self);
+
+	if (info->err)
+		g_error_free (info->err);
+
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
+	/**/
+
+	camel_object_unref (info->session);
+
+	return;
+}
+
+static gboolean
+tny_camel_folder_find_msg_async_cancelled_callback (gpointer thr_user_data)
+{
+	FindMsgInfo *info = (FindMsgInfo *) thr_user_data;
+	if (info->callback) {
+		tny_lockable_lock (info->session->priv->ui_lock);
+		info->callback (info->self, TRUE, NULL, info->err, info->user_data);
+		tny_lockable_unlock (info->session->priv->ui_lock);
+	}
+	return FALSE;
+}
+
+static gpointer 
+tny_camel_folder_find_msg_async_thread (gpointer thr_user_data)
+{
+	FindMsgInfo *info = (FindMsgInfo *) thr_user_data;
+
+	info->msg = tny_folder_find_msg (info->self, info->url_string, &info->err);
+
+	info->cancelled = FALSE;
+	if (info->err != NULL) {
+		if (camel_strstrcase (info->err->message, "cancel") != NULL)
+			info->cancelled = TRUE;
+	}
+
+	/* Free the URL */
+	g_free (info->url_string);
+
+	return NULL;
+}
+
+static void
+tny_camel_folder_find_msg_async (TnyFolder *self, const gchar *url_string, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	TNY_CAMEL_FOLDER_GET_CLASS (self)->find_msg_async(self, url_string, callback, status_callback, user_data);
+	return;
+}
+
+
+static void
+tny_camel_folder_find_msg_async_default (TnyFolder *self, const gchar *url_string, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+	FindMsgInfo *info;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelQueue *queue;
+
+	/* Idle info for the callbacks */
+	info = g_slice_new (FindMsgInfo);
+	info->cancelled = FALSE;
+	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	camel_object_ref (info->session);
+	info->self = self;
+	info->url_string = g_strdup (url_string);
+	info->callback = callback;
+	info->status_callback = status_callback;
+	info->user_data = user_data;
+	info->err = NULL;
+
+	info->stopper = tny_idle_stopper_new();
+
+	/* thread reference */
+	_tny_camel_folder_reason (priv);
+	g_object_ref (info->self);
+
+	if (!TNY_IS_CAMEL_POP_FOLDER (self))
+		queue = TNY_FOLDER_PRIV_GET_MSG_QUEUE (priv);
+	else
+		queue = TNY_FOLDER_PRIV_GET_QUEUE (priv);
+
+	_tny_camel_queue_launch (queue, 
+		tny_camel_folder_find_msg_async_thread, 
+		tny_camel_folder_find_msg_async_callback,
+		tny_camel_folder_find_msg_async_destroyer, 
+		tny_camel_folder_find_msg_async_cancelled_callback,
+		tny_camel_folder_find_msg_async_cancelled_destroyer, 
+		&info->cancelled,
+		info, sizeof (FindMsgInfo), 
+		__FUNCTION__);
+
+	return;
+}
 
 static TnyMsgReceiveStrategy* 
 tny_camel_folder_get_msg_receive_strategy (TnyFolder *self)
@@ -5886,6 +6059,7 @@ tny_folder_init (gpointer g, gpointer iface_data)
 	klass->get_msg= tny_camel_folder_get_msg;
 	klass->find_msg= tny_camel_folder_find_msg;
 	klass->get_msg_async= tny_camel_folder_get_msg_async;
+	klass->find_msg_async= tny_camel_folder_find_msg_async;
 	klass->get_id= tny_camel_folder_get_id;
 	klass->get_name= tny_camel_folder_get_name;
 	klass->get_folder_type= tny_camel_folder_get_folder_type;
@@ -5952,6 +6126,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 	class->get_msg= tny_camel_folder_get_msg_default;
 	class->find_msg= tny_camel_folder_find_msg_default;
 	class->get_msg_async= tny_camel_folder_get_msg_async_default;
+	class->find_msg_async= tny_camel_folder_find_msg_async_default;
 	class->get_id= tny_camel_folder_get_id_default;
 	class->get_name= tny_camel_folder_get_name_default;
 	class->get_folder_type= tny_camel_folder_get_folder_type_default;

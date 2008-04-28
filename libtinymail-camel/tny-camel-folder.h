@@ -67,6 +67,7 @@ struct _TnyCamelFolderClass
 	TnyMsg* (*get_msg) (TnyFolder *self, TnyHeader *header, GError **err);
 	TnyMsg* (*find_msg) (TnyFolder *self, const gchar *url_string, GError **err);
 	void (*get_msg_async) (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	void (*find_msg_async) (TnyFolder *self, const gchar *url_string, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	void (*get_headers) (TnyFolder *self, TnyList *headers, gboolean refresh, GError **err);
 	void (*get_headers_async) (TnyFolder *self, TnyList *headers, gboolean refresh, TnyGetHeadersCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 	const gchar* (*get_name) (TnyFolder *self);

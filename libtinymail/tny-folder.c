@@ -1212,6 +1212,7 @@ tny_folder_get_msg (TnyFolder *self, TnyHeader *header, GError **err)
  * g_object_unref (message);
  * </programlisting></informalexample>
  *
+ * Deprecated: 1.0: Use tny_folder_find_msg_async in stead
  * returns: (null-ok) (caller-owns): The message instance or NULL
  * since: 1.0
  * audience: application-developer
@@ -1225,7 +1226,7 @@ tny_folder_find_msg (TnyFolder *self, const gchar *url_string, GError **err)
 	g_assert (TNY_IS_FOLDER (self));
 	g_assert (url_string);
 	g_assert (strlen (url_string) > 0);
-	g_assert (strstr (url_string, "://") != NULL);
+	g_assert (strstr (url_string, ":") != NULL);
 	g_assert (TNY_FOLDER_GET_IFACE (self)->find_msg!= NULL);
 #endif
 
@@ -1284,6 +1285,55 @@ tny_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCallback 
 #endif
 
 	TNY_FOLDER_GET_IFACE (self)->get_msg_async(self, header, callback, status_callback, user_data);
+
+	return;
+}
+
+/**
+ * tny_folder_find_msg_async:
+ * @self: a #TnyFolder
+ * @url_string: the url string
+ * @callback: (null-ok): a #TnyGetMsgCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
+ *
+ * Get a message in @self identified by @url_string asynchronously.
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * static void 
+ * status_cb (GObject *sender, TnyStatus *status, gpointer user_data)
+ * {
+ *       printf (".");
+ * }
+ * static void
+ * folder_find_msg_cb (TnyFolder *folder, gboolean cancelled, TnyMsg *msg, GError **err, gpointer user_data)
+ * {
+ *       TnyMsgView *message_view = user_data;
+ *       if (!err && msg && !cancelled)
+ *           tny_msg_view_set_msg (message_view, msg);
+ * }
+ * TnyMsgView *message_view = tny_platform_factory_new_msg_view (platfact);
+ * TnyFolder *folder = ...; gchar *url_string = ...;
+ * tny_folder_find_msg_async (folder, msg_url,
+ *          folder_get_msg_cb, status_cb, message_view); 
+ * </programlisting></informalexample>
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+void
+tny_folder_find_msg_async (TnyFolder *self, const gchar *url_string, TnyGetMsgCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER (self));
+	g_assert (url_string);
+	g_assert (strlen (url_string) > 0);
+	g_assert (strstr (url_string, ":") != NULL);
+	g_assert (TNY_FOLDER_GET_IFACE (self)->get_msg_async!= NULL);
+#endif
+
+	TNY_FOLDER_GET_IFACE (self)->find_msg_async(self, url_string, callback, status_callback, user_data);
 
 	return;
 }
