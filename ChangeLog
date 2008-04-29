@@ -1,3 +1,7 @@
+2008-04-29  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Extra robustness in TnyCamelSendQueue
+
 2008-04-29  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/camel-folder.c
