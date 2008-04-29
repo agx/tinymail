@@ -1,3 +1,13 @@
+2008-04-29  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/camel-folder.c
+	(transfer_message_to): preserve flags on transferring the message to
+	a new folder.
+
+	* libtinymail-camel/camel-lite/camel/camel-folder-summary.h:
+	add some comments to flags enumeration to remember that it should be
+	kept sync with flags masks.
+
 2008-04-28  Jose Dapena Paz  <jdapena@igalia.com>, Sergio Villar Senin <svillar@igalia.com>
 
 	* libtinymail/tny-folder.[ch]: new method find_msg_async. This makes find_msg synchronous

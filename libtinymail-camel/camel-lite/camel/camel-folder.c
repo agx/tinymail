@@ -1484,7 +1484,14 @@ transfer_message_to (CamelFolder *source, const char *uid, CamelFolder *dest,
 		info = camel_message_info_clone(minfo);
 		camel_folder_free_message_info(source, minfo);
 	} else */
-		info = camel_message_info_new_from_header(NULL, ((CamelMimePart *)msg)->headers);
+	info = camel_message_info_new_from_header(NULL, ((CamelMimePart *)msg)->headers);
+
+	/*copying flags */
+	if ((source->folder_flags & CAMEL_FOLDER_HAS_SUMMARY_CAPABILITY) &&
+	    (minfo = camel_folder_get_message_info (source, uid))) {
+		camel_message_info_set_flags (info, ~CAMEL_MESSAGE_SYSTEM_MASK, camel_message_info_flags (minfo));
+		camel_folder_free_message_info (source, minfo);
+	}
 
 	/* we don't want to retain the deleted flag */
 	camel_message_info_set_flags(info, CAMEL_MESSAGE_DELETED, 0);

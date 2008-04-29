@@ -72,12 +72,18 @@ typedef enum _CamelMessageFlags {
 	CAMEL_MESSAGE_CACHED = 1<<6, /* used                 TNY_HEADER_FLAG_CACHED      */
 	CAMEL_MESSAGE_PARTIAL = 1<<7, /* used                TNY_HEADER_FLAG_PARTIAL     */
 	CAMEL_MESSAGE_EXPUNGED = 1<<8, /* used               TNY_HEADER_FLAG_EXPUNGED    */
+
+	/* CAMEL_MESSAGE_PRIORITY_MASK flags */
 	CAMEL_MESSAGE_HIGH_PRIORITY = 0<<9|1<<10, /* used    TNY_HEADER_FLAG_HIGH_PRIORITY    */
 	CAMEL_MESSAGE_NORMAL_PRIORITY = 0<<9|0<<10, /* used  TNY_HEADER_FLAG_NORMAL_PRIORITY    */
 	CAMEL_MESSAGE_LOW_PRIORITY = 1<<9|0<<10, /* used     TNY_HEADER_FLAG_LOW_PRIORITY    */
+
 	CAMEL_MESSAGE_SUSPENDED = 1<<11, /*                  TNY_HEADER_FLAG_SUSPENDED    */
 
-	/* internally used */
+	/* WARNING: just keep updated the CAMEL_MESSAGE_SYSTEM_MASK and CAMEL_MESSAGE_PRIORITY_MASK
+	 * to make them be sync'd */
+
+	/* internally used (CAMEL_MESSAGE_SYSTEM_MASK flags)*/
 	CAMEL_MESSAGE_INFO_NEEDS_FREE = 1<<13,/* internally used */
 	CAMEL_MESSAGE_INFO_UNUSED = 1<<14, /* internally used but available */
 	CAMEL_MESSAGE_FREED = 1<<15,  /* internally used */
