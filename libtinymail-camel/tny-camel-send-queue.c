@@ -989,8 +989,7 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 
 	/* Call user callback after msg has beed added to OUTBOX, waiting to be sent*/
 	if (info->callback)
-		info->callback (info->self, info->cancelled, info->msg, info->user_data, 
-			new_err?new_err:err);
+		info->callback (info->self, info->cancelled, info->msg, new_err?new_err:err, info->user_data);
 
 	if (new_err)
 		g_error_free (new_err);
