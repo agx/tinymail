@@ -233,8 +233,6 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	} else 
 		suc = TRUE;
 
-	g_static_rec_mutex_unlock (apriv->service_lock);
-
 	if (camel_exception_is_set (&ex) || !suc)
 	{
 		if (camel_exception_is_set (&ex))
@@ -251,6 +249,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 		camel_mime_message_set_date(message, CAMEL_MESSAGE_DATE_CURRENT, 0);
 
 	camel_service_disconnect (apriv->service, TRUE, &ex);
+
+	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	camel_object_unref (recipients);
 	camel_object_unref (from);
