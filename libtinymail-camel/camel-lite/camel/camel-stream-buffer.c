@@ -80,12 +80,20 @@ camel_stream_buffer_init (gpointer object, gpointer klass)
 	sbf->flags = 0;
 	sbf->size = BUF_SIZE;
 	sbf->buf = g_malloc(BUF_SIZE);
+
+	if (!sbf->buf)
+		g_critical ("Memory error");
+
 	sbf->ptr = sbf->buf;
 	sbf->end = sbf->buf;
 	sbf->mode = CAMEL_STREAM_BUFFER_READ | CAMEL_STREAM_BUFFER_BUFFER;
 	sbf->stream = NULL;
 	sbf->linesize = 80;
 	sbf->linebuf = g_malloc(sbf->linesize);
+
+	if (!sbf->linebuf)
+		g_critical ("Memory error");
+
 }
 
 static void
@@ -95,11 +103,14 @@ camel_stream_buffer_finalize (CamelObject *object)
 
 	if (!(sbf->flags & BUF_USER)) {
 		g_free(sbf->buf);
+		sbf->buf = NULL;
 	}
+
 	if (sbf->stream)
 		camel_object_unref (sbf->stream);
 
 	g_free(sbf->linebuf);
+	sbf->linebuf = NULL;
 }
 
 

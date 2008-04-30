@@ -206,8 +206,6 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 		return;
 	} 
 
-	g_static_rec_mutex_unlock (apriv->service_lock);
-
 	message = _tny_camel_msg_get_camel_mime_message (TNY_CAMEL_MSG (msg));
 
 	from = (CamelAddress *) camel_internet_address_new ();
@@ -234,6 +232,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 			recipients, &ex);
 	} else 
 		suc = TRUE;
+
+	g_static_rec_mutex_unlock (apriv->service_lock);
 
 	if (camel_exception_is_set (&ex) || !suc)
 	{

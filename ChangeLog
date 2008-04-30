@@ -1,3 +1,7 @@
+2008-04-30  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Enlarged a lock for the transport-account in camel
+
 2008-04-30  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-send-queue.c:
