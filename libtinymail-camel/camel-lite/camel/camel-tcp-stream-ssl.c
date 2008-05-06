@@ -86,6 +86,10 @@ static struct sockaddr *stream_get_remote_address (CamelTcpStream *stream, sockl
 static ssize_t stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n);
 static int stream_gettimeout (CamelTcpStream *stream);
 
+static gboolean begin_read (CamelTcpStreamSSL *stream);
+static void end_read (CamelTcpStreamSSL *stream);
+static gint ssl_close (CamelTcpStreamSSL *stream);
+
 
 struct _CamelTcpStreamSSLPrivate {
 	PRFileDesc *sockfd;
@@ -96,8 +100,82 @@ struct _CamelTcpStreamSSLPrivate {
 	guint32 flags;
 	gboolean accepted;
 	CamelService *service;
+	guint reads;
+	GMutex *reads_lock;
+	gboolean scheduled_close;
 };
 
+/*
+ * This method is used for making sure we don't close the ssl socket
+ * before all the scheduled reads are finished. It also rejects read
+ * if we have a pending close.
+ *
+ * The return value is FALSE when we didn't accept the request to begin
+ * a read operation. In this case we shouldn't call end_read.
+ */
+static inline gboolean
+begin_read (CamelTcpStreamSSL *stream)
+{
+	gboolean retval = TRUE;
+
+	g_mutex_lock (stream->priv->reads_lock);
+	if (stream->priv->scheduled_close) {
+		retval = FALSE;
+	} else {
+		stream->priv->reads ++;
+		camel_object_ref (stream);
+	}
+	g_mutex_unlock (stream->priv->reads_lock);
+	return retval;
+}
+
+/*
+ * This ends a read request started succesfully in begin_read. Then, if that
+ * method returns FALSE, we shouldn't call this.
+ *
+ * It checks if there's a close call delayed because of reads pending. It it's
+ * so, then it closes the socket and sets the sock reference to NULL.
+ */
+static inline void
+end_read (CamelTcpStreamSSL *stream)
+{
+	gboolean close;
+	g_mutex_lock (stream->priv->reads_lock);
+	stream->priv->reads --;
+	close =  ((stream->priv->reads == 0) && (stream->priv->scheduled_close));
+	g_mutex_unlock (stream->priv->reads_lock);
+	if (close) {
+		PR_Shutdown (stream->priv->sockfd, PR_SHUTDOWN_BOTH);
+		PR_Close (stream->priv->sockfd);
+		stream->priv->sockfd = NULL;
+	}
+	camel_object_unref (stream);
+}
+
+
+/*
+ * Closes the stream ssl socket, in case there are no reads pending, or sets
+ * this as requested.
+ */
+static gint
+ssl_close (CamelTcpStreamSSL *stream)
+{
+	gboolean close;
+	g_mutex_lock (stream->priv->reads_lock);
+	close = ((stream->priv->reads == 0) && (stream->priv->sockfd != NULL));
+	if (stream->priv->sockfd != NULL)
+		stream->priv->scheduled_close = TRUE;
+	g_mutex_unlock (stream->priv->reads_lock);
+	if (close) {
+		PR_Shutdown (stream->priv->sockfd, PR_SHUTDOWN_BOTH);
+		if (PR_Close (stream->priv->sockfd) == PR_FAILURE) {
+			stream->priv->sockfd = NULL;
+			return -1;
+		}
+		stream->priv->sockfd = NULL;
+	}
+	return 0;
+}
 
 static void 
 ssl_enable_compress (CamelTcpStream *stream)
@@ -144,6 +222,7 @@ camel_tcp_stream_ssl_init (gpointer object, gpointer klass)
 	CamelTcpStreamSSL *stream = CAMEL_TCP_STREAM_SSL (object);
 
 	stream->priv = g_new0 (struct _CamelTcpStreamSSLPrivate, 1);
+	stream->priv->reads_lock = g_mutex_new ();
 }
 
 static void
@@ -152,12 +231,13 @@ camel_tcp_stream_ssl_finalize (CamelObject *object)
 	CamelTcpStreamSSL *stream = CAMEL_TCP_STREAM_SSL (object);
 
 	if (stream->priv->sockfd != NULL) {
-		PR_Shutdown (stream->priv->sockfd, PR_SHUTDOWN_BOTH);
-		PR_Close (stream->priv->sockfd);
+		ssl_close (stream);
 	}
 
 	if (stream->priv->session)
 		camel_object_unref(stream->priv->session);
+
+	g_mutex_free (stream->priv->reads_lock);
 
 	g_free (stream->priv->expected_host);
 
@@ -220,6 +300,7 @@ camel_tcp_stream_ssl_new (CamelService *service, const char *expected_host, guin
 			str = g_strdup (g_get_tmp_dir ());
 		NSS_InitReadWrite (str);
 		has_init = TRUE;
+		g_free (str);
 	}
 
 	camel_object_ref(service->session);
@@ -361,7 +442,11 @@ camel_tcp_stream_ssl_enable_ssl (CamelTcpStreamSSL *ssl)
 			return -1;
 		}
 
+		g_mutex_lock (ssl->priv->reads_lock);
 		ssl->priv->sockfd = fd;
+		ssl->priv->scheduled_close = FALSE;
+		ssl->priv->reads = 0;
+		g_mutex_unlock (ssl->priv->reads_lock);
 
 		if (SSL_ResetHandshake (fd, FALSE) == SECFailure) {
 			set_errno (PR_GetError ());
@@ -424,8 +509,11 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 		} else {
 			 do {
 				nread = -1;
-				if (PR_Available (tcp_stream_ssl->priv->sockfd) != 0)
-					nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
+				if (begin_read (tcp_stream_ssl)) {
+					if (PR_Available (tcp_stream_ssl->priv->sockfd) != 0)
+						nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
+					end_read (tcp_stream_ssl);
+				}
 				if (nread == -1)
 					set_errno (PR_GetError ());
 			 } while (0 && (nread == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR));
@@ -490,9 +578,13 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 #endif
 			} else {
 				do {
-					nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
-					if (nread == -1)
-						set_errno (PR_GetError ());
+					nread = -1;
+					if (begin_read (tcp_stream_ssl)) {
+						nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
+						if (nread == -1)
+							set_errno (PR_GetError ());
+						end_read (tcp_stream_ssl);
+					}
 				} while (nread == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR);
 			}
 		} while (nread == -1 && (PR_GetError () == PR_PENDING_INTERRUPT_ERROR ||
@@ -547,9 +639,13 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 				goto failed;
 			} else {
 				do {
-					nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
-					if (nread == -1)
-						set_errno (PR_GetError ());
+					nread = -1;
+					if (begin_read (tcp_stream_ssl)) {
+						nread = PR_Read (tcp_stream_ssl->priv->sockfd, buffer, n);
+						if (nread == -1)
+							set_errno (PR_GetError ());
+						end_read (tcp_stream_ssl);
+					}
 				} while (nread == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR);
 			}
 		} while (nread == -1 && (PR_GetError () == PR_PENDING_INTERRUPT_ERROR ||
@@ -618,9 +714,13 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 #endif
 			} else {
 				do {
-					w = PR_Write (tcp_stream_ssl->priv->sockfd, buffer + written, n - written);
-					if (w == -1)
-						set_errno (PR_GetError ());
+					w = -1;
+					if (begin_read (tcp_stream_ssl)) {
+						w = PR_Write (tcp_stream_ssl->priv->sockfd, buffer + written, n - written);
+						if (w == -1)
+							set_errno (PR_GetError ());
+						end_read (tcp_stream_ssl);
+					} 
 				} while (w == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR);
 
 				if (w == -1) {
@@ -680,9 +780,13 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 				errno = EINTR;
 			} else {
 				do {
-					w = PR_Write (tcp_stream_ssl->priv->sockfd, buffer + written, n - written);
-					if (w == -1)
-						set_errno (PR_GetError ());
+					w = -1;
+					if (begin_read (tcp_stream_ssl)) {
+						w = PR_Write (tcp_stream_ssl->priv->sockfd, buffer + written, n - written);
+						if (w == -1)
+							set_errno (PR_GetError ());
+						end_read (tcp_stream_ssl);
+					}
 				} while (w == -1 && PR_GetError () == PR_PENDING_INTERRUPT_ERROR);
 
 				if (w == -1) {
@@ -723,9 +827,7 @@ stream_close (CamelStream *stream)
 		return -1;
 	}
 
-	PR_Shutdown (((CamelTcpStreamSSL *)stream)->priv->sockfd, PR_SHUTDOWN_BOTH);
-	if (PR_Close (((CamelTcpStreamSSL *)stream)->priv->sockfd) == PR_FAILURE)
-		return -1;
+	ssl_close ((CamelTcpStreamSSL *) stream);
 
 	((CamelTcpStreamSSL *)stream)->priv->sockfd = NULL;
 
@@ -1388,7 +1490,6 @@ socket_connect(CamelTcpStream *stream, struct addrinfo *host)
 			errnosave = errno;
 			PR_Shutdown (fd, PR_SHUTDOWN_BOTH);
 			PR_Close (fd);
-			ssl->priv->sockfd = NULL;
 			errno = errnosave;
 
 			return -1;
@@ -1397,7 +1498,11 @@ socket_connect(CamelTcpStream *stream, struct addrinfo *host)
 		errno = 0;
 	}
 
+	g_mutex_lock (ssl->priv->reads_lock);
+	ssl->priv->reads = 0;
+	ssl->priv->scheduled_close = FALSE;
 	ssl->priv->sockfd = fd;
+	g_mutex_unlock (ssl->priv->reads_lock);
 
 	return 0;
 }

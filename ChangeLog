@@ -7,6 +7,10 @@
         Reason the camel folder while we're getting its size and count,
 	avoiding some crashes.
 
+	* libtinymail-camel/camel-lite/camel/camel-tcp-stream-ssl.c:
+        Protect PR_Reads and writes to avoid calls to PR_Close before one of
+	them. Should avoid some crashes and bad memory accesses.
+
 2008-04-30  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Enlarged a lock for the transport-account in camel
