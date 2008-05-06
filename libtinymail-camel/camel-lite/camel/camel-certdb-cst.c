@@ -198,7 +198,6 @@ static char *
 x509_dn_to_str (X509_NAME *xname)
 {
 	gchar *result = NULL;
-	int ou_idx;
 	BIO *bio;
 	char buffer[128];
 
@@ -437,11 +436,13 @@ camel_certdb_get_cert (CamelCertDB *certdb, const char *fingerprint)
 		issuer = x509_dn_to_str (x509_issuer);
 		camel_cert_set_issuer (certdb, cert, issuer);
 		g_free (issuer);
+		X509_NAME_free (x509_issuer);
 
 		x509_subject = CST_get_subject_dn (x509_cert);
 		subject = x509_dn_to_str (x509_subject);
 		camel_cert_set_subject (certdb, cert, subject);
 		g_free (subject);
+		X509_NAME_free (x509_subject);
 
 		finger = CST_get_fingerprint (x509_cert);
 		hex_finger = cert_hexify (finger);
@@ -453,8 +454,10 @@ camel_certdb_get_cert (CamelCertDB *certdb, const char *fingerprint)
 		cert->rawcert = g_byte_array_new ();
 		cert->rawcert = g_byte_array_append (cert->rawcert, der_data, der_len);
 		OPENSSL_free (der_data);
+		X509_free (x509_cert);
 		
 	}
+	g_slist_free (cst_id_list);
 	g_mutex_unlock (certdb->priv->db_lock);
 
 	return cert;
@@ -471,7 +474,7 @@ camel_certdb_add (CamelCertDB *certdb, CamelCert *cert)
 	g_return_if_fail (CAMEL_IS_CERTDB (certdb));
 
 	buffer_p = (const unsigned char *) cert->rawcert->data;
-	x509_cert = d2i_X509 (NULL, &buffer_p, cert->rawcert->len);
+	x509_cert = d2i_X509 (NULL, (const unsigned char **) &buffer_p, cert->rawcert->len);
 
 	if (x509_cert == NULL) {
 		return;
