@@ -1,3 +1,12 @@
+2008-05-06  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/camel-certdb-cst.c
+        Fix some leaks in CST certificate manager support.
+
+	* libtinymail-camel/tny-camel-folder.c:
+        Reason the camel folder while we're getting its size and count,
+	avoiding some crashes.
+
 2008-04-30  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Enlarged a lock for the transport-account in camel

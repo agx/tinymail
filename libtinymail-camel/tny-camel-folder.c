@@ -1554,8 +1554,10 @@ tny_camel_folder_sync_default (TnyFolder *self, gboolean expunge, GError **err)
 		}
 
 	camel_folder_sync (priv->folder, expunge, &ex);
+	_tny_camel_folder_reason (priv);
 	_tny_camel_folder_check_unread_count (TNY_CAMEL_FOLDER (self));
 	reset_local_size (priv);
+	_tny_camel_folder_unreason (priv);
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
