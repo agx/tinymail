@@ -45,6 +45,7 @@
 #include "camel-imap-folder.h"
 #include "camel-imap-store-summary.h"
 #include "camel-imap-store.h"
+#include "camel-imap-store-priv.h"
 #include "camel-imap-utils.h"
 #include "camel-imap-summary.h"
 
@@ -135,15 +136,27 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 		if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder))
 			camel_object_unref(store->current_folder); */
 
-		if (!folder)
+		if (!folder) {
 			store->last_folder = store->current_folder;
-		else {
+			if (store->last_folder)
+				camel_object_hook_event (store->last_folder, "finalize",
+							 _camel_imap_store_last_folder_finalize, store);
+		} else {
 			modseq = camel_imap_folder_get_highestmodseq (CAMEL_IMAP_FOLDER (folder));
+			if (store->last_folder)
+				camel_object_unhook_event (store->last_folder, "finalize",
+							   _camel_imap_store_last_folder_finalize, store);
 			store->last_folder = NULL;
 		}
-
+		
+		if (store->current_folder)
+			camel_object_unhook_event (store->current_folder, "finalize",
+						   _camel_imap_store_current_folder_finalize, store);
 		store->current_folder = folder;
-
+		if (store->current_folder)
+			camel_object_hook_event (store->current_folder, "finalize",
+						 _camel_imap_store_current_folder_finalize, store);
+		
 		if (modseq && (store->capabilities & IMAP_CAPABILITY_QRESYNC))
 		{
 			CamelImapSummary *imap_summary = CAMEL_IMAP_SUMMARY (folder->summary);
@@ -285,11 +298,19 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		gboolean wasnull = FALSE;
 		if (!store->current_folder) {
 			store->current_folder = store->last_folder;
+			if (store->current_folder)
+				camel_object_hook_event (store->current_folder, "finalize",
+							 _camel_imap_store_current_folder_finalize, store);
 			wasnull = TRUE;
 		}
 		camel_imap_store_stop_idle (store);
-		if (wasnull)
-			store->current_folder = NULL;
+		if (wasnull) {
+			if (store->current_folder) {
+				camel_object_unhook_event (store->current_folder, "finalize",
+							   _camel_imap_store_current_folder_finalize, store);
+				store->current_folder = NULL;
+			}
+		}
 	}
 
 	/* Check for current folder */
@@ -1283,9 +1304,9 @@ imap_command_strdup_vprintf (CamelImapStore *store, const char *fmt,
 
 		start = *p ? p + 1 : p;
 	}
-
+	
 	g_ptr_array_free (args, TRUE);
-
+	
 	return out;
 }
 
@@ -1294,10 +1315,10 @@ imap_command_strdup_printf (CamelImapStore *store, const char *fmt, ...)
 {
 	va_list ap;
 	char *result;
-
+	
 	va_start (ap, fmt);
 	result = imap_command_strdup_vprintf (store, fmt, ap);
 	va_end (ap);
-
+	
 	return result;
 }

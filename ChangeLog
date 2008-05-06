@@ -11,6 +11,20 @@
         Protect PR_Reads and writes to avoid calls to PR_Close before one of
 	them. Should avoid some crashes and bad memory accesses.
 
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.[ch]:
+        Now references to current_folder, old_folder and last_folder
+        are weak references. This way, when they're finalized we
+        properly remove the store reference to them.
+        Removed some small leaks and compilation warnings.
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store-priv.h:
+        Added. Includes internal declarations of weak reference handlers
+        for folders in the imap store.
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-command.c,
+	libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
+        Use weak references to folders in accesses to store.
+
 2008-04-30  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Enlarged a lock for the transport-account in camel

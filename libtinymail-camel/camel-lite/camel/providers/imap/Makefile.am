@@ -33,6 +33,7 @@ noinst_HEADERS =			\
 	camel-imap-message-cache.h		\
 	camel-imap-search.h			\
 	camel-imap-store.h			\
+	camel-imap-store-priv.h			\
 	camel-imap-store-summary.h		\
 	camel-imap-summary.h			\
 	camel-imap-types.h			\

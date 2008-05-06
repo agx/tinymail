@@ -70,6 +70,7 @@
 #include "camel-imap-message-cache.h"
 #include "camel-imap-store-summary.h"
 #include "camel-imap-store.h"
+#include "camel-imap-store-priv.h"
 #include "camel-imap-summary.h"
 #include "camel-imap-utils.h"
 
@@ -321,6 +322,7 @@ imap_restore (CamelStore *store)
 			camel_imap_folder_selected (folder, response2, &nex, TRUE);
 			camel_imap_response_free (imap_store, response2);
 		}
+		camel_exception_clear (&nex);
 		camel_imap_store_start_idle (imap_store);
 	}
 
@@ -394,6 +396,18 @@ camel_imap_store_finalize (CamelObject *object)
 	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	let_idle_die (imap_store, TRUE);
+
+	if (imap_store->current_folder) {
+		camel_object_unhook_event (imap_store->current_folder, "finalize",
+					   _camel_imap_store_current_folder_finalize, imap_store);
+		imap_store->current_folder = NULL;
+	}
+
+	if (imap_store->old_folder) {
+		camel_object_unhook_event (imap_store->old_folder, "finalize",
+					   _camel_imap_store_old_folder_finalize, imap_store);
+		imap_store->old_folder = NULL;
+	}
 
 	/* This frees current_folder, folders, authtypes, streams, and namespace. */
 	camel_service_disconnect((CamelService *)imap_store, TRUE, NULL);
@@ -901,7 +915,7 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 	CamelImapResponse *response;
 	CamelStream *tcp_stream;
 	CamelSockOptData sockopt;
-	gboolean force_imap4 = FALSE, ssl_ena = FALSE;
+	gboolean force_imap4 = FALSE;
 	gboolean clean_quit = TRUE;
 	char *buf;
 	gboolean not_ssl = TRUE;
@@ -2121,6 +2135,12 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 	/* if (store->current_folder && CAMEL_IS_OBJECT (store->current_folder))
 		camel_object_unref (store->current_folder); */
 	store->old_folder = store->current_folder;
+	if (store->old_folder)
+		camel_object_hook_event (store->old_folder, "finalize",
+					 _camel_imap_store_old_folder_finalize, store);
+	if (store->current_folder)
+		camel_object_unhook_event (store->current_folder, "finalize",
+					   _camel_imap_store_current_folder_finalize, store);
 	store->current_folder = NULL;
 
 	if (store->authtypes) {
@@ -2629,6 +2649,8 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 
 	if (imap_store->current_folder) {
 		/* camel_object_unref (imap_store->current_folder); */
+		camel_object_unhook_event (imap_store->current_folder, "finalize",
+					   _camel_imap_store_current_folder_finalize, imap_store);
 		imap_store->current_folder = NULL;
 	}
 
@@ -2806,6 +2828,8 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		CamelException local_ex;
 
 		imap_store->current_folder = new_folder;
+		camel_object_hook_event (imap_store, "finalize",
+					 _camel_imap_store_current_folder_finalize, imap_store);
 		/* camel_object_ref (new_folder); */
 		camel_exception_init (&local_ex);
 		//camel_imap_folder_selected (new_folder, response, &local_ex, TRUE);
@@ -2813,6 +2837,8 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		if (camel_exception_is_set (&local_ex)) {
 			camel_exception_xfer (ex, &local_ex);
 			/* camel_object_unref (imap_store->current_folder); */
+			camel_object_unhook_event (imap_store, "finalize",
+						   _camel_imap_store_current_folder_finalize, imap_store);
 			imap_store->current_folder = NULL;
 			camel_object_unref (new_folder);
 			new_folder = NULL;
@@ -2881,6 +2907,8 @@ delete_folder (CamelStore *store, const char *folder_name, CamelException *ex)
 		camel_object_unref (imap_store->current_folder);*/
 
 	/* no need to actually create a CamelFolder for INBOX */
+	camel_object_unhook_event (imap_store->current_folder, "finalize",
+				   _camel_imap_store_current_folder_finalize, imap_store);
 	imap_store->current_folder = NULL;
 
 	response = camel_imap_command(imap_store, NULL, ex, "DELETE %F", folder_name);
@@ -3046,7 +3074,7 @@ move_cache (const gchar *oldpath, const gchar *newpath)
 
 		g_mkdir (newpath, S_IRWXU);
 
-		while (file = g_dir_read_name (dir)) {
+		while ((file = g_dir_read_name (dir)) != NULL) {
 			gchar *old_fullname;
 			gchar *new_fullname;
 			old_fullname = g_strdup_printf ("%s/%s", oldpath, file);
@@ -3105,6 +3133,8 @@ rename_folder (CamelStore *store, const char *old_name, const char *new_name_in,
 	/*if (imap_store->current_folder)
 		camel_object_unref (imap_store->current_folder); */
 	/* no need to actually create a CamelFolder for INBOX */
+	camel_object_unhook_event (imap_store->current_folder, "finalize",
+				   _camel_imap_store_current_folder_finalize, imap_store);
 	imap_store->current_folder = NULL;
 
 	/* Undefined progress */
@@ -4453,4 +4483,27 @@ camel_imap_store_readline_nb (CamelImapStore *store, char **dest, CamelException
 	g_byte_array_free (ba, FALSE);
 
 	return nread;
+}
+
+void 
+_camel_imap_store_current_folder_finalize (CamelObject *stream, gpointer event_data, gpointer user_data)
+{
+	CamelImapStore *store = (CamelImapStore *) user_data;
+
+	store->current_folder = NULL;
+}
+void 
+_camel_imap_store_old_folder_finalize (CamelObject *stream, gpointer event_data, gpointer user_data)
+{
+	CamelImapStore *store = (CamelImapStore *) user_data;
+
+	store->old_folder = NULL;
+}
+
+void 
+_camel_imap_store_last_folder_finalize (CamelObject *stream, gpointer event_data, gpointer user_data)
+{
+	CamelImapStore *store = (CamelImapStore *) user_data;
+
+	store->last_folder = NULL;
 }

@@ -89,6 +89,7 @@
 #include "camel-imap-private.h"
 #include "camel-imap-search.h"
 #include "camel-imap-store.h"
+#include "camel-imap-store-priv.h"
 #include "camel-imap-summary.h"
 #include "camel-imap-utils.h"
 #include "camel-imap-wrapper.h"
@@ -798,8 +799,11 @@ imap_finalize (CamelObject *object)
 		imap_folder->idle_lock = NULL;
 	}
 
-	if (store->current_folder == (CamelFolder*) object)
+	if (store->current_folder == (CamelFolder*) object) {
+		camel_object_unhook_event (store->current_folder, "finalize",
+					   _camel_imap_store_current_folder_finalize, store);
 		store->current_folder = NULL;
+	}
 
 	if (imap_folder->search)
 		camel_object_unref (CAMEL_OBJECT (imap_folder->search));
@@ -3826,6 +3830,7 @@ idle_real_start (CamelImapStore *store)
 		if (tbreak)
 			break;
 	}
+	camel_exception_clear (&ex);
 	if (resp)
 		g_free (resp);
 errh:
