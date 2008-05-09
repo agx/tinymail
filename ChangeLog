@@ -1,3 +1,11 @@
+2008-05-09  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c:
+          Add some reasons/unreasons in get_headers_operation, to avoid
+          getting a 0 account when we are replacing the headers in the
+          gtk list store model. This should avoid some very hidden
+          crashes.
+
 2008-05-06  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/camel-certdb-cst.c
