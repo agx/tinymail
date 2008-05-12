@@ -1,5 +1,9 @@
 2008-05-12  Rob Taylor  <rob.taylor@codethink.co.uk>
 
+	* libtinymail/tny-error.c: Fix documentation
+
+2008-05-12  Rob Taylor  <rob.taylor@codethink.co.uk>
+
 	* libtinymail-camel/tny-camel-bs-msg-receive-strategy.c:
 	* libtinymail-camel/tny-camel-folder.c:
 	* libtinymail-camel/tny-camel-nntp-folder.c:

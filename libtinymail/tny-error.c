@@ -49,9 +49,9 @@ tny_error_get_code (GError *err)
 }
 
 /**
- * dbus_g_error_quark:
+ * tny_g_error_quark:
  *
- * The implementation of #DBUS_GERROR error domain. See documentation
+ * The implementation of #TNY_ERROR_DOMAIN error domain. See documentation
  * for #GError in GLib reference manual.
  *
  * Returns: the error domain quark for use with #GError
