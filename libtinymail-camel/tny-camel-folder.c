@@ -759,7 +759,7 @@ tny_camel_folder_add_msg_shared (TnyFolder *self, TnyMsg *msg, TnyFolderChange *
 		}
 
 	} else {
-		g_set_error (err, TNY_MIME_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_MIME_ERROR_MALFORMED,
 			_("Malformed message"));
 		haderr = TRUE;
@@ -1012,12 +1012,12 @@ tny_camel_folder_add_msg_default (TnyFolder *self, TnyMsg *msg, GError **err)
 	}
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_ADD_MSG))
 		return;
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_ADD_MSG,
 			"Folder not ready for adding messages");
 		return;
@@ -1073,12 +1073,12 @@ tny_camel_folder_remove_msg_default (TnyFolder *self, TnyHeader *header, GError 
 	g_assert (TNY_IS_HEADER (header));
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_REMOVE_MSG))
 		return;
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_REMOVE_MSG,
 			_("Folder not ready for removing"));
 		return;
@@ -1274,12 +1274,12 @@ tny_camel_folder_remove_msgs_default (TnyFolder *self, TnyList *headers, GError 
 	g_assert (TNY_IS_LIST (headers));
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_REMOVE_MSG))
 		return;
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_REMOVE_MSG,
 			_("Folder not ready for removing"));
 		return;
@@ -1538,7 +1538,7 @@ tny_camel_folder_sync_default (TnyFolder *self, gboolean expunge, GError **err)
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_SYNC))
 		return;
 
@@ -1665,7 +1665,7 @@ tny_camel_folder_sync_async_thread (gpointer thr_user_data)
 	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 	if (!priv->account) {
-		g_set_error (&info->err, TNY_SERVICE_ERROR, 
+		g_set_error (&info->err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_SYNC,
 			"Folder not ready for synchronization");
 		info->cancelled = TRUE;
@@ -2048,12 +2048,12 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 	TnyConnectionPolicy *constrat;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_REFRESH))
 		return;
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_REFRESH,
 			_("Folder not ready for refresh"));
 		return;
@@ -2299,11 +2299,11 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 	g_assert (TNY_IS_LIST (headers));
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
-			TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_REFRESH))
+			TNY_ERROR_DOMAIN, TNY_SERVICE_ERROR_REFRESH))
 		return;
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_REFRESH,
 			_("Folder not ready for getting headers"));
 		return;
@@ -2827,12 +2827,12 @@ tny_camel_folder_get_msg_default (TnyFolder *self, TnyHeader *header, GError **e
 	TnyFolderChange *change;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_GET_MSG))
 		return NULL;
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_GET_MSG,
 			_("Folder not ready for getting messages"));
 		return NULL;
@@ -2896,12 +2896,12 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 	const gchar *uid;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_GET_MSG))
 		return NULL;
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_GET_MSG,
 			_("Folder not ready for finding messages"));
 		return NULL;
@@ -2934,7 +2934,7 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 		TnyHeader *nhdr;
 		info = camel_folder_get_message_info (priv->folder, uid);
 		if (info == NULL) {
-			g_set_error (err, TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_NO_SUCH_MESSAGE,
+			g_set_error (err, TNY_ERROR_DOMAIN, TNY_SERVICE_ERROR_NO_SUCH_MESSAGE,
 				     _("Message uid not found in folder"));
 			retval = NULL;
 		} else {
@@ -2954,7 +2954,7 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 		}
 
 	} else {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_GET_MSG,
 				_("This url string is malformed"));
 		retval = NULL;
@@ -3187,7 +3187,7 @@ recurse_copy (TnyFolder *folder, TnyFolderStore *into, const gchar *new_name, gb
 			tny_folder_store_remove_folder (a_store, folder, &nerr);
 			g_object_unref (a_store);
 		} else {
-			g_set_error (&nerr, TNY_SERVICE_ERROR, 
+			g_set_error (&nerr, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_UNKNOWN,
 				"The folder (%s) didn't have a parent, therefore "
 				"failed to remove it while moving. This problem "
@@ -3363,7 +3363,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 	if (del && priv->reason_to_live != 0)
 	{
-		g_set_error (&nerr, TNY_SERVICE_ERROR, 
+		g_set_error (&nerr, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_STATE,
 			"You should not use this operation with del=TRUE "
 			"while the folder is still in use. There are "
@@ -3452,7 +3452,7 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 					if (camel_exception_is_set (&ex) || !iter)
 					{
 						if (!camel_exception_is_set (&ex))
-							g_set_error (&terr, TNY_SERVICE_ERROR, 
+							g_set_error (&terr, TNY_ERROR_DOMAIN,
 								TNY_SERVICE_ERROR_COPY, 
 								_("Folder not ready for copy"));
 						else {
@@ -3577,13 +3577,13 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 	TnyFolderStore *orig_store;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_COPY))
 		return NULL;
 
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_COPY,
 			_("Folder not ready for copy"));
 		return NULL;
@@ -4006,14 +4006,14 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 	g_assert (TNY_IS_FOLDER (folder_dst));
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_TRANSFER,
 			_("Folder not ready for transfer"));
 		return;
 	}
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_TRANSFER))
 		return;
 
@@ -4067,7 +4067,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 
 		if (G_UNLIKELY (uid == NULL)) 
 		{
-			g_set_error (err, TNY_SERVICE_ERROR, 
+			g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_TRANSFER,
 				"You can only pass summary items as headers. "
 				"These are instances that you got with the "
@@ -4698,7 +4698,7 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 	gboolean changed = FALSE;
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_FOLDER_REMOVE,
 			_("Folder store not ready for removal"));
 		return;
@@ -4892,11 +4892,11 @@ tny_camel_folder_remove_folder_default (TnyFolderStore *self, TnyFolder *folder,
 	GList *changes = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), priv->account, err, 
-			TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_FOLDER_REMOVE))
+			TNY_ERROR_DOMAIN, TNY_SERVICE_ERROR_FOLDER_REMOVE))
 		return;
 
 	if (!priv->account) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_FOLDER_REMOVE,
 			_("Folder store not ready for removing folders"));
 		return;
@@ -4975,12 +4975,12 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	gboolean was_new = FALSE;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_FOLDER_CREATE))
 		return NULL;
 
 	if (!name || strlen (name) <= 0) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_FOLDER_CREATE,
 				_("Failed to create folder with no name"));
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
@@ -4988,7 +4988,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 	}
 
 	if (!priv->folder_name) {
-		g_set_error (err, TNY_SERVICE_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_FOLDER_CREATE,
 				_("Failed to create folder. Invalid parent folder"));
 		_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
@@ -5009,7 +5009,7 @@ tny_camel_folder_create_folder_default (TnyFolderStore *self, const gchar *name,
 			_tny_camel_exception_to_tny_error (&ex, err);
 			camel_exception_clear (&ex);
 		} else
-			g_set_error (err, TNY_SERVICE_ERROR, 
+			g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_FOLDER_CREATE,
 				_("Unknown error while trying to create folder"));
 
@@ -5254,7 +5254,7 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 	TnyAccount *account = NULL;
 
 	if (!_tny_session_check_operation (TNY_FOLDER_PRIV_GET_SESSION(priv), 
-			priv->account, err, TNY_SERVICE_ERROR, 
+			priv->account, err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_GET_FOLDERS))
 		return;
 

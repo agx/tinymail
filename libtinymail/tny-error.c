@@ -49,44 +49,19 @@ tny_error_get_code (GError *err)
 }
 
 /**
- * tny_error_domain_get_type:
+ * dbus_g_error_quark:
  *
- * GType system helper function
+ * The implementation of #DBUS_GERROR error domain. See documentation
+ * for #GError in GLib reference manual.
  *
- * returns: a #GType
- **/
-GType
-tny_error_domain_get_type (void)
+ * Returns: the error domain quark for use with #GError
+ */
+GQuark
+tny_get_error_quark (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyErrorDomain", values);
-  }
-  return etype;
+  static GQuark quark = 0;
+  if (quark == 0)
+    quark = g_quark_from_static_string ("tinymail-error-quark");
+  return quark;
 }
 
-
-/**
- * tny_error_get_type:
- *
- * GType system helper function
- *
- * returns: a #GType
- **/
-GType
-tny_error_get_type (void)
-{
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-
-
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyError", values);
-  }
-  return etype;
-}

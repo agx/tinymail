@@ -68,7 +68,7 @@ static GObjectClass *parent_class = NULL;
 static void 
 tny_camel_pop_store_account_remove_folder (TnyFolderStore *self, TnyFolder *folder, GError **err)
 {
-	g_set_error (err, TNY_SERVICE_ERROR, 
+	g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_UNSUPPORTED,
 			"You can't use the tny_folder_store_remove_folder API "
 			"on POP accounts. This problem indicates a bug in the "
@@ -80,7 +80,7 @@ tny_camel_pop_store_account_remove_folder (TnyFolderStore *self, TnyFolder *fold
 static TnyFolder* 
 tny_camel_pop_store_account_create_folder (TnyFolderStore *self, const gchar *name, GError **err)
 {
-	g_set_error (err, TNY_SERVICE_ERROR, 
+	g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_UNSUPPORTED,
 			"You can't use the tny_folder_store_create_folder "
 			"API on POP accounts. This problem indicates a "

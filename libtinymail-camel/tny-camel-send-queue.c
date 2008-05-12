@@ -844,7 +844,7 @@ create_worker (TnySendQueue *self, GError **err)
 
 			if (!info->outbox || !info->sentbox) {
 
-				g_set_error (err, TNY_SERVICE_ERROR, 
+				g_set_error (err, TNY_ERROR_DOMAIN,
 					TNY_SERVICE_ERROR_ADD_MSG, FOLDERSNOTREADY);
 				g_warning (FOLDERSNOTREADY);
 
@@ -1033,7 +1033,7 @@ tny_camel_send_queue_add_default (TnySendQueue *self, TnyMsg *msg, GError **err)
 
 		if (!outbox || !TNY_IS_FOLDER (outbox))
 		{
-			g_set_error (err, TNY_SERVICE_ERROR, 
+			g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_ADD_MSG,
 				_("Operating can't continue: send queue not ready "
 				"because it does not have a valid outbox. "
@@ -1091,7 +1091,7 @@ tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySend
 	outbox = tny_send_queue_get_outbox (TNY_SEND_QUEUE (self));
 
 	if (!outbox || !TNY_IS_FOLDER (outbox)) {
-		g_set_error (&err, TNY_SERVICE_ERROR, 
+		g_set_error (&err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_ADD_MSG,
 			_("Operating can't continue: send queue not ready "
 			"because it does not have a valid outbox. "

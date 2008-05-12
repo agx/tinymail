@@ -1608,7 +1608,7 @@ _tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, GError **
 			_tny_camel_exception_to_tny_error (priv->ex, err);
 			camel_exception_clear (priv->ex);
 		} else {
-			g_set_error (err, TNY_SERVICE_ERROR, 
+			g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_CONNECT,
 				"Account not yet fully configured. "
 				"This problem indicates a bug in the software.");
@@ -2066,7 +2066,7 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 	GError *err = NULL;
 
 	if (!_tny_session_check_operation (priv->session, TNY_ACCOUNT (self), &err, 
-			TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_UNKNOWN))
+			TNY_ERROR_DOMAIN, TNY_SERVICE_ERROR_UNKNOWN))
 	{
 		if (callback) {
 			callback (self, TRUE /* cancelled */, NULL, err, user_data);

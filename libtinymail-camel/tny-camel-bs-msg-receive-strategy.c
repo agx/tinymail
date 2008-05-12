@@ -93,7 +93,7 @@ tny_camel_bs_msg_receive_strategy_start_receiving_part (TnyCamelBsMsgReceiveStra
 			int fd = open (filename, 0);
 
 			if (fd == -1) {
-				g_set_error (err, TNY_IO_ERROR, 
+				g_set_error (err, TNY_ERROR_DOMAIN,
 					TNY_IO_ERROR_READ,
 					"Can't open %s for reading", filename);
 				retval = NULL;

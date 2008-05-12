@@ -24,22 +24,8 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
-#define TNY_TYPE_ERROR_DOMAIN (tny_error_domain_get_type())
+#define TNY_ERROR_DOMAIN (tny_get_error_quark())
 
-
-enum _TnyErrorDomain
-{
-	TNY_SYSTEM_ERROR = 1,
-	TNY_IO_ERROR = 2,
-	TNY_SERVICE_ERROR = 3,
-	TNY_MIME_ERROR = 4,
-};
-
-typedef enum _TnyErrorDomain TnyErrorDomain;
-
-#define TNY_TYPE_ERROR (tny_error_get_type())
-
- 
 /**
  * TnyError:
  *
@@ -93,8 +79,7 @@ typedef enum _TnyError TnyError;
 const gchar* tny_error_get_message (GError *err);
 gint tny_error_get_code (GError *err);
 
-GType tny_error_domain_get_type (void);
-GType tny_error_get_type (void);
+GQuark tny_get_error_quark (void);
 
 
 #endif

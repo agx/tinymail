@@ -119,7 +119,7 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 			_tny_camel_exception_to_tny_error (apriv->ex, err);
 			camel_exception_clear (apriv->ex);
 		} else {
-			g_set_error (err, TNY_SERVICE_ERROR, 
+			g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_CONNECT,
 				_("Account not yet fully configured. "
 				"This problem indicates a bug in the software."));
@@ -134,7 +134,7 @@ tny_camel_transport_account_try_connect (TnyAccount *self, GError **err)
 			camel_exception_clear (apriv->ex);
 
 	} else {
-			g_set_error (err, TNY_SERVICE_ERROR, 
+			g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_CONNECT,
 				_("Get and Forget password functions not yet set "
 				"This problem indicates a bug in the software."));
@@ -198,7 +198,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 		if (camel_exception_is_set (&ex)) {
 			_tny_camel_exception_to_tny_error (&ex, err);
 		} else {
-			g_set_error (err, TNY_SERVICE_ERROR, 
+			g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_AUTHENTICATE,
 				_("Authentication error"));
 		}
@@ -240,7 +240,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 			_tny_camel_exception_to_tny_error (&ex, err);
 			camel_exception_clear (&ex);
 		} else 
-			g_set_error (err, TNY_SERVICE_ERROR, 
+			g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_SEND,
 				_("Unknown error while sending message"));
 

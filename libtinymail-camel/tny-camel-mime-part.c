@@ -668,7 +668,7 @@ tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *strea
 		g_warning (_("Mime part does not yet have a source stream, use "
 			     "tny_mime_part_construct first"));
 		camel_object_unref (cstream);
-		g_set_error (err, TNY_MIME_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_MIME_ERROR_STATE,
 				_("Mime part does not yet have a source stream, use "
 				"tny_mime_part_construct first"));
@@ -685,7 +685,7 @@ tny_camel_mime_part_write_to_stream_default (TnyMimePart *self, TnyStream *strea
 	camel_object_unref (medium);
 
 	if (bytes < 0) {
-		g_set_error (err, TNY_IO_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_IO_ERROR_WRITE,
 				strerror (errno));
 	}
@@ -788,7 +788,7 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 	camel_object_unref (medium);
 	
 	if (bytes < 0) {
-		g_set_error (err, TNY_IO_ERROR, 
+		g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_IO_ERROR_WRITE,
 				strerror (errno));
 	}
