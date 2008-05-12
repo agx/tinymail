@@ -793,7 +793,6 @@ errorhandler:
 	g_object_unref (info->device);
 	g_object_unref (info->self);
 
-
 	if (TNY_IS_CAMEL_FOLDER (info->sentbox)) {
 		TnyCamelFolderPriv *spriv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->sentbox);
 		_tny_camel_folder_unreason (spriv);
@@ -863,22 +862,30 @@ create_worker (TnySendQueue *self, GError **err)
 			info->outbox_account = tny_folder_get_account (info->outbox);
 			info->trans_account = (TnyTransportAccount *) g_object_ref (priv->trans_account);
 
-			if (TNY_IS_CAMEL_FOLDER (info->sentbox)) {
-				TnyCamelFolderPriv *spriv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->sentbox);
-				_tny_camel_folder_reason (spriv);
-			}
-
 			if (TNY_IS_CAMEL_FOLDER (info->outbox)) {
 				TnyCamelFolderPriv *opriv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->outbox);
 				_tny_camel_folder_reason (opriv);
+			}
+			if (TNY_IS_CAMEL_FOLDER (info->sentbox)) {
+				TnyCamelFolderPriv *spriv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->sentbox);
+				_tny_camel_folder_reason (spriv);
 			}
 
 			emit_queue_control_signals (self, TNY_SEND_QUEUE_START);
 
 			priv->thread = g_thread_create (thread_main, info, FALSE, NULL);
 
-			if (priv->thread == NULL)
+			if (priv->thread == NULL) {
 				emit_queue_control_signals (self, TNY_SEND_QUEUE_STOP);
+			        if (TNY_IS_CAMEL_FOLDER (info->outbox)) {
+		        	        TnyCamelFolderPriv *opriv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->outbox);
+					_tny_camel_folder_unreason (opriv);
+				}
+			        if (TNY_IS_CAMEL_FOLDER (info->sentbox)) {
+			                TnyCamelFolderPriv *spriv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->sentbox);
+			                _tny_camel_folder_unreason (spriv);
+			        }
+			}
 		}
 	}
 
