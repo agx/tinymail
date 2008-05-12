@@ -2,7 +2,7 @@ INCLUDES = $(PYTHON_INCLUDES) $(LIBTINYMAIL_CFLAGS) $(PYGTK_CFLAGS) \
 	$(LIBTINYMAILUI_GTK_CFLAGS) $(TINYMAIL_PYTHON_CFLAGS) \
 	-I$(top_srcdir)/libtinymail -I$(top_srcdir)/libtinymailui \
 	-I$(top_srcdir)/libtinymailui-gtk -I$(top_srcdir)/libtinymail-camel \
-	-I$(top_srcdir)/$(PLATFORMDIR) -I$(top_srcdir)/libtinymail-camel/camel-lite
+	@PLATFORM_CFLAGS@ -I$(top_srcdir)/libtinymail-camel/camel-lite
 
 common_ldflags = -module -avoid-version
 
@@ -46,7 +46,7 @@ camel_la_LDFLAGS = $(common_ldflags) -export-symbols-regex initcamel
 camel_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
         $(TINYMAIL_PYTHON_LIBS) \
         $(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
-        $(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la \
+        @PLATFORM_LIBS@ \
         $(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
 camel_la_SOURCES = tinymail-camelmodule.c pytny-session-camel.c
 nodist_camel_la_SOURCES = tinymail-camel-glue.c

@@ -37,7 +37,7 @@ tinymail_vala_test_LDADD = \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la		\
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la	\
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la	\
-	$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la		\
+	@PLATFORM_LIBS@								\
 	$(NULL)
 
 EXTRA_DIST = $(tinymail_vala_test_VALASOURCES) tinymail-vala-test.vala.stamp

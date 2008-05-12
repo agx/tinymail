@@ -74,6 +74,9 @@ enable_deprecated=true
 PLATFORMDIR=libtinymail-gnome-desktop
 PLATFORMSPECIFICNAME=Gnome
 PLATFORM=1
+PLATFORM_LIBS='$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la'
+PLATFORM_CFLAGS='-I$(top_srcdir)/$(PLATFORM)'
+have_platform=yes
 
 dnl ### Debugging ###
 AC_ARG_ENABLE(debug,
@@ -135,6 +138,16 @@ AC_HELP_STRING([--with-platform=gnome-desktop],
         build_demoui=true
         PLATFORM=4
         ;;
+  none)
+	PLATFORMDIR=
+	PLATFORMSPECIFICNAME=
+	build_uigtk=false
+	build_demoui=false
+	PLATFORM=0
+	PLATFORM_LIBS=
+	PLATFORM_CFLAGS=
+	have_platform=no
+	;;
   *) 
 	PLATFORMDIR=${with_platform}
 	PLATFORMSPECIFICNAME=
@@ -147,6 +160,10 @@ esac], [PLATFORMDIR=libtinymail-gnome-desktop
 AC_SUBST(PLATFORMDIR)
 AC_SUBST(PLATFORM)
 AC_SUBST(PLATFORMSPECIFICNAME)
+AC_SUBST(PLATFORM_LIBS)
+AC_SUBST(PLATFORM_CFLAGS)
+
+AM_CONDITIONAL([HAVE_PLATFORM], [test x$have_platform = xyes])
 
 dnl ### Select the html component ##
 AC_ARG_WITH(html-component,

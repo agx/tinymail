@@ -1,5 +1,12 @@
 2008-05-12  Rob Taylor  <rob.taylor@codethink.co.uk>
 
+	* configure.ac: Add --with-platform option 'none'.
+	* bindings/python/Makefile.am: Fix up python bindings to work when built with no platform.
+	* bindings/dotnet/Makefile.am: Don't build platform subdir if platform is none.
+	* tests/vala-demo/Makefile.am: Fix up vala demo to use PLATFORM_LIBS for consistency.
+
+2008-05-12  Rob Taylor  <rob.taylor@codethink.co.uk>
+
 	* libtinymail/tny-error.c: Fix documentation
 
 2008-05-12  Rob Taylor  <rob.taylor@codethink.co.uk>
