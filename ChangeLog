@@ -4,6 +4,12 @@
 
 2008-05-12  Rob Taylor  <rob.taylor@codethink.co.uk>
 
+	* m4/ticonv.m4: Add --with-iconv-detect-h option to allow the passing
+	of a pre-generated iconv-detect.h rather than generating it at
+	configure time.
+
+2008-05-12  Rob Taylor  <rob.taylor@codethink.co.uk>
+
 	* libtinymail-camel/tny-camel-bs-msg-receive-strategy.c:
 	* libtinymail-camel/tny-camel-folder.c:
 	* libtinymail-camel/tny-camel-nntp-folder.c:

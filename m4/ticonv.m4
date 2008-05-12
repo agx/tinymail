@@ -76,17 +76,21 @@ AC_SUBST(ICONV_LIBS)
 
 CFLAGS="$CFLAGS -I$srcdir"
 
-AC_MSG_CHECKING(preferred charset formats for system iconv)
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+AC_ARG_WITH([iconv-detect-h],
+	AC_HELP_STRING([--with-iconv-detect-h],
+	[Use a hand generated iconv-detect.h rather than running iconv-detect (in libtinymail-camel/camel-lite)]),
+	[cp $withval iconv-detect.h],
+	AC_MSG_CHECKING(preferred charset formats for system iconv)
+	AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #define CONFIGURE_IN
 #include "iconv-detect.c"
-]])],[
-	AC_MSG_RESULT(found)
-],[
-	AC_MSG_RESULT(not found)
-],[])
+	]])],[
+		AC_MSG_RESULT(found)
+	],[
+		AC_MSG_RESULT(not found)
+	],[])
 
-CFLAGS="$save_CFLAGS"
-LIBS="$save_LIBS"
-
+	CFLAGS="$save_CFLAGS"
+	LIBS="$save_LIBS"
+	)
 ])
