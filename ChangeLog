@@ -1,3 +1,10 @@
+2008-05-13  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail-camel/tny-camel-bs-mime-part.c:
+	(tny_camel_bs_mime_part_is_attachment_default): Modify the
+	is_attachment heuristic in TnyCamelBSMimePart so that inline mime
+	parts with filenames are considered attachments.
+
 2008-05-12  Rob Taylor  <rob.taylor@codethink.co.uk>
 
 	* configure.ac: Add --with-platform option 'none'.

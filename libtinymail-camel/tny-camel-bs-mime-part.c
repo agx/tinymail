@@ -389,10 +389,10 @@ tny_camel_bs_mime_part_is_attachment_default (TnyMimePart *self)
 	 * not actually have this header, as not all E-mail clients add it) */
 
 	if (contdisp) {
-		if (camel_strstrcase (contdisp, "inline"))
-			return FALSE;
 		if (camel_strstrcase (contdisp, "attachment"))
 			return TRUE;
+		if (camel_strstrcase (contdisp, "inline") && mimeparam_get_value_for (priv->bodystructure->disposition.params, "FILENAME") == NULL)
+			return FALSE;
 	}
 
 	return !((camel_strcase_equal (priv->bodystructure->content.type, "application") && 
