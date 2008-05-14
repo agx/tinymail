@@ -420,7 +420,7 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 		}
 	} else {
 		g_mutex_lock (queue->mutex);
-		//if (queue->is_waiting)
+		if (queue->is_waiting)
 			g_cond_broadcast (queue->condition);
 		g_mutex_unlock (queue->mutex);
 	}
