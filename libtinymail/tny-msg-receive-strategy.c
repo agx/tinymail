@@ -84,28 +84,32 @@ tny_msg_receive_strategy_base_init (gpointer g_class)
 		initialized = TRUE;
 }
 
+static gpointer
+tny_msg_receive_strategy_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyMsgReceiveStrategyIface),
+			tny_msg_receive_strategy_base_init,   /* base_init */
+			NULL,   /* base_finalize */
+			NULL,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			0,
+			0,      /* n_preallocs */
+			NULL    /* instance_init */
+		};
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnyMsgReceiveStrategy", &info, 0);
+	return GUINT_TO_POINTER (type);
+}
+
 GType
 tny_msg_receive_strategy_get_type (void)
 {
-	static GType type = 0;
-
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyMsgReceiveStrategyIface),
-		  tny_msg_receive_strategy_base_init,   /* base_init */
-		  NULL,   /* base_finalize */
-		  NULL,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  0,
-		  0,      /* n_preallocs */
-		  NULL    /* instance_init */
-		};
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyMsgReceiveStrategy", &info, 0);
-	}
-
-	return type;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_msg_receive_strategy_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

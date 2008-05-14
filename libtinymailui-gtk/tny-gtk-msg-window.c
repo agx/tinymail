@@ -353,14 +353,12 @@ tny_gtk_msg_window_class_init (TnyGtkMsgWindowClass *class)
 	return;
 }
 
-GType 
-tny_gtk_msg_window_get_type (void)
+static gpointer 
+tny_gtk_msg_window_register_type (gpointer notused)
 {
-	static GType type = 0;
+	GType type = 0;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	static const GTypeInfo info = 
 		{
 		  sizeof (TnyGtkMsgWindowClass),
 		  NULL,   /* base_init */
@@ -374,41 +372,47 @@ tny_gtk_msg_window_get_type (void)
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_msg_window_info = 
+	static const GInterfaceInfo tny_msg_window_info = 
 		{
 		  (GInterfaceInitFunc) tny_msg_window_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
-		static const GInterfaceInfo tny_msg_view_info = 
+	static const GInterfaceInfo tny_msg_view_info = 
 		{
 		  (GInterfaceInitFunc) tny_msg_view_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
-		static const GInterfaceInfo tny_mime_part_view_info = 
+	static const GInterfaceInfo tny_mime_part_view_info = 
 		{
 		  (GInterfaceInitFunc) tny_mime_part_view_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (GTK_TYPE_WINDOW,
-			"TnyGtkMsgWindow",
-			&info, 0);
+	type = g_type_register_static (GTK_TYPE_WINDOW,
+				       "TnyGtkMsgWindow",
+				       &info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_MIME_PART_VIEW, 
-			&tny_mime_part_view_info);
+	g_type_add_interface_static (type, TNY_TYPE_MIME_PART_VIEW, 
+				     &tny_mime_part_view_info);
 
-		g_type_add_interface_static (type, TNY_TYPE_MSG_VIEW, 
-			&tny_msg_view_info);
+	g_type_add_interface_static (type, TNY_TYPE_MSG_VIEW, 
+				     &tny_msg_view_info);
 
-		g_type_add_interface_static (type, TNY_TYPE_MSG_WINDOW, 
-			&tny_msg_window_info);
+	g_type_add_interface_static (type, TNY_TYPE_MSG_WINDOW, 
+				     &tny_msg_window_info);
 
-	}
+	return GUINT_TO_POINTER (type);
+}
 
-	return type;
+GType 
+tny_gtk_msg_window_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gtk_msg_window_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

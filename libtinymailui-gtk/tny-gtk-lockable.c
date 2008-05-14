@@ -93,13 +93,11 @@ tny_gtk_lockable_new (void)
 }
 
 
-GType
-tny_gtk_lockable_get_type (void)
+static gpointer
+tny_gtk_lockable_register_type (gpointer notused)
 {
-	static GType type = 0;
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	GType type = 0;
+	static const GTypeInfo info = 
 		{
 			sizeof (TnyGtkLockableClass),
 			NULL,   /* base_init */
@@ -114,20 +112,27 @@ tny_gtk_lockable_get_type (void)
 		};
 
 
-		static const GInterfaceInfo tny_lockable_info = 
+	static const GInterfaceInfo tny_lockable_info = 
 		{
 			(GInterfaceInitFunc) tny_lockable_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyGtkLockable",
-			&info, 0);
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyGtkLockable",
+				       &info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_LOCKABLE,
-			&tny_lockable_info);
+	g_type_add_interface_static (type, TNY_TYPE_LOCKABLE,
+				     &tny_lockable_info);
 
-	}
-	return type;
+	return GUINT_TO_POINTER (type);
+}
+
+GType
+tny_gtk_lockable_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gtk_lockable_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

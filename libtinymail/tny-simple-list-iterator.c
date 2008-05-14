@@ -240,41 +240,46 @@ tny_simple_list_iterator_class_init (TnySimpleListIteratorClass *klass)
 	return;
 }
 
+static gpointer
+_tny_simple_list_iterator_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnySimpleListIteratorClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_simple_list_iterator_class_init,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnySimpleListIterator),
+			0,      /* n_preallocs */
+			tny_simple_list_iterator_instance_init,    /* instance_init */
+			NULL
+		};
+	
+	static const GInterfaceInfo tny_iterator_info = 
+		{
+			(GInterfaceInitFunc) tny_iterator_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnySimpleListIterator",
+				       &info, 0);
+
+	g_type_add_interface_static (type, TNY_TYPE_ITERATOR, 
+				     &tny_iterator_info);
+
+	return GUINT_TO_POINTER (type);
+}
+
 GType 
 _tny_simple_list_iterator_get_type (void)
 {
-	static GType type = 0;
-
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnySimpleListIteratorClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_simple_list_iterator_class_init,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnySimpleListIterator),
-		  0,      /* n_preallocs */
-		  tny_simple_list_iterator_instance_init,    /* instance_init */
-		  NULL
-		};
-
-		static const GInterfaceInfo tny_iterator_info = 
-		{
-		  (GInterfaceInitFunc) tny_iterator_init, /* interface_init */
-		  NULL,         /* interface_finalize */
-		  NULL          /* interface_data */
-		};
-
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnySimpleListIterator",
-			&info, 0);
-
-		g_type_add_interface_static (type, TNY_TYPE_ITERATOR, 
-			&tny_iterator_info);
-	}
-
-	return type;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, _tny_simple_list_iterator_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

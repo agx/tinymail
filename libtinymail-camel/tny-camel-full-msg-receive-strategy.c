@@ -164,13 +164,11 @@ tny_camel_full_msg_receive_strategy_instance_init (GTypeInstance *instance, gpoi
 }
 
 
-GType
-tny_camel_full_msg_receive_strategy_get_type (void)
+static gpointer
+tny_camel_full_msg_receive_strategy_register_type (gpointer notused)
 {
-	static GType type = 0;
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	GType type = 0;
+	static const GTypeInfo info = 
 		{
 			sizeof (TnyCamelFullMsgReceiveStrategyClass),
 			NULL,   /* base_init */
@@ -185,20 +183,27 @@ tny_camel_full_msg_receive_strategy_get_type (void)
 		};
 
 
-		static const GInterfaceInfo tny_msg_receive_strategy_info = 
+	static const GInterfaceInfo tny_msg_receive_strategy_info = 
 		{
 			(GInterfaceInitFunc) tny_msg_receive_strategy_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyCamelFullMsgReceiveStrategy",
-			&info, 0);
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyCamelFullMsgReceiveStrategy",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_MSG_RECEIVE_STRATEGY,
+				     &tny_msg_receive_strategy_info);
+	
+	return GUINT_TO_POINTER (type);
+}
 
-		g_type_add_interface_static (type, TNY_TYPE_MSG_RECEIVE_STRATEGY,
-			&tny_msg_receive_strategy_info);
-
-	}
-	return type;
+GType
+tny_camel_full_msg_receive_strategy_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_camel_full_msg_receive_strategy_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

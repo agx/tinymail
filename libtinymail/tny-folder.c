@@ -1581,33 +1581,63 @@ tny_folder_base_init (gpointer g_class)
 		tny_folder_initialized = TRUE;
 }
 
+static gpointer
+tny_folder_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyFolderIface),
+			tny_folder_base_init,   /* base_init */
+			NULL,   /* base_finalize */
+			NULL,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			0,
+			0,      /* n_preallocs */
+			NULL,   /* instance_init */
+			NULL
+		};
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnyFolder", &info, 0);
+
+	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+
+	return GUINT_TO_POINTER (type);
+}
+
 GType
 tny_folder_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_folder_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyFolderIface),
-		  tny_folder_base_init,   /* base_init */
-		  NULL,   /* base_finalize */
-		  NULL,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  0,
-		  0,      /* n_preallocs */
-		  NULL,   /* instance_init */
-		  NULL
-		};
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyFolder", &info, 0);
-
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
-	}
-
-	return type;
+static gpointer
+tny_folder_type_register_type (gpointer notused)
+{
+	GType etype = 0;
+	static const GEnumValue values[] = {
+		{ TNY_FOLDER_TYPE_UNKNOWN, "TNY_FOLDER_TYPE_UNKNOWN", "unknown" },
+		{ TNY_FOLDER_TYPE_NORMAL, "TNY_FOLDER_TYPE_NORMAL", "normal" },
+		{ TNY_FOLDER_TYPE_INBOX, "TNY_FOLDER_TYPE_INBOX", "inbox" },
+		{ TNY_FOLDER_TYPE_OUTBOX, "TNY_FOLDER_TYPE_OUTBOX", "outbox" },
+		{ TNY_FOLDER_TYPE_TRASH, "TNY_FOLDER_TYPE_TRASH", "trash" },
+		{ TNY_FOLDER_TYPE_JUNK, "TNY_FOLDER_TYPE_JUNK", "junk" },
+		{ TNY_FOLDER_TYPE_SENT, "TNY_FOLDER_TYPE_SENT", "sent" },
+		{ TNY_FOLDER_TYPE_ROOT, "TNY_FOLDER_TYPE_ROOT", "root" },
+		{ TNY_FOLDER_TYPE_NOTES, "TNY_FOLDER_TYPE_NOTES", "notes" },
+		{ TNY_FOLDER_TYPE_DRAFTS, "TNY_FOLDER_TYPE_DRAFTS", "drafts" },
+		{ TNY_FOLDER_TYPE_CONTACTS, "TNY_FOLDER_TYPE_CONTACTS", "contacts" },
+		{ TNY_FOLDER_TYPE_CALENDAR, "TNY_FOLDER_TYPE_CALENDAR", "calendar" },
+		{ TNY_FOLDER_TYPE_ARCHIVE, "TNY_FOLDER_TYPE_ARCHIVE", "archive" },
+		{ TNY_FOLDER_TYPE_MERGE, "TNY_FOLDER_TYPE_MERGE", "merge" },
+		{ 0, NULL, NULL }
+	};
+	etype = g_enum_register_static ("TnyFolderType", values);
+	return GUINT_TO_POINTER (etype);
 }
 
 /**
@@ -1620,31 +1650,23 @@ tny_folder_get_type (void)
 GType
 tny_folder_type_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_FOLDER_TYPE_UNKNOWN, "TNY_FOLDER_TYPE_UNKNOWN", "unknown" },
-      { TNY_FOLDER_TYPE_NORMAL, "TNY_FOLDER_TYPE_NORMAL", "normal" },
-      { TNY_FOLDER_TYPE_INBOX, "TNY_FOLDER_TYPE_INBOX", "inbox" },
-      { TNY_FOLDER_TYPE_OUTBOX, "TNY_FOLDER_TYPE_OUTBOX", "outbox" },
-      { TNY_FOLDER_TYPE_TRASH, "TNY_FOLDER_TYPE_TRASH", "trash" },
-      { TNY_FOLDER_TYPE_JUNK, "TNY_FOLDER_TYPE_JUNK", "junk" },
-      { TNY_FOLDER_TYPE_SENT, "TNY_FOLDER_TYPE_SENT", "sent" },
-      { TNY_FOLDER_TYPE_ROOT, "TNY_FOLDER_TYPE_ROOT", "root" },
-      { TNY_FOLDER_TYPE_NOTES, "TNY_FOLDER_TYPE_NOTES", "notes" },
-      { TNY_FOLDER_TYPE_DRAFTS, "TNY_FOLDER_TYPE_DRAFTS", "drafts" },
-      { TNY_FOLDER_TYPE_CONTACTS, "TNY_FOLDER_TYPE_CONTACTS", "contacts" },
-      { TNY_FOLDER_TYPE_CALENDAR, "TNY_FOLDER_TYPE_CALENDAR", "calendar" },
-      { TNY_FOLDER_TYPE_ARCHIVE, "TNY_FOLDER_TYPE_ARCHIVE", "archive" },
-      { TNY_FOLDER_TYPE_MERGE, "TNY_FOLDER_TYPE_MERGE", "merge" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyFolderType", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_folder_type_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
 
-
+static gpointer
+tny_folder_caps_register_type (gpointer notused)
+{
+	GType etype = 0;
+	static const GFlagsValue values[] = {
+		{ TNY_FOLDER_CAPS_WRITABLE, "TNY_FOLDER_CAPS_WRITABLE", "writable" },
+		{ TNY_FOLDER_CAPS_PUSHEMAIL, "TNY_FOLDER_CAPS_PUSHEMAIL", "pushemail" },
+		{ 0, NULL, NULL }
+	};
+	etype = g_flags_register_static ("TnyFolderCaps", values);
+	return GUINT_TO_POINTER (etype);
+}
 
 /**
  * tny_folder_caps_get_type:
@@ -1656,18 +1678,24 @@ tny_folder_type_get_type (void)
 GType
 tny_folder_caps_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GFlagsValue values[] = {
-      { TNY_FOLDER_CAPS_WRITABLE, "TNY_FOLDER_CAPS_WRITABLE", "writable" },
-      { TNY_FOLDER_CAPS_PUSHEMAIL, "TNY_FOLDER_CAPS_PUSHEMAIL", "pushemail" },
-      { 0, NULL, NULL }
-    };
-    etype = g_flags_register_static ("TnyFolderCaps", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_folder_caps_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
 
+static gpointer
+tny_folder_signal_register_type (gpointer notused)
+{
+	GType etype = 0;
+	static const GEnumValue values[] = {
+		{ TNY_FOLDER_FOLDER_INSERTED, "TNY_FOLDER_FOLDER_INSERTED", "inserted" },
+		{ TNY_FOLDER_FOLDERS_RELOADED, "TNY_FOLDER_FOLDERS_RELOADED", "reloaded" },
+		{ TNY_FOLDER_LAST_SIGNAL, "TNY_FOLDER_LAST_SIGNAL", "last-signal" },
+		{ 0, NULL, NULL }
+	};
+	etype = g_enum_register_static ("TnyFolderSignal", values);
+	return GUINT_TO_POINTER (etype);
+}
 
 /**
  * tny_folder_signal_get_type:
@@ -1679,15 +1707,7 @@ tny_folder_caps_get_type (void)
 GType
 tny_folder_signal_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_FOLDER_FOLDER_INSERTED, "TNY_FOLDER_FOLDER_INSERTED", "inserted" },
-      { TNY_FOLDER_FOLDERS_RELOADED, "TNY_FOLDER_FOLDERS_RELOADED", "reloaded" },
-      { TNY_FOLDER_LAST_SIGNAL, "TNY_FOLDER_LAST_SIGNAL", "last-signal" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyFolderSignal", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_folder_signal_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

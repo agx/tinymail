@@ -217,14 +217,12 @@ tny_moz_embed_html_mime_part_view_class_init (TnyMozEmbedHtmlMimePartViewClass *
 	return;
 }
 
-GType 
-tny_moz_embed_html_mime_part_view_get_type (void)
+static gpointer
+tny_moz_embed_html_mime_part_view_register_type (gpointer notused)
 {
-	static GType type = 0;
+	GType type = 0;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	static const GTypeInfo info = 
 		{
 		  sizeof (TnyMozEmbedHtmlMimePartViewClass),
 		  NULL,   /* base_init */
@@ -238,21 +236,27 @@ tny_moz_embed_html_mime_part_view_get_type (void)
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_mime_part_view_info = 
+	static const GInterfaceInfo tny_mime_part_view_info = 
 		{
 		  (GInterfaceInitFunc) tny_mime_part_view_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (GTK_TYPE_MOZ_EMBED,
-			"TnyMozEmbedHtmlMimePartView",
-			&info, 0);
+	type = g_type_register_static (GTK_TYPE_MOZ_EMBED,
+				       "TnyMozEmbedHtmlMimePartView",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_MIME_PART_VIEW, 
+				     &tny_mime_part_view_info);
 
-		g_type_add_interface_static (type, TNY_TYPE_MIME_PART_VIEW, 
-			&tny_mime_part_view_info);
-	}
-
-	return type;
+	return GUINT_TO_POINTER (type);
 }
 
+GType 
+tny_moz_embed_html_mime_part_view_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_moz_embed_html_mime_part_view_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}

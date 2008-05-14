@@ -222,37 +222,56 @@ tny_device_base_init (gpointer g_class)
 	}
 }
 
+static gpointer
+tny_device_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyDeviceIface),
+			tny_device_base_init,   /* base_init */
+			NULL,   /* base_finalize */
+			NULL,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			0,
+			0,      /* n_preallocs */
+			NULL,   /* instance_init */
+			NULL
+		};
+	
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnyDevice", &info, 0);
+	
+	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+
+	return GUINT_TO_POINTER (type);
+}
+
 GType
 tny_device_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyDeviceIface),
-		  tny_device_base_init,   /* base_init */
-		  NULL,   /* base_finalize */
-		  NULL,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  0,
-		  0,      /* n_preallocs */
-		  NULL,   /* instance_init */
-		  NULL
-		};
+	g_once (&once, tny_device_register_type, NULL);
 
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyDevice", &info, 0);
-
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
-	}
-
-	return type;
+	return GPOINTER_TO_UINT (once.retval);
 }
 
 
+static gpointer
+tny_device_signal_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GEnumValue values[] = {
+    { TNY_DEVICE_CONNECTION_CHANGED, "TNY_DEVICE_CONNECTION_CHANGED", "connection-changed" },
+    { TNY_DEVICE_LAST_SIGNAL, "TNY_DEVICE_LAST_SIGNAL", "last-signal" },
+    { 0, NULL, NULL }
+  };
+  etype = g_enum_register_static ("TnyDeviceSignal", values);
+  return GUINT_TO_POINTER (etype);
+}
 
 /**
  * tny_device_signal_get_type:
@@ -264,14 +283,7 @@ tny_device_get_type (void)
 GType
 tny_device_signal_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_DEVICE_CONNECTION_CHANGED, "TNY_DEVICE_CONNECTION_CHANGED", "connection-changed" },
-      { TNY_DEVICE_LAST_SIGNAL, "TNY_DEVICE_LAST_SIGNAL", "last-signal" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyDeviceSignal", values);
-  }
-  return etype;
+  static GOnce once = G_ONCE_INIT;
+  g_once (&once, tny_device_signal_register_type, NULL);
+  return GPOINTER_TO_UINT (once.retval);
 }

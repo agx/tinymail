@@ -373,6 +373,41 @@ tny_camel_transport_account_class_init (TnyCamelTransportAccountClass *class)
 	return;
 }
 
+static gpointer
+tny_camel_transport_account_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyCamelTransportAccountClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_camel_transport_account_class_init,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnyCamelTransportAccount),
+			0,      /* n_preallocs */
+			tny_camel_transport_account_instance_init    /* instance_init */
+		};
+	
+	static const GInterfaceInfo tny_transport_account_info = 
+		{
+			(GInterfaceInitFunc) tny_transport_account_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+	
+	type = g_type_register_static (TNY_TYPE_CAMEL_ACCOUNT,
+				       "TnyCamelTransportAccount",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_TRANSPORT_ACCOUNT, 
+				     &tny_transport_account_info);
+
+	return GUINT_TO_POINTER (type);
+}
+
 /**
  * tny_camel_transport_account_get_type:
  *
@@ -383,7 +418,7 @@ tny_camel_transport_account_class_init (TnyCamelTransportAccountClass *class)
 GType 
 tny_camel_transport_account_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
 
 	if (G_UNLIKELY (!_camel_type_init_done))
 	{
@@ -394,36 +429,6 @@ tny_camel_transport_account_get_type (void)
 		_camel_type_init_done = TRUE;
 	}
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyCamelTransportAccountClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_camel_transport_account_class_init,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnyCamelTransportAccount),
-		  0,      /* n_preallocs */
-		  tny_camel_transport_account_instance_init    /* instance_init */
-		};
-
-		static const GInterfaceInfo tny_transport_account_info = 
-		{
-		  (GInterfaceInitFunc) tny_transport_account_init, /* interface_init */
-		  NULL,         /* interface_finalize */
-		  NULL          /* interface_data */
-		};
-
-		type = g_type_register_static (TNY_TYPE_CAMEL_ACCOUNT,
-			"TnyCamelTransportAccount",
-			&info, 0);
-
-		g_type_add_interface_static (type, TNY_TYPE_TRANSPORT_ACCOUNT, 
-			&tny_transport_account_info);
-	}
-
-	return type;
+	g_once (&once, tny_camel_transport_account_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
-

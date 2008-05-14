@@ -1334,21 +1334,12 @@ tny_gtk_header_list_model_new (void)
 	return GTK_TREE_MODEL (model);
 }
 
-/**
- * tny_gtk_header_list_model_get_type:
- *
- * GType system helper function
- *
- * returns: a #GType
- **/
-GType
-tny_gtk_header_list_model_get_type (void)
+static gpointer
+tny_gtk_header_list_model_register_type (gpointer notused)
 {
-	static GType object_type = 0;
+	GType object_type = 0;
 
-	if (G_UNLIKELY(object_type == 0))
-	{
-		static const GTypeInfo object_info = 
+	static const GTypeInfo object_info = 
 		{
 			sizeof (TnyGtkHeaderListModelClass),
 			NULL,		/* base_init */
@@ -1362,46 +1353,51 @@ tny_gtk_header_list_model_get_type (void)
 			NULL
 		};
 
-		static const GInterfaceInfo tree_model_info = {
-			(GInterfaceInitFunc) tny_gtk_header_list_model_tree_model_init,
-			NULL,
-			NULL
-		};
+	static const GInterfaceInfo tree_model_info = {
+		(GInterfaceInitFunc) tny_gtk_header_list_model_tree_model_init,
+		NULL,
+		NULL
+	};
 		
 
-		static const GInterfaceInfo tny_list_info = {
-			(GInterfaceInitFunc) tny_list_init,
-			NULL,
-			NULL
-		};
+	static const GInterfaceInfo tny_list_info = {
+		(GInterfaceInitFunc) tny_list_init,
+		NULL,
+		NULL
+	};
 
-		object_type = g_type_register_static (G_TYPE_OBJECT, 
-						"TnyGtkHeaderListModel", &object_info, 0);
+	object_type = g_type_register_static (G_TYPE_OBJECT, 
+					      "TnyGtkHeaderListModel", &object_info, 0);
 
-		g_type_add_interface_static (object_type, GTK_TYPE_TREE_MODEL,
-						&tree_model_info);
+	g_type_add_interface_static (object_type, GTK_TYPE_TREE_MODEL,
+				     &tree_model_info);
 
-		g_type_add_interface_static (object_type, TNY_TYPE_LIST,
-						&tny_list_info);
+	g_type_add_interface_static (object_type, TNY_TYPE_LIST,
+				     &tny_list_info);
 
-	}
-
-	return object_type;
+	return GUINT_TO_POINTER (object_type);
 }
 
 /**
- * tny_gtk_header_list_model_column_get_type:
+ * tny_gtk_header_list_model_get_type:
  *
  * GType system helper function
  *
  * returns: a #GType
  **/
 GType
-tny_gtk_header_list_model_column_get_type (void)
+tny_gtk_header_list_model_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gtk_header_list_model_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}
+
+static gpointer
+tny_gtk_header_list_model_column_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GEnumValue values[] = {
 
       { TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN", "from" },
       { TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN", "to" },
@@ -1416,9 +1412,22 @@ tny_gtk_header_list_model_column_get_type (void)
       { TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN, "TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN", "flags" },
       { TNY_GTK_HEADER_LIST_MODEL_N_COLUMNS, "TNY_GTK_HEADER_LIST_MODEL_N_COLUMNS", "n" },
       { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyGtkHeaderListModelColumn", values);
-  }
-  return etype;
+  };
+  etype = g_enum_register_static ("TnyGtkHeaderListModelColumn", values);
+  return GUINT_TO_POINTER (etype);
 }
 
+/**
+ * tny_gtk_header_list_model_column_get_type:
+ *
+ * GType system helper function
+ *
+ * returns: a #GType
+ **/
+GType
+tny_gtk_header_list_model_column_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gtk_header_list_model_column_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}

@@ -497,6 +497,32 @@ tny_camel_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	return;
 }
 
+static gpointer
+tny_camel_queue_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyCamelQueueClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_camel_queue_class_init, /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnyCamelQueue),
+			0,      /* n_preallocs */
+			tny_camel_queue_instance_init,    /* instance_init */
+			NULL
+		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyCamelQueue",
+				       &info, 0);
+
+	return GUINT_TO_POINTER (type);
+}
+
 /**
  * tny_camel_queue_get_type:
  *
@@ -507,29 +533,7 @@ tny_camel_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 GType 
 tny_camel_queue_get_type (void)
 {
-	static GType type = 0;
-
-	if (G_UNLIKELY(type == 0))
-	{
-	    static const GTypeInfo info = 
-		  {
-		  sizeof (TnyCamelQueueClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_camel_queue_class_init, /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnyCamelQueue),
-		  0,      /* n_preallocs */
-		  tny_camel_queue_instance_init,    /* instance_init */
-		  NULL
-		};
-
-		type = g_type_register_static (G_TYPE_OBJECT,
-					       "TnyCamelQueue",
-					       &info, 0);
-	}
-
-	return type;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_camel_queue_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
-

@@ -148,14 +148,12 @@ tny_moz_embed_msg_view_class_init (TnyMozEmbedMsgViewClass *class)
 	return;
 }
 
-GType 
-tny_moz_embed_msg_view_get_type (void)
+static gpointer
+tny_moz_embed_msg_view_register_type (gpointer notused)
 {
-	static GType type = 0;
+	GType type = 0;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	static const GTypeInfo info = 
 		{
 		  sizeof (TnyMozEmbedMsgViewClass),
 		  NULL,   /* base_init */
@@ -168,10 +166,17 @@ tny_moz_embed_msg_view_get_type (void)
 		  tny_moz_embed_msg_view_instance_init    /* instance_init */
 		};
 
-		type = g_type_register_static (TNY_TYPE_GTK_MSG_VIEW,
-			"TnyMozEmbedMsgView",
-			&info, 0);
-	}
+	type = g_type_register_static (TNY_TYPE_GTK_MSG_VIEW,
+				       "TnyMozEmbedMsgView",
+				       &info, 0);
 
-	return type;
+	return GUINT_TO_POINTER (type);
+}
+
+GType 
+tny_moz_embed_msg_view_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_moz_embed_msg_view_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

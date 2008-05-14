@@ -188,6 +188,34 @@ tny_store_account_base_init (gpointer g_class)
 	}
 }
 
+static gpointer
+tny_store_account_register_type (gpointer notused)
+{
+	GType type = 0;
+	
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyStoreAccountIface),
+			tny_store_account_base_init,   /* base_init */
+			NULL,   /* base_finalize */
+			NULL,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			0,
+			0,      /* n_preallocs */
+			NULL,    /* instance_init */
+			NULL
+		};
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnyStoreAccount", &info, 0);
+	
+	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+	g_type_interface_add_prerequisite (type, TNY_TYPE_FOLDER_STORE);
+	g_type_interface_add_prerequisite (type, TNY_TYPE_ACCOUNT);
+
+	return GUINT_TO_POINTER (type);
+}
+
 /**
  * tny_store_account_get_type:
  *
@@ -198,35 +226,23 @@ tny_store_account_base_init (gpointer g_class)
 GType
 tny_store_account_get_type (void)
 {
-	static GType type = 0;
-	
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyStoreAccountIface),
-		  tny_store_account_base_init,   /* base_init */
-		  NULL,   /* base_finalize */
-		  NULL,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  0,
-		  0,      /* n_preallocs */
-		  NULL,    /* instance_init */
-		  NULL
-		};
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyStoreAccount", &info, 0);
-
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
-		g_type_interface_add_prerequisite (type, TNY_TYPE_FOLDER_STORE);
-		g_type_interface_add_prerequisite (type, TNY_TYPE_ACCOUNT);
-
-	}
-
-	return type;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_store_account_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
 
+static gpointer
+tny_store_account_signal_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GEnumValue values[] = {
+    { TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED, "TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED", "subscription_changed" },
+    { TNY_STORE_ACCOUNT_LAST_SIGNAL, "TNY_STORE_ACCOUNT_LAST_SIGNAL", "last-signal" },
+    { 0, NULL, NULL }
+  };
+  etype = g_enum_register_static ("TnyStoreAccountSignal", values);
+  return GUINT_TO_POINTER (etype);
+}
 
 /**
  * tny_status_code_get_type:
@@ -238,14 +254,7 @@ tny_store_account_get_type (void)
 GType
 tny_store_account_signal_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED, "TNY_STORE_ACCOUNT_SUBSCRIPTION_CHANGED", "subscription_changed" },
-      { TNY_STORE_ACCOUNT_LAST_SIGNAL, "TNY_STORE_ACCOUNT_LAST_SIGNAL", "last-signal" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyStoreAccountSignal", values);
-  }
-  return etype;
+  static GOnce once = G_ONCE_INIT;
+  g_once (&once, tny_store_account_signal_register_type, NULL);
+  return GPOINTER_TO_UINT (once.retval);
 }

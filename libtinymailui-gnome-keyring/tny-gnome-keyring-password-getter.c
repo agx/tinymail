@@ -171,13 +171,11 @@ TnyPasswordGetter* tny_gnome_keyring_password_getter_new (void)
 	return TNY_PASSWORD_GETTER (self);
 }
 
-GType
-tny_gnome_keyring_password_getter_get_type (void)
+static gpointer
+tny_gnome_keyring_password_getter_register_type (gpointer notused)
 {
-	static GType type = 0;
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	GType type = 0;
+	static const GTypeInfo info = 
 		{
 			sizeof (TnyGnomeKeyringPasswordGetterClass),
 			NULL,   /* base_init */
@@ -192,20 +190,27 @@ tny_gnome_keyring_password_getter_get_type (void)
 		};
 
 
-		static const GInterfaceInfo tny_password_getter_info = 
+	static const GInterfaceInfo tny_password_getter_info = 
 		{
 			(GInterfaceInitFunc) tny_password_getter_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyGnomeKeyringPasswordGetter",
-			&info, 0);
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyGnomeKeyringPasswordGetter",
+				       &info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_PASSWORD_GETTER,
-			&tny_password_getter_info);
+	g_type_add_interface_static (type, TNY_TYPE_PASSWORD_GETTER,
+				     &tny_password_getter_info);
 
-	}
-	return type;
+	return GUINT_TO_POINTER (type);
+}
+
+GType
+tny_gnome_keyring_password_getter_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gnome_keyring_password_getter_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

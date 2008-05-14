@@ -383,6 +383,30 @@ tny_account_store_base_init (gpointer g_class)
 	return;
 }
 
+gpointer
+tny_account_store_register_type (gpointer notused)
+{	
+	GType type = 0;
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyAccountStoreIface),
+			tny_account_store_base_init,   /* base_init */
+			NULL,   /*    base_finalize */
+			NULL,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			0,
+			0,      /* n_preallocs */
+			NULL,    /* instance_init */
+			NULL
+		};
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnyAccountStore", &info, 0);
+
+	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+
+	return GUINT_TO_POINTER (type);
+}
 
 /**
  * tny_account_store_get_type:
@@ -395,29 +419,27 @@ tny_account_store_base_init (gpointer g_class)
 GType
 tny_account_store_get_type (void)
 {
-	static GType type = 0;
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyAccountStoreIface),
-		  tny_account_store_base_init,   /* base_init */
-		  NULL,   /*    base_finalize */
-		  NULL,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  0,
-		  0,      /* n_preallocs */
-		  NULL,    /* instance_init */
-		  NULL
-		};
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyAccountStore", &info, 0);
+	static GOnce once = G_ONCE_INIT;
 
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+	g_once (&once, tny_account_store_register_type, NULL);
 
-	}
-	return type;
+	return GPOINTER_TO_UINT (once.retval);
+}
+
+static gpointer
+tny_alert_type_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GEnumValue values[] = {
+	  { TNY_ALERT_TYPE_INFO, "TNY_ALERT_TYPE_INFO", "info" },
+	  { TNY_ALERT_TYPE_WARNING, "TNY_ALERT_TYPE_WARNING", "warning" },
+	  { TNY_ALERT_TYPE_ERROR, "TNY_ALERT_TYPE_ERROR", "error" },
+	  { 0, NULL, NULL }
+  };
+
+  etype = g_enum_register_static ("TnyAlertType", values);
+
+  return GUINT_TO_POINTER (etype);
 }
 
 /**
@@ -431,17 +453,26 @@ tny_account_store_get_type (void)
 GType
 tny_alert_type_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_ALERT_TYPE_INFO, "TNY_ALERT_TYPE_INFO", "info" },
-      { TNY_ALERT_TYPE_WARNING, "TNY_ALERT_TYPE_WARNING", "warning" },
-      { TNY_ALERT_TYPE_ERROR, "TNY_ALERT_TYPE_ERROR", "error" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyAlertType", values);
-  }
-  return etype;
+  static GOnce once = G_ONCE_INIT;
+  
+  g_once (&once, tny_alert_type_register_type, NULL);
+
+  return GPOINTER_TO_UINT (once.retval);;
+}
+
+static gpointer
+tny_get_accounts_request_type_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GEnumValue values[] = {
+    { TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS, "TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS", "transport" },
+    { TNY_ACCOUNT_STORE_STORE_ACCOUNTS, "TNY_ACCOUNT_STORE_STORE_ACCOUNTS", "store" },
+    { TNY_ACCOUNT_STORE_BOTH, "TNY_ACCOUNT_STORE_BOTH", "both" },
+    { 0, NULL, NULL }
+  };
+
+  etype = g_enum_register_static ("TnyGetAccountsRequestType", values);
+  return GUINT_TO_POINTER (etype);
 }
 
 /**
@@ -455,20 +486,23 @@ tny_alert_type_get_type (void)
 GType
 tny_get_accounts_request_type_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS, "TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS", "transport" },
-      { TNY_ACCOUNT_STORE_STORE_ACCOUNTS, "TNY_ACCOUNT_STORE_STORE_ACCOUNTS", "store" },
-      { TNY_ACCOUNT_STORE_BOTH, "TNY_ACCOUNT_STORE_BOTH", "both" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyGetAccountsRequestType", values);
-  }
-  return etype;
+  static GOnce once = G_ONCE_INIT;
+  g_once (&once, tny_get_accounts_request_type_register_type, NULL);
+  return GPOINTER_TO_UINT (once.retval);
 }
 
-
+static gpointer
+tny_account_store_signal_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GEnumValue values[] = {
+    { TNY_ACCOUNT_STORE_CONNECTING_STARTED, "TNY_ACCOUNT_STORE_CONNECTING_STARTED", "started" },
+    { TNY_ACCOUNT_STORE_LAST_SIGNAL,  "TNY_ACCOUNT_STORE_LAST_SIGNAL", "last-signal" },
+    { 0, NULL, NULL }
+  };
+  etype = g_enum_register_static ("TnyAccountStoreSignal", values);
+  return GUINT_TO_POINTER (etype);
+}
 
 /**
  * tny_account_store_signal_get_type:
@@ -481,14 +515,9 @@ tny_get_accounts_request_type_get_type (void)
 GType
 tny_account_store_signal_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_ACCOUNT_STORE_CONNECTING_STARTED, "TNY_ACCOUNT_STORE_CONNECTING_STARTED", "started" },
-      { TNY_ACCOUNT_STORE_LAST_SIGNAL,  "TNY_ACCOUNT_STORE_LAST_SIGNAL", "last-signal" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyAccountStoreSignal", values);
-  }
-  return etype;
+  static GOnce once = G_ONCE_INIT;
+
+  g_once (&once, tny_account_store_signal_register_type, NULL);
+
+  return GPOINTER_TO_UINT (once.retval);
 }

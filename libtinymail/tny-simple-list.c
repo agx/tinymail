@@ -218,14 +218,12 @@ tny_simple_list_new (void)
 	return TNY_LIST (self);
 }
 
-GType
-tny_simple_list_get_type (void)
+static gpointer
+tny_simple_list_register_type (gpointer notused)
 {
-	static GType object_type = 0;
+	GType object_type = 0;
 
-	if (G_UNLIKELY(object_type == 0))
-	{
-		static const GTypeInfo object_info = 
+	static const GTypeInfo object_info = 
 		{
 			sizeof (TnySimpleListClass),
 			NULL,		/* base_init */
@@ -238,20 +236,26 @@ tny_simple_list_get_type (void)
 			(GInstanceInitFunc) tny_simple_list_init,
 			NULL
 		};
+	
+	static const GInterfaceInfo tny_list_info = {
+		(GInterfaceInitFunc) tny_list_init,
+		NULL,
+		NULL
+	};
+	
+	object_type = g_type_register_static (G_TYPE_OBJECT, 
+					      "TnySimpleList", &object_info, 0);
+	
+	g_type_add_interface_static (object_type, TNY_TYPE_LIST,
+				     &tny_list_info);
 
-		static const GInterfaceInfo tny_list_info = {
-			(GInterfaceInitFunc) tny_list_init,
-			NULL,
-			NULL
-		};
+	return GUINT_TO_POINTER (object_type);
+}
 
-		object_type = g_type_register_static (G_TYPE_OBJECT, 
-				"TnySimpleList", &object_info, 0);
-
-		g_type_add_interface_static (object_type, TNY_TYPE_LIST,
-					&tny_list_info);
-
-	}
-
-	return object_type;
+GType
+tny_simple_list_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_simple_list_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

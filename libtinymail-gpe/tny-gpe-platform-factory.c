@@ -158,41 +158,45 @@ tny_gpe_platform_factory_class_init (TnyGpePlatformFactoryClass *class)
 	return;
 }
 
+static gpointer 
+tny_gpe_platform_factory_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyGpePlatformFactoryClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_gpe_platform_factory_class_init,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnyGpePlatformFactory),
+			0,      /* n_preallocs */
+			tny_gpe_platform_factory_instance_init    /* instance_init */
+		};
+	
+	static const GInterfaceInfo tny_platform_factory_info = 
+		{
+			(GInterfaceInitFunc) tny_platform_factory_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyGpePlatformFactory",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_PLATFORM_FACTORY, 
+				     &tny_platform_factory_info);
+	
+	return GUINT_TO_POINTER (type);
+}
+
 GType 
 tny_gpe_platform_factory_get_type (void)
 {
-	static GType type = 0;
-
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyGpePlatformFactoryClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_gpe_platform_factory_class_init,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnyGpePlatformFactory),
-		  0,      /* n_preallocs */
-		  tny_gpe_platform_factory_instance_init    /* instance_init */
-		};
-
-		static const GInterfaceInfo tny_platform_factory_info = 
-		{
-		  (GInterfaceInitFunc) tny_platform_factory_init, /* interface_init */
-		  NULL,         /* interface_finalize */
-		  NULL          /* interface_data */
-		};
-
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyGpePlatformFactory",
-			&info, 0);
-
-		g_type_add_interface_static (type, TNY_TYPE_PLATFORM_FACTORY, 
-			&tny_platform_factory_info);
-
-	}
-
-	return type;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gpe_platform_factory_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

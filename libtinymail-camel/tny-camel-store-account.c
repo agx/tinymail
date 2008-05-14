@@ -2108,6 +2108,52 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 	return;
 }
 
+static gpointer
+tny_camel_store_account_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyCamelStoreAccountClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_camel_store_account_class_init,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnyCamelStoreAccount),
+			0,      /* n_preallocs */
+			tny_camel_store_account_instance_init    /* instance_init */
+		};
+	
+	static const GInterfaceInfo tny_store_account_info = 
+		{
+			(GInterfaceInitFunc) tny_store_account_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+	
+	static const GInterfaceInfo tny_folder_store_info = 
+		{
+			(GInterfaceInitFunc) tny_folder_store_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+	
+	type = g_type_register_static (TNY_TYPE_CAMEL_ACCOUNT,
+				       "TnyCamelStoreAccount",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE, 
+				     &tny_folder_store_info);  
+	
+	g_type_add_interface_static (type, TNY_TYPE_STORE_ACCOUNT, 
+				     &tny_store_account_info);
+	
+
+	return GUINT_TO_POINTER (type);
+}
+
 /**
  * tny_camel_store_account_get_type:
  *
@@ -2118,7 +2164,7 @@ tny_camel_store_account_class_init (TnyCamelStoreAccountClass *class)
 GType 
 tny_camel_store_account_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
 
 	if (G_UNLIKELY (!_camel_type_init_done))
 	{
@@ -2129,47 +2175,6 @@ tny_camel_store_account_get_type (void)
 		_camel_type_init_done = TRUE;
 	}
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyCamelStoreAccountClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_camel_store_account_class_init,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnyCamelStoreAccount),
-		  0,      /* n_preallocs */
-		  tny_camel_store_account_instance_init    /* instance_init */
-		};
-
-		static const GInterfaceInfo tny_store_account_info = 
-		{
-		  (GInterfaceInitFunc) tny_store_account_init, /* interface_init */
-		  NULL,         /* interface_finalize */
-		  NULL          /* interface_data */
-		};
-
-		static const GInterfaceInfo tny_folder_store_info = 
-		{
-		  (GInterfaceInitFunc) tny_folder_store_init, /* interface_init */
-		  NULL,         /* interface_finalize */
-		  NULL          /* interface_data */
-		};
-
-		type = g_type_register_static (TNY_TYPE_CAMEL_ACCOUNT,
-			"TnyCamelStoreAccount",
-			&info, 0);
-
-		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE, 
-			&tny_folder_store_info);  
-
-		g_type_add_interface_static (type, TNY_TYPE_STORE_ACCOUNT, 
-			&tny_store_account_info);
-
-	}
-
-	return type;
+	g_once (&once, tny_camel_store_account_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
-

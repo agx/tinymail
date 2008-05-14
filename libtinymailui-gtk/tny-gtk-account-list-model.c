@@ -280,21 +280,12 @@ tny_list_init (TnyListIface *klass)
 	return;
 }
 
-/**
- * tny_gtk_account_list_model_get_type:
- *
- * GType system helper function
- *
- * returns: a #GType
- **/
-GType
-tny_gtk_account_list_model_get_type (void)
+static gpointer
+tny_gtk_account_list_model_register_type (gpointer notused)
 {
-	static GType type = 0;
+	GType type = 0;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	static const GTypeInfo info = 
 		{
 		  sizeof (TnyGtkAccountListModelClass),
 		  NULL,   /* base_init */
@@ -308,22 +299,48 @@ tny_gtk_account_list_model_get_type (void)
 		  NULL
 		};
 
-		static const GInterfaceInfo tny_list_info = {
-			(GInterfaceInitFunc) tny_list_init,
-			NULL,
-			NULL
-		};
+	static const GInterfaceInfo tny_list_info = {
+		(GInterfaceInitFunc) tny_list_init,
+		NULL,
+		NULL
+	};
 
-		type = g_type_register_static (GTK_TYPE_LIST_STORE, "TnyGtkAccountListModel",
-					    &info, 0);
+	type = g_type_register_static (GTK_TYPE_LIST_STORE, "TnyGtkAccountListModel",
+				       &info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_LIST,
-					     &tny_list_info);
+	g_type_add_interface_static (type, TNY_TYPE_LIST,
+				     &tny_list_info);
 
+	return GUINT_TO_POINTER (type);
+}
 
-	}
+/**
+ * tny_gtk_account_list_model_get_type:
+ *
+ * GType system helper function
+ *
+ * returns: a #GType
+ **/
+GType
+tny_gtk_account_list_model_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gtk_account_list_model_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}
 
-	return type;
+static gpointer
+tny_gtk_account_list_model_column_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GEnumValue values[] = {
+      { TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN, "TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN", "name" },
+      { TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN, "TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN", "instance" },
+      { TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS, "TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS", "n" },
+      { 0, NULL, NULL }
+  };
+  etype = g_enum_register_static ("TnyGtkAccountListModelColumn", values);
+  return GUINT_TO_POINTER (etype);
 }
 
 /**
@@ -336,16 +353,7 @@ tny_gtk_account_list_model_get_type (void)
 GType 
 tny_gtk_account_list_model_column_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN, "TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN", "name" },
-      { TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN, "TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN", "instance" },
-      { TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS, "TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS", "n" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyGtkAccountListModelColumn", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gtk_account_list_model_column_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
-

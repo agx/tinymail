@@ -1162,21 +1162,12 @@ tny_list_init (TnyListIface *klass)
 	return;
 }
 
-/**
- * tny_gtk_folder_store_tree_model_get_type:
- *
- * GType system helper function
- *
- * returns: a #GType
- **/
-GType
-tny_gtk_folder_store_tree_model_get_type (void)
+static gpointer
+tny_gtk_folder_store_tree_model_register_type (gpointer notused)
 {
-	static GType type = 0;
+	GType type = 0;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	static const GTypeInfo info = 
 		{
 		  sizeof (TnyGtkFolderStoreTreeModelClass),
 		  NULL,   /* base_init */
@@ -1189,39 +1180,68 @@ tny_gtk_folder_store_tree_model_get_type (void)
 		  tny_gtk_folder_store_tree_model_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_list_info = {
-			(GInterfaceInitFunc) tny_list_init,
-			NULL,
-			NULL
-		};
+	static const GInterfaceInfo tny_list_info = {
+		(GInterfaceInitFunc) tny_list_init,
+		NULL,
+		NULL
+	};
 
-		static const GInterfaceInfo tny_folder_store_observer_info = {
-			(GInterfaceInitFunc) tny_folder_store_observer_init,
-			NULL,
-			NULL
-		};
+	static const GInterfaceInfo tny_folder_store_observer_info = {
+		(GInterfaceInitFunc) tny_folder_store_observer_init,
+		NULL,
+		NULL
+	};
 
-		static const GInterfaceInfo tny_folder_observer_info = {
-			(GInterfaceInitFunc) tny_folder_observer_init,
-			NULL,
-			NULL
-		};
+	static const GInterfaceInfo tny_folder_observer_info = {
+		(GInterfaceInitFunc) tny_folder_observer_init,
+		NULL,
+		NULL
+	};
 
-		type = g_type_register_static (GTK_TYPE_TREE_STORE, "TnyGtkFolderStoreTreeModel",
-					    &info, 0);
+	type = g_type_register_static (GTK_TYPE_TREE_STORE, "TnyGtkFolderStoreTreeModel",
+				       &info, 0);
 
-		g_type_add_interface_static (type, TNY_TYPE_LIST,
-					     &tny_list_info);
-		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE_OBSERVER,
-					     &tny_folder_store_observer_info);
-		g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
-					     &tny_folder_observer_info);
+	g_type_add_interface_static (type, TNY_TYPE_LIST,
+				     &tny_list_info);
+	g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE_OBSERVER,
+				     &tny_folder_store_observer_info);
+	g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
+				     &tny_folder_observer_info);
 
-	}
-
-	return type;
+	return GUINT_TO_POINTER (type);
 }
 
+/**
+ * tny_gtk_folder_store_tree_model_get_type:
+ *
+ * GType system helper function
+ *
+ * returns: a #GType
+ **/
+GType
+tny_gtk_folder_store_tree_model_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gtk_folder_store_tree_model_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}
+
+static gpointer
+tny_gtk_folder_store_tree_model_column_register_type (gpointer notused)
+{
+  static GType etype = 0;
+  static const GEnumValue values[] = {
+      { TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN", "name" },
+      { TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN", "unread" },
+      { TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN", "all" },
+      { TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN", "type" },
+      { TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN", "instance" },
+      { TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS, "TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS", "n" },
+      { 0, NULL, NULL }
+  };
+  etype = g_enum_register_static ("TnyGtkFolderStoreTreeModelColumn", values);
+  return GUINT_TO_POINTER (etype);
+}
 
 /**
  * tny_gtk_folder_store_tree_model_column_get_type:
@@ -1233,19 +1253,7 @@ tny_gtk_folder_store_tree_model_get_type (void)
 GType
 tny_gtk_folder_store_tree_model_column_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN", "name" },
-      { TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN", "unread" },
-      { TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN", "all" },
-      { TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN", "type" },
-      { TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, "TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN", "instance" },
-      { TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS, "TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS", "n" },
-      { 0, NULL, NULL }
-     };
-    etype = g_enum_register_static ("TnyGtkFolderStoreTreeModelColumn", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_gtk_folder_store_tree_model_column_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
-

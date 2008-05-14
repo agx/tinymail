@@ -90,14 +90,12 @@ tny_tp_mail_notifier_new (TnyFolder *folder)
 	return self;
 }
 
-GType
-tny_tp_mail_notifier_get_type (void)
+static gpointer
+tny_tp_mail_notifier_register_type (gpointer notused)
 {
-	static GType object_type = 0;
+	GType object_type = 0;
 
-	if (G_UNLIKELY(object_type == 0))
-	{
-		static const GTypeInfo object_info = 
+	static const GTypeInfo object_info = 
 		{
 			sizeof (TnyTpMailNotifierClass),
 			NULL,		/* base_init */
@@ -111,9 +109,16 @@ tny_tp_mail_notifier_get_type (void)
 			NULL
 		};
 
-		object_type = g_type_register_static (G_TYPE_OBJECT, 
-				"TnyTpMailNotifier", &object_info, 0);
-	}
+	object_type = g_type_register_static (G_TYPE_OBJECT, 
+					      "TnyTpMailNotifier", &object_info, 0);
 
-	return object_type;
+	return GUINT_TO_POINTER (object_type);
+}
+
+GType
+tny_tp_mail_notifier_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_tp_mail_notifier_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

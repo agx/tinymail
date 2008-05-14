@@ -552,14 +552,11 @@ tny_combined_account_class_init (TnyCombinedAccountClass *klass)
 	object_class->finalize = tny_combined_account_finalize;
 }
 
-
-GType
-tny_combined_account_get_type (void)
+static gpointer
+tny_combined_account_register_type (gpointer notused)
 {
-	static GType type = 0;
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	GType type = 0;
+	static const GTypeInfo info = 
 		{
 			sizeof (TnyCombinedAccountClass),
 			NULL,   /* base_init */
@@ -572,53 +569,61 @@ tny_combined_account_get_type (void)
 			tny_combined_account_instance_init,    /* instance_init */
 			NULL
 		};
-
-
-		static const GInterfaceInfo tny_store_account_info = 
+	
+	
+	static const GInterfaceInfo tny_store_account_info = 
 		{
 			(GInterfaceInitFunc) tny_store_account_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
-
-		static const GInterfaceInfo tny_transport_account_info = 
+	
+	static const GInterfaceInfo tny_transport_account_info = 
 		{
 			(GInterfaceInitFunc) tny_transport_account_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
-
-		static const GInterfaceInfo tny_account_info = 
+	
+	static const GInterfaceInfo tny_account_info = 
 		{
 			(GInterfaceInitFunc) tny_account_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
-
-		static const GInterfaceInfo tny_folder_store_info = 
+	
+	static const GInterfaceInfo tny_folder_store_info = 
 		{
 			(GInterfaceInitFunc) tny_folder_store_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyCombinedAccount",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_ACCOUNT,
+				     &tny_account_info);
+	
+	g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE,
+				     &tny_folder_store_info);
+	
+	g_type_add_interface_static (type, TNY_TYPE_STORE_ACCOUNT,
+				     &tny_store_account_info);
+	
+	g_type_add_interface_static (type, TNY_TYPE_TRANSPORT_ACCOUNT,
+				     &tny_transport_account_info);
+	
+	return GUINT_TO_POINTER (type);
+}
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyCombinedAccount",
-			&info, 0);
+GType
+tny_combined_account_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
 
-		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT,
-			&tny_account_info);
+	g_once (&once, tny_combined_account_register_type, NULL);
 
-		g_type_add_interface_static (type, TNY_TYPE_FOLDER_STORE,
-			&tny_folder_store_info);
-
-		g_type_add_interface_static (type, TNY_TYPE_STORE_ACCOUNT,
-			&tny_store_account_info);
-
-		g_type_add_interface_static (type, TNY_TYPE_TRANSPORT_ACCOUNT,
-			&tny_transport_account_info);
-
-
-	}
-	return type;
+	return GPOINTER_TO_UINT (once.retval);
 }

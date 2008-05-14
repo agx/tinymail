@@ -401,6 +401,42 @@ tny_camel_header_class_init (TnyCamelHeaderClass *class)
 	return;
 }
 
+static gpointer 
+tny_camel_header_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyCamelHeaderClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_camel_header_class_init,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnyCamelHeader),
+			0,      /* n_preallocs */
+			NULL,    /* instance_init */
+			NULL
+		};
+	
+	static const GInterfaceInfo tny_header_info = 
+		{
+			(GInterfaceInitFunc) tny_header_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyCamelHeader",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_HEADER, 
+				     &tny_header_info);
+
+	return GUINT_TO_POINTER (type);
+}
+
 /**
  * tny_camel_header_get_type:
  *
@@ -411,7 +447,7 @@ tny_camel_header_class_init (TnyCamelHeaderClass *class)
 GType 
 tny_camel_header_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
 
 	if (G_UNLIKELY (!_camel_type_init_done))
 	{
@@ -422,36 +458,6 @@ tny_camel_header_get_type (void)
 		_camel_type_init_done = TRUE;
 	}
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyCamelHeaderClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_camel_header_class_init,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnyCamelHeader),
-		  0,      /* n_preallocs */
-		  NULL,    /* instance_init */
-		  NULL
-		};
-
-		static const GInterfaceInfo tny_header_info = 
-		{
-		  (GInterfaceInitFunc) tny_header_init, /* interface_init */
-		  NULL,         /* interface_finalize */
-		  NULL          /* interface_data */
-		};
-
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyCamelHeader",
-			&info, 0);
-
-		g_type_add_interface_static (type, TNY_TYPE_HEADER, 
-			&tny_header_info);
-	}
-
-	return type;
+	g_once (&once, tny_camel_header_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

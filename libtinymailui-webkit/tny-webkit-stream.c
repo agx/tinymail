@@ -191,14 +191,12 @@ tny_webkit_stream_class_init (TnyWebkitStreamClass *class)
 	return;
 }
 
-GType 
-tny_webkit_stream_get_type (void)
+static gpointer 
+tny_webkit_stream_register_type (gpointer notused)
 {
-	static GType type = 0;
+	GType type = 0;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	static const GTypeInfo info = 
 		{
 		  sizeof (TnyWebkitStreamClass),
 		  NULL,   /* base_init */
@@ -211,20 +209,27 @@ tny_webkit_stream_get_type (void)
 		  tny_webkit_stream_instance_init    /* instance_init */
 		};
 
-		static const GInterfaceInfo tny_stream_info = 
+	static const GInterfaceInfo tny_stream_info = 
 		{
 		  (GInterfaceInitFunc) tny_stream_init, /* interface_init */
 		  NULL,         /* interface_finalize */
 		  NULL          /* interface_data */
 		};
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyWebkitStream",
-			&info, 0);
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyWebkitStream",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_STREAM, 
+				     &tny_stream_info);
 
-		g_type_add_interface_static (type, TNY_TYPE_STREAM, 
-			&tny_stream_info);
-	}
+	return GUINT_TO_POINTER (type);
+}
 
-	return type;
+GType 
+tny_webkit_stream_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_webkit_stream_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

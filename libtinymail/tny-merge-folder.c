@@ -2003,13 +2003,11 @@ tny_merge_folder_class_init (TnyMergeFolderClass *klass)
 }
 
 
-GType
-tny_merge_folder_get_type (void)
+static gpointer
+tny_merge_folder_register_type (gpointer notused)
 {
-	static GType type = 0;
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	GType type = 0;
+	static const GTypeInfo info = 
 		{
 			sizeof (TnyMergeFolderClass),
 			NULL,   /* base_init */
@@ -2022,32 +2020,38 @@ tny_merge_folder_get_type (void)
 			tny_merge_folder_instance_init,    /* instance_init */
 			NULL
 		};
-
-
-		static const GInterfaceInfo tny_folder_info = 
+	
+	
+	static const GInterfaceInfo tny_folder_info = 
 		{
 			(GInterfaceInitFunc) tny_folder_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
-
-		static const GInterfaceInfo tny_folder_observer_info = 
+	
+	static const GInterfaceInfo tny_folder_observer_info = 
 		{
 			(GInterfaceInitFunc) tny_folder_observer_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyMergeFolder",
+				       &info, 0);
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyMergeFolder",
-			&info, 0);
+	g_type_add_interface_static (type, TNY_TYPE_FOLDER,
+				     &tny_folder_info);
+	
+	g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
+				     &tny_folder_observer_info);
+	return GUINT_TO_POINTER (type);
+}
 
-		g_type_add_interface_static (type, TNY_TYPE_FOLDER,
-			&tny_folder_info);
-
-		g_type_add_interface_static (type, TNY_TYPE_FOLDER_OBSERVER,
-			&tny_folder_observer_info);
-	}
-
-	return type;
+GType
+tny_merge_folder_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_merge_folder_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

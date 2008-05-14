@@ -41,14 +41,12 @@ tny_msg_window_base_init (gpointer g_class)
 	}
 }
 
-GType
-tny_msg_window_get_type (void)
+static gpointer
+tny_msg_window_register_type (gpointer notused)
 {
-	static GType type = 0;
+	GType type = 0;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	static const GTypeInfo info = 
 		{
 		  sizeof (TnyMsgWindowIface),
 		  tny_msg_window_base_init,   /* base_init */
@@ -61,13 +59,18 @@ tny_msg_window_get_type (void)
 		  NULL    /* instance_init */
 		};
 
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyMsgWindow", &info, 0);
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnyMsgWindow", &info, 0);
 
-		g_type_interface_add_prerequisite (type, TNY_TYPE_MSG_VIEW);
-	}
+	g_type_interface_add_prerequisite (type, TNY_TYPE_MSG_VIEW);
 
-	return type;
+	return GUINT_TO_POINTER (type);
 }
 
-
+GType
+tny_msg_window_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_msg_window_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}

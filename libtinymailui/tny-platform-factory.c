@@ -187,14 +187,12 @@ tny_platform_factory_base_init (gpointer g_class)
 		initialized = TRUE;
 }
 
-GType
-tny_platform_factory_get_type (void)
+static gpointer
+tny_platform_factory_register_type (gpointer notused)
 {
-	static GType type = 0;
+	GType type = 0;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	static const GTypeInfo info = 
 		{
 		  sizeof (TnyPlatformFactoryIface),
 		  tny_platform_factory_base_init,   /* base_init */
@@ -206,11 +204,18 @@ tny_platform_factory_get_type (void)
 		  0,      /* n_preallocs */
 		  NULL    /* instance_init */
 		};
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyPlatformFactory", &info, 0);
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnyPlatformFactory", &info, 0);
 
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
-	}
+	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 
-	return type;
+	return GUINT_TO_POINTER (type);
+}
+
+GType
+tny_platform_factory_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_platform_factory_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

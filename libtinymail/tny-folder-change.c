@@ -593,35 +593,55 @@ tny_folder_change_class_init (TnyFolderChangeClass *class)
 	return;
 }
 
+static gpointer
+tny_folder_change_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyFolderChangeClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_folder_change_class_init,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnyFolderChange),
+			0,      /* n_preallocs */
+			tny_folder_change_instance_init,   /* instance_init */
+			NULL
+		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyFolderChange",
+				       &info, 0);
+	return GUINT_TO_POINTER (type);
+}
+
 GType 
 tny_folder_change_get_type (void)
 {
-	static GType type = 0;
-
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyFolderChangeClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_folder_change_class_init,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnyFolderChange),
-		  0,      /* n_preallocs */
-		  tny_folder_change_instance_init,   /* instance_init */
-		  NULL
-		};
-
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyFolderChange",
-			&info, 0);
-	}
-
-	return type;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_folder_change_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
 
+static gpointer
+tny_folder_change_changed_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GFlagsValue values[] = {
+	  { TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT, "TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT", "all-count" },
+	  { TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT, "TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT", "unread-count" },
+	  { TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS","added-headers" },
+	  { TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS", "expunged-headers" },
+	  { TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME, "TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME", "rename" },
+	  { TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED, "TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED", "received" },
+	  { 0, NULL, NULL }
+  };
+  etype = g_flags_register_static ("TnyFolderChangeChanged", values);
+  return GUINT_TO_POINTER (etype);
+}
 
 /**
  * tny_folder_change_changed_get_type:
@@ -633,19 +653,7 @@ tny_folder_change_get_type (void)
 GType
 tny_folder_change_changed_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GFlagsValue values[] = {
-      { TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT, "TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT", "all-count" },
-      { TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT, "TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT", "unread-count" },
-      { TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS","added-headers" },
-      { TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS, "TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS", "expunged-headers" },
-      { TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME, "TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME", "rename" },
-      { TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED, "TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED", "received" },
-      { 0, NULL, NULL }
-    };
-    etype = g_flags_register_static ("TnyFolderChangeChanged", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_folder_change_changed_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
-

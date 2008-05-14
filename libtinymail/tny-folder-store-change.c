@@ -350,6 +350,31 @@ tny_folder_store_change_class_init (TnyFolderStoreChangeClass *class)
 	return;
 }
 
+static gpointer 
+tny_folder_store_change_register_type (gpointer notused)
+{
+  GType type = 0;
+
+  static const GTypeInfo info = 
+    {
+      sizeof (TnyFolderStoreChangeClass),
+      NULL,   /* base_init */
+      NULL,   /* base_finalize */
+      (GClassInitFunc) tny_folder_store_change_class_init,   /* class_init */
+      NULL,   /* class_finalize */
+      NULL,   /* class_data */
+      sizeof (TnyFolderStoreChange),
+      0,      /* n_preallocs */
+      tny_folder_store_change_instance_init,   /* instance_init */
+      NULL
+    };
+  
+  type = g_type_register_static (G_TYPE_OBJECT,
+				 "TnyFolderStoreChange",
+				 &info, 0);
+  return GUINT_TO_POINTER (type);
+}
+
 /**
  * tny_folder_store_change_get_type:
  *
@@ -360,32 +385,23 @@ tny_folder_store_change_class_init (TnyFolderStoreChangeClass *class)
 GType 
 tny_folder_store_change_get_type (void)
 {
-	static GType type = 0;
-
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyFolderStoreChangeClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_folder_store_change_class_init,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnyFolderStoreChange),
-		  0,      /* n_preallocs */
-		  tny_folder_store_change_instance_init,   /* instance_init */
-		  NULL
-		};
-
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyFolderStoreChange",
-			&info, 0);
-	}
-
-	return type;
+  static GOnce once = G_ONCE_INIT;
+  g_once (&once, tny_folder_store_change_register_type, NULL);
+  return GPOINTER_TO_UINT (once.retval);
 }
 
+static gpointer
+tny_folder_store_change_changed_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GFlagsValue values[] = {
+    { TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS, "TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS", "created-folders" },
+    { TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS, "TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS", "removed-folders" },
+    { 0, NULL, NULL }
+  };
+  etype = g_flags_register_static ("TnyFolderStoreChangeChanged", values);
+  return GUINT_TO_POINTER (etype);
+}
 
 /**
  * tny_folder_store_change_changed_get_type:
@@ -397,14 +413,7 @@ tny_folder_store_change_get_type (void)
 GType
 tny_folder_store_change_changed_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GFlagsValue values[] = {
-      { TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS, "TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS", "created-folders" },
-      { TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS, "TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS", "removed-folders" },
-      { 0, NULL, NULL }
-    };
-    etype = g_flags_register_static ("TnyFolderStoreChangeChanged", values);
-  }
-  return etype;
+  static GOnce once = G_ONCE_INIT;
+  g_once (&once, tny_folder_store_change_changed_register_type, NULL);
+  return GPOINTER_TO_UINT (once.retval);
 }

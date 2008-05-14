@@ -1089,6 +1089,31 @@ tny_account_base_init (gpointer g_class)
 	}
 }
 
+static gpointer
+tny_account_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyAccountIface),
+			tny_account_base_init,   /* base_init */
+			NULL,   /* base_finalize */
+			NULL,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			0,
+			0,      /* n_preallocs */
+			NULL,   /* instance_init */
+			NULL
+		};
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnyAccount", &info, 0);
+	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+	
+	return GUINT_TO_POINTER (type);
+}
+
 /**
  * tny_account_get_type:
  *
@@ -1099,30 +1124,23 @@ tny_account_base_init (gpointer g_class)
 GType
 tny_account_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyAccountIface),
-		  tny_account_base_init,   /* base_init */
-		  NULL,   /* base_finalize */
-		  NULL,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  0,
-		  0,      /* n_preallocs */
-		  NULL,   /* instance_init */
-		  NULL
-		};
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyAccount", &info, 0);
+	g_once (&once, tny_account_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}
 
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
-	}
-
-	return type;
+static gpointer
+tny_account_type_register_type (gpointer notused)
+{
+  GType etype = 0;
+  static const GEnumValue values[] = {
+	  { TNY_ACCOUNT_TYPE_STORE, "TNY_ACCOUNT_TYPE_STORE", "store" },
+	  { TNY_ACCOUNT_TYPE_TRANSPORT, "TNY_ACCOUNT_TYPE_TRANSPORT", "transport" },
+	  { 0, NULL, NULL }
+  };
+  etype = g_enum_register_static ("TnyAccountType", values);
+  return GUINT_TO_POINTER (etype);
 }
 
 /**
@@ -1135,19 +1153,26 @@ tny_account_get_type (void)
 GType
 tny_account_type_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_ACCOUNT_TYPE_STORE, "TNY_ACCOUNT_TYPE_STORE", "store" },
-      { TNY_ACCOUNT_TYPE_TRANSPORT, "TNY_ACCOUNT_TYPE_TRANSPORT", "transport" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyAccountType", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+
+	g_once (&once, tny_account_type_register_type, NULL);
+
+	return GPOINTER_TO_UINT (once.retval);
 }
 
-
+static gpointer
+tny_account_signal_type_register_type (gpointer notused)
+{
+	GType etype = 0;
+	static const GEnumValue values[] = {
+		{ TNY_ACCOUNT_CONNECTION_STATUS_CHANGED, "TNY_ACCOUNT_CONNECTION_STATUS_CHANGED", "connection_status_changed" },
+		{ TNY_ACCOUNT_CHANGED, "TNY_ACCOUNT_CHANGED", "changed" },
+		{ TNY_ACCOUNT_LAST_SIGNAL, "TNY_ACCOUNT_LAST_SIGNAL", "last_signal" },
+		{ 0, NULL, NULL }
+	};
+	etype = g_enum_register_static ("TnyAccountSignal", values);
+	return GUINT_TO_POINTER (etype);
+}
 
 /**
  * tny_account_signal_type_get_type:
@@ -1159,17 +1184,28 @@ tny_account_type_get_type (void)
 GType
 tny_account_signal_type_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_ACCOUNT_CONNECTION_STATUS_CHANGED, "TNY_ACCOUNT_CONNECTION_STATUS_CHANGED", "connection_status_changed" },
-      { TNY_ACCOUNT_CHANGED, "TNY_ACCOUNT_CHANGED", "changed" },
-      { TNY_ACCOUNT_LAST_SIGNAL, "TNY_ACCOUNT_LAST_SIGNAL", "last_signal" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyAccountSignal", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+
+	g_once (&once, tny_account_signal_type_register_type, NULL);
+	
+	return GPOINTER_TO_UINT (once.retval);
+}
+
+static gpointer
+tny_connection_status_register_type (gpointer notused)
+{
+	GType etype = 0;
+	static const GEnumValue values[] = {
+		{ TNY_CONNECTION_STATUS_DISCONNECTED, "TNY_CONNECTION_STATUS_DISCONNECTED", "disconnected" },
+		{ TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN, "TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN", "disconnected-broken" },
+		{ TNY_CONNECTION_STATUS_CONNECTED_BROKEN, "TNY_CONNECTION_STATUS_CONNECTED_BROKEN", "connected-broken" },
+		{ TNY_CONNECTION_STATUS_CONNECTED, "TNY_CONNECTION_STATUS_CONNECTED", "connected" },
+		{ TNY_CONNECTION_STATUS_RECONNECTING, "TNY_CONNECTION_STATUS_RECONNECTING", "reconnecting" },
+		{ TNY_CONNECTION_STATUS_INIT, "TNY_CONNECTION_STATUS_INIT", "init" },
+		{ 0, NULL, NULL }
+	};
+	etype = g_enum_register_static ("TnyConnectionStatus", values);
+	return GUINT_TO_POINTER (etype);
 }
 
 /**
@@ -1182,20 +1218,11 @@ tny_account_signal_type_get_type (void)
 GType
 tny_connection_status_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_CONNECTION_STATUS_DISCONNECTED, "TNY_CONNECTION_STATUS_DISCONNECTED", "disconnected" },
-      { TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN, "TNY_CONNECTION_STATUS_DISCONNECTED_BROKEN", "disconnected-broken" },
-      { TNY_CONNECTION_STATUS_CONNECTED_BROKEN, "TNY_CONNECTION_STATUS_CONNECTED_BROKEN", "connected-broken" },
-      { TNY_CONNECTION_STATUS_CONNECTED, "TNY_CONNECTION_STATUS_CONNECTED", "connected" },
-      { TNY_CONNECTION_STATUS_RECONNECTING, "TNY_CONNECTION_STATUS_RECONNECTING", "reconnecting" },
-      { TNY_CONNECTION_STATUS_INIT, "TNY_CONNECTION_STATUS_INIT", "init" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnyConnectionStatus", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+
+	g_once (&once, tny_connection_status_register_type, NULL);
+
+	return GPOINTER_TO_UINT (once.retval);
 }
 
 

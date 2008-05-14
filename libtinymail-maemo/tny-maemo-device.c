@@ -196,42 +196,45 @@ tny_maemo_device_class_init (TnyMaemoDeviceClass *class)
 	return;
 }
 
+static gpointer 
+tny_maemo_device_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyMaemoDeviceClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_maemo_device_class_init,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnyMaemoDevice),
+			0,      /* n_preallocs */
+			tny_maemo_device_instance_init    /* instance_init */
+		};
+	
+	static const GInterfaceInfo tny_device_info = 
+		{
+			(GInterfaceInitFunc) tny_device_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyMaemoDevice",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_DEVICE, 
+				     &tny_device_info);
+	
+	return GUINT_TO_POINTER (type);
+}
+
 GType 
 tny_maemo_device_get_type (void)
 {
-	static GType type = 0;
-
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyMaemoDeviceClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_maemo_device_class_init,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnyMaemoDevice),
-		  0,      /* n_preallocs */
-		  tny_maemo_device_instance_init    /* instance_init */
-		};
-
-		static const GInterfaceInfo tny_device_info = 
-		{
-		  (GInterfaceInitFunc) tny_device_init, /* interface_init */
-		  NULL,         /* interface_finalize */
-		  NULL          /* interface_data */
-		};
-
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyMaemoDevice",
-			&info, 0);
-
-		g_type_add_interface_static (type, TNY_TYPE_DEVICE, 
-			&tny_device_info);
-
-	}
-
-	return type;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_maemo_device_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
-

@@ -155,30 +155,35 @@ tny_connection_policy_base_init (gpointer g_class)
 	}
 }
 
+static gpointer
+tny_connection_policy_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyConnectionPolicyIface),
+			tny_connection_policy_base_init,   /* base_init */
+			NULL,   /* base_finalize */
+			NULL,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			0,
+			0,      /* n_preallocs */
+			NULL,    /* instance_init */
+			NULL
+		};
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnyConnectionPolicy", &info, 0);
+	return GUINT_TO_POINTER (type);
+}
+
 GType
 tny_connection_policy_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyConnectionPolicyIface),
-		  tny_connection_policy_base_init,   /* base_init */
-		  NULL,   /* base_finalize */
-		  NULL,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  0,
-		  0,      /* n_preallocs */
-		  NULL,    /* instance_init */
-		  NULL
-		};
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnyConnectionPolicy", &info, 0);
-	}
+	g_once (&once, tny_connection_policy_register_type, NULL);
 
-	return type;
+	return GPOINTER_TO_UINT (once.retval);
 }
-

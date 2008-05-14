@@ -278,6 +278,31 @@ tny_send_queue_base_init (gpointer g_class)
 	}
 }
 
+static gpointer
+tny_send_queue_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnySendQueueIface),
+			tny_send_queue_base_init,   /* base_init */
+			NULL,   /* base_finalize */
+			NULL,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			0,
+			0,      /* n_preallocs */
+			NULL,    /* instance_init */
+			NULL
+		};
+	type = g_type_register_static (G_TYPE_INTERFACE, 
+				       "TnySendQueue", &info, 0);
+	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+
+	return GUINT_TO_POINTER (type);
+}
+
 /**
  * tny_send_queue_get_type:
  *
@@ -288,30 +313,24 @@ tny_send_queue_base_init (gpointer g_class)
 GType
 tny_send_queue_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_send_queue_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnySendQueueIface),
-		  tny_send_queue_base_init,   /* base_init */
-		  NULL,   /* base_finalize */
-		  NULL,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  0,
-		  0,      /* n_preallocs */
-		  NULL,    /* instance_init */
-		  NULL
-		};
-		type = g_type_register_static (G_TYPE_INTERFACE, 
-			"TnySendQueue", &info, 0);
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
-
-	}
-
-	return type;
+static gpointer
+tny_send_queue_signal_register_type (gpointer notused)
+{
+	GType etype = 0;
+	static const GEnumValue values[] = {
+		{ TNY_SEND_QUEUE_MSG_SENDING, "TNY_SEND_QUEUE_MSG_SENDING", "msg-sending" },
+		{ TNY_SEND_QUEUE_MSG_SENT, "TNY_SEND_QUEUE_MSG_SENT", "msg-sent" },
+		{ TNY_SEND_QUEUE_ERROR_HAPPENED, "TNY_SEND_QUEUE_ERROR_HAPPENED", "error-happened" },
+		{ TNY_SEND_QUEUE_LAST_SIGNAL, "TNY_SEND_QUEUE_LAST_SIGNAL", "last-signal" },
+		{ 0, NULL, NULL }
+	};
+	etype = g_enum_register_static ("TnySendQueueSignal", values);
+	return GUINT_TO_POINTER (etype);
 }
 
 /**
@@ -324,16 +343,7 @@ tny_send_queue_get_type (void)
 GType
 tny_send_queue_signal_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GEnumValue values[] = {
-      { TNY_SEND_QUEUE_MSG_SENDING, "TNY_SEND_QUEUE_MSG_SENDING", "msg-sending" },
-      { TNY_SEND_QUEUE_MSG_SENT, "TNY_SEND_QUEUE_MSG_SENT", "msg-sent" },
-      { TNY_SEND_QUEUE_ERROR_HAPPENED, "TNY_SEND_QUEUE_ERROR_HAPPENED", "error-happened" },
-      { TNY_SEND_QUEUE_LAST_SIGNAL, "TNY_SEND_QUEUE_LAST_SIGNAL", "last-signal" },
-      { 0, NULL, NULL }
-    };
-    etype = g_enum_register_static ("TnySendQueueSignal", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_send_queue_signal_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

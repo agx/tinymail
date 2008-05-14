@@ -2324,6 +2324,42 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	return;
 }
 
+static gpointer 
+tny_camel_account_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyCamelAccountClass),
+			NULL,   /* base_init */
+			NULL,   /* base_finalize */
+			(GClassInitFunc) tny_camel_account_class_init,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			sizeof (TnyCamelAccount),
+			0,      /* n_preallocs */
+			tny_camel_account_instance_init    /* instance_init */
+		};
+	
+	static const GInterfaceInfo tny_account_info = 
+		{
+			(GInterfaceInitFunc) tny_account_init, /* interface_init */
+			NULL,         /* interface_finalize */
+			NULL          /* interface_data */
+		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyCamelAccount",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_ACCOUNT, 
+				     &tny_account_info);
+	
+
+	return GUINT_TO_POINTER (type);
+}
+
 /**
  * tny_camel_account_get_type:
  *
@@ -2334,7 +2370,7 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 GType 
 tny_camel_account_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
 
 	if (G_UNLIKELY (!_camel_type_init_done))
 	{
@@ -2344,37 +2380,6 @@ tny_camel_account_get_type (void)
 		_camel_type_init_done = TRUE;
 	}
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyCamelAccountClass),
-		  NULL,   /* base_init */
-		  NULL,   /* base_finalize */
-		  (GClassInitFunc) tny_camel_account_class_init,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  sizeof (TnyCamelAccount),
-		  0,      /* n_preallocs */
-		  tny_camel_account_instance_init    /* instance_init */
-		};
-
-		static const GInterfaceInfo tny_account_info = 
-		{
-		  (GInterfaceInitFunc) tny_account_init, /* interface_init */
-		  NULL,         /* interface_finalize */
-		  NULL          /* interface_data */
-		};
-
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyCamelAccount",
-			&info, 0);
-
-		g_type_add_interface_static (type, TNY_TYPE_ACCOUNT, 
-			&tny_account_info);
-
-	}
-
-	return type;
+	g_once (&once, tny_camel_account_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
-

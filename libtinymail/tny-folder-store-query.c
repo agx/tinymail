@@ -118,14 +118,12 @@ tny_folder_store_query_init (TnyFolderStoreQuery *self)
 }
 
 
-GType
-tny_folder_store_query_get_type (void)
+static gpointer
+tny_folder_store_query_register_type (gpointer notused)
 {
-	static GType object_type = 0;
+	GType object_type = 0;
 
-	if (G_UNLIKELY(object_type == 0))
-	{
-		static const GTypeInfo object_info = 
+	static const GTypeInfo object_info = 
 		{
 			sizeof (TnyFolderStoreQueryClass),
 			NULL,		/* base_init */
@@ -138,28 +136,26 @@ tny_folder_store_query_get_type (void)
 			(GInstanceInitFunc) tny_folder_store_query_init,
 			NULL
 		};
-		object_type = g_type_register_static (G_TYPE_OBJECT, 
-			"TnyFolderStoreQuery", &object_info, 0);
-	}
+	object_type = g_type_register_static (G_TYPE_OBJECT, 
+					      "TnyFolderStoreQuery", &object_info, 0);
 
-	return object_type;
+	return GUINT_TO_POINTER (object_type);
 }
 
-/**
- * tny_folder_store_query_item_get_type:
- *
- * GType system helper function
- *
- * returns: a #GType
- **/
 GType
-tny_folder_store_query_item_get_type (void)
+tny_folder_store_query_get_type (void)
 {
-	static GType object_type = 0;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_folder_store_query_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}
 
-	if (G_UNLIKELY(object_type == 0))
-	{
-		static const GTypeInfo object_info = 
+static gpointer
+tny_folder_store_query_item_register_type (gpointer notused)
+{
+	GType object_type = 0;
+	
+	static const GTypeInfo object_info = 
 		{
 			sizeof (TnyFolderStoreQueryItemClass),
 			NULL,		/* base_init */
@@ -172,12 +168,25 @@ tny_folder_store_query_item_get_type (void)
 			(GInstanceInitFunc) tny_folder_store_query_item_init,
 			NULL
 		};
-		object_type = g_type_register_static (G_TYPE_OBJECT, 
-			"TnyFolderStoreQueryItem", &object_info, 0);
+	object_type = g_type_register_static (G_TYPE_OBJECT, 
+					      "TnyFolderStoreQueryItem", &object_info, 0);
+	
+	return GUINT_TO_POINTER (object_type);
+}
 
-	}
-
-	return object_type;
+/**
+ * tny_folder_store_query_item_get_type:
+ *
+ * GType system helper function
+ *
+ * returns: a #GType
+ **/
+GType
+tny_folder_store_query_item_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_folder_store_query_item_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
 
 static gchar*
@@ -366,6 +375,23 @@ tny_folder_store_query_item_get_pattern (TnyFolderStoreQueryItem *item)
 	return (const gchar*) item->pattern;
 }
 
+static gpointer
+tny_folder_store_query_option_register_type (gpointer notused)
+{
+	GType etype = 0;
+	static const GFlagsValue values[] = {
+		{ TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED, "TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED", "subscribed" },
+		{ TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED, "TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED", "unsubscribed" },
+		{ TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME, "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME", "match_on_name" },
+		{ TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID, "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID", "match_on_id" },
+		{ TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE, "TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE", "pattern_is_case_insensitive" },
+		{ TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX, "TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX", "pattern_is_regex" },
+		{ 0, NULL, NULL }
+	};
+	etype = g_flags_register_static ("TnyFolderStoreQueryOption", values);
+	return GUINT_TO_POINTER (etype);
+}
+
 /**
  * tny_folder_store_query_option_get_type:
  *
@@ -376,18 +402,7 @@ tny_folder_store_query_item_get_pattern (TnyFolderStoreQueryItem *item)
 GType
 tny_folder_store_query_option_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GFlagsValue values[] = {
-      { TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED, "TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED", "subscribed" },
-      { TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED, "TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED", "unsubscribed" },
-      { TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME, "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME", "match_on_name" },
-      { TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID, "TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID", "match_on_id" },
-      { TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE, "TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE", "pattern_is_case_insensitive" },
-      { TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX, "TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX", "pattern_is_regex" },
-      { 0, NULL, NULL }
-    };
-    etype = g_flags_register_static ("TnyFolderStoreQueryOption", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_folder_store_query_option_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

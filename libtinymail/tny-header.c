@@ -622,34 +622,62 @@ tny_header_base_init (gpointer g_class)
 	}
 }
 
+static gpointer
+tny_header_register_type (gpointer notused)
+{
+	GType type = 0;
+
+	static const GTypeInfo info = 
+		{
+			sizeof (TnyHeaderIface),
+			tny_header_base_init,   /* base_init */
+			NULL,   /* base_finalize */
+			NULL,   /* class_init */
+			NULL,   /* class_finalize */
+			NULL,   /* class_data */
+			0,
+			0,      /* n_preallocs */
+			NULL,   /* instance_init */
+			NULL
+		};
+	
+	type = g_type_register_static (G_TYPE_INTERFACE,
+				       "TnyHeader", &info, 0);
+	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
+	
+	return GUINT_TO_POINTER (type);
+}
+
 GType
 tny_header_get_type (void)
 {
-	static GType type = 0;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_header_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}
 
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
-		{
-		  sizeof (TnyHeaderIface),
-		  tny_header_base_init,   /* base_init */
-		  NULL,   /* base_finalize */
-		  NULL,   /* class_init */
-		  NULL,   /* class_finalize */
-		  NULL,   /* class_data */
-		  0,
-		  0,      /* n_preallocs */
-		  NULL,   /* instance_init */
-		  NULL
-		};
-
-		type = g_type_register_static (G_TYPE_INTERFACE,
-			"TnyHeader", &info, 0);
-		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
-
-	}
-
-	return type;
+static gpointer
+tny_header_flags_register_type (gpointer notused)
+{
+	GType etype = 0;
+	static const GFlagsValue values[] = {
+		{ TNY_HEADER_FLAG_ANSWERED, "TNY_HEADER_FLAG_ANSWERED", "answered" },
+		{ TNY_HEADER_FLAG_DELETED, "TNY_HEADER_FLAG_DELETED", "deleted" },
+		{ TNY_HEADER_FLAG_DRAFT, "TNY_HEADER_FLAG_DRAFT", "draft" },
+		{ TNY_HEADER_FLAG_FLAGGED, "TNY_HEADER_FLAG_FLAGGED", "flagged" },
+		{ TNY_HEADER_FLAG_SEEN, "TNY_HEADER_FLAG_SEEN", "seen" },
+		{ TNY_HEADER_FLAG_ATTACHMENTS, "TNY_HEADER_FLAG_ATTACHMENTS", "attachments" },
+		{ TNY_HEADER_FLAG_CACHED, "TNY_HEADER_FLAG_CACHED", "cached" },
+		{ TNY_HEADER_FLAG_PARTIAL, "TNY_HEADER_FLAG_PARTIAL", "partial" },
+		{ TNY_HEADER_FLAG_EXPUNGED, "TNY_HEADER_FLAG_EXPUNGED", "expunged" },
+		{ TNY_HEADER_FLAG_HIGH_PRIORITY, "TNY_HEADER_FLAG_HIGH_PRIORITY", "high-priority" },
+		{ TNY_HEADER_FLAG_NORMAL_PRIORITY, "TNY_HEADER_FLAG_NORMAL_PRIORITY", "normal-priority" },
+		{ TNY_HEADER_FLAG_LOW_PRIORITY, "TNY_HEADER_FLAG_LOW_PRIORITY", "low-priority" },
+		{ TNY_HEADER_FLAG_SUSPENDED, "TNY_HEADER_FLAG_SUSPENDED", "suspended" },
+		{ 0, NULL, NULL }
+	};
+	etype = g_flags_register_static ("TnyHeaderFlags", values);
+	return GUINT_TO_POINTER (etype);
 }
 
 /**
@@ -662,27 +690,7 @@ tny_header_get_type (void)
 GType
 tny_header_flags_get_type (void)
 {
-  static GType etype = 0;
-  if (etype == 0) {
-    static const GFlagsValue values[] = {
-      { TNY_HEADER_FLAG_ANSWERED, "TNY_HEADER_FLAG_ANSWERED", "answered" },
-      { TNY_HEADER_FLAG_DELETED, "TNY_HEADER_FLAG_DELETED", "deleted" },
-      { TNY_HEADER_FLAG_DRAFT, "TNY_HEADER_FLAG_DRAFT", "draft" },
-      { TNY_HEADER_FLAG_FLAGGED, "TNY_HEADER_FLAG_FLAGGED", "flagged" },
-      { TNY_HEADER_FLAG_SEEN, "TNY_HEADER_FLAG_SEEN", "seen" },
-      { TNY_HEADER_FLAG_ATTACHMENTS, "TNY_HEADER_FLAG_ATTACHMENTS", "attachments" },
-      { TNY_HEADER_FLAG_CACHED, "TNY_HEADER_FLAG_CACHED", "cached" },
-      { TNY_HEADER_FLAG_PARTIAL, "TNY_HEADER_FLAG_PARTIAL", "partial" },
-      { TNY_HEADER_FLAG_EXPUNGED, "TNY_HEADER_FLAG_EXPUNGED", "expunged" },
-      { TNY_HEADER_FLAG_HIGH_PRIORITY, "TNY_HEADER_FLAG_HIGH_PRIORITY", "high-priority" },
-      { TNY_HEADER_FLAG_NORMAL_PRIORITY, "TNY_HEADER_FLAG_NORMAL_PRIORITY", "normal-priority" },
-      { TNY_HEADER_FLAG_LOW_PRIORITY, "TNY_HEADER_FLAG_LOW_PRIORITY", "low-priority" },
-      { TNY_HEADER_FLAG_SUSPENDED, "TNY_HEADER_FLAG_SUSPENDED", "suspended" },
-      { 0, NULL, NULL }
-    };
-    etype = g_flags_register_static ("TnyHeaderFlags", values);
-  }
-  return etype;
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_header_flags_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
-
-

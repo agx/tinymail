@@ -198,13 +198,11 @@ tny_expunged_header_new (void)
 	return (TnyHeader *) g_object_new (TNY_TYPE_EXPUNGED_HEADER, NULL);
 }
 
-GType
-tny_expunged_header_get_type (void)
+static gpointer
+tny_expunged_header_register_type (gpointer notused)
 {
-	static GType type = 0;
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	GType type = 0;
+	static const GTypeInfo info = 
 		{
 			sizeof (TnyExpungedHeaderClass),
 			NULL,   /* base_init */
@@ -217,22 +215,29 @@ tny_expunged_header_get_type (void)
 			tny_expunged_header_instance_init,    /* instance_init */
 			NULL
 		};
+	
 
-
-		static const GInterfaceInfo tny_header_info = 
+	static const GInterfaceInfo tny_header_info = 
 		{
 			(GInterfaceInitFunc) tny_header_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyExpungedHeader",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_HEADER,
+				     &tny_header_info);
+	
+	return GUINT_TO_POINTER (type);
+}
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyExpungedHeader",
-			&info, 0);
-
-		g_type_add_interface_static (type, TNY_TYPE_HEADER,
-			&tny_header_info);
-
-	}
-	return type;
+GType
+tny_expunged_header_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_expunged_header_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }

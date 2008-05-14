@@ -77,13 +77,11 @@ tny_camel_default_connection_policy_new (void)
 	return TNY_CONNECTION_POLICY (g_object_new (TNY_TYPE_CAMEL_DEFAULT_CONNECTION_POLICY, NULL));
 }
 
-GType
-tny_camel_default_connection_policy_get_type (void)
+static gpointer
+tny_camel_default_connection_policy_register_type (gpointer notused)
 {
-	static GType type = 0;
-	if (G_UNLIKELY(type == 0))
-	{
-		static const GTypeInfo info = 
+	GType type = 0;
+	static const GTypeInfo info = 
 		{
 			sizeof (TnyCamelDefaultConnectionPolicyClass),
 			NULL,   /* base_init */
@@ -96,22 +94,29 @@ tny_camel_default_connection_policy_get_type (void)
 			tny_camel_default_connection_policy_instance_init,    /* instance_init */
 			NULL
 		};
-
-
-		static const GInterfaceInfo tny_connection_policy_info = 
+	
+	
+	static const GInterfaceInfo tny_connection_policy_info = 
 		{
 			(GInterfaceInitFunc) tny_connection_policy_init, /* interface_init */
 			NULL,         /* interface_finalize */
 			NULL          /* interface_data */
 		};
+	
+	type = g_type_register_static (G_TYPE_OBJECT,
+				       "TnyCamelDefaultConnectionPolicy",
+				       &info, 0);
+	
+	g_type_add_interface_static (type, TNY_TYPE_CONNECTION_POLICY,
+				     &tny_connection_policy_info);
+	
+	return GUINT_TO_POINTER (type);
+}
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-			"TnyCamelDefaultConnectionPolicy",
-			&info, 0);
-
-		g_type_add_interface_static (type, TNY_TYPE_CONNECTION_POLICY,
-			&tny_connection_policy_info);
-
-	}
-	return type;
+GType
+tny_camel_default_connection_policy_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_camel_default_connection_policy_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
 }
