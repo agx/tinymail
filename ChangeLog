@@ -1,3 +1,8 @@
+2008-05-14  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* libtinymail-camel/tny-camel-queue.c: Letting the thread wait for
+	more items instead of exiting
+
 2008-05-13  Rob Taylor  <rob.taylor@codethink.co.uk>
 
 	* libtinymail-camel/tny-camel-bs-mime-part.c:
@@ -483,7 +488,7 @@
 2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
 
         * Attempt at making mime parsing use the seekable capability of
-	streams in stead of copying them in memory. This is experimental!
+	streams instead of copying them in memory. This is experimental!
 
 2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -905,7 +910,7 @@
 2007-12-21  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Code robustness
-	* Changed the account item of a folder to be hard referenced in stead
+	* Changed the account item of a folder to be hard referenced instead
 	of weakly
 
 2007-12-20  Alberto Garcia Gonzalez  <agarcia@igalia.com>
@@ -1032,7 +1037,7 @@
 
 2007-12-12  Philip Van Hoof <pvanhoof@gnome.org>
 
-	* Experimental appending in stead of rewriting the summary.mmap
+	* Experimental appending instead of rewriting the summary.mmap
 
 2007-12-11  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -1333,13 +1338,13 @@
 	* Simulated weak references in TnyGtkFolderStoreTreeModel for the
 	observers
 	* Cyclic references fix. tny_folder_store_add_observer and
-	tny_folder_add_observer no longer add strong references, in stead they
+	tny_folder_add_observer no longer add strong references, instead they
 	add weak references
 
 	* Fixed longstanding bug that when you create two folders A and B in a
 	root folder C, and then move A into B, that A would only become a
 	subfolder of B after you restart the application. The problem was that
-	A and B got created with _tny_camel_folder_new in stead of the
+	A and B got created with _tny_camel_folder_new instead of the
 	tny_camel_store_account_factor_folder. This made the observers
 	infrastructure of the model confuse when a new list of folder was
 	requested (this new list would use the tny_camel_store_account_factor_folder
@@ -1347,7 +1352,7 @@
 	stead of the one created during _tny_camel_folder_new being reused.
 
 	For future, let's be extremely careful not to use
-	_tny_camel_folder_new but in stead to make sure that the factory is
+	_tny_camel_folder_new but instead to make sure that the factory is
 	always used.
 
 	* This is a major API change
@@ -1525,7 +1530,7 @@
 2007-10-16  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed regression on the regression fix of a few days ago :)
-	* Renamed Maildir filenames to have '!' in stead of '_' or ':' in
+	* Renamed Maildir filenames to have '!' instead of '_' or ':' in
 	their filenames
 
 2007-10-15  Jose Dapena Paz  <jdapena@igalia.com>
@@ -3148,7 +3153,7 @@
 	* Support for removing messages from a POP server after retrieval
 	* Support for tny_header_get_uid on TnyMsg's header instance
 	* Removed the warning in libtinymail/tny-folder.c: please use the
-	support for DBC in stead. It's specifically designed for this. Read
+	support for DBC instead. It's specifically designed for this. Read
 	the documentation in building.txt to find out how to enable it.
 
 	* This was a major API change
@@ -4774,7 +4779,7 @@
 	* libtinymail-camel/camel-lite: Drastic reduction of memory
 	consumption on initial download of both IMAP and NNTP folders.
 	* libtinymail-gnome-desktop: Default status of the device is now
-	offline in stead of online (for example in case network manager
+	offline instead of online (for example in case network manager
 	installation was invalid or not found)
 	* Bugfix reported by Nitin.Mahajan@nokia.com
 	* libtinymail-camel/camel-lite: Merging with Matthen Barnes's stuff
@@ -4787,7 +4792,7 @@
 2006-10-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* libtinymail-camel/camel-lite: Allocation of the CamelFolderInfo is
-	now with GSlice in stead of many different malloc ways. This one needs
+	now with GSlice instead of many different malloc ways. This one needs
 	testing!
 
 2006-10-19  Philip Van Hoof <pvanhoof@gnome.org>

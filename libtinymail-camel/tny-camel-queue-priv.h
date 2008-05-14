@@ -45,6 +45,9 @@ struct _TnyCamelQueue
 	TnyCamelAccount *account;
 	GList *list;
 	GThread *thread;
+	GCond *condition;
+	GMutex *mutex;
+	gboolean is_waiting;
 	GStaticRecMutex *lock;
 	gboolean stopped, next_uncancel;
 	gpointer current;

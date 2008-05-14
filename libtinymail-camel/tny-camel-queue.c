@@ -52,6 +52,9 @@ tny_camel_queue_finalize (GObject *object)
 	self->list = NULL;
 	g_static_rec_mutex_unlock (self->lock);
 
+	g_cond_free (self->condition);
+	g_mutex_free (self->mutex);
+
 	/* g_static_rec_mutex_free (self->lock); */
 	g_free (self->lock);
 	self->lock = NULL;
@@ -166,7 +169,7 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 	{
 		GList *first = NULL;
 		QueueItem *item = NULL;
-		gboolean deleted = FALSE;
+		gboolean deleted = FALSE, wait = FALSE;
 
 		g_static_rec_mutex_lock (queue->lock);
 
@@ -183,7 +186,7 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 				deleted = item->deleted;
 			queue->current = item;
 		} else
-			queue->stopped = TRUE;
+			wait = TRUE;
 		g_static_rec_mutex_unlock (queue->lock);
 
 		if (item) {
@@ -233,14 +236,20 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 			queue->list = g_list_delete_link (queue->list, first);
 		queue->current = NULL;
 
-		if (g_list_length (queue->list) == 0) {
-			queue->thread = NULL;
-			queue->stopped = TRUE;
-		}
+		if (g_list_length (queue->list) == 0)
+			wait = TRUE;
 		g_static_rec_mutex_unlock (queue->lock);
 
 		if (item)
 			g_slice_free (QueueItem, item);
+
+		if (wait) {
+			g_mutex_lock (queue->mutex);
+			queue->is_waiting = TRUE;
+			g_cond_wait (queue->condition, queue->mutex);
+			queue->is_waiting = FALSE;
+			g_mutex_unlock (queue->mutex);
+		}
 	}
 
 	queue->thread = NULL;
@@ -409,6 +418,11 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 		if (err) {
 			queue->stopped = TRUE;
 		}
+	} else {
+		g_mutex_lock (queue->mutex);
+		//if (queue->is_waiting)
+			g_cond_broadcast (queue->condition);
+		g_mutex_unlock (queue->mutex);
 	}
 
 	g_static_rec_mutex_unlock (queue->lock);
@@ -464,9 +478,16 @@ tny_camel_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	TnyCamelQueue *self = (TnyCamelQueue*)instance;
 
+	self->is_waiting = FALSE;
+	self->mutex = g_mutex_new ();
+	self->condition = g_cond_new ();
 	self->account = NULL;
 	self->stopped = TRUE;
 	self->list = NULL;
+
+	/* We don't use a GThreadPool because we need control over the queued
+	 * items: we must remove them sometimes for example. */
+
 	self->thread = NULL;
 	self->lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (self->lock);
