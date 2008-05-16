@@ -386,24 +386,35 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 			if (msg)
 			{
 
+				mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
+				if (mi) {
+					mi->size = (fi->size);
+					camel_message_info_free (mi);
+				}
+
 				struct _camel_header_raw *h;
 				
 				h = ((CamelMimePart *)msg)->headers;
 				if (camel_header_raw_find(&h, "X-MSMail-Priority", NULL) &&
 				    !camel_header_raw_find(&h, "X-MS-Has-Attach", NULL)) {
-					
-					((CamelMessageInfoBase *)mi)->flags &= ~CAMEL_MESSAGE_ATTACHMENTS;
-					
+					mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
+					if (mi) {
+						mi->size = (fi->size);
+						((CamelMessageInfoBase *)mi)->flags &= ~CAMEL_MESSAGE_ATTACHMENTS;
+						camel_message_info_free (mi);
+					}
 				} else if (!camel_header_raw_find (&h, "X-MS-Has-Attach", NULL)) {
 					
 					mi = (CamelMessageInfoBase*) camel_folder_summary_uid (folder->summary, fi->uid);
-					mi->size = (fi->size);
-					/* TNY TODO: This is a hack! But else we need to parse
-					 * BODYSTRUCTURE (and I'm lazy). It needs fixing though. */
-					if (mi->size > 102400)
-						mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
-					/* ... it does */
-					camel_message_info_free (mi);
+					if (mi) {
+						mi->size = (fi->size);
+						/* TNY TODO: This is a hack! But else we need to parse
+						 * BODYSTRUCTURE (and I'm lazy). It needs fixing though. */
+						if (mi->size > 102400)
+							mi->flags |= CAMEL_MESSAGE_ATTACHMENTS;
+						/* ... it does */
+						camel_message_info_free (mi);
+					}
 				}
 
 
@@ -438,8 +449,11 @@ pop3_refresh_info (CamelFolder *folder, CamelException *ex)
 				break;
 
 
-		} else if (mi)
+		} else if (mi) {
+			mi->size = fi->size;
+			camel_folder_summary_touch (folder->summary);
 			camel_message_info_free (mi);
+		}
 
 		camel_operation_progress (NULL, i , pop3_store->uids->len);
 
