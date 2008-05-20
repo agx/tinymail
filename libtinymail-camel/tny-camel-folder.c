@@ -1778,7 +1778,9 @@ tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnyFolde
 		tny_camel_folder_sync_async_cancelled_destroyer, 
 		&info->cancelled,
 		info, sizeof (SyncFolderInfo), 
-		TNY_CAMEL_QUEUE_CANCELLABLE_ITEM|TNY_CAMEL_QUEUE_SYNC_ITEM, 
+		TNY_CAMEL_QUEUE_AUTO_CANCELLABLE_ITEM|
+		TNY_CAMEL_QUEUE_CANCELLABLE_ITEM|
+		TNY_CAMEL_QUEUE_SYNC_ITEM, 
 		__FUNCTION__);
 }
 
@@ -2014,7 +2016,8 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyFolderCallback callb
 	_tny_camel_folder_reason (priv);
 
 	_tny_camel_queue_cancel_remove_items (TNY_FOLDER_PRIV_GET_QUEUE (priv),
-		TNY_CAMEL_QUEUE_CANCELLABLE_ITEM|TNY_CAMEL_QUEUE_REFRESH_ITEM);
+		TNY_CAMEL_QUEUE_AUTO_CANCELLABLE_ITEM|
+		TNY_CAMEL_QUEUE_REFRESH_ITEM);
 
 	_tny_camel_queue_launch_wflags (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_refresh_async_thread, 
@@ -2024,8 +2027,8 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyFolderCallback callb
 		tny_camel_folder_refresh_async_cancelled_destroyer, 
 		&info->cancelled,
 		info, sizeof (RefreshFolderInfo), 
-		TNY_CAMEL_QUEUE_PRIORITY_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM|
-			TNY_CAMEL_QUEUE_REFRESH_ITEM, 
+		TNY_CAMEL_QUEUE_PRIORITY_ITEM|TNY_CAMEL_QUEUE_AUTO_CANCELLABLE_ITEM|
+			TNY_CAMEL_QUEUE_CANCELLABLE_ITEM|TNY_CAMEL_QUEUE_REFRESH_ITEM, 
 		__FUNCTION__);
 
 	return;

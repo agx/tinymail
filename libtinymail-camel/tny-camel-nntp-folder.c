@@ -143,7 +143,7 @@ tny_camel_nntp_folder_register_type (gpointer notused)
 				       "TnyCamelNNTPFolder",
 				       &info, 0);	    
 
-	return GPOINTER_TO_UINT (type);
+	return GUINT_TO_POINTER (type);
 }
 
 /**
