@@ -290,6 +290,7 @@ do_write (CamelStream *stream, const char *buf, size_t n)
 	struct _filter *f;
 	size_t presize, len, left = n;
 	char *buffer, realbuffer[READ_SIZE+READ_PAD];
+	size_t written = 0;
 
 	p->last_was_read = FALSE;
 
@@ -321,8 +322,13 @@ do_write (CamelStream *stream, const char *buf, size_t n)
 			f = f->next;
 		}
 
-		if (camel_stream_write(filter->source, buffer, len) != len)
-			return -1;
+		for (written = 0; written < len;) {
+			size_t just_written;
+			just_written = camel_stream_write (filter->source, buffer + written, len - written);
+			if (just_written == -1)
+				return -1;
+			written += just_written;
+		}
 	}
 
 	g_check(p->realbuffer);
