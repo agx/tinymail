@@ -1,9 +1,14 @@
+2008-05-20  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Fixed a fallback envelope fetch, don't do the clear on the summary.
+	Instead mark all as expunged
+
 2008-05-20  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/camel-stream-filter.c:
-          (do_write): if the camel_stream_write call does not write the
-          full buffer but it's not due to an error, then loop to go on
-          writing the stream.
+	(do_write): if the camel_stream_write call does not write the
+	 full buffer but it's not due to an error, then loop to go on
+	 writing the stream.
 
 2008-05-20  Philip Van Hoof <pvanhoof@gnome.org>
 

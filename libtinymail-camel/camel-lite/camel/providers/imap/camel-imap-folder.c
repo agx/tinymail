@@ -3351,6 +3351,8 @@ imap_update_summary (CamelFolder *folder, int exists,
 		/* If we still received too few */
 		if (tcnt < (exists - seq))
 		{
+			int i;
+
 			g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 			g_ptr_array_free (needheaders, TRUE);
 			needheaders = g_ptr_array_new ();
@@ -3366,7 +3368,15 @@ imap_update_summary (CamelFolder *folder, int exists,
 					store->dontdistridlehack = FALSE;
 					return;
 				}
-			camel_folder_summary_clear (folder->summary);
+
+			for (i=0; i<folder->summary->messages->len; i++) {
+				CamelMessageInfo *ri = (CamelMessageInfo *) folder->summary->messages->pdata[i];
+				((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_EXPUNGED;
+				((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_FREED;
+				camel_folder_summary_remove (folder->summary, ri);
+			}
+
+
 			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - tcnt);
 
 			if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
