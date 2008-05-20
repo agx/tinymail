@@ -552,7 +552,7 @@ mbox_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Camel
 
 	/* check if the summary is up-to-date */
 	if (g_stat(cls->folder_path, &st) == -1) {
-		camel_folder_summary_clear(s);
+		camel_folder_summary_dispose_all (s);
 		camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 				      _("Cannot check folder: %s: %s"),
 				      cls->folder_path, g_strerror (errno));
@@ -575,7 +575,7 @@ mbox_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Camel
 				camel_message_info_free(info);
 			}
 		}
-		camel_folder_summary_clear(s);
+		camel_folder_summary_dispose_all (s);
 		ret = 0;
 	} else {
 		/* is the summary uptodate? */

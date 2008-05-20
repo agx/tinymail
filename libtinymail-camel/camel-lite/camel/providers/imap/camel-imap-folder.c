@@ -623,7 +623,7 @@ camel_imap_folder_selected (CamelFolder *folder, CamelImapResponse *response,
 		imap_summary->validity = validity;
 	else if (validity != imap_summary->validity) {
 		imap_summary->validity = validity;
-		camel_folder_summary_clear (folder->summary);
+		camel_folder_summary_dispose_all (folder->summary);
 		CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 		camel_imap_message_cache_clear (imap_folder->cache);
 		CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
@@ -3369,13 +3369,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 					return;
 				}
 
-			for (i=0; i<folder->summary->messages->len; i++) {
-				CamelMessageInfo *ri = (CamelMessageInfo *) folder->summary->messages->pdata[i];
-				((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_EXPUNGED;
-				((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_FREED;
-				camel_folder_summary_remove (folder->summary, ri);
-			}
-
+			camel_folder_summary_dispose_all (folder->summary);
 
 			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - tcnt);
 

@@ -409,6 +409,8 @@ void camel_folder_summary_move_up (CamelFolderSummary *s);
 void camel_folder_summary_lock ();
 void camel_folder_summary_unlock ();
 
+void camel_folder_summary_dispose_all (CamelFolderSummary *s);
+
 G_END_DECLS
 
 #endif /* ! _CAMEL_FOLDER_SUMMARY_H */

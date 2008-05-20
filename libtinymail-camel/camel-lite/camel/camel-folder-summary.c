@@ -346,7 +346,6 @@ camel_folder_summary_finalize (CamelObject *obj)
 	g_ptr_array_foreach (s->messages, foreach_msginfo, (gpointer)s->message_info_size);
 	g_ptr_array_foreach (s->expunged, foreach_msginfo, (gpointer)s->message_info_size);
 
-	/* camel_folder_summary_clear(s); */
 	g_ptr_array_free(s->messages, TRUE);
 	g_ptr_array_free(s->expunged, TRUE);
 
@@ -1622,6 +1621,49 @@ camel_folder_summary_clear(CamelFolderSummary *s)
 	CAMEL_SUMMARY_UNLOCK(s, summary_lock);
 }
 
+void
+camel_folder_summary_dispose_all (CamelFolderSummary *s)
+{
+	int i;
+
+	if (s->messages && s->messages->len > 0)
+	{
+		GPtrArray *items = g_ptr_array_sized_new (s->messages->len);
+
+		CAMEL_SUMMARY_LOCK(s, summary_lock);
+		g_static_rec_mutex_lock (&global_lock);
+
+		for (i=0; i<s->messages->len; i++) {
+			CamelMessageInfo *info = (CamelMessageInfo *) s->messages->pdata[i];
+			CamelMessageInfoBase *mi = (CamelMessageInfoBase *) s->messages->pdata[i];
+
+			mi->flags |= CAMEL_MESSAGE_EXPUNGED;
+			mi->flags |= CAMEL_MESSAGE_FREED;
+			destroy_possible_pstring_stuff (s, info, FALSE);
+			mi->subject = "Expunged";
+			mi->to = "Expunged";
+			mi->from = "Expunged";
+			mi->cc = "Expunged";
+
+			g_ptr_array_add (items, info);
+		}
+
+		for (i=0; i<items->len; i++) {
+			CamelMessageInfo *info = (CamelMessageInfo *) items->pdata[i];
+			g_ptr_array_remove(s->messages, info);
+			g_ptr_array_add (s->expunged, info);
+		}
+
+		s->had_expunges = TRUE;
+		s->flags |= CAMEL_SUMMARY_DIRTY;
+
+		g_static_rec_mutex_unlock (&global_lock);
+		CAMEL_SUMMARY_UNLOCK(s, summary_lock);
+
+		g_ptr_array_free (items, TRUE);
+
+	}
+}
 
 /**
  * camel_folder_summary_remove:
