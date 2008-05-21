@@ -1,5 +1,11 @@
 2008-05-21  Philip Van Hoof <pvanhoof@gnome.org>
 
+	* Help piece of shit IMAP servers that don't do SEARCH correctly, like
+	AOL's IMAP server May 2008, by asking for the same thing using UID
+	FETCH.
+
+2008-05-21  Philip Van Hoof <pvanhoof@gnome.org>
+
 	* Writing in chunks of 64 bytes
 	* Timeout per chunk is 15 seconds
 

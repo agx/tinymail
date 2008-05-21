@@ -3315,6 +3315,53 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	/* Figure out whether we need more */
 	more = (cnt < (exists - seq));
+
+	if ((cnt < nextn) && more)
+	{
+		int i;
+
+		g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
+		g_ptr_array_free (needheaders, TRUE);
+		needheaders = g_ptr_array_new ();
+
+		/* Old less efficient style */
+		if (!camel_imap_command_start (store, folder, ex,
+			"UID FETCH %d:%d (UID)", seq + 1, MAX (1, MIN (seq + 1 + nextn, exists)))) 
+		{
+			if (camel_operation_cancel_check (NULL))
+				imap_folder->cancel_occurred = TRUE;
+			else
+				g_warning ("IMAP error getting UIDs (1,1,1)");
+			camel_folder_summary_kill_hash (folder->summary);
+			camel_operation_end (NULL);
+			store->dontdistridlehack = FALSE;
+			return;
+		}
+
+		tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - tcnt);
+
+		if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
+		{
+			if (camel_operation_cancel_check (NULL))
+				imap_folder->cancel_occurred = TRUE;
+			else
+				g_warning ("IMAP error getting UIDs (1,2,1)");
+
+			g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
+			g_ptr_array_free (needheaders, TRUE);
+			camel_operation_end (NULL);
+			more = FALSE;
+			camel_folder_summary_kill_hash (folder->summary);
+			store->dontdistridlehack = FALSE;
+			return;
+		}
+		camel_operation_end (NULL);
+		more = FALSE;
+		did_hack = TRUE;
+	}
+
+	more = (cnt < (exists - seq));
+
 	/* If we received less than what we asked for, yet need more */
 	if ((cnt < nextn) && more)
 	{
@@ -3329,6 +3376,9 @@ imap_update_summary (CamelFolder *folder, int exists,
 				store->dontdistridlehack = FALSE;
 				return;
 			}
+
+		camel_folder_summary_dispose_all (folder->summary);
+
 		cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - cnt);
 
 		if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
