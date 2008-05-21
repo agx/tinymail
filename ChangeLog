@@ -1,3 +1,8 @@
+2008-05-21  Philip Van Hoof <pvanhoof@gnome.org>
+
+	* Writing in chunks of 64 bytes
+	* Timeout per chunk is 15 seconds
+
 2008-05-20  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed a fallback envelope fetch, don't do the clear on the summary.

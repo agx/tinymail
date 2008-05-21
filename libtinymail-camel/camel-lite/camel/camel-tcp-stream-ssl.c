@@ -698,6 +698,9 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 		do {
 			PRInt32 res;
 
+			/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
+			ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
+
 			pollfds[0].out_flags = 0;
 			w = -1;
 
@@ -716,7 +719,7 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 				do {
 					w = -1;
 					if (begin_read (tcp_stream_ssl)) {
-						w = PR_Write (tcp_stream_ssl->priv->sockfd, buffer + written, n - written);
+						w = PR_Write (tcp_stream_ssl->priv->sockfd, buffer + written, actual /* n - written */);
 						if (w == -1)
 							set_errno (PR_GetError ());
 						end_read (tcp_stream_ssl);
@@ -761,6 +764,9 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 		do {
 			PRInt32 res;
 
+			/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
+			ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
+
 			pollfds[0].out_flags = 0;
 			pollfds[1].out_flags = 0;
 			w = -1;
@@ -782,7 +788,7 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 				do {
 					w = -1;
 					if (begin_read (tcp_stream_ssl)) {
-						w = PR_Write (tcp_stream_ssl->priv->sockfd, buffer + written, n - written);
+						w = PR_Write (tcp_stream_ssl->priv->sockfd, buffer + written, actual /* n - written */);
 						if (w == -1)
 							set_errno (PR_GetError ());
 						end_read (tcp_stream_ssl);

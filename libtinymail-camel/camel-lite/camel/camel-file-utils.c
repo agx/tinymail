@@ -601,8 +601,11 @@ camel_write (int fd, const char *buf, size_t n)
 #endif
 	if (cancel_fd == -1) {
 		do {
+			/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
+			ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
+
 			do {
-				w = write (fd, buf + written, n - written);
+				w = write (fd, buf + written, actual /* n - written */);
 			} while (w == -1 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK));
 			if (w > 0)
 				written += w;
@@ -616,15 +619,20 @@ camel_write (int fd, const char *buf, size_t n)
 		fcntl (fd, F_SETFL, flags | O_NONBLOCK);
 
 		fdmax = MAX (fd, cancel_fd) + 1;
+
+
 		do {
 			struct timeval tv;
 			int res;
+
+			/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
+			ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
 
 			FD_ZERO (&rdset);
 			FD_ZERO (&wrset);
 			FD_SET (fd, &wrset);
 			FD_SET (cancel_fd, &rdset);
-			tv.tv_sec = BLOCKING_READ_TIMEOUT;
+			tv.tv_sec = BLOCKING_WRITE_TIMEOUT;
 			tv.tv_usec = 0;
 			w = -1;
 
@@ -638,7 +646,7 @@ camel_write (int fd, const char *buf, size_t n)
 				errno = EINTR;
 			else {
 				do {
-					w = write (fd, buf + written, n - written);
+					w = write (fd, buf + written, actual /*n - written*/);
 				} while (w == -1 && errno == EINTR);
 
 				if (w == -1) {
