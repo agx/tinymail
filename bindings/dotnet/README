@@ -20,6 +20,8 @@ bug https://bugzilla.novell.com/show_bug.cgi?id=357324
 You also need to patch ./gtk-sharp-patch-03.diff discussed in Novell
 bug https://bugzilla.novell.com/show_bug.cgi?id=361504
 
+And you need apt-get install libxml-libxml-perl
+
 Tracker bug: https://bugzilla.novell.com/show_bug.cgi?id=361505
 
 
@@ -42,7 +44,7 @@ patch -p0 < gtk-sharp-patch-03.diff
 # We just need the adapted generator, but GtkSharp's build system
 # does not make it possible to compile just that part :-( :
 
-./boodstrap-2.12 --prefix=/opt/gtk-sharp
+./bootstrap-2.12 --prefix=/opt/gtk-sharp
 
 make && sudo make install
 export PKG_CONFIG_PATH=/opt/gtk-sharp/lib/pkgconfig:/opt/tinymail/lib/pkgconfig
