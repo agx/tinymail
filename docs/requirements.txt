@@ -51,6 +51,14 @@ make install
 If you also want to build the Python bindings, install python-gtk2-dev python-dev
 add --enable-python-bindings to the autogen.sh line.
 
+If you also want to build the .NET bindings, read bindings/dotnet/README. You'll
+need to checkout gtk-sharp and apply two patches, then rebuild it and install it
+in for example /opt/gtk-sharp. It's possible that the patches have been accepted
+upstream by the time that you read this.
+
+If you also want to (re)build the Vala bindings, you'll need vapigen and valac,
+for more information check the README file in bindings/vala/README
+
 Redhat, Fedora, etc etc
 -----------------------
 TODO
