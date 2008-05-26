@@ -4534,7 +4534,7 @@ handle_freeup (CamelImapStore *store, gint nread, CamelException *ex)
 	}
 }
 
-static GStaticMutex gmsgstore_lock = G_STATIC_MUTEX_INIT;
+static GStaticRecMutex gmsgstore_lock = G_STATIC_REC_MUTEX_INIT;
 
 static gboolean
 check_gmsgstore_die (gpointer user_data)
@@ -4542,7 +4542,7 @@ check_gmsgstore_die (gpointer user_data)
 	CamelImapFolder *imap_folder = user_data;
 	gboolean retval = TRUE;
 
-	if (g_static_mutex_trylock (&gmsgstore_lock))
+	if (g_static_rec_mutex_trylock (&gmsgstore_lock))
 	{
 		imap_folder->gmsgstore_ticks--;
 		if (imap_folder->gmsgstore_ticks <= 0)
@@ -4557,7 +4557,7 @@ check_gmsgstore_die (gpointer user_data)
 			}
 			retval = FALSE;
 		}
-		g_static_mutex_unlock (&gmsgstore_lock);
+		g_static_rec_mutex_unlock (&gmsgstore_lock);
 	} else
 		retval = TRUE;
 
@@ -4572,7 +4572,7 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 	gboolean amcon = FALSE;
 
 
-	g_static_mutex_lock (&gmsgstore_lock); /* A */
+	g_static_rec_mutex_lock (&gmsgstore_lock); /* A */
 
 	if (imap_folder->gmsgstore) {
 		imap_debug ("Get-Message service reused\n");
@@ -4590,7 +4590,7 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 						_("This message is not currently available"
 						" and can't go online to fetch it: %s"),
 						camel_exception_get_description (&tex));
-				g_static_mutex_unlock (&gmsgstore_lock);
+				g_static_rec_mutex_unlock (&gmsgstore_lock);
 				camel_exception_clear (&tex);
 				return NULL;
 			}
@@ -4609,7 +4609,7 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 		{
 			g_critical ("Severe interal error while trying to construct a new connection\n");
 			camel_object_unref (store);
-			g_static_mutex_unlock (&gmsgstore_lock);
+			g_static_rec_mutex_unlock (&gmsgstore_lock);
 			return NULL;
 		}
 
@@ -4631,7 +4631,7 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 						" storage space resources."));
 
 			CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
-			g_static_mutex_unlock (&gmsgstore_lock);
+			g_static_rec_mutex_unlock (&gmsgstore_lock);
 			return NULL;
 		}
 		camel_exception_clear (ex);
@@ -4665,14 +4665,14 @@ stop_gmsgstore (CamelImapFolder *imap_folder, gboolean ctchecker, gboolean quick
 		}
 	}
 
-	g_static_mutex_unlock (&gmsgstore_lock); /* A */
+	g_static_rec_mutex_unlock (&gmsgstore_lock); /* A */
 }
 
 
 static void 
 stop_gmsgstore_from_idle (CamelImapFolder *imap_folder)
 {
-	g_static_mutex_lock (&gmsgstore_lock); /* A */
+	g_static_rec_mutex_lock (&gmsgstore_lock); /* A */
 	if (imap_folder->gmsgstore) {
 		imap_folder->gmsgstore->clean_exit = FALSE;
 		imap_folder->gmsgstore_ticks = 0;
@@ -4680,7 +4680,7 @@ stop_gmsgstore_from_idle (CamelImapFolder *imap_folder)
 		imap_folder->gmsgstore_signal = g_timeout_add (1,
 			check_gmsgstore_die, imap_folder);
 	}
-	g_static_mutex_unlock (&gmsgstore_lock); /* A */
+	g_static_rec_mutex_unlock (&gmsgstore_lock); /* A */
 }
 
 static char *
@@ -4753,9 +4753,11 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 		noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
 		if (noop_response)
 			camel_imap_response_free (store, noop_response);
-		else 
+		else {
+			stop_gmsgstore (imap_folder, ctchecker, FALSE);
 			return NULL;
-
+		}
+		
 		camel_operation_start (NULL, _("Retrieving converted message part"));
 
 		fil = fopen (path, "w");
@@ -5011,8 +5013,10 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 		noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
 		if (noop_response)
 			camel_imap_response_free (store, noop_response);
-		else 
+		else {
+			stop_gmsgstore (imap_folder, ctchecker, FALSE);
 			return NULL;
+		}
 
 		camel_operation_start (NULL, _("Retrieving message part"));
 
@@ -5441,9 +5445,10 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 			noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
 			if (noop_response)
 				camel_imap_response_free (store, noop_response);
-			else 
+			else {
+				stop_gmsgstore (imap_folder, ctchecker, FALSE);
 				return NULL;
-
+			}
 
 			camel_operation_start (NULL, _("Retrieving message bodystructure"));
 
@@ -5557,9 +5562,10 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
 	if (noop_response)
 		camel_imap_response_free (store, noop_response);
-	else 
+	else {
+		stop_gmsgstore (imap_folder, ctchecker, FALSE);
 		return NULL;
-
+	}
 
 	camel_operation_start (NULL, _("Retrieving message"));
 
