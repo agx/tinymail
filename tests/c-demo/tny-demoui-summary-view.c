@@ -1,5 +1,5 @@
 /* tinymail - Tiny Mail
- * Copyright (C) 2006-2007 Philip Van Hoof <pvanhoof@gnome.org>
+ * Copyright (C) 2006-2008 Philip Van Hoof <pvanhoof@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
