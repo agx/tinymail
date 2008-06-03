@@ -581,7 +581,10 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 		camel_pop3_engine_command_free (store->engine, pc);
 	}
 
-	camel_object_unref (CAMEL_OBJECT (store->engine));
+	/* camel_pop3_engine_iterate could issue a disconnect that
+	   could set engine to NULL */
+	if (store->engine)
+		camel_object_unref (CAMEL_OBJECT (store->engine));
 	camel_object_unref (CAMEL_OBJECT (tcp_stream));
 	g_static_rec_mutex_lock (store->eng_lock);
 	store->engine = NULL;
