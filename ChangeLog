@@ -53,7 +53,6 @@
         an empty file for each message in the folder maildir metadata
         directory (the one on top of cur, new and tmp).
 
->>>>>>> .r3687
 2008-05-26  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Bugfix when fetching parts and messages
