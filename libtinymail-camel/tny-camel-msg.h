@@ -56,6 +56,8 @@ struct _TnyCamelMsgClass
 	gchar* (*get_url_string) (TnyMsg *self);
 	void (*uncache_attachments) (TnyMsg *self);
 	void (*rewrite_cache) (TnyMsg *self);
+	gboolean (*get_allow_external_images) (TnyMsg *self);
+	void (*set_allow_external_images) (TnyMsg *self, gboolean allow);
 };
 
 GType tny_camel_msg_get_type (void);

@@ -47,6 +47,8 @@ struct _TnyMsgIface
 	gchar* (*get_url_string) (TnyMsg *self);
 	void (*uncache_attachments) (TnyMsg *self);
 	void (*rewrite_cache) (TnyMsg *self);
+	gboolean (*get_allow_external_images) (TnyMsg *self);
+	void (*set_allow_external_images) (TnyMsg *self, gboolean allow);
 
 };
 
@@ -57,6 +59,8 @@ TnyFolder* tny_msg_get_folder (TnyMsg *self);
 gchar* tny_msg_get_url_string (TnyMsg *self);
 void tny_msg_uncache_attachments (TnyMsg *self);
 void tny_msg_rewrite_cache (TnyMsg *self);
+gboolean tny_msg_get_allow_external_images (TnyMsg *self);
+void tny_msg_set_allow_external_images (TnyMsg *self, gboolean allow);
 
 G_END_DECLS
 

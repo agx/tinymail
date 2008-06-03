@@ -176,6 +176,8 @@ static void camel_imap_folder_changed_for_idle (CamelFolder *folder, int exists,
 static void imap_delete_attachments (CamelFolder *folder, const char *uid);
 static void imap_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
+static gboolean imap_get_allow_external_images (CamelFolder *folder, const char *uid);
+static void imap_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow);
 
 static void stop_gmsgstore_from_idle (CamelImapFolder *imap_folder);
 
@@ -214,6 +216,8 @@ camel_imap_folder_class_init (CamelImapFolderClass *camel_imap_folder_class)
 	camel_folder_class->thaw = imap_thaw;
 	camel_folder_class->delete_attachments = imap_delete_attachments;
 	camel_folder_class->rewrite_cache = imap_rewrite_cache;
+	camel_folder_class->get_allow_external_images = imap_get_allow_external_images;
+	camel_folder_class->set_allow_external_images = imap_set_allow_external_images;
 
 	camel_disco_folder_class->refresh_info_online = imap_refresh_info;
 	camel_disco_folder_class->sync_online = imap_sync_online;
@@ -376,6 +380,24 @@ imap_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg)
 	camel_imap_message_cache_replace_with_wrapper (cache, uid, CAMEL_DATA_WRAPPER  (msg), NULL);
 /* 	camel_imap_message_cache_remove (cache, uid); */
 /* 	camel_imap_message_cache_replace_cache (cache, uid, NULL, uid, ".purgetmp"); */
+	return;
+}
+
+static gboolean
+imap_get_allow_external_images (CamelFolder *folder, const char *uid)
+{
+	CamelImapMessageCache *cache = CAMEL_IMAP_FOLDER (folder)->cache;
+
+	return camel_imap_message_cache_get_allow_external_images (cache, uid);
+}
+
+static void
+imap_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow)
+{
+	CamelImapMessageCache *cache = CAMEL_IMAP_FOLDER (folder)->cache;
+
+	camel_imap_message_cache_set_allow_external_images (cache, uid, allow);
+
 	return;
 }
 

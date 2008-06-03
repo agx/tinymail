@@ -110,6 +110,9 @@ void camel_imap_message_cache_delete_attachments (CamelImapMessageCache *cache, 
 void camel_imap_message_cache_replace_cache (CamelImapMessageCache *cache, const char *uid, const char *part_spec,
 					     const char *dest_uid, const char *dest_part_spec);
 
+gboolean camel_imap_message_cache_get_allow_external_images (CamelImapMessageCache *cache, const char *uid);
+void camel_imap_message_cache_set_allow_external_images (CamelImapMessageCache *cache, const char *uid, gboolean allow);
+
 void
 camel_imap_message_cache_replace_with_wrapper (CamelImapMessageCache *cache,
 					       const char *uid,

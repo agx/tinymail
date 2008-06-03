@@ -32,6 +32,7 @@
 #endif
 
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 
 #include <glib/gi18n-lib.h>
@@ -394,6 +395,41 @@ camel_imap_message_cache_set_partial (CamelImapMessageCache *cache, const char *
 	}
 
 	g_free (path);
+}
+
+gboolean
+camel_imap_message_cache_get_allow_external_images (CamelImapMessageCache *cache, const char *uid)
+{
+	gchar *path = g_strdup_printf ("%s/%s.getimages", cache->path, uid);
+	gboolean retval = FALSE;
+
+	retval = g_file_test (path, G_FILE_TEST_IS_REGULAR);
+
+	g_free (path);
+
+	return retval;
+}
+
+void
+camel_imap_message_cache_set_allow_external_images (CamelImapMessageCache *cache, const char *uid, gboolean allow)
+{
+	gchar *path = g_strdup_printf ("%s/%s.getimages", cache->path, uid);
+	int fd;
+
+	if (!allow)
+	{
+		if (g_file_test (path, G_FILE_TEST_IS_REGULAR))
+			g_unlink (path);
+	} else {
+		if (!g_file_test (path, G_FILE_TEST_IS_REGULAR))
+		{
+		    fd = g_open (path, O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0600);
+		    if (fd != -1)
+			close (fd);
+		}
+	}
+
+	g_free (path);	
 }
 
 /**

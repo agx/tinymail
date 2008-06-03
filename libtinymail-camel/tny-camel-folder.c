@@ -666,7 +666,46 @@ _tny_camel_folder_rewrite_cache (TnyCamelFolder *self, const gchar *uid, CamelMi
 	g_static_rec_mutex_unlock (priv->folder_lock);
 }
 
+gboolean
+_tny_camel_folder_get_allow_external_images (TnyCamelFolder *self, const gchar *uid)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	gboolean retval;
 
+	g_static_rec_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+		if (!load_folder_no_lock (priv))
+		{
+			g_static_rec_mutex_unlock (priv->folder_lock);
+			return FALSE;
+		}
+
+	retval = camel_folder_get_allow_external_images (priv->folder, uid);
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
+	return retval;
+}
+
+void
+_tny_camel_folder_set_allow_external_images (TnyCamelFolder *self, const gchar *uid, gboolean allow)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	gboolean retval;
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+
+	if (!priv->folder || !priv->loaded || !CAMEL_IS_FOLDER (priv->folder))
+		if (!load_folder_no_lock (priv))
+		{
+			g_static_rec_mutex_unlock (priv->folder_lock);
+			return;
+		}
+
+	camel_folder_set_allow_external_images (priv->folder, uid, allow);
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
+}
 
 static gboolean
 tny_camel_folder_add_msg_shared (TnyFolder *self, TnyMsg *msg, TnyFolderChange *change, GError **err)

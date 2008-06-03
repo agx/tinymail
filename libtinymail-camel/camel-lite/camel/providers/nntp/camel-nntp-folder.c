@@ -406,6 +406,29 @@ nntp_folder_transfer_message (CamelFolder *source, GPtrArray *uids, CamelFolder 
 	                      _("You cannot copy messages from a NNTP folder!"));
 }
 
+static gboolean
+nntp_folder_get_allow_external_images (CamelFolder *folder, const char *uid)
+{
+	gboolean retval;
+	CamelNNTPStore *nntp_store;
+
+	nntp_store = (CamelNNTPStore *) folder->parent_store;
+	retval = camel_data_cache_get_allow_external_images (nntp_store->cache, "cache", uid);
+	
+	return retval;
+}
+
+static gboolean
+nntp_folder_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow)
+{
+	CamelNNTPStore *nntp_store;
+
+	nntp_store = (CamelNNTPStore *) folder->parent_store;
+	camel_data_cache_set_allow_external_images (nntp_store->cache, "cache", uid, allow);
+	
+	return;
+}
+
 static void
 nntp_folder_init (CamelNNTPFolder *nntp_folder, CamelNNTPFolderClass *klass)
 {
@@ -460,6 +483,8 @@ nntp_folder_class_init (CamelNNTPFolderClass *camel_nntp_folder_class)
 	camel_folder_class->search_by_expression = nntp_folder_search_by_expression;
 	camel_folder_class->search_by_uids = nntp_folder_search_by_uids;
 	camel_folder_class->search_free = nntp_folder_search_free;
+	camel_folder_class->get_allow_external_images = nntp_folder_get_allow_external_images;
+	camel_folder_class->set_allow_external_images = nntp_folder_set_allow_external_images;
 }
 
 CamelType

@@ -1,3 +1,53 @@
+2008-06-03  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail/tny-msg.[ch]:
+        New virtual methods get/set allow external images, to store
+        user acceptation to allow mail client to fetch external images
+        referenced in a message.
+
+	* libtinymail-camel/tny-camel-msg.[ch]:
+        Implement new public methods get/set allow external images
+        available in TnyMsg interface. It uses TnyCamelFolder for
+        implementation of storage of the flag.
+
+	* libtinymail-camel/tny-camel-folder.c,
+	libtinymail-camel/tny-camel-folder-priv.h:
+        In camel we delegate on folder for storing the "get external
+        images" flag. Then we expose a private method for this, that
+        will be called in TnyMsg public implementation.
+
+	* libtinymail-camel/camel-lite/camel/camel-folder.[ch]:
+        Add new virtual methods (not implemented here) for getting
+        and setting "get external images" flag for each message.
+
+	* libtinymail-camel/camel-lite/camel/camel-data-cache.[ch]:
+        Implementation of storage of "get external images" flag in
+        data cache. It stores a file with extension getimages in the
+        same folder the message contents are retrieved.
+
+	* libtinymail-camel/camel-lite/camel/providers/nntp/camel-nntp-folder.c:
+        Implement get/set allow external images methods. It stores
+        it in the camel data cache using the methods the cache
+        exposes for this.
+
+	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c:
+        Implement get/set allow external images methods. It also uses
+        the data cache as nntp provider.
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
+        Implement get/set allow external images methods. It relies on
+        proper implementation in imap messages cache.
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-message-cache.[ch]:
+        Add storage of allow external images flag. It saves an empty
+        file with extension getimages per allowed file (similar to
+        is partial flag approach).
+
+	* libtinymail-camel/camel-lite/camel/providers/local/camel-maildir-folder.c:
+        Implement get/set allow external images methods. It stores
+        an empty file for each message in the folder maildir metadata
+        directory (the one on top of cur, new and tmp).
+
 2008-05-26  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Bugfix when fetching parts and messages

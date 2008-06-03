@@ -228,6 +228,50 @@ tny_camel_msg_rewrite_cache (TnyMsg *self)
 	return;
 }
 
+static gboolean
+tny_camel_msg_get_allow_external_images_default (TnyMsg *self)
+{
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+	gboolean allow = FALSE;
+	
+	if (priv->folder && priv->header) {
+		gchar *uid;
+		uid = tny_header_dup_uid (priv->header);
+		allow = _tny_camel_folder_get_allow_external_images (TNY_CAMEL_FOLDER(priv->folder),
+								     uid);
+		g_free (uid);
+	}
+	return allow;
+}
+
+static gboolean
+tny_camel_msg_get_allow_external_images (TnyMsg *self)
+{
+	return TNY_CAMEL_MSG_GET_CLASS (self)->get_allow_external_images (self);
+}
+
+static void
+tny_camel_msg_set_allow_external_images_default (TnyMsg *self, gboolean allow)
+{
+	TnyCamelMsgPriv *priv = TNY_CAMEL_MSG_GET_PRIVATE (self);
+
+	if (priv->folder && priv->header) {
+		gchar *uid;
+		uid = tny_header_dup_uid (priv->header);
+		_tny_camel_folder_set_allow_external_images (TNY_CAMEL_FOLDER(priv->folder),
+							     uid, allow);
+		g_free (uid);
+	}
+	return;
+}
+
+static void
+tny_camel_msg_set_allow_external_images (TnyMsg *self, gboolean allow)
+{
+	TNY_CAMEL_MSG_GET_CLASS (self)->set_allow_external_images (self, allow);
+	return;
+}
+
 static TnyHeader*
 tny_camel_msg_get_header_default (TnyMsg *self)
 {
@@ -359,6 +403,8 @@ tny_msg_init (gpointer g, gpointer iface_data)
 	klass->get_url_string= tny_camel_msg_get_url_string;
 	klass->uncache_attachments= tny_camel_msg_uncache_attachments;
 	klass->rewrite_cache= tny_camel_msg_rewrite_cache;
+	klass->get_allow_external_images = tny_camel_msg_get_allow_external_images;
+	klass->set_allow_external_images = tny_camel_msg_set_allow_external_images;
 
 	return;
 }
@@ -376,6 +422,8 @@ tny_camel_msg_class_init (TnyCamelMsgClass *class)
 	class->get_url_string= tny_camel_msg_get_url_string_default;
 	class->uncache_attachments= tny_camel_msg_uncache_attachments_default;
 	class->rewrite_cache= tny_camel_msg_rewrite_cache_default;
+	class->get_allow_external_images = tny_camel_msg_get_allow_external_images_default;
+	class->set_allow_external_images = tny_camel_msg_set_allow_external_images_default;
 	
 	object_class->finalize = tny_camel_msg_finalize;
 	

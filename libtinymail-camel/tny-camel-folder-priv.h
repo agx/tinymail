@@ -78,6 +78,9 @@ void _tny_camel_folder_reason (TnyCamelFolderPriv *priv);
 void _tny_camel_folder_uncache_attachments (TnyCamelFolder *self, const gchar *uid);
 void _tny_camel_folder_rewrite_cache (TnyCamelFolder *self, const gchar *uid, CamelMimeMessage *msg);
 
+gboolean _tny_camel_folder_get_allow_external_images (TnyCamelFolder *self, const gchar *uid);
+void _tny_camel_folder_set_allow_external_images (TnyCamelFolder *self, const gchar *uid, gboolean allow);
+
 void _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, TnyFolderStoreChange *change, GError **err);
 
 void _tny_camel_folder_freeup_observers (TnyCamelFolder *self, TnyCamelFolderPriv *priv);

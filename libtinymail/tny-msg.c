@@ -91,6 +91,66 @@ tny_msg_rewrite_cache (TnyMsg *self)
 }
 
 /**
+ * tny_msg_set_allow_external_images:
+ * @self: a #TnyMsg
+ * @allow: a #gboolean
+ * 
+ * API WARNING: This API might change
+ * 
+ * Set if views should fetch external images referenced
+ * in this message or not.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+void
+tny_msg_set_allow_external_images (TnyMsg *self, gboolean allow)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MSG (self));
+	g_assert (TNY_MSG_GET_IFACE (self)->get_allow_external_images != NULL);
+#endif
+
+	TNY_MSG_GET_IFACE (self)->set_allow_external_images (self, allow);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return;
+}
+
+
+/**
+ * tny_msg_get_allow_external_images:
+ * @self: a #TnyMsg
+ * 
+ * API WARNING: This API might change
+ * 
+ * Get if views should fetch external images into message.
+ *
+ * Returns: a #gboolean
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+gboolean
+tny_msg_get_allow_external_images (TnyMsg *self)
+{
+	gboolean retval;
+#ifdef DBC /* require */
+	g_assert (TNY_IS_MSG (self));
+	g_assert (TNY_MSG_GET_IFACE (self)->get_allow_external_images != NULL);
+#endif
+
+	retval = TNY_MSG_GET_IFACE (self)->get_allow_external_images (self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
+}
+
+/**
  * tny_msg_get_url_string:
  * @self: a #TnyMsg
  * 

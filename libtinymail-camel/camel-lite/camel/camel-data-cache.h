@@ -95,6 +95,10 @@ gboolean     camel_data_cache_is_partial (CamelDataCache *cache, const char *pat
 
 void         camel_data_cache_set_partial (CamelDataCache *cache, const char *path,
 					      const char *uid, gboolean partial);
+gboolean     camel_data_cache_get_allow_external_images (CamelDataCache *cache, const char *path,
+							 const char *uid);
+void         camel_data_cache_set_allow_external_images (CamelDataCache *cache, const char *path,
+							 const char *uid, gboolean allow);
 void         camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path,
 					      const char *key);
 

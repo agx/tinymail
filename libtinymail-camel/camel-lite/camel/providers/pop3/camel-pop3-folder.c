@@ -80,6 +80,8 @@ static CamelMimeMessage *pop3_get_top (CamelFolder *folder, const char *uid, Cam
 static int pop3_get_local_size (CamelFolder *folder);
 
 static void pop3_delete_attachments (CamelFolder *folder, const char *uid);
+static gboolean pop3_get_allow_external_images (CamelFolder *folder, const char *uid);
+static void pop3_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow);
 
 static void
 check_dir (CamelPOP3Store *store, CamelFolder *folder)
@@ -1069,6 +1071,24 @@ pop3_delete_attachments (CamelFolder *folder, const char *uid)
 	return;
 }
 
+static gboolean
+pop3_get_allow_external_images (CamelFolder *folder, const char *uid)
+{
+	gboolean retval;
+	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
+	retval = camel_data_cache_get_allow_external_images (pop3_store->cache, "cache", uid);
+	return retval;
+}
+
+static void
+pop3_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow)
+{
+	gboolean retval;
+	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
+	camel_data_cache_set_allow_external_images (pop3_store->cache, "cache", uid, allow);
+	return;
+}
+
 static CamelMimeMessage *
 pop3_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType type, gint param, CamelException *ex)
 {
@@ -1821,6 +1841,8 @@ camel_pop3_folder_class_init (CamelPOP3FolderClass *camel_pop3_folder_class)
 	camel_folder_class->get_message = pop3_get_message;
 	camel_folder_class->set_message_flags = pop3_set_message_flags;
 	camel_folder_class->delete_attachments = pop3_delete_attachments;
+	camel_folder_class->get_allow_external_images = pop3_get_allow_external_images;
+	camel_folder_class->set_allow_external_images = pop3_set_allow_external_images;
 
 	camel_disco_folder_class->refresh_info_online = pop3_refresh_info;
 	camel_disco_folder_class->sync_online = pop3_sync_online;

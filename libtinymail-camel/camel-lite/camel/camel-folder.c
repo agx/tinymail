@@ -183,6 +183,17 @@ rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg)
 {
 }
 
+static gboolean
+get_allow_external_images (CamelFolder *folder, const char *uid)
+{
+	return FALSE;
+}
+
+static void
+set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow)
+{
+}
+
 static void
 folder_set_push_email (CamelFolder *folder, gboolean setting)
 {
@@ -246,6 +257,8 @@ camel_folder_class_init (CamelFolderClass *camel_folder_class)
 	camel_folder_class->is_frozen = is_frozen;
 	camel_folder_class->delete_attachments = delete_attachments;
 	camel_folder_class->rewrite_cache = rewrite_cache;
+	camel_folder_class->get_allow_external_images = get_allow_external_images;
+	camel_folder_class->set_allow_external_images = set_allow_external_images;
 
 	/* virtual method overload */
 	camel_object_class->getv = folder_getv;
@@ -412,6 +425,24 @@ camel_folder_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessa
 	g_return_if_fail (CAMEL_IS_FOLDER (folder));
 
 	CF_CLASS (folder)->rewrite_cache (folder, uid, msg);
+
+	return;
+}
+
+gboolean
+camel_folder_get_allow_external_images (CamelFolder *folder, const char *uid)
+{
+	g_return_val_if_fail (CAMEL_IS_FOLDER (folder), FALSE);
+     
+	return CF_CLASS (folder)->get_allow_external_images (folder, uid);
+}
+
+void
+camel_folder_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow)
+{
+	g_return_if_fail (CAMEL_IS_FOLDER (folder));
+     
+	CF_CLASS (folder)->set_allow_external_images (folder, uid, allow);
 
 	return;
 }

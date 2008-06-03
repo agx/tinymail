@@ -314,6 +314,59 @@ camel_data_cache_set_partial (CamelDataCache *cdc, const char *path,
 
 }
 
+gboolean
+camel_data_cache_get_allow_external_images (CamelDataCache *cdc, const char *path,
+					    const char *uid)
+{
+	gboolean retval = FALSE;
+	gchar *mpath; char *dir;
+	guint32 hash;
+	hash = g_str_hash(uid);
+	hash = (hash>>5)&CAMEL_DATA_CACHE_MASK;
+	dir = alloca(strlen(cdc->path) + strlen(path) + 8);
+	sprintf(dir, "%s/%s/%02x", cdc->path, path, hash);
+
+	mpath = g_strdup_printf ("%s/%s.getimages", dir, uid);
+
+	retval = g_file_test (mpath, G_FILE_TEST_IS_REGULAR);
+
+	g_free (mpath);
+
+	return retval;
+}
+
+
+void
+camel_data_cache_set_allow_external_images (CamelDataCache *cdc, const char *path,
+					    const char *uid, gboolean allow)
+{
+	int fd; char *dir;
+	gchar *mpath;
+	guint32 hash;
+	hash = g_str_hash(uid);
+	hash = (hash>>5)&CAMEL_DATA_CACHE_MASK;
+	dir = alloca(strlen(cdc->path) + strlen(path) + 8);
+	sprintf(dir, "%s/%s/%02x", cdc->path, path, hash);
+
+	mpath = g_strdup_printf ("%s/%s.getimages", dir, uid);
+
+	if (!allow)
+	{
+		if (g_file_test (mpath, G_FILE_TEST_IS_REGULAR))
+			g_unlink (mpath);
+	} else {
+		if (!g_file_test (mpath, G_FILE_TEST_IS_REGULAR))
+		{
+		    fd = g_open (mpath, O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0600);
+		    if (fd != -1)
+			close (fd);
+		}
+	}
+
+	g_free (mpath);
+
+}
+
 
 /* Since we have to stat the directory anyway, we use this opportunity to
    lazily expire old data.

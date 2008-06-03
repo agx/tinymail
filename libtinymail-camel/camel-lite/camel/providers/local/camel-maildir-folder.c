@@ -33,11 +33,13 @@
 #include <sys/types.h>
 
 #include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
 
 #include "camel-data-wrapper.h"
 #include "camel-exception.h"
 #include "camel-mime-message.h"
 #include "camel-stream-fs.h"
+#include "camel-file-utils.h"
 
 #include "camel-maildir-folder.h"
 #include "camel-maildir-store.h"
@@ -59,6 +61,9 @@ static CamelMimeMessage *maildir_get_message(CamelFolder * folder, const gchar *
 static void maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
 static void maildir_transfer_messages_to (CamelFolder *source, GPtrArray *uids, CamelFolder *dest, GPtrArray **transferred_uids, gboolean delete_originals, CamelException *ex);
+
+static gboolean maildir_get_allow_external_images (CamelFolder *folder, const char *uid);
+static void maildir_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow);
 
 
 static void maildir_finalize(CamelObject * object);
@@ -107,6 +112,8 @@ static void camel_maildir_folder_class_init(CamelObjectClass * camel_maildir_fol
 	camel_folder_class->append_message = maildir_append_message;
 	camel_folder_class->get_message = maildir_get_message;
 	camel_folder_class->rewrite_cache = maildir_rewrite_cache;
+	camel_folder_class->get_allow_external_images = maildir_get_allow_external_images;
+	camel_folder_class->set_allow_external_images = maildir_set_allow_external_images;
 
 	//camel_folder_class->transfer_messages_to = maildir_transfer_messages_to;
 
@@ -407,3 +414,44 @@ maildir_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *m
 	g_free (name);
 	g_free (dest);
 }
+
+static gboolean
+maildir_get_allow_external_images (CamelFolder *folder, const char *uid)
+{
+	CamelLocalFolder *lf = (CamelLocalFolder *) folder;
+	char *name = NULL;
+	gboolean retval;
+
+	/* write it out to tmp, use the uid we got from the summary */
+	name = g_strdup_printf("%s/%s.getimages", lf->folder_path, uid);
+	retval = g_file_test (name, G_FILE_TEST_IS_REGULAR);
+	g_free (name);
+	return retval;
+}
+
+static void
+maildir_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow)
+{
+	CamelLocalFolder *lf = (CamelLocalFolder *) folder;
+	char *name = NULL;
+	int fd;
+
+	/* write it out to tmp, use the uid we got from the summary */
+	name = g_strdup_printf("%s/%s.getimages", lf->folder_path, uid);
+
+	if (!allow)
+	{
+		if (g_file_test (name, G_FILE_TEST_IS_REGULAR))
+			g_unlink (name);
+	} else {
+		if (!g_file_test (name, G_FILE_TEST_IS_REGULAR))
+		{
+		    fd = g_open (name, O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0600);
+		    if (fd != -1)
+			close (fd);
+		}
+	}
+
+	g_free (name);	
+}
+

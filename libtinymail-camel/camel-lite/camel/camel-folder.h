@@ -216,6 +216,9 @@ typedef struct {
 	void (*delete_attachments) (CamelFolder *folder, const char *uid);
 	void (*rewrite_cache) (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
 
+	gboolean (*get_allow_external_images) (CamelFolder *folder, const char *uid);
+	void (*set_allow_external_images) (CamelFolder *folder, const char *uid, gboolean allow);
+
 	char* (*get_cache_filename) (CamelFolder *folder, const char *uid, const char *spec, CamelFolderPartState *state);
 	char* (*fetch) (CamelFolder *folder, const char *uid, const char *spec, gboolean *binary, CamelException *ex);
 	char* (*fetch_structure) (CamelFolder *folder, const char *uid, CamelException *ex);
@@ -379,6 +382,9 @@ int camel_folder_get_local_size   (CamelFolder *folder);
 
 void camel_folder_delete_attachments (CamelFolder *folder, const char *uid);
 void camel_folder_rewrite_cache (CamelFolder *folder, const char *uid, CamelMimeMessage *msg);
+
+gboolean camel_folder_get_allow_external_images (CamelFolder *folder, const char *uid);
+void camel_folder_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow);
 
 char* camel_folder_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *binary, CamelException *ex);
 char* camel_folder_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex);
