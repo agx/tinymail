@@ -3535,12 +3535,14 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 						g_hash_table_insert(present, fi->full_name, fi);
 					else {
 						fi->flags |= CAMEL_FOLDER_NONEXISTENT;
+						fi->flags |= CAMEL_FOLDER_NOSELECT;
 						camel_folder_info_free(fi);
 					}
 				} else {
 					if (j == 1) {
 						fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
 						hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
+						hfi->flags |= fi->flags;
 					}
 					if (j == 0) {
 						hfi->unread = fi->unread;
@@ -3770,6 +3772,7 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 						if (j == 1 || j == 3) {
 							fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
 							hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
+							hfi->flags |= fi->flags;
 						} else {
 							hfi->unread = fi->unread;
 							hfi->total = fi->total;
