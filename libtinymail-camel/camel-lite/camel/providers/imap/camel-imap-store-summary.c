@@ -296,14 +296,14 @@ camel_imap_store_summary_path_to_full(CamelImapStoreSummary *s, const char *path
 }
 
 static void 
-create_parents (CamelImapStoreSummary *s, const char *path)
+create_parents (CamelImapStoreSummary *s, const char *path, char dir_sep)
 {
 	gchar *p = g_strdup (path);
 	int i = 1, len = strlen (p);
 
 	while (i < len) {
 		char tmp;
-		if (p[i] == '/') {
+		if (p[i] == dir_sep) {
 			tmp = p[i];
 			p[i]=0;
 			if (!(!strcmp (path, p))) {
@@ -363,7 +363,7 @@ camel_imap_store_summary_add_from_full(CamelImapStoreSummary *s, const char *ful
 			if (full_name[len] == ns->sep)
 				len++;
 
-			prefix = camel_imap_store_summary_full_to_path(s, full_name+len, dir_sep?dir_sep:ns->sep?ns->sep:'/');
+			prefix = camel_imap_store_summary_full_to_path(s, full_name+len, ns->sep?ns->sep:dir_sep);
 			if (*ns->path) {
 				pathu8 = g_strdup_printf ("%s/%s", ns->path, prefix);
 				g_free (prefix);
@@ -377,7 +377,7 @@ camel_imap_store_summary_add_from_full(CamelImapStoreSummary *s, const char *ful
 		pathu8 = camel_imap_store_summary_full_to_path(s, full_name, dir_sep);
 	}
 
-	create_parents (s, pathu8);
+	create_parents (s, pathu8, dir_sep);
 
 	info = (CamelImapStoreInfo *)camel_store_summary_add_from_path((CamelStoreSummary *)s, pathu8);
 
