@@ -363,7 +363,7 @@ camel_imap_store_summary_add_from_full(CamelImapStoreSummary *s, const char *ful
 			if (full_name[len] == ns->sep)
 				len++;
 
-			prefix = camel_imap_store_summary_full_to_path(s, full_name+len, ns->sep?ns->sep:dir_sep);
+			prefix = camel_imap_store_summary_full_to_path(s, full_name+len, dir_sep?dir_sep:ns->sep?ns->sep:'/');
 			if (*ns->path) {
 				pathu8 = g_strdup_printf ("%s/%s", ns->path, prefix);
 				g_free (prefix);

@@ -2,6 +2,7 @@
 
 	* Merging folder flags from LSUB
 	* Folders that are only in LSUB are flagged NoSelect automatically
+	* Separator fallbacks
 
 2008-06-03  Sergio Villar Senin  <svillar@igalia.com>
 

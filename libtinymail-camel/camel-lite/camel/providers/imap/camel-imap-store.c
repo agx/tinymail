@@ -3366,7 +3366,7 @@ create_folder (CamelStore *store, const char *parent_name,
 
 static CamelFolderInfo *
 parse_list_response_as_folder_info (CamelImapStore *imap_store,
-				    const char *response)
+				    const char *response, char alt_sep)
 {
 	CamelFolderInfo *fi;
 	int flags;
@@ -3380,7 +3380,10 @@ parse_list_response_as_folder_info (CamelImapStore *imap_store,
 
 	/* FIXME: should use imap_build_folder_info, note the differences with param setting tho */
 
-	si = camel_imap_store_summary_add_from_full(imap_store->summary, dir, sep?sep:'/');
+	if (!imap_store->dir_sep && sep)
+		imap_store->dir_sep = sep;
+
+	si = camel_imap_store_summary_add_from_full(imap_store->summary, dir, sep?sep:alt_sep);
 	g_free(dir);
 	if (si == NULL)
 		return NULL;
@@ -3512,7 +3515,8 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 
 		for (i = 0; i < response->untagged->len; i++) {
 			list = response->untagged->pdata[i];
-			fi = parse_list_response_as_folder_info (imap_store, list);
+			fi = parse_list_response_as_folder_info (imap_store, list, 
+					imap_store->dir_sep);
 
 			if (fi) {
 				if (fi->flags & CAMEL_FOLDER_NONEXISTENT) {
@@ -3692,7 +3696,8 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 
 			for (i = 0; i < response->untagged->len; i++) {
 				list = response->untagged->pdata[i];
-				fi = parse_list_response_as_folder_info (imap_store, list);
+				fi = parse_list_response_as_folder_info (imap_store, list, 
+						namespace->delim?namespace->delim:0);
 
 				if (fi) {
 
@@ -3754,7 +3759,8 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 			for (i = 0; i < response->untagged->len; i++) 
 			{
 				list = response->untagged->pdata[i];
-				fi = parse_list_response_as_folder_info (imap_store, list);
+				fi = parse_list_response_as_folder_info (imap_store, list, 
+						namespace->delim?namespace->delim:0);
 
 				if (fi) {
 
@@ -3845,7 +3851,8 @@ get_folders_sync_ns_only_lsub (CamelImapStore *imap_store, struct _namespace *na
 
 	for (i = 0; i < response->untagged->len; i++) {
 		list = response->untagged->pdata[i];
-		fi = parse_list_response_as_folder_info (imap_store, list);
+		fi = parse_list_response_as_folder_info (imap_store, list, 
+				namespace->delim?namespace->delim:0);
 
 		hfi = g_hash_table_lookup(present, fi->full_name);
 
@@ -3942,6 +3949,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 	{
 		struct _namespaces *ns = imap_store->namespaces;
 		char delim = '.';
+		gboolean has_d = FALSE;
 
 		/* Asking LIST and LSUB recursively is fine for the personal 
 		 * namespace. Whoever puts thousands of folders in his personal
@@ -3956,6 +3964,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 				(gboolean) ns->other, 
 				(gboolean) ns->shared, ex);
 			delim = ns->personal->delim;
+			has_d = TRUE;
 		}
 
 		if (camel_exception_is_set(ex))
@@ -3983,7 +3992,8 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 
 		if (imap_store->summary && camel_store_summary_count( (CamelStoreSummary*)imap_store->summary) == 0) {
 			gchar *str = g_strdup_printf ("* LIST () \"%c\" \"INBOX\"", delim);
-			CamelFolderInfo *fi = parse_list_response_as_folder_info (imap_store, str);
+			CamelFolderInfo *fi = parse_list_response_as_folder_info (imap_store, str, 
+						has_d?delim:imap_store->dir_sep?imap_store->dir_sep:0);
 			camel_folder_info_free(fi);
 			g_free (str);
 		}
