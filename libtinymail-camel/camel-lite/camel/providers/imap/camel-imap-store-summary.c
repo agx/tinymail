@@ -296,7 +296,7 @@ camel_imap_store_summary_path_to_full(CamelImapStoreSummary *s, const char *path
 }
 
 static void 
-create_parents (CamelImapStoreSummary *s, const char *path, char dir_sep)
+create_parents (CamelImapStoreSummary *s, const char *path, char dir_sep, char *ns_path)
 {
 	gchar *p = g_strdup (path);
 	int i = 1, len = strlen (p);
@@ -312,7 +312,15 @@ create_parents (CamelImapStoreSummary *s, const char *path, char dir_sep)
 				info = camel_imap_store_summary_full_name(s, p);
 
 				if (!info) {
-					info = (CamelImapStoreInfo *)camel_store_summary_add_from_path((CamelStoreSummary *)s, p);
+
+					if (!ns_path)
+						info = (CamelImapStoreInfo *)camel_store_summary_add_from_path((CamelStoreSummary *)s, p);
+					else {
+						char *pp = g_strdup_printf ("%s/%s", ns_path, p);
+						info = (CamelImapStoreInfo *)camel_store_summary_add_from_path((CamelStoreSummary *)s, pp);
+						g_free (pp);
+					}
+
 					if (info)
 						camel_store_info_set_string((CamelStoreSummary *)s, (CamelStoreInfo *)info, CAMEL_IMAP_STORE_INFO_FULL_NAME, p);
 				}
@@ -365,6 +373,7 @@ camel_imap_store_summary_add_from_full(CamelImapStoreSummary *s, const char *ful
 
 			prefix = camel_imap_store_summary_full_to_path(s, full_name+len, ns->sep?ns->sep:dir_sep);
 			if (*ns->path) {
+				create_parents (s, prefix, dir_sep, ns->path);
 				pathu8 = g_strdup_printf ("%s/%s", ns->path, prefix);
 				g_free (prefix);
 			} else {
@@ -375,9 +384,9 @@ camel_imap_store_summary_add_from_full(CamelImapStoreSummary *s, const char *ful
 	} else {
 		d(printf("(Cannot find namespace for '%s')\n", full_name));
 		pathu8 = camel_imap_store_summary_full_to_path(s, full_name, dir_sep);
+		create_parents (s, pathu8, dir_sep, NULL);
 	}
 
-	create_parents (s, pathu8, dir_sep);
 
 	info = (CamelImapStoreInfo *)camel_store_summary_add_from_path((CamelStoreSummary *)s, pathu8);
 
