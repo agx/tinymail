@@ -146,7 +146,12 @@ imap_namespace_decode (const char **in, struct _namespace **namespace)
 				if (*inptr == '\\')
 					inptr++;
 
-				node->delim = *inptr++;
+				if (*inptr == '"') {
+					/* The IMAP server should have gave us NIL instead */
+					node->delim = '\0';
+				} else {
+					node->delim = *inptr++;
+				}
 
 				if (*inptr++ != '"')
 					goto exception;
