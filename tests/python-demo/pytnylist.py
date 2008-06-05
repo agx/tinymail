@@ -15,23 +15,23 @@ class PyTnyList(GObject, UserList, List):
 		GObject.__init__(self)
 		UserList.__init__(self, sequence)
 
-	def do_get_length_func(self):
+	def do_get_length(self):
 		return len(self)
 
-	def do_prepend_func(self, obj):
+	def do_prepend(self, obj):
 		self.insert(0, obj)
 
-	def do_append_func(self, obj):
+	def do_append(self, obj):
 		self.append(obj)
 
-	def do_foreach_func(self, func, data):
+	def do_foreach(self, func, data):
 		for item in self:
 			func(item, data) 
 
-	def do_create_iterator_func(self):
+	def do_create_iterator(self):
 		return self.__ListIterator(tuple(self))
 
-	def do_copy_func(self):
+	def do_copy(self):
 		return PyTnyList(self)
 
 	class __ListIterator(GObject, Iterator):
@@ -42,25 +42,25 @@ class PyTnyList(GObject, UserList, List):
 			self.sequence = sequence
 			self.position = 0
 	
-		def do_next_func(self):
+		def do_next(self):
 			self.position += 1
 	
-		def do_prev_func(self):
+		def do_prev(self):
 			self.position -= 1
 	
-		def do_first_func(self):
+		def do_first(self):
 			self.position = 0
 	
-		def do_nth_func(self, pos):
+		def do_nth(self, pos):
 			self.position = pos
 	
-		def do_get_current_func(self):
+		def do_get_current(self):
 			return self.sequence[self.position]
 	
-		def do_is_done_func(self):
+		def do_is_done(self):
 			return not self.position < len(sequence)
 	
-		def do_get_list_func(self):
+		def do_get_list(self):
 			return PyTnyList(self.sequence)
 
 gobject.type_register(PyTnyList)

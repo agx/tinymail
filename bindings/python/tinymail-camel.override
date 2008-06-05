@@ -84,3 +84,4 @@ import tinymail.FolderObserver as PyTnyFolderObserver_Type
 import tinymail.MsgRemoveStrategy as PyTnyMsgRemoveStrategy_Type
 import tinymail.MimePart as PyTnyMimePart_Type
 import tinymail.FolderStoreQuery as PyTnyFolderStoreQuery_Type
+import tinymail.Pair as PyTnyPair_Type

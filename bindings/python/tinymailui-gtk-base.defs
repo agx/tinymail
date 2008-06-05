@@ -364,6 +364,21 @@
   )
 )
 
+(define-method set_no_duplicates
+  (of-object "TnyGtkHeaderListModel")
+  (c-name "tny_gtk_header_list_model_set_no_duplicates")
+  (return-type "none")
+  (parameters
+    '("gboolean" "setting")
+  )
+)
+
+(define-method get_no_duplicates
+  (of-object "TnyGtkHeaderListModel")
+  (c-name "tny_gtk_header_list_model_get_no_duplicates")
+  (return-type "gboolean")
+)
+
 
 
 ;; From tny-gtk-header-view.h

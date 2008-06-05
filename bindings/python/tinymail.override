@@ -316,6 +316,9 @@ typedef struct {
 } PyTnyAccSetPassCaller;
 
 static void
+pytny_list_foreach_marshal(GObject* obj, gpointer data);
+
+static void
 pytny_account_set_pass_func_marshal(GObject* obj, gpointer data)
 {
     PyGILState_STATE state;
@@ -378,15 +381,16 @@ _wrap_tny_account_set_pass_func(PyGObject *self, PyObject *args)
 override tny_folder_get_msg_async kwargs
 
 static void
-tny_get_msg_cb (TnyFolder *self, TnyMsg *msg, GError **err, gpointer user_data)
+tny_get_msg_cb (TnyFolder *self, gboolean cancelled, TnyMsg *msg, GError **err, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
 
     state = pyg_gil_state_ensure();
     callback = PyTuple_GetItem((PyObject *)user_data, 1);
-    args = Py_BuildValue("(NNO)",
+    args = Py_BuildValue("(NNNO)",
                          pygobject_new((GObject *)self),
+			 PyBool_FromLong (cancelled), 
 			 pygobject_new((GObject *)msg),
                          PyTuple_GetItem((PyObject *)user_data, 3));
     ret = PyObject_CallObject(callback, args);
@@ -402,7 +406,7 @@ tny_get_msg_cb (TnyFolder *self, TnyMsg *msg, GError **err, gpointer user_data)
 
 
 static void
-tny_get_msg_status_cb (TnyFolder *self, TnyStatus *status, gpointer user_data)
+tny_get_msg_status_cb (GObject *self, TnyStatus *status, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -476,7 +480,7 @@ tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, GError **err, gpoint
 }
 
 static void
-tny_refresh_folder_status_cb (TnyFolder *self, TnyStatus *status, gpointer user_data)
+tny_refresh_folder_status_cb (GObject *self, TnyStatus *status, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;

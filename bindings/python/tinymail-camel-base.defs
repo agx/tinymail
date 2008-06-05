@@ -54,6 +54,13 @@
   (gtype-id "TNY_TYPE_CAMEL_FULL_MSG_RECEIVE_STRATEGY")
 )
 
+(define-object CamelHeader
+  (in-module "Tny")
+  (parent "GObject")
+  (c-name "TnyCamelHeader")
+  (gtype-id "TNY_TYPE_CAMEL_HEADER")
+)
+
 (define-object CamelIMAPFolder
   (in-module "Tny")
   (parent "TnyCamelFolder")
@@ -185,12 +192,27 @@
   (return-type "GType")
 )
 
+(define-method get_options
+  (of-object "TnyCamelAccount")
+  (c-name "tny_camel_account_get_options")
+  (return-type "none")
+  (parameters
+    '("TnyList*" "options")
+  )
+)
+
+(define-method clear_options
+  (of-object "TnyCamelAccount")
+  (c-name "tny_camel_account_clear_options")
+  (return-type "none")
+)
+
 (define-method add_option
   (of-object "TnyCamelAccount")
   (c-name "tny_camel_account_add_option")
   (return-type "none")
   (parameters
-    '("TnyPair" "option")
+    '("TnyPair*" "option")
   )
 )
 
@@ -319,6 +341,11 @@
 
 ;; From tny-camel-header.h
 
+(define-function camel_header_get_type
+  (c-name "tny_camel_header_get_type")
+  (return-type "GType")
+)
+
 
 
 ;; From tny-camel-imap-folder.h
@@ -356,6 +383,15 @@
   (c-name "tny_camel_mem_stream_new")
   (is-constructor-of "TnyCamelMemStream")
   (return-type "TnyStream*")
+)
+
+(define-function camel_mem_stream_new_with_buffer
+  (c-name "tny_camel_mem_stream_new_with_buffer")
+  (return-type "TnyStream*")
+  (parameters
+    '("const-char*" "buffer")
+    '("size_t" "len")
+  )
 )
 
 
@@ -590,18 +626,6 @@
   )
 )
 
-(define-method add_async
-  (of-object "TnyCamelSendQueue")
-  (c-name "tny_camel_send_queue_add_async")
-  (return-type "none")
-  (parameters
-    '("TnyMsg*" "msg")
-    '("TnySendQueueAddCallback" "callback")
-    '("TnyStatusCallback" "status_callback")
-    '("gpointer" "user_data")
-  )
-)
-
 
 
 ;; From tny-camel-shared.h
@@ -668,6 +692,21 @@
   (c-name "tny_camel_transport_account_new")
   (is-constructor-of "TnyCamelTransportAccount")
   (return-type "TnyTransportAccount*")
+)
+
+(define-method get_from
+  (of-object "TnyCamelTransportAccount")
+  (c-name "tny_camel_transport_account_get_from")
+  (return-type "const-gchar*")
+)
+
+(define-method set_from
+  (of-object "TnyCamelTransportAccount")
+  (c-name "tny_camel_transport_account_set_from")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "from")
+  )
 )
 
 

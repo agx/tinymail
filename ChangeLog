@@ -1,3 +1,13 @@
+2008-06-05  Mark Doffman  <mark.doffman@codethink.co.uk>
+	
+	* bindings/python/* 
+	Update .override and .defs files to reflect changes
+	in tinymail interfaces.
+
+	* tests/python-demo/*
+	Update python implementations to remove _func prefix
+	from methods no longer required by gtk-codegen.
+
 2008-06-05  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Merging folder flags from LSUB

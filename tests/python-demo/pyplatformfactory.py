@@ -17,19 +17,19 @@ class PyPlatformFactory(gobject.GObject, PlatformFactory):
 	def __init__(self):
 		gobject.GObject.__init__(self)
 
-	def do_new_account_store_func(self):
+	def do_new_account_store(self):
 		return XmlAccountStore('tinymailacc.xml')
 
-	def do_new_msg_view_func(self):
+	def do_new_msg_view(self):
 		return GtkMsgView()
 
-	def do_new_msg_func(self):
+	def do_new_msg(self):
 		return CamelMsg()
 
-	def do_new_mime_part_func(self):
+	def do_new_mime_part(self):
 		return CamelMimePart()
 
-	def do_new_password_getter_func(self):
+	def do_new_password_getter(self):
 		return GtkPasswordDialog()
 
 gobject.type_register(PyPlatformFactory)

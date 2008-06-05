@@ -42,6 +42,7 @@ tinymail_h_files = \
         $(top_srcdir)/libtinymail/tny-noop-lockable.h \
         $(top_srcdir)/libtinymail/tny-pair.h \
         $(top_srcdir)/libtinymail/tny-password-getter.h \
+        $(top_srcdir)/libtinymail/tny-seekable.h \
         $(top_srcdir)/libtinymail/tny-send-queue.h \
         $(top_srcdir)/libtinymail/tny-shared.h \
         $(top_srcdir)/libtinymail/tny-signals-marshal.h \

@@ -54,6 +54,7 @@ import tinymail.List as PyTnyList_Type
 import tinymail.FolderStore as PyTnyFolderStore_Type
 import tinymail.FolderStoreQuery as PyTnyFolderStoreQuery_Type
 import tinymail.Stream as PyTnyStream_Type
+import tinymail.ui.MimePartView as PyTnyMimePartView_Type
 import tinymail.ui.MimePartSaver as PyTnyMimePartSaver_Type
 import tinymail.ui.MimePartSaveStrategy as PyTnyMimePartSaveStrategy_Type
 import tinymail.ui.MsgView as PyTnyMsgView_Type

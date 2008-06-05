@@ -31,14 +31,14 @@ class NMDevice(gobject.GObject, tinymail.Device):
 		self.__state(reply_handler=self.__update_state,
 				error_handler=self.__dbus_error)
 
-	def do_is_online_func(self):
+	def do_is_online(self):
 		return self.online
 
-	def do_force_online_func(self):
+	def do_force_online(self):
 		self.__forced = True
 		self.online = True
 
-	def do_force_offline_func(self):
+	def do_force_offline(self):
 		self.__forced = True
 		self.online = False
 

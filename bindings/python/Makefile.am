@@ -23,7 +23,7 @@ _tinymail_la_LDFLAGS = $(common_ldflags) -export-symbols-regex init_tinymail
 _tinymail_la_LIBADD = $(LIBTINYMAIL_LIBS) $(TINYMAIL_PYTHON_LIBS) \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la 
 _tinymail_la_SOURCES = tinymailmodule.c pytny-status.c
-nodist__tinymail_la_SOURCES = tinymail-glue.c
+nodist__tinymail_la_SOURCES = tinymail.c
 
 ui_la_LDFLAGS = $(common_ldflags) -export-symbols-regex initui
 ui_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(TINYMAIL_PYTHON_LIBS) \
@@ -31,7 +31,7 @@ ui_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(TINYMAIL_PYTHON_LIBS) \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la
 ui_la_SOURCES = tinymailuimodule.c
-nodist_ui_la_SOURCES = tinymailui-glue.c
+nodist_ui_la_SOURCES = tinymailui.c
  
 uigtk_la_LDFLAGS = $(common_ldflags) -export-symbols-regex inituigtk
 uigtk_la_LIBADD = $(LIBTINYMAILUI_GTK_LIBS) $(LIBTINYMAILUI_LIBS) \
@@ -40,7 +40,7 @@ uigtk_la_LIBADD = $(LIBTINYMAILUI_GTK_LIBS) $(LIBTINYMAILUI_LIBS) \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui-gtk/libtinymailui-gtk-$(API_VERSION).la
 uigtk_la_SOURCES = tinymailui-gtkmodule.c
-nodist_uigtk_la_SOURCES = tinymailui-gtk-glue.c
+nodist_uigtk_la_SOURCES = tinymailui-gtk.c
 
 camel_la_LDFLAGS = $(common_ldflags) -export-symbols-regex initcamel
 camel_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
@@ -49,14 +49,14 @@ camel_la_LIBADD = $(LIBTINYMAILUI_LIBS) $(LIBTINYMAIL_LIBS) \
         @PLATFORM_LIBS@ \
         $(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la
 camel_la_SOURCES = tinymail-camelmodule.c pytny-session-camel.c
-nodist_camel_la_SOURCES = tinymail-camel-glue.c
+nodist_camel_la_SOURCES = tinymail-camel.c
 
 CREATEDEFS = $(PYTHON) $(top_srcdir)/bindings/python/createdefs.py
 
-CLEANFILES = tinymail-glue.c tinymailui-glue.c tinymailui-gtk-glue.c \
+CLEANFILES = tinymail.c tinymailui.c tinymailui-gtk.c \
 	tinymail.defs \
 	tinymailui.defs tinymailui-gtk.defs \
-	tinymail-camel.defs tinymail-camel-glue.c
+	tinymail-camel.defs tinymail-camel.c
 
 TINYMAIL_DEFS = $(top_srcdir)/bindings/python/tinymail-base.defs \
 	$(top_srcdir)/bindings/python/tinymail-extra.defs
@@ -64,7 +64,7 @@ TINYMAIL_DEFS = $(top_srcdir)/bindings/python/tinymail-base.defs \
 tinymail.defs: $(TINYMAIL_DEFS)
 	$(CREATEDEFS) $@ $(TINYMAIL_DEFS)
 
-tinymail-glue.c: tinymail.defs tinymail.override
+tinymail.c: tinymail.defs tinymail.override
 	$(PYGTK_CODEGEN) --prefix pytinymail \
 	--override $(top_srcdir)/bindings/python/tinymail.override \
 	tinymail.defs > $@
@@ -74,7 +74,7 @@ TINYMAILUI_DEFS = $(top_srcdir)/bindings/python/tinymailui-base.defs
 tinymailui.defs: $(TINYMAILUI_DEFS)
 	$(CREATEDEFS) $@ $(TINYMAILUI_DEFS)
 
-tinymailui-glue.c: tinymailui.defs tinymailui.override
+tinymailui.c: tinymailui.defs tinymailui.override
 	$(PYGTK_CODEGEN) --prefix pyui \
 	--register tinymail.defs \
 	--override $(top_srcdir)/bindings/python/tinymailui.override \
@@ -85,7 +85,7 @@ TINYMAILUI_GTK_DEFS = $(top_srcdir)/bindings/python/tinymailui-gtk-base.defs
 tinymailui-gtk.defs: $(TINYMAILUI_GTK_DEFS)
 	$(CREATEDEFS) $@ $(TINYMAILUI_GTK_DEFS)
 
-tinymailui-gtk-glue.c: tinymail.defs $(PYGTK_DEFSDIR)/gdk-types.defs $(PYGTK_DEFSDIR)/gtk-types.defs tinymailui-gtk.defs tinymailui-gtk.override
+tinymailui-gtk.c: tinymail.defs $(PYGTK_DEFSDIR)/gdk-types.defs $(PYGTK_DEFSDIR)/gtk-types.defs tinymailui-gtk.defs tinymailui-gtk.override
 	$(PYGTK_CODEGEN) --prefix pyuigtk --register $(PYGTK_DEFSDIR)/gdk-types.defs \
 	--register $(PYGTK_DEFSDIR)/gtk-types.defs --register tinymail.defs \
 	--register tinymailui.defs --override $(top_srcdir)/bindings/python/tinymailui-gtk.override \
@@ -97,7 +97,7 @@ TINYMAIL_CAMEL_DEFS = $(top_srcdir)/bindings/python/tinymail-camel-base.defs \
 tinymail-camel.defs: $(TINYMAIL_CAMEL_DEFS)
 	$(CREATEDEFS) $@ $(TINYMAIL_CAMEL_DEFS)
 
-tinymail-camel-glue.c: tinymail-camel.defs tinymail-camel.override
+tinymail-camel.c: tinymail-camel.defs tinymail-camel.override
 	$(PYGTK_CODEGEN) --prefix pycamel \
 	--register tinymail.defs \
 	--override $(top_srcdir)/bindings/python/tinymail-camel.override \

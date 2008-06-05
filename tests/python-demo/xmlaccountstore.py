@@ -43,7 +43,7 @@ class XmlAccountStore(gobject.GObject, AccountStore):
 
 		self.__load_cache()
 	
-	def do_get_accounts_func(self, list, types):
+	def do_get_accounts(self, list, types):
 		store = False
 		transport = False
 		if types == tinymail.ACCOUNT_STORE_STORE_ACCOUNTS:
@@ -59,13 +59,13 @@ class XmlAccountStore(gobject.GObject, AccountStore):
 			elif gobject.type_is_a(account._gtype__, tinymail.TransportAccount) and transport:
 				list.append(account)
 
-	def do_get_cache_dir_func(self):
+	def do_get_cache_dir(self):
 		return self.cacheName
 
-	def do_get_device_func(self):
+	def do_get_device(self):
 		return self.__device
 
-	def do_find_account_func(selfi, urlString):
+	def do_find_account(selfi, urlString):
 		for account in self.__accounts:
 			if account.matches_url_string(urlString):
 				return account
