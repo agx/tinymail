@@ -617,14 +617,14 @@ stream_write (CamelStream *stream, const char *buffer, size_t n)
 		struct timeval timeout;
 		fd_set rdset, wrset;
 
-		/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
-		ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
-
 		flags = fcntl (openssl->priv->sockfd, F_GETFL);
 		fcntl (openssl->priv->sockfd, F_SETFL, flags | O_NONBLOCK);
 
 		fdmax = MAX (openssl->priv->sockfd, cancel_fd) + 1;
 		do {
+			/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
+			ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
+
 			FD_ZERO (&rdset);
 			FD_ZERO (&wrset);
 			FD_SET (openssl->priv->sockfd, &wrset);
