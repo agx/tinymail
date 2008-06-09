@@ -1,3 +1,10 @@
+2008-06-09  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
+	Some mail servers use a namespace for their inbox, but inbox
+	is also a top-level folder. This special-cases it so we get the
+	flags of INBOX and also do the rest of our INBOX special casing.
+
 2008-06-05  Mark Doffman  <mark.doffman@codethink.co.uk>
 	
 	* bindings/python/* 

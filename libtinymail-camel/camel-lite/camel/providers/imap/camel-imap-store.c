@@ -3965,6 +3965,9 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 				(gboolean) ns->shared, ex);
 			delim = ns->personal->delim;
 			has_d = TRUE;
+			if (g_ascii_strncasecmp (ns->personal->prefix, "INBOX", 5) == 0) {
+				get_folders_sync (imap_store, "%", ex);
+			}
 		}
 
 		if (camel_exception_is_set(ex))
