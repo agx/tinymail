@@ -183,11 +183,11 @@ handle_connect (TnyMaemoConicDevice *self, int con_err, int con_state)
 			case CON_IC_CONNECTION_ERROR_NONE:
 				break;
 			case CON_IC_CONNECTION_ERROR_INVALID_IAP:
-				g_set_error (&err, TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_UNKNOWN,
+				g_set_error (&err, TNY_ERROR_DOMAIN, TNY_SERVICE_ERROR_UNKNOWN,
 					"IAP is invalid");
 				break;
 			case CON_IC_CONNECTION_ERROR_CONNECTION_FAILED:
-				g_set_error (&err, TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_UNKNOWN,
+				g_set_error (&err, TNY_ERROR_DOMAIN, TNY_SERVICE_ERROR_UNKNOWN,
 					"Connection failed");
 				break;
 			case CON_IC_CONNECTION_ERROR_USER_CANCELED:
@@ -396,13 +396,13 @@ tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self,
 
 	if (iap_id) {
 		if (!con_ic_connection_connect_by_id (priv->cnx, iap_id, flags)) {
-			g_set_error (&err, TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_UNKNOWN,
+			g_set_error (&err, TNY_ERROR_DOMAIN, TNY_SERVICE_ERROR_UNKNOWN,
 				"Could not send connect_by_id dbus message");
 			request_failed = TRUE;
 		}
 	} else {
 		if (!con_ic_connection_connect (priv->cnx, flags)) {
-			g_set_error (&err, TNY_SERVICE_ERROR, TNY_SERVICE_ERROR_UNKNOWN,
+			g_set_error (&err, TNY_ERROR_DOMAIN, TNY_SERVICE_ERROR_UNKNOWN,
 				"Could not send connect dbus message");
 			request_failed = TRUE;
 		}
