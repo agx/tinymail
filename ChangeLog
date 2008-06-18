@@ -1,3 +1,29 @@
+2008-06-18  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail/tny-shared.h:
+        Added stream cache classes and handlers
+
+	* libtinymail/tny-stream-cache.[ch]:
+        Interface for streams caches. It's mostly intended for image
+        remote streams.
+
+	* libtinymail/tny-fs-stream-cache.[ch]:
+        Implementation of TnyStreamCache interface using a local
+        folder for storage. This implementation tries to keep the
+        size of the cached streams lower than 1 MB.
+
+	* libtinymail/tny-cached-file.[ch]:
+        Data object to store status information of currently cached
+        files. It also controls the process of fetching the remote
+        streams, and creation of streams reading from cache.
+
+	* libtinymail/tny-cached-file-stream.[ch]:
+        Streams wrapping TnyFsStream, that access the cache files
+        waiting when they're not completely fetched yet.
+
+	* libtinymail/Makefile.am:
+        Added stream cache implementation files.
+
 2008-06-10  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:

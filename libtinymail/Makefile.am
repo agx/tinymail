@@ -49,6 +49,10 @@ libtinymail_1_0_headers = \
 	tny-send-queue.h \
 	tny-password-getter.h \
 	tny-merge-folder.h \
+	tny-stream-cache.h \
+	tny-fs-stream-cache.h \
+	tny-cached-file.h \
+	tny-cached-file-stream.h \
 	tny-combined-account.h \
 	tny-connection-policy.h 
 
@@ -91,6 +95,10 @@ libtinymail_1_0_la_SOURCES = \
 	tny-msg-receive-strategy.c \
 	tny-send-queue.c \
 	tny-password-getter.c \
+	tny-stream-cache.c \
+	tny-fs-stream-cache.c \
+	tny-cached-file.c \
+	tny-cached-file-stream.c \
 	tny-merge-folder.c \
 	tny-combined-account.c \
 	tny-idle-stopper.c \

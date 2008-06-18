@@ -104,6 +104,14 @@ typedef struct _TnyConnectionPolicy TnyConnectionPolicy;
 typedef struct _TnyConnectionPolicyIface TnyConnectionPolicyIface;
 typedef struct _TnySeekable TnySeekable;
 typedef struct _TnySeekableIface TnySeekableIface;
+typedef struct _TnyStreamCache TnyStreamCache;
+typedef struct _TnyStreamCacheIface TnyStreamCacheIface;
+typedef struct _TnyFsStreamCache TnyFsStreamCache;
+typedef struct _TnyFsStreamCacheClass TnyFsStreamCacheClass;
+typedef struct _TnyCachedFile TnyCachedFile;
+typedef struct _TnyCachedFileClass TnyCachedFileClass;
+typedef struct _TnyCachedFileStream TnyCachedFileStream;
+typedef struct _TnyCachedFileStreamClass TnyCachedFileStreamClass;
 
 
 /** 
@@ -126,6 +134,9 @@ typedef void (*TnyCreateFolderCallback) (TnyFolderStore *self, gboolean cancelle
 
 typedef void (*TnyFolderCallback) (TnyFolder *self, gboolean cancelled, GError *err, gpointer user_data);
 typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean cancelled, TnyList *headers, GError *err, gpointer user_data);
+
+typedef TnyStream* (*TnyStreamCacheOpenStreamFetcher) (TnyStreamCache *self, gint64 *expected_size, gpointer userdata);
+typedef gboolean (*TnyStreamCacheRemoveFilter) (TnyStreamCache *self, const gchar *id, gpointer userdata);
 
 /** 
  * TnyGetMsgCallback:
