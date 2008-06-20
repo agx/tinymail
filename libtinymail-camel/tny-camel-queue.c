@@ -39,6 +39,7 @@ static GObjectClass *parent_class = NULL;
 #define TNY_CAMEL_QUEUE_GET_PRIVATE(o)	\
 	(G_TYPE_INSTANCE_GET_PRIVATE ((o), TNY_TYPE_CAMEL_QUEUE, TnyCamelQueuePriv))
 
+static void account_finalized (TnyCamelQueue *queue, GObject *finalized_account);
 
 static void
 tny_camel_queue_finalize (GObject *object)
@@ -46,6 +47,11 @@ tny_camel_queue_finalize (GObject *object)
 	TnyCamelQueue *self = (TnyCamelQueue*) object;
 
 	self->stopped = TRUE;
+
+	g_mutex_lock (self->mutex);
+	if (self->account)
+		g_object_weak_unref (G_OBJECT (self->account), (GWeakNotify) account_finalized, self);
+	g_mutex_unlock (self->mutex);
 
 	g_static_rec_mutex_lock (self->lock);
 	g_list_free (self->list);
@@ -64,6 +70,18 @@ tny_camel_queue_finalize (GObject *object)
 	return;
 }
 
+static void
+account_finalized (TnyCamelQueue *queue, GObject *finalized_account)
+{
+	g_mutex_lock (queue->mutex);
+	queue->account = NULL;
+	queue->stopped = TRUE;
+	if (queue->is_waiting) {
+		g_cond_broadcast (queue->condition);
+	}
+	g_mutex_unlock (queue->mutex);
+}
+
 /**
  * _tny_camel_queue_new
  * @account: the account
@@ -78,6 +96,7 @@ _tny_camel_queue_new (TnyCamelAccount *account)
 	TnyCamelQueue *self = g_object_new (TNY_TYPE_CAMEL_QUEUE, NULL);
 
 	self->account = account;
+	g_object_weak_ref (G_OBJECT (account), (GWeakNotify) account_finalized, self);
 
 	return TNY_CAMEL_QUEUE (self);
 }
@@ -175,7 +194,15 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 
 		if (queue->next_uncancel)
 		{
-			_tny_camel_account_actual_uncancel (TNY_CAMEL_ACCOUNT (queue->account));
+			g_mutex_lock (queue->mutex);
+			if (queue->account) {
+				g_object_ref (queue->account);
+				g_mutex_unlock (queue->mutex);
+				_tny_camel_account_actual_uncancel (TNY_CAMEL_ACCOUNT (queue->account));
+				g_object_unref (queue->account);
+			} else {
+				g_mutex_unlock (queue->mutex);
+			}
 			queue->next_uncancel = FALSE;
 		}
 
@@ -255,7 +282,6 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 	queue->thread = NULL;
 	queue->stopped = TRUE;
 
-	g_object_unref (queue->account);
 	g_object_unref (queue);
 
 	return NULL;
@@ -334,7 +360,8 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
 	if (item) {
 		if (item->flags & TNY_CAMEL_QUEUE_CANCELLABLE_ITEM) {
 			if (!(item->flags & TNY_CAMEL_QUEUE_SYNC_ITEM)) {
-				_tny_camel_account_actual_cancel (TNY_CAMEL_ACCOUNT (queue->account));
+				if (queue->account)
+					_tny_camel_account_actual_cancel (TNY_CAMEL_ACCOUNT (queue->account));
 				queue->next_uncancel = TRUE;
 			}
 		}
@@ -388,6 +415,9 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 
 	g_static_rec_mutex_lock (queue->lock);
 
+	if (queue->account == NULL)
+		g_assert ("We should never be running tny_camel_queue_launch_wflags if account was unreferenced");
+
 	if (flags & TNY_CAMEL_QUEUE_PRIORITY_ITEM) 
 	{
 		/* Preserve the order for prioritized items */
@@ -412,7 +442,6 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 		GError *err = NULL;
 		queue->stopped = FALSE;
 		g_object_ref (queue);
-		g_object_ref (queue->account);
 		queue->thread = g_thread_create (tny_camel_queue_thread_main_func, 
 			queue, FALSE, &err);
 		if (err) {

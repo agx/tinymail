@@ -1,5 +1,17 @@
 2008-06-20  Jose Dapena Paz  <jdapena@igalia.com>
 
+	* libtinymail-camel/tny-camel-folder.c:
+        Fix camel operation references
+
+	* libtinymail-camel/tny-camel-bs-mime-part.c:
+        Fix camel operation references
+
+	* libtinymail-camel/tny-camel-queue.c:
+        Make queue reference to account be weak.
+
+	* libtinymail-camel/tny-camel-account.c:
+        More camel operation reference fixes.
+
 	* libtinymail/tny-cached-file-stream.c:
 	Linked the reset implementation to the stream interface.
 

@@ -2508,13 +2508,13 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	if (priv->account && TNY_IS_CAMEL_ACCOUNT (priv->account)) {
 		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 		apriv->getmsg_cancel = cancel;
+		camel_operation_ref (cancel);
 	}
 
 	/* To disable parallel getting of messages while summary is being retreived,
 	 * restore this lock (A) */
 	/* g_static_rec_mutex_lock (priv->folder_lock); */
 
-	camel_operation_ref (cancel);
 	camel_operation_register (cancel);
 	camel_operation_start (cancel, (char *) "Getting message");
 
@@ -2535,6 +2535,7 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 	if (priv->account && TNY_IS_CAMEL_ACCOUNT (priv->account)) {
 		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
 		apriv->getmsg_cancel = NULL;
+		camel_operation_unref (cancel);
 	}
 
 	/* To disable parallel getting of messages while summary is being retreived,

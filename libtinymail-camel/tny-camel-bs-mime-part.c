@@ -556,11 +556,11 @@ decode_async_thread (gpointer user_data)
 		TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->folder);
 		if (fpriv->account && TNY_IS_CAMEL_ACCOUNT (fpriv->account)) {
 			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (fpriv->account);
+			camel_operation_ref (cancel);
 			apriv->getmsg_cancel = cancel;
 		}
 	}
 
-	camel_operation_ref (cancel);
 	camel_operation_register (cancel);
 	camel_operation_start (cancel, (char *) "Getting message part");
 
@@ -588,6 +588,7 @@ decode_async_thread (gpointer user_data)
 		if (fpriv->account && TNY_IS_CAMEL_ACCOUNT (fpriv->account)) {
 			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (fpriv->account);
 			apriv->getmsg_cancel = NULL;
+			camel_operation_unref (cancel);
 		}
 	}
 
