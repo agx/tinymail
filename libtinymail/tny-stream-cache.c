@@ -52,7 +52,6 @@ tny_stream_cache_get_stream (TnyStreamCache *self, const gchar *id,
 #ifdef DBC /* require */
 	g_assert (TNY_IS_STREAM_CACHE (self));
 	g_assert (id);
-	g_assert (expected_size > 0);
 	g_assert (TNY_STREAM_CACHE_GET_IFACE (self)->get_stream!= NULL);
 #endif
 
