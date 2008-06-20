@@ -190,7 +190,7 @@ get_new_fd_of_stream (TnyCachedFile *self, gboolean creation, gboolean temp)
 	priv = TNY_CACHED_FILE_GET_PRIVATE (self);
 	flags = O_RDWR;
 	if (creation) {
-		flags = O_CREAT | O_RDWR;
+		flags = O_CREAT | O_RDWR | O_SYNC;
 	} else {
 		flags |= O_RDONLY;
 	}
@@ -291,7 +291,7 @@ tny_cached_file_unregister_stream_default (TnyCachedFile *self, TnyCachedFileStr
 
 typedef struct {
 	TnyCachedFile *self;
-	TnyStream *write_stream;
+	gint write_fd;
 } AsyncFetchStreamData;
 
 static gpointer
@@ -301,15 +301,12 @@ async_fetch_stream (gpointer userdata)
 	TnyCachedFile *self;
 	TnyCachedFilePriv *priv;
 	TnyStream *write_stream;
-	int write_fd;
 
 	self = afs_data->self;
 	priv = TNY_CACHED_FILE_GET_PRIVATE (self);
 
 	/* First we dump the read stream contents to file cache */
-	write_fd = get_new_fd_of_stream (self, TRUE, TRUE);
-	lseek (write_fd, 0, SEEK_SET);
-	write_stream = tny_fs_stream_new (write_fd);
+	write_stream = tny_fs_stream_new (afs_data->write_fd);
 	while (!tny_stream_is_eos (priv->fetch_stream)) {
 		gssize readed, written;
 		char buffer[1024];
@@ -427,6 +424,8 @@ tny_cached_file_new (TnyFsStreamCache *stream_cache, const char *id, gint64 expe
 		/* we begin retrieval of the stream to disk. This should be cancellable */
 		afs_data = g_slice_new0 (AsyncFetchStreamData);
 		afs_data->self = g_object_ref (result);
+		afs_data->write_fd = get_new_fd_of_stream (result, TRUE, TRUE);
+		lseek (afs_data->write_fd, 0, SEEK_SET);
 		g_thread_create (async_fetch_stream, afs_data, FALSE, NULL);
 	} else {
 		gchar *fullpath;

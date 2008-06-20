@@ -1,3 +1,14 @@
+2008-06-20  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail/tny-cached-file-stream.c:
+	Linked the reset implementation to the stream interface.
+
+	* libtinymail/tny-cached-file.c:
+	Create the files synchronously, to avoid accessing the file from other
+	thread if this has not been created yet.
+
+	* Changelog: removed many end-of-line whitespaces.
+
 2008-06-18  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail/tny-shared.h:
@@ -37,8 +48,8 @@
 	flags of INBOX and also do the rest of our INBOX special casing.
 
 2008-06-05  Mark Doffman  <mark.doffman@codethink.co.uk>
-	
-	* bindings/python/* 
+
+	* bindings/python/*
 	Update .override and .defs files to reflect changes
 	in tinymail interfaces.
 
@@ -55,7 +66,7 @@
 2008-06-03  Sergio Villar Senin  <svillar@igalia.com>
 
 	* camel/providers/pop3/camel-pop3-store.c (connect_to_server):
-	fixed a crash when there is a connection problem related to TLS 
+	fixed a crash when there is a connection problem related to TLS
 
 2008-06-03  Jose Dapena Paz  <jdapena@igalia.com>
 
@@ -107,7 +118,6 @@
         an empty file for each message in the folder maildir metadata
         directory (the one on top of cur, new and tmp).
 
->>>>>>> .r3690
 2008-05-26  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Bugfix when fetching parts and messages
@@ -390,16 +400,16 @@
 	Implementation of certificates database using maemo libcst. This
 	makes you can manage certificates using the maemo tablet certificate
 	manager.
-	
+
 	* libtinymail-camel/camel-lite/camel/camel-certdb.h,
 	libtinymail-camel/camel-lite/camel/camel-private.h: modified to
 	have a pointer to the CST object in certdb and certificate id in
 	certificate object in case we compile with CST support.
-	
+
 	* libtinymail-camel/camel-lite/camel/camel-tcp-stream-ssl.c:
 	Modified a bit the code for proper integration with cst (mainly
 	removing direct access to internal fields).
-	
+
 	* libtinymail-camel/camel-lite/configure.ac,
 	libtinymail-camel/camel-lite/camel/Makefile.am:
 	Added support for detection and configuration of libcst.
@@ -788,7 +798,7 @@
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c
 	libtinymail-camel/camel-lite/camel/camel-store-summary.c:
 	Added the proper error codes when there is no enough space left on
-	devices	
+	devices
 
 2008-01-29  Philip Van Hoof <pvanhoof@gnome.org>
 
@@ -809,7 +819,7 @@
 
 2008-01-27  Philip Van Hoof <pvanhoof@gnome.org>
 
-	* Various code improvements 
+	* Various code improvements
 	* Merged camel-lite with upstream camel revision 8428
 
 2008-01-26  Philip Van Hoof <pvanhoof@gnome.org>
@@ -870,7 +880,7 @@
 	* This was a minor API change
 
 2008-01-21 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
-	
+
 	* fix freeing uninitialized data in camel-imap-folder.c
 
 2008-01-21  Sergio Villar Senin  <svillar@igalia.com>
@@ -929,7 +939,7 @@
 2008-01-16 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
 
 	* fix for use of unitialized variable in decode_it function,
-	which caused crashes in some cases. 
+	which caused crashes in some cases.
 
 2008-01-15  Sergio Villar Senin  <svillar@igalia.com>
 
@@ -967,7 +977,7 @@
 2008-01-12  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Merged camel-lite with Camel upstream rev. 8360
-	* Added an extra check around a strcmp that seems to have caused a 
+	* Added an extra check around a strcmp that seems to have caused a
 	crash once
 	* Size determining when adding items to a local maildir folder
 	* Content-Transfer-Encoding when adding MIME parts
@@ -986,7 +996,7 @@
 	fix typo that caused a compilation error
 
 2008-01-10 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
-	
+
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store-summary:
 	fix typo in camel-imap-store-summary.c which caused valgrind errors
 
@@ -997,7 +1007,7 @@
 	the newly created folder
 
 2008-01-09  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
-	
+
 	* small fixes / cleanups for tny-maemo-conic-device
 
 2008-01-08  Sergio Villar Senin  <svillar@igalia.com>
@@ -1068,7 +1078,7 @@
 2007-12-20  Alberto Garcia Gonzalez  <agarcia@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-
-	imap-command.c: (camel_imap_command_response): Set an initial 
+	imap-command.c: (camel_imap_command_response): Set an initial
 	value to variable len
 	* libtinymail/tny-store-acount.c:
 	(tny_store_account_find_folder): Fixed assertion to allow
@@ -1150,7 +1160,7 @@
 2007-12-13  Alberto Garcia Gonzalez  <agarcia@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c
-	(tny_camel_mime_part_new): Fixed a memory leak	
+	(tny_camel_mime_part_new): Fixed a memory leak
 
 2007-12-13  Felipe Erias Morandeira  <femorandeira@igalia.com>
 
@@ -1178,7 +1188,7 @@
 	* libtinymail-camel/tny-camel-msg-header.c: now the decorated header
 	can be added with g_object_ref or a weak reference.
 	* libtinymail-camel/tny-camel-folder.c: now the TnyCamelHeader we
-	use to retrieve the message in find_msg is constructed from summary. 
+	use to retrieve the message in find_msg is constructed from summary.
 	This is created in a way it's persistent, and then, we can access
 	properly to the summary flags. We also eturn null and set error if
 	message is not in summary.
@@ -1204,7 +1214,7 @@
 2007-12-11  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c:
-	Fixed an small leak when notifying folder observers	
+	Fixed an small leak when notifying folder observers
 	* libtinymail/tny-folder.[ch]
 	libtinymail/tny-shared.h
 	libtinymail-camel/tny-camel-folder.[ch]
@@ -1214,7 +1224,7 @@
 
 2007-12-09  Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
 
-	* optimization :) for NULL strings in decode_it 
+	* optimization :) for NULL strings in decode_it
 
 2007-12-08  Jürg Billeter  <j@bitron.ch>
 
@@ -1267,7 +1277,7 @@
 2007-12-02  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Merge from devel/pvanhoof/bs branch
-	
+
 2007-11-30  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix for ticket #72
@@ -1298,7 +1308,7 @@
 	and no longer reports false connection status changes after 1 second
 
 2007-11-26 Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
-	
+
 	* add a dummy conic device, so libtinymail-maemo does
 	  not require libconic anymore
 
@@ -1470,14 +1480,14 @@
 
 2007-11-09  Sergio Villar Senin  <svillar@igalia.com>
 
-	* libtinymail-maemo/tny-maemo-conic-device.c: 
+	* libtinymail-maemo/tny-maemo-conic-device.c:
 	Added a new API to allow asynchronous connections
 	in the Maemo conic device. This patch is a new version of an initial
 	patch developed by pvanhoof with some changes.
 	Splitted the Maemo connic device in two files, one for the actual
 	device and the other one for a dummy device (useful for sbox devel)
-	Fixed a problem when linking the maemo conic device 
-							
+	Fixed a problem when linking the maemo conic device
+
 2007-11-08  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-common.c:
@@ -1532,7 +1542,7 @@
 	* This was a minor API change
 
 2007-11-05  Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
-	
+
 	* Don't leak an fp in md5_get_digest_from_file
 
 2007-11-05  Philip Van Hoof  <pvanhoof@gnome.org>
@@ -1545,7 +1555,7 @@
 2007-11-05  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Bugfix when renaming or moving a local folder. Not all of its sub-
-	folders where recreated (if the flags where 0, CamelStore's 
+	folders where recreated (if the flags where 0, CamelStore's
 	camel_store_get_folder_info returned an iter with only one child in it.
 	Either it should return no childs or all childs. I adapted Tinymail to
 	request all childs. This is tny-camel-folder.c:3084 (under the was_new
@@ -1584,7 +1594,7 @@
 	me if they want their description improven or removed.
 	* Using the SSL negotiated timeout time for IDLE's recycle (undone)
 	* Undone last timeout change, set it to 27 minutes fixed for IMAP
-	
+
 2007-10-29  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Fix: now we don't unset the priority flag on setting or
@@ -1749,7 +1759,7 @@
 	an error in initialisation. Now we calculate an
 	id with the merged folder id's and their account
 	id's.
-	(tny_merge_folder_get_url_string): created 
+	(tny_merge_folder_get_url_string): created
 	implementation. Now it gets the merge folder id
 	as part of the url string with this format:
 	"merge://ID"
@@ -1777,20 +1787,20 @@
 	* Date-Received on maildir was foobar
 
 2007-09-25  Mark Doffman <mark.doffman@codethink.co.uk>
-	
+
 	* /bindings/python/*: Remove the platform generation
-	from the automatically generated bindings. 
+	from the automatically generated bindings.
 
 	* /bindings/python/README: Update for changes to the way
 	the python bindings are generated.
-	
+
 	* /tests/python-demo/*: Add implementations of a tny-list
-	iterator, platform factory, and account store. Update the 
-	svn ignore to ignore the compiled python files. 
+	iterator, platform factory, and account store. Update the
+	svn ignore to ignore the compiled python files.
 
 	* /tests/python-demo/tinymail-python-test.py: Modify to use
 	the python implementation of the platform factory.
-	
+
 2007-09-24  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Local-size updates after sync, sync_async and add_msg and
@@ -1811,7 +1821,7 @@
 	in tny_gtk_header_list_model_set_folder and additions
 	to the tinymail library.
 
-	* bindings/python/Makefile.am: Added a generated file to 
+	* bindings/python/Makefile.am: Added a generated file to
 	the CLEANFILES to fix release problems.
 
 2007-09-18  Sergio Villar Senín  <svillar@igalia.com>
@@ -1841,7 +1851,7 @@
 2007-09-17  Mark Doffman  <mark.doffman@codethink.co.uk>
 
 	* /bindings/python/gendefs/defsgen.py:
-	Modify so that only non-virtual methods can be 
+	Modify so that only non-virtual methods can be
 	generated.
 
 	* /bindings/python/gendefs/Makefile.am:
@@ -1850,10 +1860,10 @@
 
 	* /bindings/python/*.defs: Include virtual method
 	definitions. All Tinymail and Tinymailui interfaces
-	are implementable. 
+	are implementable.
 
 	* /bindings/python/*.override: I add type definitions
-	to fix bindings compilation problems when used with    
+	to fix bindings compilation problems when used with
 	updated .defs files.
 
 2007-09-14  Philip Van Hoof  <pvanhoof@gnome.org>
@@ -1863,27 +1873,27 @@
 	TnyCamelFolder
 	* Disconnecting the old settings if new settings are set and
 	tny_camel_account_set_online is issued (experimental)
-	* Crash fixes when alerting 
+	* Crash fixes when alerting
 
 2007-09-13  Jose Dapena Paz  <jdapena@igalia.com>
 
-	* libtinymail/tny-folder.c: Remove assertion that expects folder 
-	names to have 1 character at least (at least in my IMAP server 
+	* libtinymail/tny-folder.c: Remove assertion that expects folder
+	names to have 1 character at least (at least in my IMAP server
 	we've got empty strings as valid imap folders).
 
 	* libtinymail-camel/tny-camel-msg-header-priv.h: Add internal API
 	to set a decorated header (at least for updating flag values).
-	
-	* libtinymail-camel/tny-camel-msg-header.c: Now we can set an 
-	internal decorated TnyHeader instance. For flags operations, 
+
+	* libtinymail-camel/tny-camel-msg-header.c: Now we can set an
+	internal decorated TnyHeader instance. For flags operations,
 	we'll set/unset/get also the decorated header.
-	
+
 	* libtinymail-camel/tny-camel-partial-msg-receive-strategy.c: Now
-	we set the folder header as decorated by the msg header. This way 
-	the flags are set correctly in folder when we set a flag from the 
+	we set the folder header as decorated by the msg header. This way
+	the flags are set correctly in folder when we set a flag from the
 	header obtained from the message.
-	
-	* libtinymail-camel/tny-camel-full-msg-receive-strategy.c: Now we 
+
+	* libtinymail-camel/tny-camel-full-msg-receive-strategy.c: Now we
 	set the folder header as decorated by the msg header.
 
 
@@ -1949,7 +1959,7 @@
 
 2007-09-04  Murray Cumming  <murrayc@murrayc.com>
 
-	* libtinymail-camel/tny-camel-account.h: Change the 
+	* libtinymail-camel/tny-camel-account.h: Change the
 	TnyCamelGetSupportedSecureAuthCallback callback to provide a
 	GError* instead of a GError**, because it is not an output parameter.
 	* libtinymail-camel/tny-camel-account.c: (on_supauth_idle),
@@ -1978,15 +1988,15 @@
 	(tny_camel_account_set_hostname_default),
 	(tny_camel_account_set_port_default),
 	(tny_camel_account_set_pass_func_default),
-	(tny_camel_account_set_forget_pass_func_default): Check that the input 
-	is differnt to the existing value, to avoid unnecessarily signalling that 
+	(tny_camel_account_set_forget_pass_func_default): Check that the input
+	is differnt to the existing value, to avoid unnecessarily signalling that
 	the account has changed.
 
 2007-09-04  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
-	* Fixed bug in update folder observers call, creating 
+	* Fixed bug in update folder observers call, creating
 	the new change object to propagate it to observers.
- 
+
 2007-09-04  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c: fixed the default function
@@ -1997,7 +2007,7 @@
 	* Added AC_CONFIG_AUX_DIR(.) to
 	libtinymail-camel/camel-lite/configure.ac : fixes a maemo integration
 	build error.
-	
+
 2007-09-04  Philip Van Hoof  <pvanhoof@gnome.org>
 
 	* Fixed a possible race condition in CamelMultiPart
@@ -2016,7 +2026,7 @@
 	* Changed the Copyright of tny-vfs-stream.c: the original is not
 	really recognizable anymore so it shouldn't copy the copyright of the
 	original as this is not a copy anymore.
-	* Date, Received, INTERNALDATE: fixes 
+	* Date, Received, INTERNALDATE: fixes
 	* Fixed filedescriptor leaks with local folders
 	* Fixed online command attempts when password got cancelled
 	* Fixed a deadlock when sending failed
@@ -2028,8 +2038,8 @@
 2007-09-03  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
 	* Add a new API function, tny_send_queue_add_async to define
-	user and status callbacks for messages transfer to outbox 
-	folder. 
+	user and status callbacks for messages transfer to outbox
+	folder.
 
 2007-09-03  Sergio Villar Senin  <svillar@igalia.com>
 
@@ -2047,7 +2057,7 @@
 	auth types so priv->service is set.
 
 2007-08-31 Dirk-Jan C. Binnema <dirk-jan.binnema@nokia.com>
-	
+
 	* Fix tny_camel_msg_header_date_(sent|received):
 		- don't try to normalize to GMT (camel already does that)
 		- only use Date: for received if not received date is found
@@ -2061,10 +2071,10 @@
 
 2007-08-28  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
-	* Added a new API function in TnyFolder class: tny_folder_remove_msgs. 
-  	This function allows to remove several messages in a single camel 
-	operation, avoiding to call excesive times to folder observer 
-	notification. 
+	* Added a new API function in TnyFolder class: tny_folder_remove_msgs.
+  	This function allows to remove several messages in a single camel
+	operation, avoiding to call excesive times to folder observer
+	notification.
 
 2007-08-15  Philip Van Hoof  <pvanhoof@gnome.org>
 
@@ -2074,7 +2084,7 @@
 2007-08-15  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
-	(tny_maemo_conic_device_force_offline): Fix a compiler warning 
+	(tny_maemo_conic_device_force_offline): Fix a compiler warning
 	about an unused variable.
 
 2007-08-15  Philip Van Hoof  <pvanhoof@gnome.org>
@@ -2093,11 +2103,11 @@
 2007-08-15  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
-	(tny_maemo_conic_device_instance_init): Change the is_online default 
+	(tny_maemo_conic_device_instance_init): Change the is_online default
 	to TRUE.
 	* This is a hack that fixes a problem
-	* (Our signal is not emitted before the gtk mainloop is started, 
-	* because we use an idle handler for that and we don't know how to 
+	* (Our signal is not emitted before the gtk mainloop is started,
+	* because we use an idle handler for that and we don't know how to
 	* detect when the mainloop has not yet started.
 	* The downside is that we now don't know that we are really offline,
 	* so we can't ask the user to go online.
@@ -2106,7 +2116,7 @@
 2007-08-15  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c: (conic_emit_status):
-	Do not check for a running mainloop, because we know of no working 
+	Do not check for a running mainloop, because we know of no working
 	way to do this, and it causes hangs if we never use the idle handler.
 	See the comments in the code.
 
@@ -2118,31 +2128,31 @@
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
 	(conic_emit_status_idle), (conic_emit_status):
-	If no mainloop is running (for instance, before gtk_main_run()), 
-	just emit without using g_idle_add(). Hopefully this will cause the signal 
-	to be emitted early enough - when tinymail needs is_online() to be correct. 
+	If no mainloop is running (for instance, before gtk_main_run()),
+	just emit without using g_idle_add(). Hopefully this will cause the signal
+	to be emitted early enough - when tinymail needs is_online() to be correct.
 	See the comments to see why this is OK for tinymail.
 
 2007-08-14  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
 	(on_connection_event), (tny_maemo_conic_device_get_iap):
-	Fixed a compiler warnings and a build fix when building for the device. 
+	Fixed a compiler warnings and a build fix when building for the device.
 
 2007-08-14  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c:
-	(tny_maemo_conic_device_instance_init): Initialize is_online before 
+	(tny_maemo_conic_device_instance_init): Initialize is_online before
 	forcing the on_connection_event() signal handler to be called, not after,
-	which could explain why is_online sometimes seems to be false at the start 
+	which could explain why is_online sometimes seems to be false at the start
 	when it should not be.
 
 2007-08-14  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/tny-camel-folder.c:
-	(tny_camel_folder_transfer_msgs_default): Remove unused err variable 
+	(tny_camel_folder_transfer_msgs_default): Remove unused err variable
 	to fix a compiler warning.
-	* libtinymail-maemo/tny-maemo-conic-device.c: Formatting/syntax 
+	* libtinymail-maemo/tny-maemo-conic-device.c: Formatting/syntax
 	changes requested by Philip.
 
 2007-08-14  Philip Van Hoof  <pvanhoof@gnome.org>
@@ -2193,8 +2203,8 @@
 	* libtinymail/tny-merge-folder.c: (get_msg_async_thread):
 	* tests/c-demo/tny-demoui-summary-view.c:
 	(on_header_view_tree_row_activated):
-	Avoid compiler warnings, such as unused variables, functions without 
-	returns, and unused functions. Tinymail now builds with -Wall -Werror 
+	Avoid compiler warnings, such as unused variables, functions without
+	returns, and unused functions. Tinymail now builds with -Wall -Werror
 	again.
 
 2007-08-13  Philip Van Hoof  <pvanhoof@gnome.org>
@@ -2259,7 +2269,7 @@
 	on the mainloop (POP can cause this, in case of an auth error during
 	sync operation's reconnect)
 	* Added the changed signal to TnyAccount
-	* Making tny_account_set_name get propagated to the TnyGtkFolderStore- 
+	* Making tny_account_set_name get propagated to the TnyGtkFolderStore-
 	TreeModel instance.
 	* Fixed a kludge in the TnySessionCamel for POP accounts with wrong
 	passwords
@@ -2289,7 +2299,7 @@
 2007-07-30  Javier Fernandez Garcia-Boente  <jfernandez@igalia.com>
 
 	* Fixed some bugs in TnyMergeFolder notification function. This
-        method was overwriting data into old change, rather than use the 
+        method was overwriting data into old change, rather than use the
 	new_change structure to propagate changes to observed folders.
 
         * Fixed bug in TnyCamelSendQueue related with msg-sent signal
@@ -2298,8 +2308,8 @@
 2007-07-27  Murray Cumming  <murrayc@murrayc.com>
 
 	* camel/camel-mime-parser.c: (folder_scan_content),
-	(folder_scan_step): Initialize some variables because 
-	valgrind complains about uninitialized variables here. This does not 
+	(folder_scan_step): Initialize some variables because
+	valgrind complains about uninitialized variables here. This does not
 	fix it but it should make things clearer for someone who can fix it.
 
 2007-07-27  Philip Van Hoof  <pvanhoof@gnome.org>
@@ -2344,7 +2354,7 @@
 
 	* Cond locks in the queues of the store accounts while the callbacks
 	are happening. This is a significant policy change in locking
-	behaviour that should be well tested. 
+	behaviour that should be well tested.
 
 	* This was a major API change in TnyAccount
 
@@ -2375,13 +2385,13 @@
 
 2007-07-23  Murray Cumming  <murrayc@murrayc.com>
 
-	* libtinymail-camel/tny-camel-account.c: Improved the 
+	* libtinymail-camel/tny-camel-account.c: Improved the
 	documentation for tny_camel_account_set_online().
 
 	* libtinymail/tny-merge-folder.c: (tny_merge_folder_get_id),
-	(tny_merge_folder_instance_init): Use 
-	unknown_mergefolder instead of an empty string for the default ID, 
-	because an empty string is not allowed by the get_func_id() DBC 
+	(tny_merge_folder_instance_init): Use
+	unknown_mergefolder instead of an empty string for the default ID,
+	because an empty string is not allowed by the get_func_id() DBC
 	contract, causing a crash at runtime when DBC is enabled in the build.
 
 2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
@@ -2391,12 +2401,12 @@
 	call it, preventing crashes.
 
 2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
-	
+
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
 	(imap_refresh_info): now we lock the folder also, before locking the
 	service, in order to respect better the lock order. This should avoid
  	some locks.
-	
+
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.[ch]:
 	now we store a reference to the struct addrinfo used for connections. When
 	we are successful getting a valid addrinfo, it's stored and reused. This
@@ -2405,16 +2415,16 @@
 	this should make the application more reponsive in general and avoid
 	flooding the connection.
 	We also removed the method (camel_imap_service_connect) as it's not used.
-	
+
 	* libtinymail-camel/camel-lite/camel/camel-private.h:
  	added parenthesis to some lock macros.
- 
+
 2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c: protect a folder lock
 	with a reason. This prevents some interlock problems, as the
 	last unreason can lead to a folder lock.
-	
+
 2007-07-23  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail/tny-camel-mime-part.c:
@@ -2422,7 +2432,7 @@
 	of attached messages, as we need to create a proper TnyMsg
 	object when the attachment is a message.
 	(tny_camel_mime_part_add_part_default): now when we are
-	attaching a message as a part, it's created adding a 
+	attaching a message as a part, it's created adding a
 	message/rfc822 mime part that contains the message as
 	its content object. This fixes attaching messages.
 
@@ -2449,8 +2459,8 @@
 2007-07-12  Murray Cumming  <murrayc@murrayc.com>
 
 	* libtinymail-camel/tny-camel-account.c:
-	(tny_camel_account_matches_url_string_default): For maildir accounts, 
-	compare their paths before the # marker for the folder, to avoid 
+	(tny_camel_account_matches_url_string_default): For maildir accounts,
+	compare their paths before the # marker for the folder, to avoid
 	considering all maildir accounts to be the same account.
 
 2007-07-11  Armin Burgmeier  <armin@openismus.com>
@@ -2466,8 +2476,8 @@
 
 2007-07-09  Javier Fernández García-Boente <jfernandez@igalia.com>
 	* Implements and emits msg-sending and msg-sent signals
-	when a message is just being sent and when is fully sent. 
-        * Add a notification about EXPUNGED header change in 
+	when a message is just being sent and when is fully sent.
+        * Add a notification about EXPUNGED header change in
 	tny_camel_folder_remove_msg_default method.
 
 2007-07-10  Philip Van Hoof  <pvanhoof@gnome.org>
@@ -2498,17 +2508,17 @@
 	* libtinymail-olpc/tny-olpc-account-store.c:
 	(tny_olpc_account_store_alert):
 	* tests/shared/account-store.c: (tny_test_account_store_alert):
-	Add a TnyAcccount* parameter to the alert_func vfunc, so that 
-	applications an show information about the account (and server) 
-	that failed. This is documented as sometimes being NULL for current 
+	Add a TnyAcccount* parameter to the alert_func vfunc, so that
+	applications an show information about the account (and server)
+	that failed. This is documented as sometimes being NULL for current
 	implementations (see the *ssl.c comment below).
 
 	* camel/camel-session.h:
 	* camel/camel-session.c: (camel_session_alert_user),
 	(camel_session_alert_user_with_id),
-	(camel_session_alert_user_generic): Added a CamelService* 
-	paramteter to these functions. For tinymail, this allows us to use 
-	CamelService::data to get the TnyAccount*. 
+	(camel_session_alert_user_generic): Added a CamelService*
+	paramteter to these functions. For tinymail, this allows us to use
+	CamelService::data to get the TnyAccount*.
 	* camel/camel-disco-diary.c: (camel_disco_diary_log),
 	(diary_decode_folder):
 	* camel/providers/imap/camel-imap-command.c:
@@ -2520,8 +2530,8 @@
 	* camel/providers/smtp/camel-smtp-transport.c: (smtp_connect):
 	Pass the CamelService::data to camel_session_alert_user*().
 	* camel/camel-tcp-stream-openssl.c: (ssl_verify):
-	* camel/camel-tcp-stream-ssl.c: (ssl_bad_cert): Pass NULL for 
-	service_user_data because I cannot see a suitable CamelService. 
+	* camel/camel-tcp-stream-ssl.c: (ssl_bad_cert): Pass NULL for
+	service_user_data because I cannot see a suitable CamelService.
 	See the TODOs.
 
 2007-07-10  Philip Van Hoof  <pvanhoof@gnome.org>

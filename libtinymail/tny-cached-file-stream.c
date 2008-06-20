@@ -211,6 +211,7 @@ tny_stream_init (gpointer g, gpointer iface_data)
 	klass->read= tny_cached_file_stream_read;
 	klass->write= tny_cached_file_stream_write;
 	klass->close= tny_cached_file_stream_close;
+	klass->reset= tny_cached_file_stream_reset;
 
 	return;
 }
