@@ -234,7 +234,6 @@ let_idle_die (CamelImapStore *store, gboolean connect_buz)
 		idle_debug ("Sending DONE in let_idle_die\n");
 		CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 		nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
-		store->in_idle = FALSE;
 		if (nwritten != -1) {
 			resp = NULL;
 			while ((camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) {
@@ -396,6 +395,8 @@ camel_imap_store_finalize (CamelObject *object)
 	CamelException nex = CAMEL_EXCEPTION_INITIALISER;
 
 	let_idle_die (imap_store, TRUE);
+
+	camel_imap_store_stop_idle (imap_store);
 
 	if (imap_store->current_folder) {
 		camel_object_unhook_event (imap_store->current_folder, "finalize",
@@ -2100,7 +2101,8 @@ imap_connect_offline (CamelService *service, CamelException *ex)
 
 	imap_debug ("imap_connect_offline\n");
 
-	/* let_idle_die (store, TRUE); */
+	let_idle_die (store, TRUE);
+	camel_imap_store_stop_idle (store);
 
 	if (!disco_store->diary)
 		return FALSE;
@@ -2117,7 +2119,8 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 
 	imap_debug ("imap_disconnect_offline\n");
 
-	/*let_idle_die (store, TRUE);*/
+	let_idle_die (store, TRUE);
+	camel_imap_store_stop_idle (store);
 
 	if (store->istream) {
 		camel_stream_close(store->istream);

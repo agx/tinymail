@@ -982,7 +982,7 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
 	/* TNY TODO: proper reference counting here please! Note that we can't
 	 * have embraced references either. So be careful! */
 
-	priv->device = device;
+	priv->device = g_object_ref (device);
 
 	return;
 }
@@ -1089,6 +1089,10 @@ tny_session_camel_finalise (CamelObject *object)
 	{
 		g_signal_handler_disconnect (G_OBJECT (priv->device), 
 			priv->connchanged_signal);
+	}
+
+	if (priv->device) {
+		g_object_unref (priv->device);
 	}
 
 	if (priv->ui_lock)

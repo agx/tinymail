@@ -2162,6 +2162,7 @@ tny_camel_account_finalize (GObject *object)
 			priv->service->url->user = g_strdup ("non existing dummy user");
 		}
 		camel_object_unref (CAMEL_OBJECT (priv->service));
+		priv->service = NULL;
 	}
 
 	if (G_LIKELY (priv->cache_location))

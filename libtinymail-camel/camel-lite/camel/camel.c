@@ -54,6 +54,7 @@ camel_shutdown (void)
 	if (!initialised)
 		return;
 
+	initialised = FALSE;
 	certdb = camel_certdb_get_default ();
 	if (certdb) {
 		camel_certdb_save (certdb);
@@ -65,7 +66,6 @@ camel_shutdown (void)
 	PR_Cleanup ();
 #endif /* HAVE_NSS */
 
-	initialised = FALSE;
 }
 
 int

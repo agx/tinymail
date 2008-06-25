@@ -4220,6 +4220,7 @@ idle_thread (gpointer data)
 		g_mutex_unlock (info->mutex);
 	}
 
+	store->in_idle = FALSE;
 	camel_object_unref (folder);
 
 	g_thread_exit (retval);
