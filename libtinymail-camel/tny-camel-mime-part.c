@@ -147,7 +147,9 @@ tny_camel_mime_part_get_header_pairs_default (TnyMimePart *self, TnyList *list)
 	for (i=0; i < headers->len; i++)
 	{
 		CamelMediumHeader *header = &g_array_index (headers, CamelMediumHeader, i);
-		tny_list_append (list, G_OBJECT (tny_pair_new (header->name, header->value)));
+		TnyPair *pair = tny_pair_new (header->name, header->value);
+		tny_list_append (list, G_OBJECT (pair));
+		g_object_unref (pair);
 	}
 
 	camel_medium_free_headers (CAMEL_MEDIUM (priv->part), headers);

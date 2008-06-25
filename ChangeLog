@@ -1,5 +1,9 @@
 2008-06-25  Jose Dapena Paz  <jdapena@igalia.com>
 
+	* libtinymail-camel/tny-camel-mime-part.c
+	(..._get_header_pairs_default): we were leaking all the TnyPair objects
+	created here. Fixed.
+
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
         Don't set in_idle to false so that join works properly.
         On disconnecting we forze a stop_idle so we warrant idle
