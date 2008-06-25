@@ -1,3 +1,33 @@
+2008-06-25  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
+        Don't set in_idle to false so that join works properly.
+        On disconnecting we forze a stop_idle so we warrant idle
+        thread has died when we disconnect. Also, send let idle die commands
+	on disconnecting. It's very important to make the idle thread die
+	on time as it keeps a reference to the folder. Folder keeps a reference to
+        this store, and then store should finish idle soon to be able
+        to finalize (cycle reference).
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
+        On finishing the idle thread we state we're out of it.
+
+	* libtinymail-camel/camel-lite/camel.c:
+        Avoid running internal methods of camel_shutdown two times if
+        we can call shutdown two times.
+
+	* libtinymail-camel/tny-session-camel.c:
+        Keep a proper reference to TnyDevice.
+
+	* libtinymail-camel/tny-camel-store-account.c:
+        Free the iter store reference on finalising.
+
+	* libtinymail-camel/tny-camel-account.c:
+        Set service to null after unreffing it.
+
+	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c:
+        * Don't get folders again when we change status to disconnected.
+
 2008-06-20  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c:
