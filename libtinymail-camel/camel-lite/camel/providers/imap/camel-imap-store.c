@@ -3725,8 +3725,10 @@ get_folders_sync_ns(CamelImapStore *imap_store, struct _namespace *namespace, gb
 						camel_folder_info_free(fi);
 					}
 				}
-				camel_imap_response_free (imap_store, response);
 			}
+			camel_imap_response_free (imap_store, response);
+			if (i == 0)
+				loops = 2;
 		}
 	} else {
 
