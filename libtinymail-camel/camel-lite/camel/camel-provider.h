@@ -144,6 +144,8 @@ typedef struct {
 #define CAMEL_PROVIDER_CONF_DEFAULT_PATH      { CAMEL_PROVIDER_CONF_ENTRY, "path", NULL, N_("_Path:"), "" }
 
 typedef int (*CamelProviderAutoDetectFunc) (CamelURL *url, GHashTable **auto_detected, CamelException *ex);
+typedef void (*CamelProviderShutdownFunc) (CamelObject *provider);
+
 
 typedef struct {
 	/* Provider name used in CamelURLs. */
@@ -208,6 +210,10 @@ typedef struct {
 	 */
 	const char *license_file;
 
+	/* Shutdown function. Will be called in camel_shutdown.
+	 */
+	CamelProviderShutdownFunc shutdown;
+
 	/* Private to the provider */
 	void *priv;
 } CamelProvider;
@@ -224,6 +230,8 @@ void camel_provider_init(void);
 
 void camel_provider_load(const char *path, CamelException *ex);
 void camel_provider_register(CamelProvider *provider);
+void camel_provider_shutdown (CamelProvider *provider);
+void camel_provider_shutdown_all (void);
 GList *camel_provider_list(gboolean load);
 CamelProvider *camel_provider_get(const char *url_string, CamelException *ex);
 

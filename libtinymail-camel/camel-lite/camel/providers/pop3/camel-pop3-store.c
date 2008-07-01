@@ -83,6 +83,9 @@
 #define _(o) o
 
 static CamelStoreClass *parent_class = NULL;
+static GMutex *wait_for_login_mutex = NULL;
+static GCond *wait_for_login_cond = NULL;
+static GList *wait_for_login_threads = NULL;
 
 static void finalize (CamelObject *object);
 
@@ -161,7 +164,7 @@ pop3_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 	g_static_rec_mutex_lock (store->eng_lock);
 
 	if (store->engine == NULL) {
-		g_static_rec_mutex_lock (store->eng_lock);
+		g_static_rec_mutex_unlock (store->eng_lock);
 		return TRUE;
 	}
 
@@ -174,9 +177,10 @@ pop3_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 		camel_pop3_engine_command_free(store->engine, pc);
 	}
 
+	g_static_rec_mutex_unlock (store->eng_lock);
+
 	g_timeout_add (20000, unref_it, store->engine);
 	store->engine = NULL;
-	g_static_rec_mutex_unlock (store->eng_lock);
 
 	/* camel_object_unref((CamelObject *)store->engine); */
 
@@ -403,10 +407,17 @@ wait_for_login_delay (gpointer user_data)
 		login_delay = store->engine->login_delay;
 	g_static_rec_mutex_unlock (store->eng_lock);
 
+	g_mutex_lock (wait_for_login_mutex);
 	while (!killed) {
+		GTimeVal tv_delay = {0, 0};
 
-		sleep (login_delay);
+		tv_delay.tv_sec = login_delay;
 
+		g_cond_timed_wait (wait_for_login_cond, wait_for_login_mutex, &tv_delay);
+
+		if (!store->engine) {
+			break;
+		}
 
 		if (!store->is_refreshing) {
 			CamelException dex = CAMEL_EXCEPTION_INITIALISER;
@@ -422,6 +433,8 @@ wait_for_login_delay (gpointer user_data)
 	}
 
 	camel_object_unref (store);
+	wait_for_login_threads = g_list_append (wait_for_login_threads, store->login_delay_thread);
+	g_mutex_unlock (wait_for_login_mutex);
 	return NULL;
 }
 
@@ -920,8 +933,11 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 static void 
 camel_pop3_store_prepare (CamelStore *store)
 {
+	CamelPOP3Store *pstore = (CamelPOP3Store *) store;
 	camel_object_ref (store);
-	g_thread_create (wait_for_login_delay, store, FALSE, NULL);
+	g_mutex_lock (wait_for_login_mutex);
+	pstore->login_delay_thread = g_thread_create (wait_for_login_delay, store, TRUE, NULL);
+	g_mutex_unlock (wait_for_login_mutex);
 }
 
 static gboolean
@@ -1019,9 +1035,7 @@ pop3_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 	}
 
 	g_timeout_add (20000, unref_it, store->engine);
-	/* camel_object_unref((CamelObject *)store->engine); */
 	store->engine = NULL;
-
 	//g_static_rec_mutex_unlock (store->eng_lock);
 
 	return TRUE;
@@ -1199,6 +1213,22 @@ pop3_construct (CamelService *service, CamelSession *session,
 
 }
 
+void
+camel_pop3_store_kill_threads (void)
+{
+	GThread *thread_to_join;
+	g_mutex_lock (wait_for_login_mutex);
+	while (wait_for_login_threads) {
+		thread_to_join = wait_for_login_threads->data;
+		g_cond_broadcast (wait_for_login_cond);
+		g_mutex_unlock (wait_for_login_mutex);
+		g_thread_join (thread_to_join);
+		g_mutex_lock (wait_for_login_mutex);
+		wait_for_login_threads = g_list_remove (wait_for_login_threads, thread_to_join);
+	}
+	g_mutex_unlock (wait_for_login_mutex);
+}
+
 static void
 camel_pop3_store_class_init (CamelPOP3StoreClass *camel_pop3_store_class)
 {
@@ -1210,6 +1240,9 @@ camel_pop3_store_class_init (CamelPOP3StoreClass *camel_pop3_store_class)
 		CAMEL_DISCO_STORE_CLASS (camel_pop3_store_class);
 
 	parent_class = CAMEL_STORE_CLASS (camel_type_get_global_classfuncs (camel_disco_store_get_type ()));
+	wait_for_login_mutex = g_mutex_new ();
+	wait_for_login_cond = g_cond_new ();
+	wait_for_login_threads = NULL;
 
 	/* virtual method overload */
 	camel_service_class->construct = pop3_construct;
@@ -1255,6 +1288,7 @@ camel_pop3_store_init (gpointer object, gpointer klass)
 	g_static_rec_mutex_init (store->eng_lock);
 	store->uidl_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (store->uidl_lock);
+	store->login_delay_thread = NULL;
 
 	return;
 }

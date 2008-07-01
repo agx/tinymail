@@ -54,6 +54,8 @@ camel_shutdown (void)
 	if (!initialised)
 		return;
 
+	camel_provider_shutdown_all ();
+
 	initialised = FALSE;
 	certdb = camel_certdb_get_default ();
 	if (certdb) {

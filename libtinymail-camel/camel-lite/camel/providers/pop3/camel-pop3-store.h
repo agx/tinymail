@@ -53,6 +53,7 @@ typedef struct {
 	GStaticRecMutex *eng_lock, *uidl_lock;
 	gpointer book;
 	guint login_delay;
+	GThread *login_delay_thread;
 
 	GPtrArray *uids;
 	GHashTable *uids_uid;	/* messageinfo by uid */
@@ -78,6 +79,7 @@ char *camel_pop3_command_get_additional_data (CamelPOP3Store *store, int total, 
 CamelType camel_pop3_store_get_type (void);
 
 void camel_pop3_store_destroy_lists (CamelPOP3Store *pop3_store);
+void camel_pop3_store_kill_threads (void);
 
 G_END_DECLS
 

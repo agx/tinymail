@@ -95,9 +95,13 @@ notify_factory_del (TnyCamelStoreAccount *self, GObject *folder)
 {
 	if (self && TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
 		TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+		TnyCamelPopStoreAccountPriv *ppriv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (self);
 		g_static_rec_mutex_lock (priv->factory_lock);
 		priv->managed_folders = g_list_remove_all (priv->managed_folders, folder);
 		g_static_rec_mutex_unlock (priv->factory_lock);
+		if (ppriv->inbox == folder) {
+			ppriv->inbox = NULL;
+		}
 	}
 }
 
@@ -115,11 +119,13 @@ tny_camel_pop_store_account_factor_folder (TnyCamelStoreAccount *self, const gch
 		ppriv->inbox = TNY_FOLDER (_tny_camel_pop_folder_new ());
 		g_object_weak_ref (G_OBJECT (ppriv->inbox), (GWeakNotify) notify_factory_del, self);
 		priv->managed_folders = g_list_prepend (priv->managed_folders, ppriv->inbox);
+	} else {
+		g_object_ref (ppriv->inbox);
 	}
 
 	g_static_rec_mutex_unlock (priv->factory_lock);
 
-	return (TnyFolder *) g_object_ref (ppriv->inbox);
+	return (TnyFolder *) ppriv->inbox;
 }
 
 /**
@@ -141,9 +147,6 @@ static void
 tny_camel_pop_store_account_finalize (GObject *object)
 {
 	TnyCamelPopStoreAccountPriv *priv = TNY_CAMEL_POP_STORE_ACCOUNT_GET_PRIVATE (object);
-
-	if (priv->inbox)
-		g_object_unref (priv->inbox);
 
 	g_mutex_free (priv->lock);
 
