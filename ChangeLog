@@ -1,3 +1,26 @@
+2008-07-01  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/camel-provider.[ch]:
+        Now providers offer a new shutdown handler, that will be
+        called on shutting down camel.
+
+	* libtinymail-camel/camel-lite/camel/camel.c:
+        Use the providers shutdown handler on shutting down camel.
+
+	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-provider.c:
+        Implement new provider shutdown handler, to kill the login delay
+        threads on shutting down tinymail.
+
+	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-store.[ch]:
+        New method to kill the login delay thread. This is used to kill
+        the thread on shutting down tinymail.
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-provider.c:
+        Set as NULL the default shutdown handler.
+
+	* libtinymail-camel/tny-camel-pop-store-account.c:
+        Manage properly the internal inbox reference to avoid leaking it.
+
 2008-06-26  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed LIST (SUBSCRIBED) for some IMAP servers
