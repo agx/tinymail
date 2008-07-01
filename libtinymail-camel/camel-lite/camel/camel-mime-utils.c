@@ -2462,6 +2462,44 @@ header_decode_addrspec(const char **in)
    *(word) '<' [ *('@' domain ) ':' ] word *( '.' word) @ domain
    */
 
+static void
+fix_broken_rfc2047 (const char **in)
+{
+	gchar *p, *broken_start, *r;
+	gboolean encoded = FALSE;
+	gboolean broken = TRUE;
+
+	p = *in;
+
+	while (*p != '\0') {
+		if (!encoded) {
+			if (*p == '=' && *(p+1) == '?') {
+				p++;
+				encoded = TRUE;
+				broken = FALSE;
+			}
+		} else if (!broken) {
+			if (*p == '<') {
+				broken = TRUE;
+				broken_start = p;
+			} else if ((*p == '?') && (*(p+1) == '=')) {
+				encoded = FALSE;
+				p++;
+			}
+		} else {
+			if ((*p == '?') && (*(p+1) == '=')) {
+				memmove (broken_start + 2, broken_start, p - broken_start);
+				broken_start[0] = '?';
+				broken_start[1] = '=';
+				broken = FALSE;
+				encoded = FALSE;
+			}
+		}
+		p++;
+	}
+
+}
+
 static struct _camel_header_address *
 header_decode_mailbox(const char **in, const char *charset)
 {
@@ -2474,6 +2512,11 @@ header_decode_mailbox(const char **in, const char *charset)
 	const char *comment = NULL;
 
 	addr = g_string_new("");
+
+	if (strncmp (inptr, "=?", 2)==0) {
+		/* check if we've got a wrong string as gmail sends and fix it.*/
+		fix_broken_rfc2047 (in);
+	}
 
 	/* for each address */
 	pre = header_decode_word (&inptr);

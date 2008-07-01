@@ -21,6 +21,9 @@
 	* libtinymail-camel/tny-camel-pop-store-account.c:
         Manage properly the internal inbox reference to avoid leaking it.
 
+	* libtinymail-camel/camel-lite/camel/camel-mime-utils.c:
+        Parse properly broken rfc2047 recipient headers sent from gmail imap.
+
 2008-06-26  Philip Van Hoof <pvanhoof@gnome.org>
 
 	* Fixed LIST (SUBSCRIBED) for some IMAP servers
