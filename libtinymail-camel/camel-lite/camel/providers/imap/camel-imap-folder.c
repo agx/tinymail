@@ -4247,7 +4247,7 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 	if ((store->capabilities & IMAP_CAPABILITY_IDLE))
 	{
 		g_static_rec_mutex_lock (store->idle_t_lock);
-		if (store->in_idle && store->idle_thread) {
+		if (store->in_idle && store->idle_thread && (g_thread_self () != store->idle_thread)) {
 			IdleResponse *idle_resp = NULL;
 			store->idle_cont = FALSE;
 			idle_resp = g_thread_join (store->idle_thread);
@@ -4311,7 +4311,7 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 
 			g_static_rec_mutex_lock (store->idle_t_lock);
 
-			if (!store->in_idle && store->idle_thread) {
+			if (!store->in_idle && store->idle_thread && (g_thread_self () != store->idle_thread)) {
 				IdleResponse *idle_resp = NULL;
 
 				store->idle_cont = FALSE;
