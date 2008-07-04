@@ -65,7 +65,6 @@ camel_shutdown (void)
 
 #if defined (HAVE_NSS)
 	NSS_Shutdown ();
-	PR_Cleanup ();
 #endif /* HAVE_NSS */
 
 }
