@@ -181,6 +181,8 @@ static void imap_set_allow_external_images (CamelFolder *folder, const char *uid
 
 static void stop_gmsgstore_from_idle (CamelImapFolder *imap_folder);
 
+static const gchar *imap_search_request_string (CamelImapFolder *imap_folder);
+
 #ifdef G_OS_WIN32
 /* The strtok() in Microsoft's C library is MT-safe (but still uses
  * only one buffer pointer per thread, but for the use of strtok_r()
@@ -3189,7 +3191,7 @@ construct_junk_headers (char *header, char *value, struct _junk_data *jdata)
 
 
 static guint32
-imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, GPtrArray *needheaders, int size)
+imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, GPtrArray *needheaders, int greater_than, int size)
 {
 	char *resp = NULL;
 	CamelImapResponseType type;
@@ -3215,8 +3217,9 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 			}
 		} else {
 			GData *data = parse_fetch_response ((CamelImapFolder *)folder, resp);
+			int sequence = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
 			char *uid = g_datalist_get_data (&data, "UID");
-			if (uid) {
+			if (sequence > greater_than && uid) {
 				g_ptr_array_add (needheaders, g_strdup (uid));
 				cnt++;
 			}
@@ -3241,6 +3244,19 @@ imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, G
 	return cnt;
 
 }
+
+static const gchar *
+imap_search_request_string (CamelImapFolder *imap_folder)
+{
+	CamelImapStore *store = CAMEL_IMAP_STORE (CAMEL_FOLDER (imap_folder)->parent_store);
+
+	if (store->capabilities & IMAP_CAPABILITY_XAOLNETMAIL) {
+		return "UID FETCH %d:* (UID)";
+	} else {
+		return "UID SEARCH %d:* ALL";
+	}
+}
+
 
 static void
 imap_update_summary (CamelFolder *folder, int exists,
@@ -3303,7 +3319,8 @@ imap_update_summary (CamelFolder *folder, int exists,
 	seq = camel_folder_summary_count (folder->summary);
 
 	if (!camel_imap_command_start (store, folder, ex,
-		"UID SEARCH %d:%d ALL", seq + 1, MAX (1, MIN (seq + 1 + nextn, exists))))
+				       imap_search_request_string ((CamelImapFolder *) folder), 
+				       seq + 1, MAX (1, MIN (seq + 1 + nextn, exists))))
 		{
 			if (camel_operation_cancel_check (NULL))
 				imap_folder->cancel_occurred = TRUE;
@@ -3315,7 +3332,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	more = FALSE;
 	needheaders = g_ptr_array_new ();
-	cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq));
+	cnt = imap_get_uids (folder, store, ex, needheaders, seq, (exists - seq));
 
 	if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
 	{
@@ -3360,7 +3377,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 			return;
 		}
 
-		tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - tcnt);
+		tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, seq + tcnt, (exists - seq) - tcnt);
 
 		if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
 		{
@@ -3388,7 +3405,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 	if ((cnt < nextn) && more)
 	{
 		if (!camel_imap_command_start (store, folder, ex,
-			"UID SEARCH %d:* ALL", seq + 1 + cnt))
+					       imap_search_request_string ((CamelImapFolder *) folder), seq + 1 + cnt))
 			{
 				if (camel_operation_cancel_check (NULL))
 					imap_folder->cancel_occurred = TRUE;
@@ -3401,7 +3418,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 		camel_folder_summary_dispose_all (folder->summary);
 
-		cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - cnt);
+		cnt = imap_get_uids (folder, store, ex, needheaders, seq + cnt, (exists - seq) - cnt);
 
 		if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
 		{
@@ -3443,7 +3460,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 			camel_folder_summary_dispose_all (folder->summary);
 
-			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, (exists - seq) - tcnt);
+			tcnt = cnt = imap_get_uids (folder, store, ex, needheaders, seq + tcnt, (exists - seq) - tcnt);
 
 			if (cnt == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL)
 			{
@@ -3555,33 +3572,33 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 				  if (sequence > 0 && sequence <= exists && sequence != curlen)
 				  {
-					int r;
-					if (curlen > sequence)
-					{
-						for (r = curlen-1; r >= sequence -1; r--)
-						{
-							CamelMessageInfo *ri;
-							g_warning ("Problem with your local summary store (too much), correcting: curlen=%d, r=%d, seq=%d\n", curlen, r, sequence);
-							ri = g_ptr_array_index (folder->summary->messages, r);
-							if (ri) {
-								/* camel_folder_change_info_remove_uid (mchange, camel_message_info_uid (mi)); */
-								((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_EXPUNGED;
-								((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_FREED;
-								camel_folder_summary_remove (folder->summary, ri);
-							}
-						}
-					} else {
-						for (r=0; r < sequence - curlen - 1; r++)
-						{
-							CamelMessageInfo *ni = camel_message_info_clone (mi);
-							if (ni) {
-								g_warning ("Problem with your local summary store (too few), correcting: curlen=%d, r=%d, seq=%d\n", curlen, r, sequence);
-								camel_folder_summary_add (folder->summary, (CamelMessageInfo *)ni);
-								/* camel_folder_change_info_add_uid (mchanges, camel_message_info_uid (ni)); */
-							}
-						}
-					}
-					oosync = TRUE;
+				  	int r;
+				  	if (curlen > sequence)
+				  	{
+				  		for (r = curlen-1; r >= sequence -1; r--)
+				  		{
+				  			CamelMessageInfo *ri;
+				  			g_warning ("Problem with your local summary store (too much), correcting: curlen=%d, r=%d, seq=%d\n", curlen, r, sequence);
+				  			ri = g_ptr_array_index (folder->summary->messages, r);
+				  			if (ri) {
+				  				/* camel_folder_change_info_remove_uid (mchange, camel_message_info_uid (mi)); */
+				  				((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_EXPUNGED;
+				  				((CamelMessageInfoBase*)ri)->flags |= CAMEL_MESSAGE_FREED;
+				  				camel_folder_summary_remove (folder->summary, ri);
+				  			}
+				  		}
+				  	} else {
+				  		for (r=0; r < sequence - curlen - 1; r++)
+				  		{
+				  			CamelMessageInfo *ni = camel_message_info_clone (mi);
+				  			if (ni) {
+				  				g_warning ("Problem with your local summary store (too few), correcting: curlen=%d, r=%d, seq=%d\n", curlen, r, sequence);
+				  				camel_folder_summary_add (folder->summary, (CamelMessageInfo *)ni);
+				  				/* camel_folder_change_info_add_uid (mchanges, camel_message_info_uid (ni)); */
+				  			}
+				  		}
+				  	}
+				  	oosync = TRUE;
 				  }
 
 				  camel_folder_summary_add (folder->summary, (CamelMessageInfo *)mi);

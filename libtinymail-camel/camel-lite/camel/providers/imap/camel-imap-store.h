@@ -125,6 +125,7 @@ typedef enum {
 #define IMAP_CAPABILITY_CONVERT			(1 << 18)
 #define IMAP_CAPABILITY_LISTEXT			(1 << 19)
 #define IMAP_CAPABILITY_COMPRESS		(1 << 20)
+#define IMAP_CAPABILITY_XAOLNETMAIL             (1 << 21)
 
 #define IMAP_PARAM_OVERRIDE_NAMESPACE		(1 << 0)
 #define IMAP_PARAM_CHECK_ALL			(1 << 1)

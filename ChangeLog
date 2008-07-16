@@ -1,3 +1,15 @@
+2008-07-16  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.[ch]:
+        Added fetching aol specific imap capability.
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.[ch]:
+        Now we use FETCH instead of SEARCH for getting the UID's
+        when the server is AOL.
+        Added an extra check in imap_get_uids. If server gives a list
+        including sequence numbers we didn't request, we ignore them.
+        This should fix the AOL problem fetching headers.
+
 2008-07-16  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/camel-tcp-stream-ssl.c: added
