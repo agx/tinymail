@@ -1,3 +1,9 @@
+2008-07-16  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/camel-tcp-stream-ssl.c: added
+	some code that properly checks the result of the call to
+	NSS_InitReadWrite.
+
 2008-07-04  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/camel.c:
