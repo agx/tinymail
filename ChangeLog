@@ -1,3 +1,8 @@
+2008-07-21  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camep-imap-store.c:
+	Trivial fix for current folder weak reference code.
+
 2008-07-21  Mark Doffman  <mark.doffman@codethink.co.uk>
 	* bindings/python/tinymail.override
 	Fixed some incompatible pointer warnings.

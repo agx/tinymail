@@ -2832,7 +2832,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		CamelException local_ex;
 
 		imap_store->current_folder = new_folder;
-		camel_object_hook_event (imap_store, "finalize",
+		camel_object_hook_event (imap_store->current_folder, "finalize",
 					 _camel_imap_store_current_folder_finalize, imap_store);
 		/* camel_object_ref (new_folder); */
 		camel_exception_init (&local_ex);
@@ -2841,7 +2841,7 @@ get_folder_online (CamelStore *store, const char *folder_name, guint32 flags, Ca
 		if (camel_exception_is_set (&local_ex)) {
 			camel_exception_xfer (ex, &local_ex);
 			/* camel_object_unref (imap_store->current_folder); */
-			camel_object_unhook_event (imap_store, "finalize",
+			camel_object_unhook_event (imap_store->current_folder, "finalize",
 						   _camel_imap_store_current_folder_finalize, imap_store);
 			imap_store->current_folder = NULL;
 			camel_object_unref (new_folder);
