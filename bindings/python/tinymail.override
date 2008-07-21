@@ -176,7 +176,7 @@ _wrap_tny_folder_change_get_rename (PyGObject *self)
 {
     const gchar *rename, *oldname;
 
-    rename = tny_folder_change_get_rename(TNY_FOLDER(self->obj), &oldname);
+    rename = tny_folder_change_get_rename(TNY_FOLDER_CHANGE(self->obj), &oldname);
 
     return Py_BuildValue("ss", rename, oldname);
 }
@@ -381,7 +381,7 @@ _wrap_tny_account_set_pass_func(PyGObject *self, PyObject *args)
 override tny_folder_get_msg_async kwargs
 
 static void
-tny_get_msg_cb (TnyFolder *self, gboolean cancelled, TnyMsg *msg, GError **err, gpointer user_data)
+tny_get_msg_cb (TnyFolder *self, gboolean cancelled, TnyMsg *msg, GError *err, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -397,7 +397,6 @@ tny_get_msg_cb (TnyFolder *self, gboolean cancelled, TnyMsg *msg, GError **err, 
     if (!ret)
         PyErr_Print();
 
-    pyg_error_check(err);
     Py_XDECREF(ret);
     Py_DECREF(args);
     Py_DECREF ((PyObject *)user_data);
@@ -456,7 +455,7 @@ _wrap_tny_folder_get_msg_async (PyGObject *self, PyObject *args, PyObject *kwarg
 override tny_folder_refresh_async kwargs
 
 static void
-tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, GError **err, gpointer user_data)
+tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, GError *err, gpointer user_data)
 {
     PyObject *callback, *args, *ret;
     PyGILState_STATE state;
@@ -471,8 +470,6 @@ tny_refresh_folder_cb (TnyFolder *self, gboolean cancelled, GError **err, gpoint
     if (!ret)
 	PyErr_Print();
 
-    pyg_error_check(err);
-	
     Py_XDECREF(ret);
     Py_DECREF(args);
     Py_DECREF ((PyObject *)user_data);

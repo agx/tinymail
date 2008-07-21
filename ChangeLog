@@ -1,3 +1,7 @@
+2008-07-21  Mark Doffman  <mark.doffman@codethink.co.uk>
+	* bindings/python/tinymail.override
+	Fixed some incompatible pointer warnings.
+
 2008-07-16  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.[ch]:
