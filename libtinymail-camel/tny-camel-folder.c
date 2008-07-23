@@ -2188,9 +2188,11 @@ typedef struct
 	TnyList *headers;
 	gboolean refresh;
 	TnyGetHeadersCallback callback;
+	TnyStatusCallback status_callback;
 	gpointer user_data;
 	TnySessionCamel *session;
 	gboolean cancelled;
+	TnyIdleStopper *stopper;
 
 } GetHeadersInfo;
 
@@ -2209,6 +2211,9 @@ tny_camel_folder_get_headers_async_destroyer (gpointer thr_user_data)
 	if (info->err)
 		g_error_free (info->err);
 
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
+
 	/**/
 
 	camel_object_unref (info->session);
@@ -2225,21 +2230,54 @@ tny_camel_folder_get_headers_async_callback (gpointer thr_user_data)
 		info->callback (info->self, info->cancelled, info->headers, info->err, info->user_data);
 		tny_lockable_unlock (info->session->priv->ui_lock);
 	}
+	tny_idle_stopper_stop (info->stopper);
+
 	return FALSE;
 }
+
+static void
+tny_camel_folder_get_headers_async_status (struct _CamelOperation *op, const char *what, int sofar, int oftotal, void *thr_user_data)
+{
+	GetHeadersInfo *oinfo = thr_user_data;
+	TnyProgressInfo *info = NULL;
+
+	info = tny_progress_info_new (G_OBJECT (oinfo->self), oinfo->status_callback, 
+				      TNY_FOLDER_STATUS, TNY_FOLDER_STATUS_CODE_GET_MSG, what, sofar, 
+				      oftotal, oinfo->stopper, oinfo->session->priv->ui_lock, oinfo->user_data);
+	
+	g_idle_add_full (TNY_PRIORITY_LOWER_THAN_GTK_REDRAWS, 
+			 tny_progress_info_idle_func, info, 
+			 tny_progress_info_destroy);
+	
+	return;
+}
+
 
 static gpointer 
 tny_camel_folder_get_headers_async_thread (gpointer thr_user_data)
 {
 	GetHeadersInfo *info = (GetHeadersInfo*) thr_user_data;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
+
 	info->err = NULL;
-	tny_folder_get_headers (info->self, info->headers, info->refresh, &info->err);
 	info->cancelled = FALSE;
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+
+	_tny_camel_account_start_camel_operation (TNY_CAMEL_ACCOUNT (priv->account),
+						  tny_camel_folder_get_headers_async_status, 
+						  info, "Getting headers");
+
+	tny_folder_get_headers (info->self, info->headers, info->refresh, &info->err);
+
+	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	if (info->err != NULL) {
 		if (camel_strstrcase (info->err->message, "cancel") != NULL)
 			info->cancelled = TRUE;
 	}
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
 
 	return NULL;
 }
@@ -2256,7 +2294,8 @@ tny_camel_folder_get_headers_async_cancelled_destroyer (gpointer thr_user_data)
 	g_object_unref (info->self);
 	g_object_unref (info->headers);
 
-	/**/
+	tny_idle_stopper_destroy (info->stopper);
+	info->stopper = NULL;
 
 	camel_object_unref (info->session);
 
@@ -2297,8 +2336,10 @@ tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, g
 	info->headers = headers;
 	info->refresh = refresh;
 	info->callback = callback;
+	info->status_callback = status_callback;
 	info->user_data = user_data;
 	info->err = NULL;
+	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
 	g_object_ref (info->self);
@@ -2318,7 +2359,7 @@ tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, g
 		&info->cancelled,
 		info, sizeof (GetHeadersInfo),
 		TNY_CAMEL_QUEUE_PRIORITY_ITEM/*|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM*/|
-			TNY_CAMEL_QUEUE_GET_HEADERS_ITEM, 
+		TNY_CAMEL_QUEUE_GET_HEADERS_ITEM, 
 		__FUNCTION__);
 
 	return;

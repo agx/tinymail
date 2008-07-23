@@ -781,6 +781,7 @@ _tny_camel_account_start_camel_operation_n (TnyCamelAccount *self, CamelOperatio
 
 	priv->cancel = camel_operation_new (func, user_data);
 
+	camel_operation_register (priv->cancel);
 	camel_operation_start (priv->cancel, (char*)what);
 
 	g_static_rec_mutex_unlock (priv->cancel_lock);

@@ -1,3 +1,13 @@
+2008-07-23  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-account.c
+	(_tny_camel_account_start_camel_operation_n): added a missing
+	camel_operation_register that was preventing progress info to be
+	threw up and cancelations as well.
+
+	* libtinymail-camel/tny-camel-folder.c: added progress information
+	to get_headers_async function.
+
 2008-07-21  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camep-imap-store.c:
