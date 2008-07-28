@@ -1,3 +1,9 @@
+2008-07-28  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c:
+	do not mark as expunged those messages that could not be retrieved due
+	to the user canceled the request
+
 2008-07-23  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-account.c

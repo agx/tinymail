@@ -1189,28 +1189,33 @@ rfail:
 			 * funny things, especially if they have web access and
 			 * the user has a delete-mail finger  ... ) */
 
-			CamelFolder *folder = (CamelFolder *) pop3_folder;
-			CamelMessageInfo *mi = camel_folder_summary_uid (folder->summary, uid);
-			if (mi) {
-				CamelFolderChangeInfo *changes = camel_folder_change_info_new ();
-				((CamelMessageInfoBase*)mi)->flags |= CAMEL_MESSAGE_EXPUNGED;
-				if (mi->uid) {
-					camel_folder_change_info_remove_uid (changes, mi->uid);
-					camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+			if (camel_operation_cancel_check (NULL)) {
+				camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL,
+					"User canceled message retrieval");
+			} else {
+				CamelFolder *folder = (CamelFolder *) pop3_folder;
+				CamelMessageInfo *mi = camel_folder_summary_uid (folder->summary, uid);
+				if (mi) {
+					CamelFolderChangeInfo *changes = camel_folder_change_info_new ();
+					((CamelMessageInfoBase*)mi)->flags |= CAMEL_MESSAGE_EXPUNGED;
+					if (mi->uid) {
+						camel_folder_change_info_remove_uid (changes, mi->uid);
+						camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
+					}
+					camel_folder_summary_remove (folder->summary, mi);
+					camel_folder_change_info_free (changes);
+					camel_message_info_free (mi);
 				}
-				camel_folder_summary_remove (folder->summary, mi);
-				camel_folder_change_info_free (changes);
-				camel_message_info_free (mi);
-			}
 
-			camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
-			  "Message with UID %s is not currently available on the POP server. "
-			  "If you have a web E-mail account with POP access, make sure "
-			  "that you select to export all E-mails over POP for mail, "
-			  "the ones that have already been downloaded too. Also verify "
-			  "whether other E-mail clients that use the account are not "
-			  "configured to automatically delete E-mails from the POP server." ,
-			  uid);
+				camel_exception_setv (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
+				      "Message with UID %s is not currently available on the POP server. "
+				      "If you have a web E-mail account with POP access, make sure "
+				      "that you select to export all E-mails over POP for mail, "
+				      "the ones that have already been downloaded too. Also verify "
+				      "whether other E-mail clients that use the account are not "
+				      "configured to automatically delete E-mails from the POP server." ,
+				      uid);
+			}
 
 			g_static_rec_mutex_unlock (pop3_store->uidl_lock);
 			goto do_free_ex;
