@@ -27,7 +27,7 @@ tinymail_vala_test_SOURCES = \
 	$(NULL)
 
 tinymail-vala-test.vala.stamp: $(tinymail_vala_test_VALASOURCES)
-	$(VALAC) --vapidir $(top_srcdir)/bindings/vala --pkg libtinymail-gnome-desktop-1.0 --basedir $(top_srcdir) $^
+	$(VALAC) -C --vapidir $(top_srcdir)/bindings/vala --pkg libtinymail-gnome-desktop-1.0 --basedir $(top_srcdir) $^
 	touch $@
 
 tinymail_vala_test_LDADD = \

@@ -1,3 +1,8 @@
+2008-07-28  Jürg Billeter  <j@bitron.ch>
+
+	* tests/vala-demo/Makefile.am:
+	Fix build with recent Vala versions
+
 2008-07-28  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c:
