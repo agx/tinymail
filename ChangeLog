@@ -1,3 +1,9 @@
+2008-07-31  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
+	Check on fetching folder info if the top folder is inbox (should fix
+	inbox detection in dovecot).
+
 2008-07-28  Jürg Billeter  <j@bitron.ch>
 
 	* tests/vala-demo/Makefile.am:
