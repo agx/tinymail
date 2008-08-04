@@ -4163,7 +4163,7 @@ get_folder_info_offline (CamelStore *store, const char *top,
 
 	fi = camel_folder_info_build (folders, top, '/', TRUE);
 	/* for the case the inbox itself has been synthesized here (hack for dovecot) */
-	if (!g_ascii_strcasecmp(fi->full_name, "inbox"))
+	if (fi && !g_ascii_strcasecmp(fi->full_name, "inbox"))
 		fi->flags = (fi->flags & ~CAMEL_FOLDER_TYPE_MASK) | CAMEL_FOLDER_TYPE_INBOX;
 	g_ptr_array_free (folders, TRUE);
 	g_free(name);

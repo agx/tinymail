@@ -1,3 +1,9 @@
+2008-08-04  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c
+	(get_folder_info_offline): check wheter the returned folder info is
+	NULL or not to prevent a crash
+
 2008-08-01  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/local/camel-local-store.c
