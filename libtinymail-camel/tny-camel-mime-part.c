@@ -781,7 +781,7 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 		return -1;
 	}
 	
-	if (camel_content_type_is (wrapper->mime_type, "text", "*"))
+	if (camel_content_type_is (wrapper->mime_type, "text", "plain"))
 		bytes = (gssize) camel_stream_format_text (wrapper, cstream);
 	else
 		bytes = (gssize) camel_data_wrapper_decode_to_stream (wrapper, cstream);
@@ -945,7 +945,7 @@ tny_camel_mime_part_get_decoded_stream_default (TnyMimePart *self)
 	if (wrapper->stream) {
 		camel_stream_reset (wrapper->stream);
 
-		if (camel_content_type_is (wrapper->mime_type, "text", "*"))
+		if (camel_content_type_is (wrapper->mime_type, "text", "plain"))
 			bytes = camel_stream_format_text (wrapper, stream);
 		else
 			bytes = camel_data_wrapper_decode_to_stream (wrapper, stream);
