@@ -1,3 +1,9 @@
+2008-08-18  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c (tny_camel_folder_finalize):
+	remove the folder from the account before unrefing it as it could be
+	the last reference of the account
+
 2008-08-12  Thomas Monjalon  <thomas.monjalon@openwide.fr>
 
 	* libtinymail-camel/tny-camel-mime-part.c: convert only plain text
