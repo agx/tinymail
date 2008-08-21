@@ -1,6 +1,10 @@
 Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog
+2008-08-21  Sergio Villar Senin  <svillar@igalia.com>
+
+	* camel/camel.c (camel_init): merged a fix from upstream for a
+	memory leak 
 
 2008-04-03  Philip Van Hoof <pvanhoof@gnome.org>
 
