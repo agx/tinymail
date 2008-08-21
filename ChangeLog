@@ -1,5 +1,15 @@
 2008-08-21  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail/tny-merge-folder.c (remove_msgs_async_thread),
+	(tny_merge_folder_remove_msgs_async), (sync_async_thread),
+	(tny_merge_folder_sync_async), (get_msg_async_thread),
+	(tny_merge_folder_get_msg_async), (find_msg_async_thread),
+	(tny_merge_folder_find_msg_async), (get_headers_async_thread),
+	(tny_merge_folder_get_headers_async), (refresh_async_thread),
+	(tny_merge_folder_refresh_async), (transfer_msgs_async_thread),
+	(tny_merge_folder_transfer_msgs_async): Added some missing frees
+	to fix several leaks of thread structures
+
 	* libtinymail/tny-fs-stream-cache.c
 	(tny_fs_stream_cache_finalize): properly unref the hash table with
 	the cached files

@@ -201,8 +201,7 @@ remove_msgs_async_thread (gpointer thr_user_data)
 			remove_msgs_async_destroyer (info);
 		}
 	} else { /* Thread reference */
-		g_object_unref (info->self);
-		g_object_unref (info->headers);
+		remove_msgs_async_destroyer (info);
 	}
 
 	g_thread_exit (NULL);
@@ -217,7 +216,7 @@ tny_merge_folder_remove_msgs_async (TnyFolder *self, TnyList *headers, TnyFolder
 	RemMsgsInfo *info;
 	GThread *thread;
 
-	info = g_slice_new (RemMsgsInfo);
+	info = g_slice_new0 (RemMsgsInfo);
 	info->err = NULL;
 	info->self = self;
 	info->headers = headers;
@@ -412,8 +411,9 @@ sync_async_thread (gpointer thr_user_data)
 			sync_async_callback (info);
 			sync_async_destroyer (info);
 		}
-	} else /* Thread reference */
-		g_object_unref (self);
+	} else { /* Thread reference */
+		sync_async_destroyer (info);
+	}
 
 	g_thread_exit (NULL);
 
@@ -427,7 +427,7 @@ tny_merge_folder_sync_async (TnyFolder *self, gboolean expunge, TnyFolderCallbac
 	SyncFolderInfo *info;
 	GThread *thread;
 
-	info = g_slice_new (SyncFolderInfo);
+	info = g_slice_new0 (SyncFolderInfo);
 	info->err = NULL;
 	info->self = self;
 	info->expunge = expunge;
@@ -604,8 +604,9 @@ get_msg_async_thread (gpointer thr_user_data)
 			get_msg_async_callback (info);
 			get_msg_async_destroyer (info);
 		}
-	} else /* thread reference */
-		g_object_unref (info->self);
+	} else { /* thread reference */
+		get_msg_async_destroyer (info);
+	}
 
 	g_thread_exit (NULL);
 
@@ -619,7 +620,7 @@ tny_merge_folder_get_msg_async (TnyFolder *self, TnyHeader *header, TnyGetMsgCal
 	GetMsgInfo *info;
 	GThread *thread;
 
-	info = g_slice_new (GetMsgInfo);
+	info = g_slice_new0 (GetMsgInfo);
 	info->self = self;
 	info->header = header;
 	info->callback = callback;
@@ -711,8 +712,9 @@ find_msg_async_thread (gpointer thr_user_data)
 			find_msg_async_callback (info);
 			find_msg_async_destroyer (info);
 		}
-	} else /* thread reference */
-		g_object_unref (info->self);
+	} else { /* thread reference */
+		find_msg_async_destroyer (info);
+	}
 
 	g_thread_exit (NULL);
 
@@ -726,7 +728,7 @@ tny_merge_folder_find_msg_async (TnyFolder *self, const gchar *url_string, TnyGe
 	FindMsgInfo *info;
 	GThread *thread;
 
-	info = g_slice_new (FindMsgInfo);
+	info = g_slice_new0 (FindMsgInfo);
 	info->self = self;
 	info->url_string = g_strdup (url_string);
 	info->callback = callback;
@@ -842,8 +844,7 @@ get_headers_async_thread (gpointer thr_user_data)
 			get_headers_async_destroyer (info);
 		}
 	} else { /* Thread reference */
-		g_object_unref (info->self);
-		g_object_unref (info->headers);
+		get_headers_async_destroyer (info);
 	}
 
 	g_thread_exit (NULL);
@@ -858,7 +859,7 @@ tny_merge_folder_get_headers_async (TnyFolder *self, TnyList *headers, gboolean 
 	GetHeadersFolderInfo *info;
 	GThread *thread;
 
-	info = g_slice_new (GetHeadersFolderInfo);
+	info = g_slice_new0 (GetHeadersFolderInfo);
 	info->err = NULL;
 	info->self = self;
 	info->headers = headers;
@@ -1245,8 +1246,9 @@ refresh_async_thread (gpointer thr_user_data)
 			refresh_async_callback (info);
 			refresh_async_destroyer (info);
 		}
-	} else /* Thread reference */
-		g_object_unref (self);
+	} else {
+		refresh_async_destroyer (info);
+	}
 
 	g_thread_exit (NULL);
 
@@ -1260,7 +1262,7 @@ tny_merge_folder_refresh_async (TnyFolder *self, TnyFolderCallback callback, Tny
 	RefreshFolderInfo *info;
 	GThread *thread;
 
-	info = g_slice_new (RefreshFolderInfo);
+	info = g_slice_new0 (RefreshFolderInfo);
 	info->err = NULL;
 	info->self = self;
 	info->callback = callback;
@@ -1379,9 +1381,7 @@ transfer_msgs_async_thread (gpointer thr_user_data)
 			transfer_msgs_async_destroyer (info);
 		}
 	} else  { /* Thread reference */
-		g_object_unref (info->self);
-		g_object_unref (info->folder_dst);
-		g_object_unref (info->header_list);
+		transfer_msgs_async_destroyer (info);
 	}
 
 	g_thread_exit (NULL);
@@ -1395,7 +1395,7 @@ tny_merge_folder_transfer_msgs_async (TnyFolder *self, TnyList *header_list, Tny
 	TransferMsgsInfo *info;
 	GThread *thread;
 
-	info = g_slice_new (TransferMsgsInfo);
+	info = g_slice_new0 (TransferMsgsInfo);
 	info->err = NULL;
 	info->self = self;
 	info->callback = callback;
