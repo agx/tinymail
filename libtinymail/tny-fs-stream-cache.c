@@ -337,6 +337,9 @@ tny_fs_stream_cache_finalize (GObject *object)
 	TnyFsStreamCache *self = (TnyFsStreamCache *)object;
 	TnyFsStreamCachePriv *priv = TNY_FS_STREAM_CACHE_GET_PRIVATE (self);
 
+	if (priv->cached_files)
+		g_hash_table_unref (priv->cached_files);
+
 	if (priv->path) {
 		g_free (priv->path);
 		priv->path = NULL;
