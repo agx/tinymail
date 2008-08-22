@@ -1,3 +1,8 @@
+2008-08-22  Philip Van Hoof  <pvanhoof@gnome.org>
+
+	* http://www.tinymail.org/trac/tinymail/ticket/81
+	Patch by agx@sigxcpu.org
+
 2008-08-21  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail/tny-merge-folder.c (remove_msgs_async_thread),

@@ -180,7 +180,7 @@ tny_gtk_header_view_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_table_set_col_spacings (GTK_TABLE (self), 4);
 
-	label2 = gtk_label_new (_("<b>to:</b>"));
+	label2 = gtk_label_new (_("<b>To:</b>"));
 	gtk_widget_show (label2);
 	gtk_table_attach (GTK_TABLE (self), label2, 0, 1, 1, 2,
 			  (GtkAttachOptions) (GTK_FILL),
