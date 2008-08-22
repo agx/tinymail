@@ -1,4 +1,4 @@
-2008-08-22  Philip Van Hoof  <pvanhoof@gnome.org>
+2008-08-22  Philip Van Hoof  <philip@codeminded.be>
 
 	* http://www.tinymail.org/trac/tinymail/ticket/81
 	Patch by agx@sigxcpu.org
@@ -138,7 +138,7 @@
 	* libtinymail-camel/camel-lite/camel/camel-mime-utils.c:
         Parse properly broken rfc2047 recipient headers sent from gmail imap.
 
-2008-06-26  Philip Van Hoof <pvanhoof@gnome.org>
+2008-06-26  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed LIST (SUBSCRIBED) for some IMAP servers
 
@@ -247,7 +247,7 @@
 	Update python implementations to remove _func prefix
 	from methods no longer required by gtk-codegen.
 
-2008-06-05  Philip Van Hoof <pvanhoof@gnome.org>
+2008-06-05  Philip Van Hoof <philip@codeminded.be>
 
 	* Merging folder flags from LSUB
 	* Folders that are only in LSUB are flagged NoSelect automatically
@@ -308,23 +308,23 @@
         an empty file for each message in the folder maildir metadata
         directory (the one on top of cur, new and tmp).
 
-2008-05-26  Philip Van Hoof <pvanhoof@gnome.org>
+2008-05-26  Philip Van Hoof <philip@codeminded.be>
 
 	* Bugfix when fetching parts and messages
 	* Fixed various copyright note issues
 
-2008-05-21  Philip Van Hoof <pvanhoof@gnome.org>
+2008-05-21  Philip Van Hoof <philip@codeminded.be>
 
 	* Help piece of shit IMAP servers that don't do SEARCH correctly, like
 	AOL's IMAP server May 2008, by asking for the same thing using UID
 	FETCH.
 
-2008-05-21  Philip Van Hoof <pvanhoof@gnome.org>
+2008-05-21  Philip Van Hoof <philip@codeminded.be>
 
 	* Writing in chunks of 64 bytes
 	* Timeout per chunk is 15 seconds
 
-2008-05-20  Philip Van Hoof <pvanhoof@gnome.org>
+2008-05-20  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed a fallback envelope fetch, don't do the clear on the summary.
 	Instead mark all as expunged
@@ -336,12 +336,12 @@
 	 full buffer but it's not due to an error, then loop to go on
 	 writing the stream.
 
-2008-05-20  Philip Van Hoof <pvanhoof@gnome.org>
+2008-05-20  Philip Van Hoof <philip@codeminded.be>
 
 	* Differentiate between auto-cancellable and normally cancellable
 	items in TnyCamelQueue
 
-2008-05-16  Philip Van Hoof <pvanhoof@gnome.org>
+2008-05-16  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed size reporting in POP, regression fix it seems
 
@@ -350,7 +350,7 @@
 	* Use GOnce registering all types in tinymail to make
 	registering thread-safe.
 
-2008-05-14  Philip Van Hoof <pvanhoof@gnome.org>
+2008-05-14  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/tny-camel-queue.c: Letting the thread wait for
 	more items instead of exiting
@@ -441,7 +441,7 @@
 	libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
         Use weak references to folders in accesses to store.
 
-2008-04-30  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-30  Philip Van Hoof <philip@codeminded.be>
 
 	* Enlarged a lock for the transport-account in camel
 
@@ -451,7 +451,7 @@
 	(on_added): place correctly two swapped parameters when calling the
 	user callback
 
-2008-04-29  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-29  Philip Van Hoof <philip@codeminded.be>
 
 	* Extra robustness in TnyCamelSendQueue
 
@@ -474,7 +474,7 @@
 	libtinymail/tny-merge-folder.[ch]:
 	Added implementations of find_msg_async method.
 
-2008-04-25  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-25  Philip Van Hoof <philip@codeminded.be>
 
 	* Error reporting when sending a message without From, and a crash-fix
 	about it too
@@ -483,7 +483,7 @@
 
 	* This was a minor API change
 
-2008-04-24  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-24  Philip Van Hoof <philip@codeminded.be>
 
 	* Removed all synchronous API usage in TnyCamelSendQueue
 
@@ -501,7 +501,7 @@
           attachments parts that have filename= in disposition even
           if they're "inline".
 
-2008-04-23  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-23  Philip Van Hoof <philip@codeminded.be>
 
 	* Reference count fix in TnyCamelSendQueue
 
@@ -509,7 +509,7 @@
 
 	* Update Vala bindings and demo app
 
-2008-04-22  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-22  Philip Van Hoof <philip@codeminded.be>
 
 	* tny_camel_account_add_option changed !!
 	* tny_camel_account_clear_options added
@@ -518,7 +518,7 @@
 
 	* This was a major API change in libtinymail-camel
 
-2008-04-20  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-20  Philip Van Hoof <philip@codeminded.be>
 
 	* These problems got highlighted during pre-release 0.0.9
 	* Build environment improvements
@@ -538,14 +538,14 @@
 	detect when we cancel the connection dialog (and then report this
 	properly).
 
-2008-04-18  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-18  Philip Van Hoof <philip@codeminded.be>
 
 	* Removed unnecessary old code rot in TnyCamelSendQueue that might
 	cause a deathlock
 	* Decprecated tny_send_queue_add, use tny_send_queue_add_async
 	* Pre-release 0.0.9 preparations
 
-2008-04-17  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-17  Philip Van Hoof <philip@codeminded.be>
 
 	* Corrections to reference handling for TnyCamelSendQueue
 	* Removed a tny_folder_get_headers (deprecated API)
@@ -558,14 +558,14 @@
 	* libtinymail-gnomevfs/tny-vfs-stream.c (tny_vfs_stream_read):
 	return -1 if there was an error reading from the vfs stream.
 
-2008-04-15  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-15  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed alerts when get-msg-async takes place to have their account
 	not set to NULL
 	* Moved the POP's get-msg-qasync queue to its normal interactive queue
 	* Various bugfixes
 
-2008-04-14  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-14  Philip Van Hoof <philip@codeminded.be>
 
 	* Weak referenced folders in the folder-factor methods
 	* Handling uncaching the password during account finalization
@@ -573,12 +573,12 @@
 	* Uncaching of the folder-list in case of tree-changing operations
 	* Experimentally nuked the caching of services ...
 
-2008-04-11  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-11  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed a bug in case LIST and LSUB are not in agreement
 	* Marking certain symbols as deprecated
 
-2008-04-10  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-10  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed a glitch in Jose Dapena Paz's patch of yesterday
 	* Added API documentation about cancelling
@@ -621,12 +621,12 @@
 	* libtinymail/tny-merge-folder.c
 	(tny_merge_folder_get_id): fixed a reference leak
 
-2008-04-07  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-07  Philip Van Hoof <philip@codeminded.be>
 
 	* Refcount problem in async contexts
 	* Fixing the actual problem, too
 
-2008-04-03  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-03  Philip Van Hoof <philip@codeminded.be>
 
 	* Merged patch for upstream camel-lite bug #257361
 	* Bugfix for ticket #76
@@ -637,12 +637,12 @@
 	* Respect better the attachment flag headers also in POP (equivalent
 	to previous change in imap.
 
-2008-04-02  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-02  Philip Van Hoof <philip@codeminded.be>
 
 	* Added a name file, just like the url_string file, to each account
 	* Moved the sendqueue's outbox and sentbox under a sendqueue subdir
 
-2008-04-01  Philip Van Hoof <pvanhoof@gnome.org>
+2008-04-01  Philip Van Hoof <philip@codeminded.be>
 
 	* Storing certificate fingerprints in cache_dir
 	* Writing a file called url_string in the account's cache dir, to make
@@ -650,19 +650,19 @@
 	* Status reporting fix for POP accounts
 	* Merging with camel upstream
 
-2008-03-31  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-31  Philip Van Hoof <philip@codeminded.be>
 
 	* Creating the POP account's cache dir when/if removed
 
-2008-03-28  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-28  Philip Van Hoof <philip@codeminded.be>
 
 	* Cleaning up cache when canceling a POP message download
 
-2008-03-27  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-27  Philip Van Hoof <philip@codeminded.be>
 
 	* Support for Importance header
 
-2008-03-26  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-26  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed several problems like documentation problems in Jose's patch
 	* Review of Jose's patch
@@ -689,11 +689,11 @@
 	* libtinymail-gnomevfs/tny-vfs-stream.c:
 	(tny_vfs_reset): Set priv->position to 0 after a successful reset
 
-2008-03-25  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-25  Philip Van Hoof <philip@codeminded.be>
 
 	* Replaced a GByteArray with a EByteArray
 
-2008-03-24  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-24  Philip Van Hoof <philip@codeminded.be>
 
 	* Rewrote tny_camel_folder_remove_msgs_default
 	* Added tny_folder_remove_msgs_async
@@ -701,16 +701,16 @@
 
 	* This was a minor API change
 
-2008-03-20  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-20  Philip Van Hoof <philip@codeminded.be>
 
 	* Implementation of a connect() that will timeout within 15 seconds
 	for the non-SSL connection types. Experimental.
 
-2008-03-19  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-19  Philip Van Hoof <philip@codeminded.be>
 
 	* Fast message moves when source and dest folder are both Maildir
 
-2008-03-19  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-19  Philip Van Hoof <philip@codeminded.be>
 
 	* Bugfix when sending large E-mails to GMail's SMTP service
 	* When a large mail is being sent, it takes a long time to move it
@@ -722,7 +722,7 @@
 
 	* Small bugfix in libtinymail-maemo
 
-2008-03-18  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-18  Philip Van Hoof <philip@codeminded.be>
 
 	* Non-initialization of a variable caused memory corruption on the
 	stack
@@ -736,7 +736,7 @@
 	* libtinymail-camel/camel-lite/camel/camel-folder-summary.c: improved
 	error notification when there are problems in the local storage
 
-2008-03-17  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-17  Philip Van Hoof <philip@codeminded.be>
 
 	* Made tny_folder_transfer_msgs_async cancellable
 
@@ -747,11 +747,11 @@
 	headers. Also take into account the case we get ms has attachments but
 	we don't have priority flag, for avoiding using heuristics.
 
-2008-03-16  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-16  Philip Van Hoof <philip@codeminded.be>
 
 	* Added extra insurance that an INBOX folder will be present
 
-2008-03-13  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-13  Philip Van Hoof <philip@codeminded.be>
 
 	* IMAP provider: bugfix when asking for a list of folders that has no
 	subfolders, on Cyrus.
@@ -789,7 +789,7 @@
 	* tinymail/libtinymail-camel/tny-camel-mem-stream.c:
 	Added tny_camel_mem_stream_new_with_buffer()
 
-2008-03-06  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-06  Philip Van Hoof <philip@codeminded.be>
 
 	* Experimental improvement in locking in the POP3 provider
 	* Bugfix when canceling POP summary retrieval
@@ -800,7 +800,7 @@
 	* debian/libtinymail-camel-1.0-0-dev.install:
 	Install libcamel-lite
 
-2008-03-05  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-05  Philip Van Hoof <philip@codeminded.be>
 
 	* Experimental improvement in locking
 
@@ -810,7 +810,7 @@
 	(connect_to_server): we don't abort connection attempt if we get
 	LOGINDISABLED but we have secure auth methods in capabilities.
 
-2008-03-05  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-05  Philip Van Hoof <philip@codeminded.be>
 
 	* Check-for-duplicates in TnyFolderObserver and TnyFolderMonitor
 	* Introduction of tny_gtk_header_list_model_set_no_duplicates
@@ -820,7 +820,7 @@
 
 	* This was a minor API change
 
-2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-04  Philip Van Hoof <philip@codeminded.be>
 
 	* Leave on disk, MIME parsing. Highly experimental
 
@@ -837,17 +837,17 @@
 	causing coredumps) for bodystructure strings not
 	including BODYSTRUCTURE prefix.
 
-2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-04  Philip Van Hoof <philip@codeminded.be>
 
         * Attempt at making mime parsing use the seekable capability of
 	streams instead of copying them in memory. This is experimental!
 
-2008-03-04  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-04  Philip Van Hoof <philip@codeminded.be>
 
 	* Introduction of TnySeekable
 	* This is experimental
 
-2008-03-03  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-03  Philip Van Hoof <philip@codeminded.be>
 
 	* Smaller bug fixes in the build
 	* filename= encoding fixes
@@ -858,7 +858,7 @@
 	* debian/libtinymail-camel-1.0-0-dev.install:
 	Removed obsolete libraries
 
-2008-03-01  Philip Van Hoof <pvanhoof@gnome.org>
+2008-03-01  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixes in the POP code for POP servers that return invalid CAPA
 	responses (like pop.sina.com)
@@ -894,21 +894,21 @@
 	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c:
 	(pop3_get_message). Now it works even if no exception parameter is passed.
 
-2008-02-20  Philip Van Hoof <pvanhoof@gnome.org>
+2008-02-20  Philip Van Hoof <philip@codeminded.be>
 
 	* Improvement for cancel's their reconnection
 
-2008-02-18  Philip Van Hoof <pvanhoof@gnome.org>
+2008-02-18  Philip Van Hoof <philip@codeminded.be>
 
 	* Make distcheck for the .NET bindings (finally)
 
-2008-02-16  Philip Van Hoof <pvanhoof@gnome.org>
+2008-02-16  Philip Van Hoof <philip@codeminded.be>
 
 	* NAMESPACE vs. LIST separator for mail.h-farm.it
 	* Get-Message cancels
 	* Various smaller bugfixes
 
-2008-02-15  Philip Van Hoof <pvanhoof@gnome.org>
+2008-02-15  Philip Van Hoof <philip@codeminded.be>
 
 	* Merged Alberto's cancel patch of yesterday with some minor
 	corrections and committed the patch
@@ -934,7 +934,7 @@
 	* libtinymail-gnomevfs/tny-vfs-stream.c:
 	(tny_vfs_reset): Return 0 on success
 
-2008-02-09  Philip Van Hoof <pvanhoof@gnome.org>
+2008-02-09  Philip Van Hoof <philip@codeminded.be>
 
 	* Crash when the IMAP server doesn't support namespaces
 	* GLib Signal leakage in TnyGtkFolderStoreTreeModel
@@ -944,7 +944,7 @@
 
 	* This was a minor API change
 
-2008-02-05  Philip Van Hoof <pvanhoof@gnome.org>
+2008-02-05  Philip Van Hoof <philip@codeminded.be>
 
 	* Making the DotNet bindings actually work
 	* Added a demoui written in C#
@@ -959,7 +959,7 @@
 	Now we use Mozilla NSS api for this as the old method was not
 	reliable in some cases.
 
-2008-02-03  Philip Van Hoof <pvanhoof@gnome.org>
+2008-02-03  Philip Van Hoof <philip@codeminded.be>
 
 	* Crashfix when retrieving a large message while expunging it from
 	another E-mail client
@@ -980,7 +980,7 @@
         * Cleaned up the debian/control.maemo-chinook and
 	debian/control.maemo-diablo files.
 
-2008-01-30  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-30  Philip Van Hoof <philip@codeminded.be>
 
 	* Implemented DotNet bindings
 
@@ -990,11 +990,11 @@
 	Added the proper error codes when there is no enough space left on
 	devices
 
-2008-01-29  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-29  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed reference counting for all TnyIterator implementations
 
-2008-01-28  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-28  Philip Van Hoof <philip@codeminded.be>
 
 	* Removed the _func from all the interfaces and virtual function
 	pointers in the classes. This should not be an ABI but is an API
@@ -1002,17 +1002,17 @@
 
 	* This was a major API change
 
-2008-01-28  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-28  Philip Van Hoof <philip@codeminded.be>
 
 	* Added skeleton for unfinished DotNet bindings. This wont work yet,
 	it seems gapi2 is generating a few *Implementor types incorrectly.
 
-2008-01-27  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-27  Philip Van Hoof <philip@codeminded.be>
 
 	* Various code improvements
 	* Merged camel-lite with upstream camel revision 8428
 
-2008-01-26  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-26  Philip Van Hoof <philip@codeminded.be>
 
 	* Experimental expunge handling. Less expunging from the local
 	summary will be needed, as we'll more carefully calculate which of the
@@ -1020,7 +1020,7 @@
 	revert in needed. This commit should reduce the "Expunged" labels that
 	you might have been seeing in tny E-mail clients too.
 
-2008-01-26  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-26  Philip Van Hoof <philip@codeminded.be>
 
 	* Workaround for a known problem that ain't easy to solve right now:
 	expunged headers stay around for too long. When this is detected, a
@@ -1029,7 +1029,7 @@
 
 	* This was a major API change
 
-2008-01-25  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-25  Philip Van Hoof <philip@codeminded.be>
 
 	* Some IMAP servers don't instantly update sessions that where not in
 	IDLE when in monitoring service IDLE received an EXISTS. Tinymail
@@ -1061,7 +1061,7 @@
 
 	* This was a major API change
 
-2008-01-22  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-22  Philip Van Hoof <philip@codeminded.be>
 
 	* Added support for GtkHTML in libtinymailui-gtkhtml. This is highly
 	experimental and unfinished at this moment
@@ -1084,7 +1084,7 @@
 	to remove the messages or just to suspend them
 	(thread_main): make the tny_transport_account_send cancellable
 
-2008-01-20  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-20  Philip Van Hoof <philip@codeminded.be>
 
 	* Refactoring of all error reporting situations, errors and handling
 	of connection failures, reconnecting and getting messages in case of a
@@ -1099,7 +1099,7 @@
 
 	* This was a major API change for all modules
 
-2008-01-19  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-19  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed sync when offline transfers took place
 
@@ -1136,7 +1136,7 @@
 	* libtinymail-maemo/tny-maemo-conic-device.c: fixes a condition that
 	was preventing the callback of connect_async from being called
 
-2008-01-15  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-15  Philip Van Hoof <philip@codeminded.be>
 
 	* Better error reporting on connection failures
 	* Fix in namespace parsing when the separator was NIL
@@ -1145,7 +1145,7 @@
 
 	* initialize some priv-> member in TnyMaemoConicDevice
 
-2008-01-14  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-14  Philip Van Hoof <philip@codeminded.be>
 
 	* Some aggresive memory checking revealed a few interesting memory
 	leaks. This commit fixes those. The fixes are experimental, although
@@ -1156,7 +1156,7 @@
 	* Flag setting to 0xffff must be 0x1fff as bit 13 and 14 are system
 	bits that should not be altered like that.
 
-2008-01-13  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-13  Philip Van Hoof <philip@codeminded.be>
 
 	* Changed tny_mime_part_construct_from_stream to
 	tny_mime_part_construct, added a parameter for the
@@ -1164,7 +1164,7 @@
 
 	* This was a major API change
 
-2008-01-12  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-12  Philip Van Hoof <philip@codeminded.be>
 
 	* Merged camel-lite with Camel upstream rev. 8360
 	* Added an extra check around a strcmp that seems to have caused a
@@ -1174,7 +1174,7 @@
 	* Maildir folders are always subscribed
 	* Non existing UIDs when BODY.PEEK-ing
 
-2008-01-11  Philip Van Hoof <pvanhoof@gnome.org>
+2008-01-11  Philip Van Hoof <philip@codeminded.be>
 
 	* Preparations for the new summary store
 	* Made all remaining static libraries LTLIBRARIES
@@ -1205,24 +1205,24 @@
 	* libtinymail-maemo/tny-maemo-conic-device.c: fixed an invalid g_free
 	over a previously freed field of a struct
 
-2007-12-30  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-30  Philip Van Hoof <philip@codeminded.be>
 
 	* Performance enhancements
 	* Bugfix for the bodystructure parser and per-MIME-part fetching
 	* Experimental performance improvement in tny-gtk-header-list-model.c
 
-2007-12-27  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-27  Philip Van Hoof <philip@codeminded.be>
 
 	* Updates from Camel upstream, rfc 2047 decoder
 
-2007-12-26  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-26  Philip Van Hoof <philip@codeminded.be>
 
 	* Committed Jeffrey Stedfast's patch for Camel upstream to
 	camel-mime-utils.c and camel-charset-map.c
 	More information here:
 	http://mail.gnome.org/archives/evolution-hackers/2007-December/msg00079.html
 
-2007-12-24  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-24  Philip Van Hoof <philip@codeminded.be>
 
 	* Merging with Camel upstream
 	* When offline, folders in namespace that had a parent that was not
@@ -1230,14 +1230,14 @@
 	not created, as LSUB didn't list those. This patch creates the
 	parents.
 
-2007-12-23  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-23  Philip Van Hoof <philip@codeminded.be>
 
 	* Removed libtinymail-queues and libtinymail-asyncworker since those
 	two libs are not going to be supported in Tinymail 1.0
 	* Improvements to the NAMESPACE, LIST and LSUB things
 	* Reverted decoder patch, it contains buffer overflows
 
-2007-12-22  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-22  Philip Van Hoof <philip@codeminded.be>
 
 	* Experimental support for NAMESPACE
 	* Major improvements for LIST and LSUB
@@ -1259,7 +1259,7 @@
         * libtinymail-test/tny-mime-part-test.c:
                 Small changes to use the new signatures of the two functions.
 
-2007-12-21  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-21  Philip Van Hoof <philip@codeminded.be>
 
 	* Code robustness
 	* Changed the account item of a folder to be hard referenced instead
@@ -1285,7 +1285,7 @@
 	    tny_maemo_conic_device_connect_async which could cause
 	    warnings and other problems
 
-2007-12-19  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-19  Philip Van Hoof <philip@codeminded.be>
 
 	* New documentation style, third commit (libtinymailui-gtk)
 	* Implemented support for LIST-EXTENDED's SUBSCRIBED parameter
@@ -1293,7 +1293,7 @@
 	* Experimental improvements for LIST
 	* Made the new documentation style backward compatible for gtk-doc
 
-2007-12-18  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-18  Philip Van Hoof <philip@codeminded.be>
 
 	* New documentation style, second commit (GtkDocFuture)
 	* API fixes in TnyMimePart and TnyGtkImageMimePartView
@@ -1301,11 +1301,11 @@
 
 	* This was a major API change
 
-2007-12-17  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-17  Philip Van Hoof <philip@codeminded.be>
 
 	* New documentation style, first commit (GtkDocFuture)
 
-2007-12-17  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-17  Philip Van Hoof <philip@codeminded.be>
 
 	* Bugfix in tny_folder_get_folders_async
 	* Bugfix in $Label1 on IMAP
@@ -1318,7 +1318,7 @@
 	(tny_camel_mime_part_construct_from_stream_default)
 	Fixed three memory leaks
 
-2007-12-15  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-15  Philip Van Hoof <philip@codeminded.be>
 
 	* Moved the TnyFolderStoreQuery parameter in
 	tny_folder_store_get_folders_async
@@ -1326,20 +1326,20 @@
 
 	* This was a major API change
 
-2007-12-15  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-15  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed some thread-unsafe code in TnyCamelSendQueue
 	* Use PR_Shutdown to cut an SSL connection
 	* Fixed folder subscriptions and queries
 
-2007-12-14  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-14  Philip Van Hoof <philip@codeminded.be>
 
 	* Bugfix in the POP support: when an item is not available remotely
 	anymore, nor have we cached it locally, we remove it from the summary
 	list locally.
 	* Detailed progress info for BODY fetches
 
-2007-12-13  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-13  Philip Van Hoof <philip@codeminded.be>
 
 	* Added the TnyConnectionPolicy type for coping with connectivity
 	changes (for example sheduling a reconnect or asking the user what to
@@ -1387,11 +1387,11 @@
 	use the new TnyCamelMsgHeader decorator api.
 	* Fixed minor build issues.
 
-2007-12-12  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-12  Philip Van Hoof <philip@codeminded.be>
 
 	* Experimental appending instead of rewriting the summary.mmap
 
-2007-12-11  Philip Van Hoof <pvanhoof@gnome.org>
+2007-12-11  Philip Van Hoof <philip@codeminded.be>
 
 	* Repeated the bugfix of Sergio to the other locations where the same
 	technique was wrongfully used.
@@ -1440,12 +1440,12 @@
 
 	* ChangeLog: use UTF-8 for all entries
 
-2007-12-07  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-12-07  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed the BODY fetcher to cope with unsolicited responses
 	* Fixed decoding of message headers in TnyMsg type
 
-2007-12-05  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-12-05  Philip Van Hoof  <philip@codeminded.be>
 
 	* Merged all of devel/pvanhoof/bs branch back
 	* Disabled the bodystruct mime part and fetching for now
@@ -1464,11 +1464,11 @@
 	Add configure flags to force pkg-config modules for xpcom,
 	gtkmozembed, nss, and nspr.
 
-2007-12-02  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-12-02  Philip Van Hoof  <philip@codeminded.be>
 
 	* Merge from devel/pvanhoof/bs branch
 
-2007-11-30  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-30  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix for ticket #72
 	* Workaround for a known but unfound bug: don't register observers
@@ -1477,7 +1477,7 @@
 	incorrect locking while a list was being destroyed)
 	* Fixed tny_camel_account_set_online
 
-2007-11-29  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-29  Philip Van Hoof  <philip@codeminded.be>
 
         * Backporting stable things from the devel/pvanhoof/bs branch to trunk
 	* Added TnyGtkExpanderMimePartView. This type is advised to be used
@@ -1486,7 +1486,7 @@
 	construction make sure that you don't download the part's content
 	until you expand the expander).
 
-2007-11-28  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-28  Philip Van Hoof  <philip@codeminded.be>
 
 	* Backporting stable things from the devel/pvanhoof/bs branch to trunk
 
@@ -1502,26 +1502,26 @@
 	* add a dummy conic device, so libtinymail-maemo does
 	  not require libconic anymore
 
-2007-12-02  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-12-02  Philip Van Hoof  <philip@codeminded.be>
 
 	* Merging with trunk
 
-2007-12-02  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-12-02  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed tny_mime_part_add of TnyCamelMimePart to fully cope with alien
 	mime parts
 
-2007-11-30  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-30  Philip Van Hoof  <philip@codeminded.be>
 
 	* Merging with trunk
 
-2007-11-29  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-29  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed mime part purging
 	* Fixed status information notifying
 	* Added TnyGtkExpanderMimePartView
 
-2007-11-28  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-28  Philip Van Hoof  <philip@codeminded.be>
 
 	* Several fixes. in the bodystructure parsing
 	* Several fixes in the mime part handling
@@ -1530,18 +1530,18 @@
 
 	* This was a major API change in libtinymail and libtinymailui
 
-2007-11-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* Branchpoint bodystructure work
 
-2007-11-25  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-25  Philip Van Hoof  <philip@codeminded.be>
 
 	* Using the LOGIN-DELAY of a POP server
 	* If LOGIN-DELAY is not given, use 300 seconds as default timeout for
 	POP servers
 	* Reconnect after the timeout has expired
 
-2007-11-22  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-22  Philip Van Hoof  <philip@codeminded.be>
 
 	* Refactored TnyCamelQueue to make more sense
 	* Fixed a bug if a message was not available and whe are offline with
@@ -1552,7 +1552,7 @@
 	click on later E-mails (for POP accounts)
 	* Fixed regression bug in the TnyCamelQueue refactoring
 
-2007-11-21  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-21  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix: the necessity of depth is old, and probably not needed
 	anymore. On top of that have I seen backtraces where a g_idle is not
@@ -1578,7 +1578,7 @@
 	(folder_changed): update the total count as well as the unread
 	count when there is a change in the folder
 
-2007-11-20  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-20  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix makes ENABLE not happen if login failed
 	* Completed the implementation of TnyMergeFolder, shortened its locks
@@ -1589,7 +1589,7 @@
 
 	* Bugfix for Ubuntu packages
 
-2007-11-19  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-19  Philip Van Hoof  <philip@codeminded.be>
 
 	* IMAP protocol bugfix during Lemonade interop, bug found while
 	testing with Arnt's IMAP server
@@ -1604,7 +1604,7 @@
 	Missed that CamelSpoolStore has its own free_folder_info()
 	implementation (why?).  Change it to use g_slice_free().
 
-2007-11-16  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-16  Philip Van Hoof  <philip@codeminded.be>
 
 	* The cache deleter. A little bit of rework
 	* Hardening Tinymail a little bit
@@ -1615,7 +1615,7 @@
 	Now rewrite folder gets the filename of the messages to rewrite from the
 	message info instead of using simply the message uid.
 
-2007-11-16  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-16  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix in TnyGtkFolderStoreTreeModel: the signals where not being
 	disconnected when the instance finalised.
@@ -1633,7 +1633,7 @@
 	requested by an user or by an automatic system (like a daemon). This
 	allows the connection not to succed when the device is sleeping.
 
-2007-11-15  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-15  Philip Van Hoof  <philip@codeminded.be>
 
 	* Updating attachment flags after downloading of message
 	* Bugfix, bug detected by Milan Crha (alloc must be a alloc0)
@@ -1645,7 +1645,7 @@
 	* A few new argument guards here and there (e.g. g_return_if_fail).
 	* Tons of little whitespace and coding style fixes.
 
-2007-11-14  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-14  Philip Van Hoof  <philip@codeminded.be>
 
 	* Changed a hard reference into a weak reference, although I'm not
 	sure that this was necessary.
@@ -1654,7 +1654,7 @@
 	that the TnyCamelSendQueue was making TnyCamelFolder crash since
 	yesterday's reference count fixes
 
-2007-11-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Weak references for TnyHeader instances in TnyCamelMsgHeader
 	* Reference counting mistakes in TnyGtkFolderStoreTreeModel
@@ -1664,7 +1664,7 @@
 
 	* Renamed the control files with respect to the new maemo versions.
 
-2007-11-09  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-09  Philip Van Hoof  <philip@codeminded.be>
 
 	* Tryout lockup fix
 
@@ -1684,7 +1684,7 @@
 	(split_recipients): now we strip the obtained addresses to
 	avoid adding unmeaningful spaces to addresses.
 
-2007-11-08  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-08  Philip Van Hoof  <philip@codeminded.be>
 
 	* Backported changes from Pre release 0.0.4 preparations
 	* Simulated weak references in TnyGtkFolderStoreTreeModel for the
@@ -1709,14 +1709,14 @@
 
 	* This is a major API change
 
-2007-11-07  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-07  Philip Van Hoof  <philip@codeminded.be>
 
 	* Some problems fixed in TnyGtkFolderStoreTreeModel when moving
 	folders around into newly created folders
 	* Minor corrections when creating and moving folders
 	* Bugfix when copying a folder into its own store under another name
 
-2007-11-06  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-06  Philip Van Hoof  <philip@codeminded.be>
 
 	* Rare but possible race condition when creating the IDLE thread,
 	marked the sections as critical by locking them.
@@ -1735,14 +1735,14 @@
 
 	* Don't leak an fp in md5_get_digest_from_file
 
-2007-11-05  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-05  Philip Van Hoof  <philip@codeminded.be>
 
 	* Merged with upstream Camel revision 8186
 	* Merged bugfix http://bugzilla.gnome.org/show_bug.cgi?id=430420
 	* Fixed a warning during the build procedure, detecting Mozilla
 	version
 
-2007-11-05  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-05  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix when renaming or moving a local folder. Not all of its sub-
 	folders where recreated (if the flags where 0, CamelStore's
@@ -1751,7 +1751,7 @@
 	request all childs. This is tny-camel-folder.c:3084 (under the was_new
 	if). Please keep an eye on this one!
 
-2007-11-01  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-11-01  Philip Van Hoof  <philip@codeminded.be>
 
 	* GHost items when renaming a local folder, fixed
 	* Date-Received date = Date header for messages that never got
@@ -1768,7 +1768,7 @@
 	* Remove the X-Priority header in set_prio_mask() instead of
 	tny_camel_msg_header_set_flag()
 
-2007-10-31  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-31  Philip Van Hoof  <philip@codeminded.be>
 
 	* \NoSelect folders should never get a STATUS request, fixed
 	* Documentation clarification about priority and flags
@@ -1778,7 +1778,7 @@
 
 	* This was a major API change
 
-2007-10-30  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-30  Philip Van Hoof  <philip@codeminded.be>
 
 	* Improvements to the AUTHORS file. Authors can obviously notify
 	me if they want their description improven or removed.
@@ -1790,7 +1790,7 @@
 	* Fix: now we don't unset the priority flag on setting or
 	  unsetting other flags.
 
-2007-10-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* Introduction of tny_gtk_msg_window_set_view
 
@@ -1800,11 +1800,11 @@
 
 	* Parse the X-Priority flag correctly, and allow values of 2 and 4
 
-2007-10-26  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-26  Philip Van Hoof  <philip@codeminded.be>
 
 	* X-Priority flag writing fixed
 
-2007-10-25  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-25  Philip Van Hoof  <philip@codeminded.be>
 
 	* Corrections for the priority flags
 	* Memory leak fix in CamelImapCommand, found by Dirk-Jan
@@ -1813,7 +1813,7 @@
 
 	* This was a major API change
 
-2007-10-24  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-24  Philip Van Hoof  <philip@codeminded.be>
 
 	* Improvements for the IDLE support. The Nonblocking read is now
 	actually used correctly, various racy situations should be fixed now
@@ -1824,7 +1824,7 @@
 	* Updating unread and total count if necessary (due to IDLE events)
 	* Fixed the normal-priority flag ni Maildir
 
-2007-10-23  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-23  Philip Van Hoof  <philip@codeminded.be>
 
 	* Reference count problem in TnyCamelHeader
 	* priv->folder_name in TnyCamelFolder sometimes is NULL, which
@@ -1836,7 +1836,7 @@
 	required. This to reduce the complexity of the IDLE patch so that we
 	can later, perhaps, more easily bring this feature to upstream Camel.
 
-2007-10-19  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-19  Philip Van Hoof  <philip@codeminded.be>
 
 	* Avoiding the second capability request, eliminating roundtrips when
 	connecting. If LOGIN returns a capability response, we assume this one
@@ -1849,7 +1849,7 @@
 	* Locking issue, fix is experimental
 	* A fix for normal CONDSTORE
 
-2007-10-18  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-18  Philip Van Hoof  <philip@codeminded.be>
 
 	* Operation notifactions no longer wait for 4 seconds to group them
 	together. This is experimental. Uncomment line 620 of
@@ -1867,7 +1867,7 @@
 	* non-case sensitivity of IMAP responses
 	* Various memory problem fixes
 
-2007-10-17  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-17  Philip Van Hoof  <philip@codeminded.be>
 
 	* Made sure that the standard Maildir format also works (with the ':'
 	as flag separator character). The standard for Tinymail, though, is to
@@ -1879,7 +1879,7 @@
 	* Added microb-engine-dev and changed the debug architecture to 'any'
 	in debian/control.maemo1.
 
-2007-10-16  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-16  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed regression on the regression fix of a few days ago :)
 	* Renamed Maildir filenames to have '!' instead of '_' or ':' in
@@ -1890,12 +1890,12 @@
 	* Some fixes to mozembed build.
 	* Disable mozembed packages build in maemo.
 
-2007-10-12  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-12  Philip Van Hoof  <philip@codeminded.be>
 
 	* Regression on yesterday's summary related patch. Fixed
 	* Regression on yesterday's mime part parser patch. Fixed
 
-2007-10-11  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-11  Philip Van Hoof  <philip@codeminded.be>
 
 	* iconv error situation handler
 	* Bugfix when the summary file was not yet created for a Maildir
@@ -1919,11 +1919,11 @@
 	component path (mozilla home from used engine), and the profile path
 	(using the progname). We set a default chrome without scrollbars.
 
-2007-10-08  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-08  Philip Van Hoof  <philip@codeminded.be>
 
 	* Merged camel-mime-utils.c with uptream Camel
 
-2007-10-07  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-07  Philip Van Hoof  <philip@codeminded.be>
 
 	* Backported a patch from Niels Christens on Camel to Camel-Lite. The
 	patch fixed the behaviour when the server expects a TLS HELLO, while
@@ -1934,7 +1934,7 @@
 	* Changed the address of FSF in the copyright notes
 	* Further merging upstream Camel with camel-lite
 
-2007-10-04  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-10-04  Philip Van Hoof  <philip@codeminded.be>
 
 	- -Wall warnings
 	- -pedantic warnings
@@ -1954,7 +1954,7 @@
 	as part of the url string with this format:
 	"merge://ID"
 
-2007-09-28  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-28  Philip Van Hoof  <philip@codeminded.be>
 
 	* Unsigned integers can't be < 0
 
@@ -1970,7 +1970,7 @@
 	in the name part of an address, as they are added by
 	camel part automatically.
 
-2007-09-26  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-26  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed (avoided) a memory leak in saving CamelObject's states
 	* Sending messages, some fixes for the CC and BCC fields
@@ -1991,7 +1991,7 @@
 	* /tests/python-demo/tinymail-python-test.py: Modify to use
 	the python implementation of the platform factory.
 
-2007-09-24  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-24  Philip Van Hoof  <philip@codeminded.be>
 
 	* Local-size updates after sync, sync_async and add_msg and
 	add_msg_async
@@ -2001,7 +2001,7 @@
 	* depend on / use NSS for debian builds for maemo
 	* fix some tny mem leaks
 
-2007-09-20  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-20  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed a possible too-early cleanup of the account
 
@@ -2020,7 +2020,7 @@
 	transferring folders, the CamelFolderInfo of the parent of the folder
 	that is moved is now NULLized.
 
-2007-09-18  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-18  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed a possible crash when renaming folders
 
@@ -2030,7 +2030,7 @@
 	Add implementation of method rewrite_cache for maildir,
 	so that we can implement also purge in maildir.
 
-2007-09-17  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-17  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added callback, status_callback and user_data to
 	tny_gtk_header_list_model_set_folder
@@ -2056,7 +2056,7 @@
 	to fix bindings compilation problems when used with
 	updated .defs files.
 
-2007-09-14  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-14  Philip Van Hoof  <philip@codeminded.be>
 
 	* TnyCamelSendQueue's sent-msg signal emission (some corrections)
 	* Small locking problem when requesting the unread-count of a
@@ -2087,7 +2087,7 @@
 	set the folder header as decorated by the msg header.
 
 
-2007-09-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Unread count improvements for IMAP folders
 	* Unread count improvements for POP folders
@@ -2097,12 +2097,12 @@
 
 
 
-2007-09-12  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-12  Philip Van Hoof  <philip@codeminded.be>
 
 	* POP improvements, retrying when failed
 	* Fixed a locking problem
 
-2007-09-11  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-11  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix when determining Push E-mail capabilities
 	* The service pointer of the OpenSSL stream implementation is now
@@ -2110,7 +2110,7 @@
 	* Performance improvement in POP3's sync operation
 	* The CACHED and PARTIAL flags of received messages
 
-2007-09-10  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-10  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix when deleting a local folder
 	* Cyclic reference adding, fixed in TnyCamelFolder and
@@ -2120,12 +2120,12 @@
 	* Bugfix when deleting last E-mail of a POP folder
 	* Coping with large POP folders
 
-2007-09-07  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-07  Philip Van Hoof  <philip@codeminded.be>
 
 	* Error reporting and retrying when there are problems while getting
 	messages. Including insufficient disk space while writing the caches.
 
-2007-09-06  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-06  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix for POP folders (content building not needed and causes some
 	crashers)
@@ -2142,7 +2142,7 @@
 	notification of a folder removal that could cause a SIGSEV when
 	deleting a tree of folders with messages.
 
-2007-09-05  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-05  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed folder renames for local folders
 	* Fixed a bug about keeping folders open
@@ -2157,7 +2157,7 @@
 	), (tny_camel_account_get_supported_secure_authentication):
 	Adapt to the change, propagating GErrors up to the callback.
 
-2007-09-04  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-04  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed a problem when folder creation failed: observers where
 	nevertheless notified about a folder creation in this case
@@ -2198,7 +2198,7 @@
 	libtinymail-camel/camel-lite/configure.ac : fixes a maemo integration
 	build error.
 
-2007-09-04  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-04  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed a possible race condition in CamelMultiPart
 	* Fixed thread stack leakage on threads that are joinable but never
@@ -2209,7 +2209,7 @@
 
 	* This was a major API change
 
-2007-09-03  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-09-03  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed a filedescriptor leak when there are no items in a folder, on
 	summary.mmap
@@ -2266,7 +2266,7 @@
 	operation, avoiding to call excesive times to folder observer
 	notification.
 
-2007-08-15  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-15  Philip Van Hoof  <philip@codeminded.be>
 
 	* Reading dnsmasq's resolv.conf files to know whether or not we are
 	initially online or not in libtinymail-maemo/tny-maemo-conic-device.c
@@ -2277,7 +2277,7 @@
 	(tny_maemo_conic_device_force_offline): Fix a compiler warning
 	about an unused variable.
 
-2007-08-15  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-15  Philip Van Hoof  <philip@codeminded.be>
 
 	* Improved the TnyMaemoConicDevice a bit
 	* Making TnyMaemoConicDevice wait five seconds before proxing the
@@ -2310,7 +2310,7 @@
 	way to do this, and it causes hangs if we never use the idle handler.
 	See the comments in the code.
 
-2007-08-15  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-15  Philip Van Hoof  <philip@codeminded.be>
 
 	* Moved the conic tests to a subdirectory
 
@@ -2345,7 +2345,7 @@
 	* libtinymail-maemo/tny-maemo-conic-device.c: Formatting/syntax
 	changes requested by Philip.
 
-2007-08-14  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-14  Philip Van Hoof  <philip@codeminded.be>
 
 	* Recursively removing local directories
 	* Smaller bugfixes and performance improvements
@@ -2397,7 +2397,7 @@
 	returns, and unused functions. Tinymail now builds with -Wall -Werror
 	again.
 
-2007-08-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Improvements in notifying the observers when removing folders
 	* Improvements when deleting items
@@ -2407,17 +2407,17 @@
 	signal emissions)
 	* Fixed a few memory problems in TnyCamelStoreAccount
 
-2007-08-10  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-10  Philip Van Hoof  <philip@codeminded.be>
 
 	* Enhancements in the POP code, when removing and expunging items
 
-2007-08-09  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-09  Philip Van Hoof  <philip@codeminded.be>
 
 	* Async operations can now be queued while a connection is being made
 	* Enhancements to tny_folder_add_msg and tny_folder_add_msg_async
 	* Some improvements when getting a folder list
 
-2007-08-08  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-08  Philip Van Hoof  <philip@codeminded.be>
 
 	* Code cleanups in TnyCamelSendQueue
 	* Introduction of tny_folder_add_msg_async
@@ -2427,7 +2427,7 @@
 
 	* This was a major API change
 
-2007-08-07  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-07  Philip Van Hoof  <philip@codeminded.be>
 
 	* Consistency in the async callback APIs
 	* Cleaning up in case of cancels
@@ -2436,7 +2436,7 @@
 
 	* This was a major API change
 
-2007-08-06  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-06  Philip Van Hoof  <philip@codeminded.be>
 
 	* GDK lock awareness
 	* More conservatism about reconnecting
@@ -2444,14 +2444,14 @@
 	* Callbacks and destroynotifies of cancelled-removed items
 	* Fetching of folders happens in a queue item now
 
-2007-08-02  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-02  Philip Van Hoof  <philip@codeminded.be>
 
 	* Reintroduction of cancellation support (this is experimental)
 	* Timezone fix in the summary (remove your caches)
 	* Making tny_account_cancel actually work, or at least a little bit
 	better than before this commit (cleaning up the queue a bit)
 
-2007-08-01  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-08-01  Philip Van Hoof  <philip@codeminded.be>
 
 	* Reconnect hang fix
 	* Invalid cancelled warning fix
@@ -2466,23 +2466,23 @@
 
 	* This was a major API change
 
-2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-31  Philip Van Hoof  <philip@codeminded.be>
 
 	* Introduction of tny_folder_get_headers_async
 	* Adaptation of TnyGtkHeaderListModel to use the new API
 
 	* This was a major API change
 
-2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-31  Philip Van Hoof  <philip@codeminded.be>
 
 	* Merging back devel/pvanhoof/sessionwork to trunk/
 
-2007-07-31  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-31  Philip Van Hoof  <philip@codeminded.be>
 
 	* Cleaning up, coding style fixes
 	* Review of TnyCamelFolder and TnyCamelStoreAccount
 
-2007-07-30  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-30  Philip Van Hoof  <philip@codeminded.be>
 
 	* Various fixes that make Modest actually work with this
 
@@ -2502,7 +2502,7 @@
 	valgrind complains about uninitialized variables here. This does not
 	fix it but it should make things clearer for someone who can fix it.
 
-2007-07-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* Merged tny-camel-folder.c with devel/sessionwork's version
 	* This moves the poke-status operations to the account's queue
@@ -2511,13 +2511,13 @@
 
 	* Merging the Cond patch from devel/sessionwork
 
-2007-07-29  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-29  Philip Van Hoof  <philip@codeminded.be>
 
 	* The long awaited alert, get_pass and forget_pass now in the mainloop
 
 	* This was a major API and behaviour change
 
-2007-07-29  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-29  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed a race condition when the account was or is connection or not
 	yet finished connecting while the connection-status-changed signal was
@@ -2529,7 +2529,7 @@
 
 	* This was a major API change
 
-2007-07-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* Dealing with remotely removed folders
 	* The poke status calls are now on the same queue as the other
@@ -2548,17 +2548,17 @@
 
 	* This was a major API change in TnyAccount
 
-2007-07-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* Branchpoint "devel/sessionwork"
 
-2007-07-26  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-26  Philip Van Hoof  <philip@codeminded.be>
 
 	* More granularity in the locking of the POP code
 	* Several fixes in the POP code
 	* Folder renaming for local folders
 
-2007-07-25  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-25  Philip Van Hoof  <philip@codeminded.be>
 
 	* Various locking improvements in the POP code
 	* Parallel retrieval of messages
@@ -2566,7 +2566,7 @@
 	* Disconnecting after get-msg and sync of a POP folder
 	* Some reference counting problems when factoring folders
 
-2007-07-24  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-24  Philip Van Hoof  <philip@codeminded.be>
 
 	* Preparing for a release candidate
 	* Added skeleton for webkit support
@@ -2626,7 +2626,7 @@
 	message/rfc822 mime part that contains the message as
 	its content object. This fixes attaching messages.
 
-2007-07-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Allowing the POP code to do RETRs while the TOPs are working (while
 	summary is being retrieved, allow the POP code to receive messages
@@ -2642,7 +2642,7 @@
 
 	* This is a major API change
 
-2007-07-12  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-12  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed the POP unread count problems
 
@@ -2670,7 +2670,7 @@
         * Add a notification about EXPUNGED header change in
 	tny_camel_folder_remove_msg_default method.
 
-2007-07-10  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-10  Philip Van Hoof  <philip@codeminded.be>
 
 	* Made the connecting of accounts more finegrained (once more)
 	* Introduced the required tny_session_camel_set_initialized API
@@ -2724,7 +2724,7 @@
 	service_user_data because I cannot see a suitable CamelService.
 	See the TODOs.
 
-2007-07-10  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-10  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added the tny_folder_get_local_size API
 	* Fixed the folder deletion of maildir folders
@@ -2750,14 +2750,14 @@
 	Likewise, handle as CAMEL_EXCEPTION_USER_CANCE as 
 	TNY_TRANSPORT_ACCOUNT_ERROR_SEND_USER_CANCEL.
 
-2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-09  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added the tny_folder_sync_async method. Boutifully paradoxical by
 	name!
 
 	* This was a major API change
 
-2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-09  Philip Van Hoof  <philip@codeminded.be>
 
 	* Changed the cache-dir locations to ones that are more suitable for
 	mor types of filesystems
@@ -2797,7 +2797,7 @@
 	Use _tny_camel_account_get_tny_error_code_for_camel_exception_id() 
 	here to provide a more specific error code.
 
-2007-07-09  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-09  Philip Van Hoof  <philip@codeminded.be>
 
 	* Improvement for tny_camel_mime_part_is_attachment_default
 	* Deleting non-empty folders of a maildir
@@ -2806,7 +2806,7 @@
 
 	* This was a major API change
 
-2007-07-08  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-08  Philip Van Hoof  <philip@codeminded.be>
 
 	* Yet another attempt at fixing the namespace problem (empty root
 	folders)
@@ -2866,7 +2866,7 @@
 	folder. Also, do not propagate folder renames because the merge folder
 	itself has not been renamed.
 
-2007-07-07  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-07  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed a crasher when transferring messages
 
@@ -2907,7 +2907,7 @@
 	* camel/camel-net-utils.c: (camel_getaddrinfo):
 	Use the new error code when appropriate.
 
-2007-07-06  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-06  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added some non standard flags to the maildir support
 	* Support for suspended items in sendqueues
@@ -2915,7 +2915,7 @@
 	* Empty folder bugfix
 	* Added a guard to tny_mime_part_set_filename for NULL situations
 
-2007-07-05  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-05  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixes for the new headers after a transfer of messages happened
 	* Fixed for new headers after adding a message happened
@@ -2935,13 +2935,13 @@
 	if the GMainLoop is available, even if the thread could not be
 	started.
 
-2007-07-05  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-05  Philip Van Hoof  <philip@codeminded.be>
 
 	* Renamed removed to expunged in TnyFolderChange
 
 	* This was a major API change
 
-2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-04  Philip Van Hoof  <philip@codeminded.be>
 
 	* Dealing with the first connection status of the device instance
 	* Several race conditions when rapidly connecting and disconnecting
@@ -2969,7 +2969,7 @@
 
 	* This was a major API change
 
-2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-04  Philip Van Hoof  <philip@codeminded.be>
 
 	* Implementation of tny_folder_poke_status for the total count of a
 	POP folder
@@ -2994,14 +2994,14 @@
 	(tny_maemo_conic_device_finalize): Don't use libconic at all if we are in scratchbox, 
 	because it signals that there is no connection, which confuses our dummy implementation.
 
-2007-07-04  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-04  Philip Van Hoof  <philip@codeminded.be>
 
 	* Total count of POP3 folders
 	* Thread joining between the TnyCamelSendQueue and the TnySessionCamel
 	connection threads
 	* Error handling in TnyMergeFolder
 
-2007-07-03  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-03  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix in TnyCamelTransportAccount's prepare method
 	* Fixing up the TnyCamelSendQueue's at-connect
@@ -3016,7 +3016,7 @@
 	* Bugfix when tny_camel_account_set_online was called from the
 	mainloop
 
-2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-02  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed a bug in Maildir when setting flags
 	* Fixed empty-string folders at root's level on IMAP
@@ -3035,7 +3035,7 @@
 	a meaning of connection debugid0. (tny_maemo_conic_device_get_
 	current_iap_id): Return NULL if the iap is 'none', when in scratchbox.
 
-2007-07-02  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-02  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fallback for BINARY
 	* Fallback for UIDPLUS
@@ -3043,7 +3043,7 @@
 	* Bugfix when finalizing an account
 	* Removed some old internal hooks-API
 
-2007-07-01  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-07-01  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed/updated the Python bindings
 	* Fixed the gtk-doc API documentation genation process
@@ -3075,7 +3075,7 @@
 	There is lots of debug output here, which I will remove later after 
 	further investigations.
 
-2007-06-29  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-29  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix in TnyCamelTransportAccount: rewrote the prepare method
 	implementation
@@ -3087,14 +3087,14 @@
 	(tny_maemo_conic_device_disconnect): Fix a warning about an 
 	uninitialized variable. Nobody is using this function yet anyway.
 
-2007-06-29  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-29  Philip Van Hoof  <philip@codeminded.be>
 
 	* Various connectivity bugfixes
 	* Fixed a locking problem when connectivity changes
 	* Bugfix in poke-status
 	* Crasher fixed (NULL function pointer)
 
-2007-06-28  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-28  Philip Van Hoof  <philip@codeminded.be>
 
 	* Slowing down the STATUS commands
 	* Detecting connection changes with the connection_status_changed
@@ -3172,11 +3172,11 @@
 	so they do not have the right pointers to their children, parents and
 	siblings. NOTE that this is a risky patch, not completely tested.
 
-2007-06-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* Several memory fixes, based on Valgrind error and warning reporting
 
-2007-06-26  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-26  Philip Van Hoof  <philip@codeminded.be>
 
 	* Maildir on MMC (VFAT) (non-allowed characters on that FS type)
 	* Fixed a bug when removing folders (apriv->managed_folders needed to
@@ -3184,18 +3184,18 @@
 	* Attachments purger for IMAP (bugfixes)
 	* Bugfix when transferring messages
 
-2007-06-25  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-25  Philip Van Hoof  <philip@codeminded.be>
 	
 	* Deleting messages from local folders (bugfix about ghost rows)
 	* Deleting attachments from message cache
 
 	* This was a major API change
 
-2007-06-24  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-24  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix in the folder factory
 
-2007-06-22  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-22  Philip Van Hoof  <philip@codeminded.be>
 
 	* The folder type of the INBOX of a POP account
 	* Folder lists when offline
@@ -3214,7 +3214,7 @@
 	* Changes how set_flags function was used on get_full and
 	get_partial messages methods.
 	
-2007-06-21  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-21  Philip Van Hoof  <philip@codeminded.be>
 
 	* Error handling: No space left on device, when retrieving messages
 	* Flag handling after message retrieval
@@ -3224,14 +3224,14 @@
 
 	* This was a major API change
 
-2007-06-20  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-20  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed a bug in tny_folder_transfer_msgs
 	* Removed some memory problems
 	* Unsolicted FETCH responses while getting messages using BINARY and
 	FETCH
 
-2007-06-19  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-19  Philip Van Hoof  <philip@codeminded.be>
 
 	* The connection_status_changed signal got extended a little bit
 
@@ -3261,7 +3261,7 @@
 	* libtinymail-maemo/test-conic.c: Added a simple test case to show 
 	that libconic does not seem to emit the connection-event signal.
 
-2007-06-19  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-19  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed reading the unread and total counts from Maildir folders
 	* First baby steps into better connection state detection and handling
@@ -3271,7 +3271,7 @@
 
 	* Compiler warning fixes
 
-2007-06-18  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-18  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix in IMAP, when all messages got expunged tinymail did not
 	succeed in refreshing the summary correctly
@@ -3289,7 +3289,7 @@
 	Fix some warnings reported in tinymail trac ticket #66:
 	http://tinymail.org/trac/tinymail/ticket/66
 
-2007-06-18  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-18  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed the From and the Error reporting when sending messages
 	* Fixed the support for Yahoo's SMTP
@@ -3298,7 +3298,7 @@
 
 	* This was a major API change
 
-2007-06-17  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-17  Philip Van Hoof  <philip@codeminded.be>
 
 	* Increased read-idle's low timeout times: now that all IDLE happens in
 	a thread, it's not necessary anymore to quickly unblock.
@@ -3310,7 +3310,7 @@
 
 	* This was a major API change
 
-2007-06-15  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-15  Philip Van Hoof  <philip@codeminded.be>
 
 	* Connection failure handling in the IMAP code
 	* Experimental timeout for hostname lookups
@@ -3318,7 +3318,7 @@
 	* Local folders for now will no longer emit "folder_changed" signals
 	* The unread and total count of local folders at initial startup
 	
-2007-06-14  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-14  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed some flag values
 
@@ -3338,13 +3338,13 @@
 	on adding these mime parts to a message or
 	mime part.
 
-2007-06-14  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-14  Philip Van Hoof  <philip@codeminded.be>
 
 	* The cache size of local folders, feature implementation
 	* Locking fix for the get-msg service of IMAP
 	* Date received fix in POP
 	
-2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fix for the uid of POP summary items
 	* Some bugfixing for finding messages
@@ -3378,16 +3378,16 @@
 	about the url-string. Note that Philip fixed 
 	tny_folder_get_url_string_default() in a previous commit.
 
-2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added some extra locking into the camel-lite's POP3 code
 
-2007-06-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added placeholder for future libtinymail-tp
 	* This is unfinished material (don't yet use it)
 
-2007-06-12  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-12  Philip Van Hoof  <philip@codeminded.be>
 
 	* Improved the tny_folder_poke_status implementation of TnyCamelFolder
 	(performance improvement, made it internally async)
@@ -3407,7 +3407,7 @@
 	gtk_tree_model_get() to initialize it. The compiler can't detect these 
 	possible unitialized uses.
 
-2007-06-12  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-12  Philip Van Hoof  <philip@codeminded.be>
 
 	* Configurable idle delays
 	* Configurable get-message service shutdown timeouts
@@ -3417,7 +3417,7 @@
 
 	* This was a major API change
 	
-2007-06-11  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-11  Philip Van Hoof  <philip@codeminded.be>
 
 	* The summary camel-lite code no longer puts the uid field in the mmap
 	* Several race conditions fixed with the IDLE support
@@ -3439,7 +3439,7 @@
 	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c: Add the tree
 	model as an observer of the root folder stores
 
-2007-06-08  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-08  Philip Van Hoof  <philip@codeminded.be>
 
 	* tny_folder_poke_status fixes
 	* Unread and total count fixes
@@ -3462,7 +3462,7 @@
 	when notifying the observers when a folder was added just under an
 	account
 
-2007-06-07  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-07  Philip Van Hoof  <philip@codeminded.be>
 
 	* Merged camel-lite with upstream Camel revision 7777
 	* Various connection cancellation problems fixed in the IMAP code
@@ -3472,7 +3472,7 @@
 	* tny_folder_poke_status will now, for IMAP, do a STATUS command to
 	more accurately find out the UNSEEN and MESSAGES statuses
 
-2007-06-06  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-06  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed the OpenSSL support, although I'm leaving the warnings in
 	place as the support for OpenSSL has not had as much testing as the
@@ -3485,7 +3485,7 @@
 	* Fixed the configure.ac of camel-lite, it had a small OpenSSL vs. NSS
 	mixup
 
-2007-06-05  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-05  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix for LOGINDISABLED on IMAP
 	* Bugfix when connecting (connection status problem)
@@ -3500,7 +3500,7 @@
 	Fixed implementation to get the secure authentication support
 	methods and simplied them a lot.
 
-2007-06-03  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-06-03  Philip Van Hoof  <philip@codeminded.be>
 
 	* Support for removing messages from a POP server after retrieval
 	* Support for tny_header_get_uid on TnyMsg's header instance
@@ -3535,7 +3535,7 @@
 	this in my local checkout and maybe things crash without the check. 
 	Can be removed later if you like.
 
-2007-05-29  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-29  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed an error message when the account's status is offline and a
 	cached version of a message is not available in tny_folder_get_msg and
@@ -3564,22 +3564,22 @@
 	set the dummy ID when using scratchbox so we can check it for changes 
 	every 1 second.
 	
-2007-05-28  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-28  Philip Van Hoof  <philip@codeminded.be>
 
 	* Experimental reuse of the get-message service for IMAP
 
-2007-05-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* Refactored the TnyGtkPasswordDialog
 	* Various fixes for the OLPC build
 	* Various fixes for the Maemo mistal and gregale builds
 
-2007-05-26  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-26  Philip Van Hoof  <philip@codeminded.be>
 
 	* Experimental connection camel_recovery for IMAP
 	* Letting IDLE/PushE-mail support code cope with connection failures
 
-2007-05-25  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-25  Philip Van Hoof  <philip@codeminded.be>
 
 	* libtinymail-camel-tny-camel-send-queue.c: various locking fixes
 
@@ -3625,13 +3625,13 @@
 	allocated string. Also, camel_header_encode_string() doesn't seem to
 	like being given NULL.
 
-2007-05-22  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-22  Philip Van Hoof  <philip@codeminded.be>
 
 	* Shaped up the Unit tests
 	* Fixed a bunch of -Wall warnings
 	* Fixed some of the Design By Contract clausules
 
-2007-05-21  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-21  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added a couple of new signals on TnyAccountStore and TnyAccount
 
@@ -3643,7 +3643,7 @@
 
 	* Add camel operation and progress call to 'folder_rename' operation.
 	
-2007-05-20  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-20  Philip Van Hoof  <philip@codeminded.be>
 
 	* TnyAccountStore's alert_func has a 'question' parameter now
 
@@ -3654,7 +3654,7 @@
    	* folder was 'reason' unnecesary in copy_folder_async.
         * fix bug: g_error_free not neccesary after g_error_propagate
 
-2007-05-17  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-17  Philip Van Hoof  <philip@codeminded.be>
 
 	* Recursively removing folders
 
@@ -3671,7 +3671,7 @@
 	connection change (though the signal will not be emitted when the 
 	environment variable changes.)
 	
-2007-05-16  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-16  Philip Van Hoof  <philip@codeminded.be>
 
 	* Removed the unworkable tny_folder_set_name, old code should replace
 	this with tny_folder_copy with the del parameter set to TRUE and the
@@ -3685,7 +3685,7 @@
 	(tny_camel_store_account_prepare): Remove a warning that I shouldn't 
 	have added in my last commit.
 
-2007-05-16  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-16  Philip Van Hoof  <philip@codeminded.be>
 
 	* Some clarity for tny_folder_transfer_msgs in a GError for the
 	developer who uses TnyHeader instances that came from
@@ -3711,7 +3711,7 @@
 	* libtinymail-queues/Makefile.am: install libtinymail-queues header
 	files
 
-2007-05-15  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-15  Philip Van Hoof  <philip@codeminded.be>
 
 	* The new TnyQueue and TnyQueueTasks types
 	* Major rewrites of libtinymail-queues
@@ -3721,7 +3721,7 @@
 	* This was a major API change in libtinymail-queues
 	* This was a major API change in libtinymail-asyncworker
 
-2007-05-15  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-15  Philip Van Hoof  <philip@codeminded.be>
 
 	* A new implementation for tny_folder_copy in libtinymail-camel
 	* A new implementation for tny_folder_copy_async in libtinymail-camel
@@ -3729,7 +3729,7 @@
 
 	* This was a major API change
 
-2007-05-14  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-14  Philip Van Hoof  <philip@codeminded.be>
 
 	* Waiting for the + continuation after IDLE
 	* Please watch this fix with different IMAP implementations
@@ -3787,14 +3787,14 @@
 	(tny_combined_account_set_secure_auth_mech), (tny_account_init):
 	Adapted to the changed API.
 
-2007-05-12  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-12  Philip Van Hoof  <philip@codeminded.be>
 
 	* Improved connection / error handling when trying to connect fails
 	* Merged camel-lite with camel-svn7713
 
 	* This was a major API change
 
-2007-05-11  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-11  Philip Van Hoof  <philip@codeminded.be>
 
 	* Implemented Rob's priv->stamp++ idea for removing things from an
 	TnyGtkHeaderListModel
@@ -3827,7 +3827,7 @@
 	* libtinymail/tny-folder.c: Defined new abstract operation 
 	folder_copy_async.
 	
-2007-05-09  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-09  Philip Van Hoof  <philip@codeminded.be>
 
 	* libtinymailui-gtk/tny-gtk-header-list-model.c: Moved the private API
 	to a private type
@@ -3858,7 +3858,7 @@
 	* ibtinymail-camel/tny-camel-folder.c : Implementation of 
 	status_callbacks calls in transfer_msgs_async function.
 
-2007-05-08  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-08  Philip Van Hoof  <philip@codeminded.be>
 
 	* -Wall warnings fixed
 	* Speedups in TnyGtkHeaderListModel
@@ -3908,7 +3908,7 @@
 	* tests/shared/account-store.c: (tny_test_account_store_alert):
 	Use the GError instead of the message string.
 
-2007-05-08  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-08  Philip Van Hoof  <philip@codeminded.be>
 
 	* Real fix for a gtk_tree_model_row_inserted oddity
 	* The problem was that me->cur_len was set to 1 to avoid an assertion
@@ -3922,7 +3922,7 @@
 	* Fixes for a bunch of tickets
 	* Fixed the IDLE support for folders with == 0 items
 
-2007-05-07  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-07  Philip Van Hoof  <philip@codeminded.be>
 
 	* Workaround for a gtk_tree_model_row_inserted oddity 
 
@@ -3931,12 +3931,12 @@
 	* Fixed some use-before-initalization bugs in tny-maemo-conic-device
 	* Don't try to disconnect in the dummy case there
 
-2007-05-06  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-06  Philip Van Hoof  <philip@codeminded.be>
 
 	* Moved some stuff around
 	* Created an internal API for status reporting
 
-2007-05-04  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-04  Philip Van Hoof  <philip@codeminded.be>
 
 	* Changed the TnyGetMsgCallback function signature to have a cancelled 
 	property.
@@ -3971,7 +3971,7 @@
 	I think that language bindings will actually need one or more destroy 
 	callbacks eventually.
 
-2007-05-04  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-05-04  Philip Van Hoof  <philip@codeminded.be>
 
 	* Massive changes to TnyGetMsgQueue (unfinished, experimental)
 	* Fix for urgent ticket #43
@@ -3994,13 +3994,13 @@
 
 	* This was a major API change
 
-2007-04-30  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-30  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added a TnyCombinedAccount type
 
 	* This was a major API change
 
-2007-04-29  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-29  Philip Van Hoof  <philip@codeminded.be>
 
 	* Documentation updates
 	* Made a few symbols start with an underscore, so that they are not
@@ -4027,7 +4027,7 @@
 	implementations also match the documented behaviour. I wish that 
 	GInterfaces could have default implementations that could be shared.
 
-2007-04-28  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-28  Philip Van Hoof  <philip@codeminded.be>
 
 	* Documentation updates
 	* Changes to the TnyAccountStore API
@@ -4035,7 +4035,7 @@
 
 	* This was a major API change
 
-2007-04-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* Getting the unread and total counts correct. Latest changes
 	introduce a memory peak at application startup. This peak can be
@@ -4063,7 +4063,7 @@
 	(tny_maemo_conic_device_instance_init): Improve the implementation, 
 	to match the documented behaviour.
 
-2007-04-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* Creating a new connection for getting uncached messages 
 	with the IMAP code.
@@ -4099,7 +4099,7 @@
 	Added g_return_if*() checks for priv->cnx, without which nothing 
 	could work.
 
-2007-04-23  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-23  Philip Van Hoof  <philip@codeminded.be>
 
 	* tny_folder_change_set_received_msg,
 	tny_folder_change_get_received_msg and
@@ -4111,7 +4111,7 @@
 
 	* Make tinymail/maemo buildable with or without libconic
 
-2007-04-23  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-23  Philip Van Hoof  <philip@codeminded.be>
 
 	* Introduction of the TnyStatus infrastructure
 	* Changed the TnyStatusCallback function prototype to reflect the
@@ -4126,7 +4126,7 @@
 	priority.
 	* New enumeration to define available priority flags. 
 
-2007-04-21  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-21  Philip Van Hoof  <philip@codeminded.be>
 
 	* Created a TnyGenericSendQueue which implements TnySendQueue in a
 	generic way (doesn't strictly depend on the libtinymail-camel impl
@@ -4138,14 +4138,14 @@
 	* This was a major API change for tny_folder_get_msg_async and
 	tny_folder_refresh_async (TnyStatusCallback added and renamed)
 
-2007-04-21  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-21  Philip Van Hoof  <philip@codeminded.be>
 
 	* Made TnyGetMsgQueue not care about the folder (it'll use the
 	tny_header_get_folder API)
 
 	* This was a major API change
 
-2007-04-20  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-20  Philip Van Hoof  <philip@codeminded.be>
 
 	* Further implementing of TnyMergeFolder
 	* Bugfixes in camel-lite (concurrent camel_folder_get_message on
@@ -4154,7 +4154,7 @@
 
 	* This was a major API change
 
-2007-04-18  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-18  Philip Van Hoof  <philip@codeminded.be>
 
 	* Further implementing of TnyMergeFolder
 	* Bugfixing of several trac tickets (like #39)
@@ -4178,7 +4178,7 @@
 
 	* Bugfix in TnyCamelTransportAccount
 
-2007-04-17  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-17  Philip Van Hoof  <philip@codeminded.be>
 
 	* Further implementing of TnyMergeFolder
 	* Bugfix in TnyGtkHeaderListModel
@@ -4199,7 +4199,7 @@
 	* TnyMaemoDevice goes back to the dummy it was before, so this should
 	make pre-libconic compiles (770) also possible; not tested though.
 
-2007-04-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Introduction of the TnyMergeFolder type
 
@@ -4210,7 +4210,7 @@
 	* remove #include for removed tny-maemo-password-dialog.h,
 	  this broke the compilation
 
-2007-04-12  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-12  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added skeleton for ACAP support
 	* Major modifications to the 'getting of passwords'
@@ -4218,7 +4218,7 @@
 
 	* This was a major API change
 
-2007-04-11  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-04-11  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed ticket #40
 
@@ -4226,7 +4226,7 @@
 
 	* Improve tny-maemo-device so it works a bit better
 
-2007-03-30  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-30  Philip Van Hoof  <philip@codeminded.be>
 
 	* Support for low, high and normal X-Priority
 	* Auto updating the unread count of TnyFolderObservers when unread
@@ -4241,7 +4241,7 @@
 	* libtinymail-camel/tny-camel-store-account.c: added a missing folder
 	reference when getting folders
 
-2007-03-25  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-25  Philip Van Hoof  <philip@codeminded.be>
 
 	* Support for filling up the header view (a.k.a. the summary view)
 	with already or recently downloaded information while downloading is
@@ -4255,16 +4255,16 @@
 	bit (although it shouldn't for the old-style of using the 
 	TnyFolderMonitor, or at least not as far as I know and tested).
 
-2007-03-23  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-23  Philip Van Hoof  <philip@codeminded.be>
 
 	* Support for X-Priority and X-MSMail-Priority
 	* Experimental support for quickly detecting attachments availability
 
-2007-03-20  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-20  Philip Van Hoof  <philip@codeminded.be>
 
 	* Although this needs a lot testing, potential fix for ticket #30
 
-2007-03-19  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-19  Philip Van Hoof  <philip@codeminded.be>
 
 	* camel-lite: added some additional locking to narrow down 
 	Ticket #27's problem
@@ -4279,7 +4279,7 @@
 	* changed license to LGPL for some files which were mistakenly marked
 	GPL
 
-2007-03-16  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-16  Philip Van Hoof  <philip@codeminded.be>
 
 	* Design by contract assertions
 	* tny_account_store_find_account API added
@@ -4292,7 +4292,7 @@
 	* libtinymailui/tny-msg-view.c: fixed a typo in a function name
 	* libtinymail/tny-folder.c: fixed a DBC assertion
 
-2007-03-15  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-15  Philip Van Hoof  <philip@codeminded.be>
 
 	* Design by contract assertions
 
@@ -4311,7 +4311,7 @@
 
 	* libtinymail/tny-mime-part.c: Design by contract assertions
 
-2007-03-14  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-14  Philip Van Hoof  <philip@codeminded.be>
 
 	* tny_folder_store_remove now specifies and its implementation will
 	unsubscribe all the observers of the folder being removed.
@@ -4323,7 +4323,7 @@
 
 	* Fixed an issue with ACLOCAL_FLAGS in the autogen.sh
 
-2007-03-11  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-11  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added the TnyFolderCaps API
 	* Improved the tny_folder_copy and tny_folder_transfer_msgs
@@ -4332,7 +4332,7 @@
 
 	* This was a major API change
 
-2007-03-10  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-10  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added tny_folder_get_url_string and tny_msg_get_url_string APIs
 	* Made tny_account_get_url_string consistent in constness with the
@@ -4340,7 +4340,7 @@
 
 	* This was a major API change
 
-2007-03-09  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-09  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added the tny_account_store_find_account API. It's possible that in
 	future a set and get find strategy API will be added. For now, finding
@@ -4359,7 +4359,7 @@
 
 	* This was a major API change
 
-2007-03-06  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-06  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfixes for summary items and writing them to disk, keeping the
 	local array in sync with that is on disk
@@ -4367,7 +4367,7 @@
 	stead of a GList: should be both faster and less memory consuming
 	* Removed some non-used camel-lite functionality and symbols
 
-2007-03-05  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-05  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix for ticket #26
 	* Major changes in the TnyCamelHeader type
@@ -4384,7 +4384,7 @@
 
 	* Small update for tny-maemo-device
 
-2007-03-04  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-04  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix for trac ticket #25
 	* Created a new libtinymail-camel API:
@@ -4394,28 +4394,28 @@
 
 	* This was an API change for libtinymail-camel
 
-2007-03-02  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-02  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added the TnyFolderStats type
 
 	* This was a major API change
 
-2007-03-01  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-03-01  Philip Van Hoof  <philip@codeminded.be>
 
 	* Fixed THE flags bug (size was swapped with the flags field when
 	reading from the summary file)
 
-2007-02-28  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-28  Philip Van Hoof  <philip@codeminded.be>
 
 	* Folder's unread count, total count and local size fixes
 
-2007-02-23  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-23  Philip Van Hoof  <philip@codeminded.be>
 
 	* tny_account_cancel API
 
 	* This was a major API change
 
-2007-02-20  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-20  Philip Van Hoof  <philip@codeminded.be>
 
 	* Disabled the LIST with LSUB merging (it just doesn't sound right to
 	do this, yet Evolution's Camel does this, as a result did camel-lite
@@ -4426,11 +4426,11 @@
 	* TnyCamelFolder: Replaced the folder lock by a recursive static
 	folder lock
 
-2007-02-18  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-18  Philip Van Hoof  <philip@codeminded.be>
 
 	* Various fixes for the folder create, rename and delete functionality
 
-2007-02-16  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-16  Philip Van Hoof  <philip@codeminded.be>
 
 	* TnyFolderObserver notifications
 	* TnyFolderStoreObserver notifications
@@ -4445,7 +4445,7 @@
 	* Added tny_folder_get_folder_store(): retrieves the folder store
 	of a given folder
 
-2007-02-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* TnyFolderStoreObserver notifications
 
@@ -4453,11 +4453,11 @@
 
 	* Maemo packaging scripts: add missing .install for lib-maemo
 
-2007-02-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Introduction of the TnyFolderStoreChange and TnyFolderStoreObserver
 
-2007-02-13  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-13  Philip Van Hoof  <philip@codeminded.be>
 
 	* Various error handling situations when the IMAP service went offline
 	or something with the connection happened
@@ -4467,7 +4467,7 @@
 
 	* Maemo packaging scripts: split into one package per library
 
-2007-02-12  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-12  Philip Van Hoof  <philip@codeminded.be>
 
 	* Support for EXPUNGE and FETCH unsolicited events during IDLE. This
 	should complete the support for IDLE and Push-Email. From now on we
@@ -4478,7 +4478,7 @@
 	* Make TnyCamelSendQueue subclassable - add accessors
 	  for setting the TnyCamelTransportAccount, and _flush
 
-2007-02-10  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-10  Philip Van Hoof  <philip@codeminded.be>
 
 	* Various bugfixes for the IDLE feature
 	* Error reporting for the TnySendQueue
@@ -4494,7 +4494,7 @@
 
 	* This was a major API change
 
-2007-02-08  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-08  Philip Van Hoof  <philip@codeminded.be>
 
 	* Removed the public constructor of TnyCamelFolder, use the private
 	one if you really need it (normal people don't, and you can make the
@@ -4503,7 +4503,7 @@
 
 	* This was a major API change
 
-2007-02-07  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-07  Philip Van Hoof  <philip@codeminded.be>
 
 	* Support for non-blocking read in the SSL streams
 	* Various bugfixing on the IDLE feature
@@ -4513,15 +4513,15 @@
 
 	* update TnyMaemoDevice
 
-2007-02-06  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-06  Philip Van Hoof  <philip@codeminded.be>
 
 	* Support for IMAP IDLE (RFC 2177)
 
-2007-02-05  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-05  Philip Van Hoof  <philip@codeminded.be>
 
 	* Bugfix for issue #10
 
-2007-02-02  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-02-02  Philip Van Hoof  <philip@codeminded.be>
 
 	* CamelDiscoStore and CamelDiscoFolder implementation of the POP3
 	provider of camel-lite. This means that the POP3 support now supports
@@ -4539,12 +4539,12 @@
 	* libtinymail-camel/tny-session-camel: fixed some wrong
 	initializations
 
-2007-01-31  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-01-31  Philip Van Hoof  <philip@codeminded.be>
 
 	* Support for BINARY responses from IMAP servers that have the BINARY
 	capability
 
-2007-01-30  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-01-30  Philip Van Hoof  <philip@codeminded.be>
 
 	* Little bugfix. Max line size of an E-mail is now MAX_LINE_SIZE
 	* Cleaning up old code, fixing bug in the tny-session-camel.c
@@ -4556,7 +4556,7 @@
 
 	* Implemented tny-maemo-device (first version)
 
-2007-01-29  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-01-29  Philip Van Hoof  <philip@codeminded.be>
 
 	* Finally, asynchronously connecting. Though, it's experimental.
 	* Various error checking and while-connecting error throwing
@@ -4564,7 +4564,7 @@
 	strange things when trying to get messages), on the camel-lite IMAP
 	provider.
 
-2007-01-28  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-01-28  Philip Van Hoof  <philip@codeminded.be>
 
 	* Lots of small bugfixes and testing. Also a few code boutifications
 
@@ -4574,7 +4574,7 @@
 	  crash; this will be replaced by a real solution later, but for now
 	  we just don't want the crashes.
 
-2007-01-27  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-01-27  Philip Van Hoof  <philip@codeminded.be>
 
 	* First LEMONADE feature, implemented support for the CONDSTORE 
 	capability in camel-lite's IMAP provider (RFC 4551)
@@ -4584,7 +4584,7 @@
 
 	* This was a major API change
 
-2007-01-26  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-01-26  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added the tny_account_set/get_mech API
 
@@ -4597,7 +4597,7 @@
 	a value yet) instead of the string "Invalid". The documentation has
 	been updated also.
 
-2007-01-26  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-01-26  Philip Van Hoof  <philip@codeminded.be>
 
 	* Renamed tny_folder_expunge to tny_folder_sync, and made it possible
 	to sync without expunging
@@ -4612,7 +4612,7 @@
 
 	* Added TNY_FOLDER_TYPE_ARCHIVE and TNY_FOLDER_TYPE_NUM
 
-2007-01-25  Philip Van Hoof  <pvanhoof@gnome.org>
+2007-01-25  Philip Van Hoof  <philip@codeminded.be>
 
 	* Added a CamelStreamGZip which might someday be used to support the
 	COMPRESS capability of some LEMONADE-enabled IMAP servers. This new
@@ -4622,13 +4622,13 @@
 
 	* libtinymail-camel/tny-camel-mime-part.c: added a missing unlock
 
-2007-01-23  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-23  Philip Van Hoof <philip@codeminded.be>
 
 	* Several locking fixes when retrieving summary info
 	* Performance improvements in camel-imap-folder.c
 	* Bandwidth improvements for the IMAP provider
 
-2007-01-22  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-22  Philip Van Hoof <philip@codeminded.be>
 
 	* Preperation for notification of changes in folders, mostly bugfixes
 	* More camel-folder-summary.c memory corruption bugfixes 
@@ -4641,7 +4641,7 @@
 	memory consumption
 	* Performance improvements
 
-2007-01-21  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-21  Philip Van Hoof <philip@codeminded.be>
 
 	* Preperation for notification of changes in folders, mostly bugfixes
 	* Important bugfix for camel-folder-summary.c when creating new
@@ -4650,11 +4650,11 @@
 	* Compile with -DIM_TESTING in the CFLAGS to see the TnyFolderMonitor
 	in action already
 
-2007-01-19  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-19  Philip Van Hoof <philip@codeminded.be>
 
 	* Preparations for notification of changes in folders
 
-2007-01-17  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-17  Philip Van Hoof <philip@codeminded.be>
 
 	* Introduction of TnyFolderChange, TnyFolderObserver, TnyFolderMonitor
 	* Updated Python bindings
@@ -4675,7 +4675,7 @@
 
 	* This was a API change in libtinymailui-gtk
 
-2007-01-16  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-16  Philip Van Hoof <philip@codeminded.be>
 
 	* Preparations for size limited retrieval
 	* Major refactoring for the flags of messages
@@ -4688,7 +4688,7 @@
 	* This was a major API change in all
 	* This change influenced the on-disk cache
 
-2007-01-14  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-14  Philip Van Hoof <philip@codeminded.be>
 
 	* Implementation for TNY_HEADER_FLAG_CACHED and
 	TNY_HEADER_FLAG_PARTIAL for IMAP and POP3
@@ -4700,7 +4700,7 @@
 
 	* This was a major API change
 
-2007-01-13  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-13  Philip Van Hoof <philip@codeminded.be>
 
 	* Introduction of the TnyLockable type
 	* Implementation of TnyGtkLockable and TnyNoopLockable
@@ -4711,11 +4711,11 @@
 
 	* This was a major API change
 
-2007-01-12  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-12  Philip Van Hoof <philip@codeminded.be>
 
 	* Refreshing POP folders, bugfix
 
-2007-01-11  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-11  Philip Van Hoof <philip@codeminded.be>
 
 	* Implemented partial message retrieval for POP
 	* Implemented detecting partial retrieval status for POP
@@ -4724,7 +4724,7 @@
 
 	* Fix tiny leak in tny_folder_store_query_add_item
 
-2007-01-10  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-10  Philip Van Hoof <philip@codeminded.be>
 
 	* Improved the camel-lite POP summary support by detecting the TOP
 	capability
@@ -4733,11 +4733,11 @@
 
 	* Added some extra TnyFolderType's for use in tinymail clients
 
-2007-01-09  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-09  Philip Van Hoof <philip@codeminded.be>
 
 	* Temporary POP implementation (CamelFolderSummary support)
 
-2007-01-09  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-09  Philip Van Hoof <philip@codeminded.be>
 
 	* Implemented a very memory efficient message fetching mechanism in
 	camel-lite (it uses streams rather than copying things in memory)
@@ -4748,12 +4748,12 @@
 
 	* This was a major API change
 
-2007-01-08  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-08  Philip Van Hoof <philip@codeminded.be>
 
 	* Implemented first pieces of the partial message retrieval
 	* Further implemented TnyCamelPopFolder and TnyCamelPopAccount
 
-2007-01-04  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-04  Philip Van Hoof <philip@codeminded.be>
 
 	* Created the TnyMsgReceiveStrategy infrastructure
 	* Implemented TnyCamelFullMsgReceiveStrategy
@@ -4765,7 +4765,7 @@
 
 	* This was a major API change
 
-2007-01-03  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-03  Philip Van Hoof <philip@codeminded.be>
 
 	* Porting to the one laptop per child project laptop
 	* Created marketing demo video about tinymail on the OLPC, posted on 
@@ -4773,7 +4773,7 @@
 	* Analysis of partial message retrieval
 	* Created documentation item about partial message retrieval
 
-2007-01-02  Philip Van Hoof <pvanhoof@gnome.org>
+2007-01-02  Philip Van Hoof <philip@codeminded.be>
 
 	* Created new documentation items
 	* Created camel-lite internal documentation items
@@ -4782,13 +4782,13 @@
 	* Replaced an include that prevented the documentation from being
 	built
 
-2006-12-25  Philip Van Hoof <pvanhoof@gnome.org>
+2006-12-25  Philip Van Hoof <philip@codeminded.be>
 
 	* Various fixes about creating and sending E-mails
 	* Added a TnyCamelMemStream type
 	* Added a msg-send test
 
-2006-12-25  Philip Van Hoof <pvanhoof@gnome.org>
+2006-12-25  Philip Van Hoof <philip@codeminded.be>
 
 	* TnyPlatformFactory: Added new_msg, new_header and new_mime_part
 
@@ -4799,7 +4799,7 @@
 	* docs/devel/reference/Makefile.am: added the path where to look
 	for the includes of the tests
 
-2006-12-20  Philip Van Hoof <pvanhoof@gnome.org>
+2006-12-20  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed a few reference counting problems too
 
@@ -4807,7 +4807,7 @@
 
 	* Fixed a few reference counting problems 
 	
-2006-12-16  Philip Van Hoof <pvanhoof@gnome.org>
+2006-12-16  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixes and simplification of API for RFC822 support
 
@@ -4817,7 +4817,7 @@
 	unit tests
 	* Documentation fixes in TnyList
 
-2006-12-15  Philip Van Hoof <pvanhoof@gnome.org>
+2006-12-15  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite/camel: merging interesting bits and
 	pieces with upstream Camel
@@ -4833,7 +4833,7 @@
 	* libtinymail/tny-folder.h: added the tny_folder_get_msg_async
 	signature to the list of public methods
 
-2006-12-10  Philip Van Hoof <pvanhoof@gnome.org>
+2006-12-10  Philip Van Hoof <philip@codeminded.be>
 
 	* Committed unfinished copy/moving of folders
 
@@ -4843,7 +4843,7 @@
 
 	* Ported GUnit unit tests to Check
 
-2006-12-08  Philip Van Hoof <pvanhoof@gnome.org>
+2006-12-08  Philip Van Hoof <philip@codeminded.be>
 
 	* Added the tny_folder_transfer_msgs_async API
 	* Implemented for libtinymail-camel
@@ -4856,14 +4856,14 @@
 	* libtinymail-camel/tny-camel-header.c: Added a default camel
 	implementation for tny_header_set/get_replyto
 
-2006-12-06  Philip Van Hoof <pvanhoof@gnome.org>
+2006-12-06  Philip Van Hoof <philip@codeminded.be>
 
 	* Added the tny_folder_get_msg_async API
 	* Implemented tny_camel_folder_get_msg_async
 
 	* This was a major API change in libtinymail
 
-2006-12-01  Philip Van Hoof <pvanhoof@gnome.org>
+2006-12-01  Philip Van Hoof <philip@codeminded.be>
 
 	* Support for content-objects in RFC822 messages
 
@@ -4873,7 +4873,7 @@
 	* libtinymail-camel/tny-camel-common.c: a store query with no items
 	filters nothing
 
-2006-11-30  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-30  Philip Van Hoof <philip@codeminded.be>
 
 	* Bugfixes and Maildir implementations for TnyCamelSendQueue
 	* Renamed TnyGtkAccountTreeModel to TnyGtkFolderTreeModel and adapted
@@ -4881,12 +4881,12 @@
 
 	* This was a major API change in libtinymailui-gtk
 
-2006-11-28  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-28  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed various locking and error handling problems
 	* Fixed support for unread-message count
 
-2006-11-27  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-27  Philip Van Hoof <philip@codeminded.be>
 
 	* Added the first pieces for error reporting and support
 	* Added error reporting and checking in a lot methods and types
@@ -4904,11 +4904,11 @@
 	* tools/gtypeinterface-h-files-to-c-file.pl: Rewrite and major
 	improvements
 
-2006-11-26  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-26  Philip Van Hoof <philip@codeminded.be>
 
 	* tools/gtypeinterface-h-files-to-c-file.pl: Initial implementation
 
-2006-11-23  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-23  Philip Van Hoof <philip@codeminded.be>
 
 	* The mail-sending API, fine tuning
 
@@ -4924,7 +4924,7 @@
 
 	* Improvements for the debian package
 
-2006-11-23  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-23  Philip Van Hoof <philip@codeminded.be>
 
 	* Major fixes and refactoring for the rfc822 support
 	* Reimplemented TnyGtkMsgWindow
@@ -4953,7 +4953,7 @@
 
 	* This was a major API change in libtinymailui-gtk
 
-2006-11-21  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-21  Philip Van Hoof <philip@codeminded.be>
 
 	* Major changes in TnyMsg and TnyMimePart
 	* First support for message/rfc822 messages
@@ -4962,7 +4962,7 @@
 	
 	* This was a major API change in all libraries
 
-2006-11-20  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-20  Philip Van Hoof <philip@codeminded.be>
 
 	* A new style of handling mime parts
 	* First building blocks for supporting message/rfc822
@@ -4973,7 +4973,7 @@
 	* Improved the support for subscribing and ubsubscribing folders
 	* Improved creating new folders
 
-2006-11-17  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-17  Philip Van Hoof <philip@codeminded.be>
 
 	* A few s/g_new/g_slice replacements
 
@@ -4997,7 +4997,7 @@
 	* test/functional/msg-transfer.c: added this program to test
 	tny_folder_transfer_msgs implementation
 
-2006-11-16  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-16  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite: Fixed a rather big memory leak when
 	downloading new messages happened
@@ -5009,15 +5009,15 @@
 	(tny_folder_store_query_item_get_type): replaced TnyFolderStoreQuery
 	by TnyFolderStoreQueryItem in the instance size field 
 
-2006-11-15  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-15  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymailui-mozembed: fixes for the Gecko support
 
-2006-11-14  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-14  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymailui-mozembed: fixes for the Gecko support
 
-2006-11-13  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-13  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite: moved some scripts in the configure.ac
 	to the m4 directory to simplify migrating to the toplevel configure.ac
@@ -5031,7 +5031,7 @@
 	* debian/: Dependencies
 	* README: Some documentation updates
 
-2006-11-12  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-12  Philip Van Hoof <philip@codeminded.be>
 
 	* Corrected the MimePartSaveStrategy pattern method naming
 	* Various gtk-doc fixes
@@ -5054,7 +5054,7 @@
 	that caused an error when trying to fetch messages from an IMAP
 	server.
 
-2006-11-09  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-09  Philip Van Hoof <philip@codeminded.be>
 
 	* Introduction of the new TnySendQueue interface
 	* Added a lot assertions to check for type safety
@@ -5064,7 +5064,7 @@
 
 	* This was a major API change
 
-2006-11-06  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-06  Philip Van Hoof <philip@codeminded.be>
 
 	* Introduction of the TnyMsgRemoveStrategy, which makes it more
 	flexible to define how tinymail should remove messages (as this might
@@ -5084,7 +5084,7 @@
 	of the cc and bcc fields to the list of	recipients when sending an 
 	email with camel
 	
-2006-11-06  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-06  Philip Van Hoof <philip@codeminded.be>
 	
 	* Build environment improvements
 
@@ -5092,11 +5092,11 @@
 
 	* libtinymail-camel: Some bugfixes for when sendings E-mails
 
-2006-11-01  Philip Van Hoof <pvanhoof@gnome.org>
+2006-11-01  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite: Restored the OpenSSL support
 
-2006-10-30  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-30  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite: Build environment simplificiations
 
@@ -5106,27 +5106,27 @@
 	nspr and nss packages
 	* libtinymail-camel/libtinymail-camel.pc.in: Bugfix
 
-2006-10-27  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-27  Philip Van Hoof <philip@codeminded.be>
 
 	*  libtinymail-camel/camel-lite: NSPR & NSS detection, bugfix
 
-2006-10-26  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-26  Philip Van Hoof <philip@codeminded.be>
 
 	*  libtinymail-camel/camel-lite: Aggressive memory reductions by
 	removing unused features and fields from Camel
 
-2006-10-25  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-25  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite: Applied patch #75412 of Bug #363695
 	which was done by Matthew Barnes (porting the patch from evolution-
 	data-server to camel-lite)
 	* libtinymail-camel/camel-lite: Bugfixes (important ones)
 	
-2006-10-24  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-24  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite: All sorts of bugfixes
 
-2006-10-23  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-23  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite: Drastic reduction of memory
 	consumption on initial download of both IMAP and NNTP folders.
@@ -5141,25 +5141,25 @@
 	* docs/deve/reference/libtinymail-docs.sgml: Language corrections in
 	the introduction of the API reference documentation.
 
-2006-10-20  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-20  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite: Allocation of the CamelFolderInfo is
 	now with GSlice instead of many different malloc ways. This one needs
 	testing!
 
-2006-10-19  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-19  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel: bugfix in tny-camel-store-account.c
 	* libtinymail-camel/camel-lite: Merged with new stuff from Matthew
 	* Memory consumption reduction in libtinymail-camel/camel-lite
 
-2006-10-18  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-18  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/camel-lite/: EMsgPort, EThread, EMutex and
 	EMemChunk replacements with modern glib infrastructure like
 	GAsyncQueue, GThread, GMutex and g_slice_alloc
 
-2006-10-17  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-17  Philip Van Hoof <philip@codeminded.be>
 
 	* Added libtinymail-camel/camel-lite
 	* Made a huge amount of compiler warning fixes to libtinymail-camel/camel-lite
@@ -5167,14 +5167,14 @@
 	* Fixed the tests and unit tests
 	* Fixed the documentation build procedure
 
-2006-10-16  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-16  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed the Python bindings
 	* Added lots of code samples to the API reference documentation
 
 	* This was a major API change in the Python bindings
 
-2006-10-15  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-15  Philip Van Hoof <philip@codeminded.be>
 
 	* Major refactoring in the TnyMimePartSaveStrategy stuff
 	* Introduced a new client-type for the strategy pattern:
@@ -5188,13 +5188,13 @@
 
 	*  This was a major API change in libtinymailui
 	
-2006-10-13  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-13  Philip Van Hoof <philip@codeminded.be>
 
 	* Added the TnyGtkAttachmentMimePartView type
 
 	*  This was a major API change in libtinymailui-gtk
 	
-2006-10-12  Philip Van Hoof <pvanhoof@gnome.org>
+2006-10-12  Philip Van Hoof <philip@codeminded.be>
 
 	* The new TnyMimePartView API
 	* The TnyMimePartView API implemented for Gtk+
@@ -5202,12 +5202,12 @@
 
 	* This was a major API change in libtinymailui
 	 
-2006-09-26  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-26  Philip Van Hoof <philip@codeminded.be>
 
 	* Bugfix in tny-camel-folder.c, added documentation aid
 	* Fixed possible memory leak
 
-2006-09-25  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-25  Philip Van Hoof <philip@codeminded.be>
 
 	* Aggressively hardened the TnyCamelFolder implementation. This
 	hardening isn't good for debugging, as major bugs and mistakes now
@@ -5229,11 +5229,11 @@
 
 	Feel free to help me spot it, and/or fix it.
 
-2006-09-19  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-19  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed compilation for OLPC, GPE and Maemo platforms
 
-2006-09-17  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-17  Philip Van Hoof <philip@codeminded.be>
 
 	* Changed the length method of the TnyList interface to get_length as
 	it's a normal property like any other
@@ -5243,13 +5243,13 @@
 
 	* This was a major API change
 
-2006-09-14  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-14  Philip Van Hoof <philip@codeminded.be>
 
 	* Bugfixes in the list types found after improving a few unit tests
 	* Bugfixes in the stream types found after improving a few unit tests
 	* Fixed the TnyFsStream, TnyGtkTextBufferStream and TnyVfsStream types
 
-2006-09-13  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-13  Philip Van Hoof <philip@codeminded.be>
 
 	* Removed silly API in TnySessionCamel, solved the need for the API internally
 	* Bug fixes in TnySessionCamel
@@ -5269,7 +5269,7 @@
 
 	* This was a major API change in libtinymail-camel
 	
-2006-09-11  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-11  Philip Van Hoof <philip@codeminded.be>
 
 	* Experimented a bit with scanvirtuals.py in bindings/python decided
 	to add it
@@ -5287,7 +5287,7 @@
 
 	* This was a major API change in libtinymail
 
-2006-09-08  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-08  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed the Python bindings
 	* Fixed the TnyIterator API (current -> get_current, as it's a
@@ -5296,7 +5296,7 @@
 
 	* This was a major API change in all libraries
 	
-2006-09-06  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-06  Philip Van Hoof <philip@codeminded.be>
 
 	* The big commit we have all been waiting for: Removing the Iface
 	suffix from the interface types
@@ -5304,7 +5304,7 @@
 
 	* This was a major API change in all libraries
 
-2006-09-05  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-05  Philip Van Hoof <philip@codeminded.be>
 
 	* Renamed TnyList to TnySimpleList
 	* Renamed TnySummaryView to TnyDemouiSummaryView
@@ -5312,7 +5312,7 @@
 
 	* This was a major API change in all libraries
 
-2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-04  Philip Van Hoof <philip@codeminded.be>
 
 	* Renamed the GPE types in libtinymail-gpe
 	* Renamed the Maemo types in libtinymail-maemo
@@ -5325,7 +5325,7 @@
 	* This was a major API change in libtinymail-gpe, libtinymail-maemo,
 	libtinymail-olpc and libtinymail-gnome
 
-2006-09-04  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-04  Philip Van Hoof <philip@codeminded.be>
 	
 	* Renamed TnyDevice of libtestshared to TnyTestDevice
 	* Renamed TnyPlatformFactory of libtestshared to
@@ -5334,7 +5334,7 @@
 
 	* This was a minor API change
 
-2006-09-03  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-03  Philip Van Hoof <philip@codeminded.be>
 
 	* Renamed TnySaveStrategy to TnyGtkSaveStrategy
 	* Renamed TnyTextBufferStream to TnyGtkTextBufferStream
@@ -5346,13 +5346,13 @@
 
 	* This was a major API change in libtinymailui-gtk
 
-2006-09-01  Philip Van Hoof <pvanhoof@gnome.org>
+2006-09-01  Philip Van Hoof <philip@codeminded.be>
 
 	* Renamed TnyHeaderView to TnyGtkHeaderView
 
 	* This was a major API change in libtinymailui-gtk
 
-2006-08-31  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-31  Philip Van Hoof <philip@codeminded.be>
 
 	* Fixed some small issues in the renaming patch of Thomas and
 	committed it.
@@ -5366,7 +5366,7 @@
 
 	* This was a major API change in libtinymailui-gtk
 		
-2006-08-31  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-31  Philip Van Hoof <philip@codeminded.be>
 
 	* Made TnyCamelFolder and TnyAccountStore's get_folders
 	and get_folders_async methods virtual ones that can be
@@ -5389,7 +5389,7 @@
 
 	* This was a major API change in libtinymail-camel
 	
-2006-08-30  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-30  Philip Van Hoof <philip@codeminded.be>
 
 	* Updated the platform specific libraries olpc, maemo, gpe and
 	gnome-desktop to the new APIs
@@ -5413,13 +5413,13 @@
 
 	* Bugfix in libtinymail-gnome-desktop/tny-account-store.c
 	
-2006-08-29  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-29  Philip Van Hoof <philip@codeminded.be>
 
 	* Updated the Python bindings a little bit
 	* Documentation updates
 	* Added some support for the doxygen documentation generator
 
-2006-08-28  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-28  Philip Van Hoof <philip@codeminded.be>
 
 	*  Added unit tests for TnyFolderStoreQuery
 	*  Added unit tests for TnyMsgIface
@@ -5432,7 +5432,7 @@
 
 	* This was a major API change in all
 
-2006-08-27  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-27  Philip Van Hoof <philip@codeminded.be>
 
 	* Bugfix when switching offline and online and again getting a
 	message that had been viewed already
@@ -5446,27 +5446,27 @@
 	* Fix test program (gtk_init)
 	* Fix internet address parsing (camel-common)
 
-2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <philip@codeminded.be>
 
 	* Further upgraded to the new get-folders API
 	* Updated the API documentation
 
-2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <philip@codeminded.be>
 
 	* Added the tny_msg_view_iface_clear API
 
 	* This was a major API change in libtinymailui and libtinymailui-gtk
 
-2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymailui-gtk/tny-account-tree-model.c: Reimplemented using the
 	new TnyFolderStoreIface API
 
-2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <philip@codeminded.be>
 
 	* Speedup the new get-folders API by caching the CamelFolderStore
 
-2006-08-25  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-25  Philip Van Hoof <philip@codeminded.be>
 
 	* Lots of files: Removed the tny_folder_iface_uncache API and replaced 
 	it with a detection mechanism that automates this. It will now uncache 
@@ -5481,7 +5481,7 @@
 
 	* This was a major API change in all
 	
-2006-08-24  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-24  Philip Van Hoof <philip@codeminded.be>
 
 	* libtinymail-camel/tny-camel-common.c, 
 	libtinymail-camel/tny-folder.c, libtinymail-camel/tny-store-account.c,
@@ -5495,7 +5495,7 @@
 
 	* This was a major API change in all
 
-2006-08-23  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-23  Philip Van Hoof <philip@codeminded.be>
 	
 	* ChangeLog: Corrected the dates
 	* libtinymail-test: Implemented unit tests for TnyFolderIface
@@ -5506,11 +5506,11 @@
 	
 	* This was a major API change in all
 	
-2006-08-22  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-22  Philip Van Hoof <philip@codeminded.be>
 
 	* tests/*: Added some tests
 
-2006-08-20  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-20  Philip Van Hoof <philip@codeminded.be>
 
 	* Reviewed and corrected Dirk-Jan's patch of 08-08
 	* Removed the has_first and has_next methods from the iterator API
@@ -5526,7 +5526,7 @@
 
 	* This was a major API change in all
 	
-2006-08-01  Philip Van Hoof <pvanhoof@gnome.org>
+2006-08-01  Philip Van Hoof <philip@codeminded.be>
 
 	* Implemented a few new unit tests
 	* Completed a few existing unit tests
@@ -5536,14 +5536,14 @@
 	* bindings/python/tinymail.override: Sequence protocol, initial pieces 
 	of implementation
 
-2006-07-29  Philip Van Hoof <pvanhoof@gnome.org>
+2006-07-29  Philip Van Hoof <philip@codeminded.be>
 
 	* Improved the enums (GType'ed them)
 
 	* This was a minor API change in all but a major one for language
 	bindings
 	
-2006-07-29  Philip Van Hoof <pvanhoof@gnome.org>
+2006-07-29  Philip Van Hoof <philip@codeminded.be>
 
 	* bindings/python/*: Some fixes for the Python bindings
 	* libtinymailui-gtk/tny-account-tree-model-priv.h, libtinymailui-gtk/
@@ -5559,11 +5559,11 @@
 
 	* bindings/python/*: Some fixes for the Python bindings
 
-2006-07-28  Philip Van Hoof <pvanhoof@gnome.org>
+2006-07-28  Philip Van Hoof <philip@codeminded.be>
 
 	*  bindings/python/*: Some fixes for the Python bindings
 
-2006-07-27  Philip Van Hoof <pvanhoof@gnome.org>
+2006-07-27  Philip Van Hoof <philip@codeminded.be>
 
 	*  tinymail-python/ moved to bindings/python
 	*  bindings/python: reworked the python bindings
@@ -5585,7 +5585,7 @@
 
 	* This was a major API change in all
 	
-2006-06-07  Philip Van Hoof <pvanhoof@gnome.org>
+2006-06-07  Philip Van Hoof <philip@codeminded.be>
 
 	* Major API changes in TnyAccountStore
 	
@@ -5595,7 +5595,7 @@
 
 	* Make GPE TnyDevice default to be online for now.
 
-2006-06-01  Philip Van Hoof <pvanhoof@gnome.org>
+2006-06-01  Philip Van Hoof <philip@codeminded.be>
 
 	* Implementation and implementing
 	* Lots of coding happened
@@ -5604,7 +5604,7 @@
 
 	* Fix endless loop sending mails.
 
-2006-05-01  Philip Van Hoof <pvanhoof@gnome.org>
+2006-05-01  Philip Van Hoof <philip@codeminded.be>
 
 	* Implementation and implementing
 	* Lots of coding happened
@@ -5614,7 +5614,7 @@
 	* Support for mail status flags.
 	* Minor fixes.
 
-2006-04-01  Philip Van Hoof <pvanhoof@gnome.org>
+2006-04-01  Philip Van Hoof <philip@codeminded.be>
 
 	* Implementation and implementing
 	* Lots of coding happened
@@ -5623,7 +5623,7 @@
 
 	* Added initial Python bindings
 	
-2006-01-17  Philip Van Hoof <pvanhoof@gnome.org>
+2006-01-17  Philip Van Hoof <philip@codeminded.be>
 	
 	* Initial import
 	* Tinymail epoch
