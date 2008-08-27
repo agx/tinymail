@@ -1,3 +1,11 @@
+2008-08-27  Martin Bonnin  <martinbonnin@gmail.com>
+
+	* This removes the "Warning: invalid file descriptor -1 in syscall 
+	close()" seen when using valgrind with tinymail. stream_close() is 
+	called twice in a row on the same stream.  There might be more 
+	implications than just this valgrind warning, full details here 
+	http://www.tinymail.org/trac/tinymail/ticket/62#preview
+
 2008-08-22  Philip Van Hoof  <philip@codeminded.be>
 
 	* http://www.tinymail.org/trac/tinymail/ticket/81

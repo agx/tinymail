@@ -691,13 +691,18 @@ close_ssl_connection (SSL *ssl)
 static int
 stream_close (CamelStream *stream)
 {
-	close_ssl_connection (((CamelTcpStreamSSL *)stream)->priv->ssl);
-	((CamelTcpStreamSSL *)stream)->priv->ssl = NULL;
+	if( ((CamelTcpStreamSSL *)stream)->priv->ssl ){
+		close_ssl_connection (((CamelTcpStreamSSL *)stream)->priv->ssl);
+		((CamelTcpStreamSSL *)stream)->priv->ssl = NULL;
+	}
 
-	if (close (((CamelTcpStreamSSL *)stream)->priv->sockfd) == -1)
-		return -1;
+	if( ((CamelTcpStreamSSL *)stream)->priv->sockfd != -1 ){
+		if (close (((CamelTcpStreamSSL *)stream)->priv->sockfd) == -1)
+			return -1;
 
-	((CamelTcpStreamSSL *)stream)->priv->sockfd = -1;
+		((CamelTcpStreamSSL *)stream)->priv->sockfd = -1;
+	}
+
 	return 0;
 }
 
