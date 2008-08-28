@@ -99,7 +99,7 @@ notify_factory_del (TnyCamelStoreAccount *self, GObject *folder)
 		g_static_rec_mutex_lock (priv->factory_lock);
 		priv->managed_folders = g_list_remove_all (priv->managed_folders, folder);
 		g_static_rec_mutex_unlock (priv->factory_lock);
-		if (ppriv->inbox == folder) {
+		if (((GObject *) ppriv->inbox) == folder) {
 			ppriv->inbox = NULL;
 		}
 	}

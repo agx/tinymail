@@ -320,7 +320,7 @@ tny_status_domain_get_type (void)
 }
 
 static gpointer
-tny_status_code_register_type (void)
+tny_status_code_register_type (gpointer notused)
 {
   GType etype = 0;
   static const GEnumValue values[] = {
