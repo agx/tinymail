@@ -394,7 +394,7 @@ camel_service_connect (CamelService *service, CamelException *ex)
 		service->connect_op = NULL;
 	}
 
-	if (service->disconnecting)
+	if (service->connecting)
 		service->connecting (service, ret, service->data);
 
 	CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
@@ -447,7 +447,7 @@ camel_service_connect_r (CamelService *service, CamelException *ex)
 		service->connect_op = NULL;
 	}
 
-	if (service->disconnecting)
+	if (service->connecting)
 		service->connecting (service, ret, service->data);
 
 	//CAMEL_SERVICE_UNLOCK (service, connect_op_lock);
