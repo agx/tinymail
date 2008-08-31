@@ -371,11 +371,14 @@ alert_idle_func (gpointer user_data)
 
 	tny_lockable_lock (self->priv->ui_lock);
 
-	info->retval = tny_account_store_alert (
-		(TnyAccountStore*) self->priv->account_store, 
-		account, info->tnytype, info->question, 
-		info->err);
-
+	if( self->priv->account_store ){
+		info->retval = tny_account_store_alert (
+			(TnyAccountStore*) self->priv->account_store, 
+			account, info->tnytype, info->question, 
+			info->err);
+	} else {
+		g_warning ("cannot alert: no account_store");
+	}
 	tny_lockable_unlock (self->priv->ui_lock);
 
 	return FALSE;
@@ -723,10 +726,14 @@ on_account_connect_done (TnyCamelAccount *account, gboolean canceled, GError *er
 	if (!canceled && err) {
 
 		/* It seems err is forgotten here ... if the disk is full ! */
-		tny_account_store_alert (
-			(TnyAccountStore*) self->priv->account_store, 
-			TNY_ACCOUNT (account), TNY_ALERT_TYPE_ERROR, FALSE, 
-			err);
+		if( self->priv->account_store ){
+			tny_account_store_alert (
+				(TnyAccountStore*) self->priv->account_store, 
+				TNY_ACCOUNT (account), TNY_ALERT_TYPE_ERROR, FALSE, 
+				err);
+		} else {
+			g_warning("disk full: no account_store");
+		}
 	}
 
 	camel_object_unref (self);
@@ -1005,6 +1012,8 @@ tny_session_camel_set_account_store (TnySessionCamel *self, TnyAccountStore *acc
 	TnySessionCamelPriv *priv = self->priv;
 
 	priv->account_store = (gpointer)account_store;    
+	g_object_add_weak_pointer (priv->account_store, &priv->account_store);
+
 	base_directory = g_strdup (tny_account_store_get_cache_dir (account_store));
 
 	if (camel_init (base_directory, TRUE) != 0)
@@ -1089,6 +1098,10 @@ tny_session_camel_finalise (CamelObject *object)
 	{
 		g_signal_handler_disconnect (G_OBJECT (priv->device), 
 			priv->connchanged_signal);
+	}
+
+	if( priv->account_store ){
+		g_object_remove_weak_pointer (priv->account_store, &priv->account_store);
 	}
 
 	if (priv->device) {
