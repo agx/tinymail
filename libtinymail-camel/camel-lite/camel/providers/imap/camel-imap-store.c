@@ -2611,8 +2611,7 @@ imap_get_folder_status (CamelStore *store, const char *folder_name, int *unseen,
 		if (!g_ascii_strcasecmp (item->name, "MESSAGES"))
 			*messages = item->value;
 		if (!g_ascii_strcasecmp (item->name, "UNSEEN")) {
-			if (munread_count == -1)
-				*unseen = item->value;
+			*unseen = item->value;
 		}
 		if (!g_ascii_strcasecmp (item->name, "UIDNEXT"))
 			*uidnext = item->value;

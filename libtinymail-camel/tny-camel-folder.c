@@ -5709,6 +5709,10 @@ tny_camel_folder_poke_status_thread (gpointer user_data)
 	} else {
 		info->unread = newurlen;
 		info->total = newlen;
+
+		priv->unread_length = newurlen;
+		priv->cached_length = newlen;
+		update_iter_counts (priv);
 	}
 
 	return NULL;
