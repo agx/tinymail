@@ -834,9 +834,10 @@ imap_finalize (CamelObject *object)
 	if (imap_folder->cache)
 		camel_object_unref (CAMEL_OBJECT (imap_folder->cache));
 
-	if (imap_folder->folder_dir)
+	if (imap_folder->folder_dir){
 		g_free (imap_folder->folder_dir);
-
+		imap_folder->folder_dir = NULL;
+	}
 
 #ifdef ENABLE_THREADS
 	g_static_mutex_free(&imap_folder->priv->search_lock);

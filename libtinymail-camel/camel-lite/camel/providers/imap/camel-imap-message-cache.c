@@ -347,6 +347,11 @@ void
 camel_imap_message_cache_set_flags (const gchar *folder_dir, CamelMessageInfoBase *mi)
 {
 	char mystring [512];
+
+	if( !folder_dir ){
+		return;
+	}
+
 	snprintf (mystring, 512, "%s/%s.", folder_dir, mi->uid);
 	if (g_file_test (mystring, G_FILE_TEST_IS_REGULAR))
 	{
