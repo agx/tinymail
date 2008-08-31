@@ -117,16 +117,15 @@ tny_progress_info_new (GObject *self, TnyStatusCallback status_callback, TnyStat
 
 	info->stopper = tny_idle_stopper_copy (stopper);
 
-	if (info->oftotal < 1)
-		info->oftotal = 1;
-
-	if (sofar < 1)
-		info->sofar = 1;
-	else 
-		if (sofar > info->oftotal)
-			info->sofar = info->oftotal;
+	if (oftotal < 1 || sofar < 1 ) {
+		info->oftotal = 0;
+		info->sofar = 0;
+	} else {
+		if (sofar > oftotal)
+			info->sofar = oftotal;
 		else
 			info->sofar = sofar;
+	}
 
 	return info;
 }
