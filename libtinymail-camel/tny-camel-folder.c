@@ -6045,20 +6045,10 @@ _tny_camel_folder_freeup_observers (TnyCamelFolder *self, TnyCamelFolderPriv *pr
 }
 
 static void
-tny_camel_folder_finalize (GObject *object)
+tny_camel_folder_dispose (GObject *object)
 {
 	TnyCamelFolder *self = (TnyCamelFolder*) object;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-
-
-#ifdef DEBUG
-	g_print ("Finalizing TnyCamelFolder: %s\n", 
-		priv->folder_name?priv->folder_name:"(cleared)");
-
-	if (priv->reason_to_live != 0)
-		g_print ("Finalizing TnyCamelFolder, yet TnyHeader instances "
-		"are still alive: %d\n", priv->reason_to_live);
-#endif
 
 	if (priv->store)
 		camel_object_unref (priv->store);
@@ -6099,10 +6089,6 @@ tny_camel_folder_finalize (GObject *object)
 		priv->folder = NULL;
 	}
 
-	if (G_LIKELY (priv->cached_name))
-		g_free (priv->cached_name);
-	priv->cached_name = NULL;
-
 	if (G_LIKELY (priv->remove_strat))
 		g_object_unref (G_OBJECT (priv->remove_strat));
 	priv->remove_strat = NULL;
@@ -6112,6 +6098,48 @@ tny_camel_folder_finalize (GObject *object)
 	priv->receive_strat = NULL;
 
 	priv->parent = NULL;
+
+	g_static_rec_mutex_unlock (priv->folder_lock);
+
+	return;
+}
+
+
+static void
+tny_camel_folder_finalize (GObject *object)
+{
+	TnyCamelFolder *self = (TnyCamelFolder*) object;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+
+#ifdef DEBUG
+	g_print ("Finalizing TnyCamelFolder: %s\n", 
+		priv->folder_name?priv->folder_name:"(cleared)");
+
+	if (priv->reason_to_live != 0)
+		g_print ("Finalizing TnyCamelFolder, yet TnyHeader instances "
+		"are still alive: %d\n", priv->reason_to_live);
+#endif
+
+	g_static_rec_mutex_lock (priv->folder_lock);
+	priv->dont_fkill = FALSE;
+
+	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account)) {
+		TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
+		g_static_rec_mutex_lock (apriv->factory_lock);
+		apriv->managed_folders = g_list_remove (apriv->managed_folders, self);
+		g_static_rec_mutex_unlock (apriv->factory_lock);
+	}
+
+	if (G_LIKELY (priv->folder))
+	{
+		camel_object_unref (priv->folder);
+		priv->folder = NULL;
+	}
+
+	if (G_LIKELY (priv->cached_name))
+		g_free (priv->cached_name);
+	priv->cached_name = NULL;
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
@@ -6205,6 +6233,7 @@ tny_camel_folder_class_init (TnyCamelFolderClass *class)
 
 	parent_class = g_type_class_peek_parent (class);
 	object_class = (GObjectClass*) class;
+	object_class->dispose = tny_camel_folder_dispose;
 	object_class->finalize = tny_camel_folder_finalize;
 
 	class->add_msg_async= tny_camel_folder_add_msg_async_default;
