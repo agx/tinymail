@@ -1,3 +1,34 @@
+2008-08-31  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail-camel/tny-session-camel.c: Make account_store
+	weak-referenced in TnySessionCamel.
+
+2008-08-31  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-message-cache.c:
+	Fix some valgrind warnings in camel imap provider.
+
+2008-08-31  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail/tny-progress-info.c: Make the sofar/oftotal field in
+	TnyProgress more sensible when one of the is negative.  In general one
+	of these ill be negative right at the start of an operation, and if
+	one is 0, then the other is generally gibberish, so 0/0 is more
+	sensible.
+
+2008-08-31  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
+	* libtinymail-camel/tny-camel-folder.c: Correctly change the unread
+	and total message numbers after a status_poke
+
+2008-08-31  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail-camel/tny-camel-folder.c:
+	* libtinymail-camel/tny-camel-store-account.c:
+	do unrefs in dispose, not finalise for tny-camel-folder and tny-camel-st
+
 2008-08-28  Martin Bonnin  <martinbonnin@gmail.com>
 
 	* Fixed typo in camel-service.c
@@ -189,6 +220,8 @@
         * Don't get folders again when we change status to disconnected.
 
 2008-06-20  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c:
         Fix camel operation references
 
 	* libtinymail-camel/tny-camel-bs-mime-part.c:
@@ -234,12 +267,6 @@
 
 	* libtinymail/Makefile.am:
         Added stream cache implementation files.
-
-2008-06-12  Rob Taylor  <rob.taylor@codethink.co.uk>
-
-	* libtinymail-camel/tny-camel-folder.c:
-	* libtinymail-camel/tny-camel-store-account.c:
-	do unrefs in dispose, not finalise for tny-camel-folder and tny-camel-store-account.
 
 2008-06-10  Sergio Villar Senin  <svillar@igalia.com>
 
