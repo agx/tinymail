@@ -89,12 +89,6 @@ CamelServiceAuthType camel_pop3_apop_authtype = {
 	TRUE
 };
 
-static void
-pop3_shutdown (CamelProvider *provider)
-{
-	camel_pop3_store_kill_threads ();
-}
-
 void
 camel_provider_module_init(void)
 {
@@ -111,7 +105,6 @@ camel_provider_module_init(void)
 	pop3_provider.authtypes = g_list_prepend(pop3_provider.authtypes, &camel_pop3_apop_authtype);
 	pop3_provider.authtypes = g_list_prepend(pop3_provider.authtypes, &camel_pop3_password_authtype);
 	pop3_provider.translation_domain = GETTEXT_PACKAGE;
-	pop3_provider.shutdown = pop3_shutdown;
 
 	camel_provider_register(&pop3_provider);
 }

@@ -113,7 +113,6 @@ camel_provider_module_init(void)
 	imap_provider.authtypes = camel_sasl_authtype_list (FALSE);
 	imap_provider.authtypes = g_list_prepend (imap_provider.authtypes, &camel_imap_password_authtype);
 	imap_provider.translation_domain = GETTEXT_PACKAGE;
-	imap_provider.shutdown = NULL;
 
 	camel_provider_register(&imap_provider);
 }

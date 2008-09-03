@@ -269,26 +269,6 @@ camel_provider_register(CamelProvider *provider)
 	UNLOCK();
 }
 
-void camel_provider_shutdown (CamelProvider *provider)
-{
-	if (provider->shutdown) {
-		provider->shutdown ((CamelObject *) provider);
-	}
-}
-
-void camel_provider_shutdown_all (void)
-{
-	GList *providers_list;
-	GList *node;
-
-	providers_list = camel_provider_list (FALSE);
-	for (node = providers_list; node != NULL; node = g_list_next (node)) {
-		CamelProvider *provider = (CamelProvider *) node->data;
-		camel_provider_shutdown (provider);
-	}
-	g_list_free (providers_list);
-}
-
 static gint
 provider_compare (gconstpointer a, gconstpointer b)
 {
