@@ -2054,7 +2054,7 @@ _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySess
 		tny_camel_store_account_queue_going_online_cancelled_destroy,
 		NULL,
 		info, sizeof (GoingOnlineInfo),
-		TNY_CAMEL_QUEUE_RECONNECT_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM,
+		TNY_CAMEL_QUEUE_CONNECT_ITEM|TNY_CAMEL_QUEUE_CANCELLABLE_ITEM,
 		__FUNCTION__);
 
 	return;

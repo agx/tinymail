@@ -74,6 +74,7 @@ typedef enum {
 	TNY_CAMEL_QUEUE_SYNC_ITEM = 1<<5, 
 	TNY_CAMEL_QUEUE_REFRESH_ITEM = 1<<6,
 	TNY_CAMEL_QUEUE_AUTO_CANCELLABLE_ITEM = 1<<7,
+	TNY_CAMEL_QUEUE_CONNECT_ITEM = 1<<8,
 } TnyCamelQueueItemFlags;
 
 GType tny_camel_queue_get_type (void);
@@ -83,6 +84,7 @@ void _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSo
 void _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, GSourceFunc cancel_callback, GDestroyNotify cancel_destroyer, gboolean *cancel_field, gpointer data, gsize data_size, const gchar *name);
 void _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 void _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
+gboolean _tny_camel_queue_has_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 
 G_END_DECLS
 

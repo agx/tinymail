@@ -1,3 +1,16 @@
+2008-09-03  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c
+	(tny_camel_folder_get_msg_async_default),
+	(tny_camel_folder_find_msg_async_default):
+	* libtinymail-camel/tny-camel-queue-priv.h:
+	* libtinymail-camel/tny-camel-queue.c (_tny_camel_queue_has_items):
+	* libtinymail-camel/tny-camel-store-account.c
+	(_tny_camel_store_account_queue_going_online): do not add a
+	message retrieval (with both get_msg_async and find_msg_async) to
+	the IMAP store account message retrieval queue when there is a
+	pending connection in the account queue.
+
 2008-08-31  Rob Taylor  <rob.taylor@codethink.co.uk>
 
 	* libtinymail-camel/tny-session-camel.c: Make account_store

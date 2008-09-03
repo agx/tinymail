@@ -488,6 +488,32 @@ _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc cal
 	return;
 }
 
+gboolean 
+_tny_camel_queue_has_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags)
+{
+	GList *copy = NULL;
+	gboolean retval = FALSE;
+
+	g_static_rec_mutex_lock (queue->lock);
+	copy = queue->list;
+	while (copy)
+	{
+		QueueItem *item = copy->data;
+
+		if (item && (item->flags & flags)) 
+		{
+			tny_debug ("TnyCamelQueue: %s found\n", item->name);
+			retval = TRUE;
+			break;
+		}
+		
+		copy = g_list_next (copy);
+	}
+	g_static_rec_mutex_unlock (queue->lock);
+
+	return retval;
+}
+
 static void 
 tny_camel_queue_class_init (TnyCamelQueueClass *class)
 {

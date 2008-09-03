@@ -2669,7 +2669,9 @@ tny_camel_folder_get_msg_async_default (TnyFolder *self, TnyHeader *header, TnyG
 	/* thread reference header */
 	g_object_ref (info->header);
 
-	if (!TNY_IS_CAMEL_POP_FOLDER (self))
+	if (!TNY_IS_CAMEL_POP_FOLDER (self) && 
+	    !_tny_camel_queue_has_items (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+					 TNY_CAMEL_QUEUE_RECONNECT_ITEM | TNY_CAMEL_QUEUE_CONNECT_ITEM))
 		queue = TNY_FOLDER_PRIV_GET_MSG_QUEUE (priv);
 	else
 		queue = TNY_FOLDER_PRIV_GET_QUEUE (priv);
@@ -2845,7 +2847,9 @@ tny_camel_folder_find_msg_async_default (TnyFolder *self, const gchar *url_strin
 	_tny_camel_folder_reason (priv);
 	g_object_ref (info->self);
 
-	if (!TNY_IS_CAMEL_POP_FOLDER (self))
+	if (!TNY_IS_CAMEL_POP_FOLDER (self) && 
+	    !_tny_camel_queue_has_items (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+					 TNY_CAMEL_QUEUE_RECONNECT_ITEM | TNY_CAMEL_QUEUE_CONNECT_ITEM))
 		queue = TNY_FOLDER_PRIV_GET_MSG_QUEUE (priv);
 	else
 		queue = TNY_FOLDER_PRIV_GET_QUEUE (priv);
