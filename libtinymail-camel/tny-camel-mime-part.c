@@ -303,7 +303,19 @@ decode_async_callback (gpointer user_data)
 	return FALSE;
 }
 
-/* This one is just to fulfil the API requirements */
+static gpointer
+decode_to_stream_async_thread (gpointer userdata)
+{
+	DecodeAsyncInfo *info = (DecodeAsyncInfo *) userdata;
+
+	tny_mime_part_decode_to_stream (info->self, info->stream, &(info->err));
+
+	g_idle_add_full (G_PRIORITY_HIGH, 
+			 decode_async_callback, 
+			 info, decode_async_destroyer);
+	return NULL;
+
+}
 
 static void
 tny_camel_mime_part_decode_to_stream_async (TnyMimePart *self, TnyStream *stream, TnyMimePartCallback callback, TnyStatusCallback status_callback, gpointer user_data)
@@ -317,18 +329,16 @@ tny_camel_mime_part_decode_to_stream_async_default (TnyMimePart *self, TnyStream
 {
 	DecodeAsyncInfo *info = g_slice_new0 (DecodeAsyncInfo);
 
-	tny_mime_part_decode_to_stream (self, stream, NULL);
-
 	info->self = g_object_ref (self);
 	info->stream = g_object_ref (stream);
 	info->callback = callback;
 	info->user_data = user_data;
 	info->err = NULL;
 
-	g_idle_add_full (G_PRIORITY_HIGH, 
-				decode_async_callback, 
-				info, decode_async_destroyer);
-
+	if (g_thread_create (decode_to_stream_async_thread, info, FALSE, &(info->err)) == FALSE) {
+		g_critical ("%s failed: couldn't create the working thread", __FUNCTION__);
+	}
+		
 	return;
 }
 
