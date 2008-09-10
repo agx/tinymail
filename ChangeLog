@@ -1,4 +1,5 @@
 2008-10-10  Sergio Villar Senin  <svillar@igalia.com>
+
 	* libtinymail-camel/camel-lite/camel/providers/local/camel-mailder-store.c
 	(scan_dirs): do not free name before using it to notify an
 	exception 
