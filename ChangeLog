@@ -1,9 +1,15 @@
-2008-10-10  Sergio Villar Senin  <svillar@igalia.com>
+2008-09-16  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c
+	(let_idle_die): do a trylock in connect_lock instead of lock, so that
+	we can avoid interlocks on stop_idle called from imap_command_start.
+
+2008-09-10  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/local/camel-mailder-store.c
 	(scan_dirs): do not free name before using it to notify an
-	exception 
-	
+	exception
+
 2008-09-03  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c

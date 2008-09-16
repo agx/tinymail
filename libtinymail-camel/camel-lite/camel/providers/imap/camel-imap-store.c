@@ -232,20 +232,23 @@ let_idle_die (CamelImapStore *store, gboolean connect_buz)
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
 
 		idle_debug ("Sending DONE in let_idle_die\n");
-		CAMEL_SERVICE_REC_LOCK (store, connect_lock);
-		nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
-		if (nwritten != -1) {
-			resp = NULL;
-			while ((camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) {
-				idle_debug ("(.., ..) <- %s | in let_idle_die\n", resp);
-				g_free (resp); resp=NULL;
+		/* We replace the lock with a try lock. If some other is retaining the connect lock, then we don't need that someone breaks
+		 * the idle */
+		if (CAMEL_SERVICE_REC_TRYLOCK (store, connect_lock)) {
+			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
+			if (nwritten != -1) {
+				resp = NULL;
+				while ((camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED) {
+					idle_debug ("(.., ..) <- %s | in let_idle_die\n", resp);
+					g_free (resp); resp=NULL;
+				}
+				if (resp) {
+					idle_debug ("(.., ..) <- %s\n", resp);
+					g_free (resp);
+				}
 			}
-			if (resp) {
-				idle_debug ("(.., ..) <- %s\n", resp);
-				g_free (resp);
-			}
+			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		}
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		g_free (store->idle_prefix);
 		store->idle_prefix=NULL;
 	}
