@@ -1,3 +1,15 @@
+2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store-summary.c
+	(camel_imap_store_summary_init),
+	(camel_imap_store_summary_namespace_new),
+	(camel_imap_store_summary_namespace_set), (namespace_load),
+	(namespace_save):
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store-summary.h:
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c
+	(construct), (save_namespace_in_summary), (imap_connect_online): Fix
+	saving and loading of namespaces in the summary.
+
 2008-09-16  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c
