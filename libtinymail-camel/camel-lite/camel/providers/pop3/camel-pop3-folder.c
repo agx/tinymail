@@ -570,6 +570,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 {
 	CamelPOP3Folder *pop3_folder;
 	CamelPOP3Store *pop3_store;
+	CamelPOP3Command *pcl, *pcu = NULL;
 	int i, max;
 	CamelMessageInfoBase *info;
 	GList *deleted = NULL;
@@ -585,6 +586,44 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
+
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
+	pop3_store->is_refreshing = TRUE;
+	if (pop3_store->engine == NULL)
+	{
+		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
+		if (camel_exception_is_set (ex)) {
+			pop3_store->is_refreshing = FALSE;
+			g_static_rec_mutex_unlock (pop3_store->eng_lock);
+			return;
+		}
+	}
+
+	camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
+
+	if (pop3_store->engine == NULL) {
+		pop3_store->is_refreshing = FALSE;
+		g_static_rec_mutex_unlock (pop3_store->eng_lock);
+		goto mfail;
+	}
+
+	pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
+	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
+		pcu = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_uidl, folder, "UIDL\r\n");
+	while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0)
+		;
+
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
+	if (i == -1) {
+		if (errno == EINTR)
+			camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("User canceled"));
+		else
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
+					      _("Cannot get POP summary: %s"),
+					      g_strerror (errno));
+	}
+
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine == NULL) {
@@ -698,6 +737,16 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	camel_folder_summary_save (folder->summary, ex);
 
 	return;
+
+mfail:
+
+	pop3_store->is_refreshing = FALSE;
+
+	/* dont need this anymore */
+	camel_operation_end (NULL);
+
+	return;
+
 }
 
 

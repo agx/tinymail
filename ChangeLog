@@ -1,5 +1,11 @@
 2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
 
+	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c
+	(pop3_sync): In pop3 provider, do a LIST before a folder sync so
+	failure doesnt happen if wait_for_login_delay kills the store
+
+2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
+
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store-summary.c
 	(camel_imap_store_summary_init),
 	(camel_imap_store_summary_namespace_new),
