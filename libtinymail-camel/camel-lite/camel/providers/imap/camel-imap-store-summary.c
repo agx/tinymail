@@ -96,7 +96,6 @@ camel_imap_store_summary_init (CamelImapStoreSummary *s)
 	((CamelStoreSummary *)s)->store_info_size = sizeof(CamelImapStoreInfo);
 	s->version = CAMEL_IMAP_STORE_SUMMARY_VERSION;
 	s->namespaces = NULL;
-	s->namespace = NULL;
 }
 
 static void
@@ -423,7 +422,7 @@ camel_imap_store_summary_full_from_path(CamelImapStoreSummary *s, const char *pa
 }
 
 /* TODO: this api needs some more work */
-CamelImapStoreNamespace *camel_imap_store_summary_namespace_new(CamelImapStoreSummary *s, const char *full_name, char dir_sep)
+CamelImapStoreNamespace *camel_imap_store_summary_namespace_new(CamelImapStoreSummary *s, const char *full_name, char dir_sep, CamelImapStoreNamespaceType type)
 {
 	CamelImapStoreNamespace *ns;
 	char *p, *o, c;
@@ -435,6 +434,7 @@ CamelImapStoreNamespace *camel_imap_store_summary_namespace_new(CamelImapStoreSu
 	if (len >= 0 && ns->full_name[len] == dir_sep)
 		ns->full_name[len] = 0;
 	ns->sep = dir_sep;
+	ns->type = type;
 
 	o = p = ns->path = camel_imap_store_summary_full_to_path(s, ns->full_name, dir_sep);
 	while ((c = *p++)) {
@@ -472,12 +472,6 @@ CamelImapStoreNamespace * camel_imap_store_summary_namespace_add(CamelImapStoreS
 		namespace_free((CamelStoreSummary*)s, ns);
 
 	return ret;
-}
-
-void camel_imap_store_summary_namespace_set(CamelImapStoreSummary *s, CamelImapStoreNamespace *ns)
-{
-	s->namespace = ns;
-	return;
 }
 
 CamelImapStoreNamespace *
@@ -569,6 +563,7 @@ namespace_load(CamelStoreSummary *s, FILE *in)
 
 	for (i=0 ; i< count; i++) {
 		guint32 sep = '/';
+		guint32 type = CAMEL_IMAP_STORE_NAMESPACE_TYPE_NONE;
 		ns = g_malloc0(sizeof(*ns));
 		if (camel_file_util_decode_string(in, &ns->path) == -1) {
 			namespace_free(s, ns);
@@ -583,6 +578,11 @@ namespace_load(CamelStoreSummary *s, FILE *in)
 			goto nserror;
 		}
 		ns->sep = sep;
+		if (camel_file_util_decode_uint32(in, &type) == -1) {
+			namespace_free(s, ns);
+			goto nserror;
+		}
+		ns->type = type;
 		is->namespaces = g_list_prepend (is->namespaces, ns);
 	}
 
@@ -615,6 +615,9 @@ namespace_save(CamelStoreSummary *s, FILE *in)
 			goto serr;
 
 		if (camel_file_util_encode_uint32(in, (guint32)ns->sep) == -1)
+			goto serr;
+
+		if (camel_file_util_encode_uint32(in, (guint32)ns->type) == -1)
 			goto serr;
 
 		list = list->next;

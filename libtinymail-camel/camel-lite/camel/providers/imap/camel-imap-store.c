@@ -598,7 +598,61 @@ construct (CamelService *service, CamelSession *session,
 	if (camel_store_summary_load((CamelStoreSummary *)imap_store->summary) == 0) {
 		CamelImapStoreSummary *is = imap_store->summary;
 
-		if (is->namespace) {
+		imap_store->capabilities = is->capabilities;
+		imap_set_server_level(imap_store);
+
+		if ((imap_store->capabilities & IMAP_CAPABILITY_NAMESPACE) &&
+			!(imap_store->parameters & IMAP_PARAM_OVERRIDE_NAMESPACE))
+		{
+			CamelImapStoreNamespace *ns;
+			GList *lst = is->namespaces;
+
+			imap_store->namespaces = g_new0 (struct _namespaces, 1);
+
+			/* down in imap_connect_online we added the name spaces in the order:
+			 * personal
+			 * other
+			 * shared
+			 * so go through them backwards. This is all a bunch of crap.
+			 */
+			while (lst) {
+				struct _namespace **namespace = NULL;
+
+				ns = lst->data;
+				switch (ns->type) {
+					case CAMEL_IMAP_STORE_NAMESPACE_TYPE_NONE:
+						break;
+					case CAMEL_IMAP_STORE_NAMESPACE_TYPE_PERSONAL:
+						namespace = &imap_store->namespaces->personal;
+						break;
+					case CAMEL_IMAP_STORE_NAMESPACE_TYPE_OTHER:
+						namespace = &imap_store->namespaces->other;
+						break;
+					case CAMEL_IMAP_STORE_NAMESPACE_TYPE_SHARED:
+						namespace = &imap_store->namespaces->shared;
+						break;
+				}
+				if (namespace) {
+					struct _namespace *old = *namespace;
+					*namespace = g_new (struct _namespace, 1);
+					(*namespace)->prefix = strdup(ns->full_name);
+					(*namespace)->delim = ns->sep;
+					(*namespace)->next = old;
+				}
+				lst = lst->next;
+			}
+
+			if (imap_store->namespaces && imap_store->namespaces->personal) {
+				imap_store->namespace = imap_store->namespaces->personal->prefix;
+				imap_store->dir_sep = imap_store->namespaces->personal->delim;
+			} else {
+				imap_store->namespace = NULL;
+				imap_store->dir_sep = 0;
+			}
+
+		}
+#if 0
+		else if (is->namespace) {
 			/* if namespace has changed, clear folder list */
 			if (imap_store->namespace && strcmp(imap_store->namespace, is->namespace->full_name) != 0) {
 				camel_store_summary_clear((CamelStoreSummary *)is);
@@ -607,9 +661,9 @@ construct (CamelService *service, CamelSession *session,
 				imap_store->dir_sep = is->namespace->sep;
 			}
 		}
+#endif
 
-		imap_store->capabilities = is->capabilities;
-		imap_set_server_level(imap_store);
+
 	}
 	g_static_rec_mutex_unlock (imap_store->sum_lock);
 
@@ -1906,6 +1960,19 @@ can_work_offline (CamelDiscoStore *disco_store)
 	return camel_store_summary_count((CamelStoreSummary *)store->summary) != 0;
 }
 
+
+static void
+save_namespace_in_summary (CamelImapStore *store, struct _namespace *namespace, CamelImapStoreNamespaceType type)
+{
+	CamelImapStoreNamespace *ns;
+	while (namespace) {
+		ns = camel_imap_store_summary_namespace_new(store->summary, namespace->prefix, namespace->delim, type);
+		ns = camel_imap_store_summary_namespace_add(store->summary,ns);
+
+		namespace = namespace->next;
+	}
+}
+
 static gboolean
 imap_connect_online (CamelService *service, CamelException *ex)
 {
@@ -1960,6 +2027,9 @@ imap_connect_online (CamelService *service, CamelException *ex)
 		if (!result)
 			goto done;
 
+		if (store->namespaces)
+			imap_namespaces_destroy (store->namespaces);
+
 		store->namespaces = imap_parse_namespace_response (result);
 		namespaces = store->namespaces;
 
@@ -1971,28 +2041,16 @@ imap_connect_online (CamelService *service, CamelException *ex)
 			store->dir_sep = 0;
 		}
 
-		if (namespaces && namespaces->personal) {
-			ns = camel_imap_store_summary_namespace_new(store->summary, namespaces->personal->prefix, namespaces->personal->delim);
-			ns = camel_imap_store_summary_namespace_add(store->summary,ns);
-			camel_imap_store_summary_namespace_set(store->summary, ns);
+		if (namespaces) {
+			save_namespace_in_summary (store, namespaces->personal, CAMEL_IMAP_STORE_NAMESPACE_TYPE_PERSONAL);
+			save_namespace_in_summary (store, namespaces->other, CAMEL_IMAP_STORE_NAMESPACE_TYPE_OTHER);
+			save_namespace_in_summary (store, namespaces->shared, CAMEL_IMAP_STORE_NAMESPACE_TYPE_SHARED);
 		}
-
-		if (namespaces && namespaces->other) {
-			ns = camel_imap_store_summary_namespace_new(store->summary, namespaces->other->prefix, namespaces->other->delim);
-			ns = camel_imap_store_summary_namespace_add(store->summary,ns);
-		}
-
-		if (namespaces && namespaces->shared) {
-			ns = camel_imap_store_summary_namespace_new(store->summary, namespaces->shared->prefix, namespaces->shared->delim);
-			ns = camel_imap_store_summary_namespace_add(store->summary,ns);
-		}
-
 
 		g_free (result);
 	} else {
-		ns = camel_imap_store_summary_namespace_new(store->summary, store->namespace, store->dir_sep);
+		ns = camel_imap_store_summary_namespace_new(store->summary, store->namespace, store->dir_sep, CAMEL_IMAP_STORE_NAMESPACE_TYPE_NONE);
 		camel_imap_store_summary_namespace_add(store->summary,ns);
-		camel_imap_store_summary_namespace_set(store->summary, ns);
 	}
 
 	if (store->namespace && strlen (store->namespace) == 0)
