@@ -1066,7 +1066,8 @@ camel_imap_response_free (CamelImapStore *store, CamelImapResponse *response)
 	if (expunged)
 		g_array_free (expunged, TRUE);
 
-	camel_object_unref (CAMEL_OBJECT (response->folder));
+	if (response->folder)
+		camel_object_unref (CAMEL_OBJECT (response->folder));
 
 	g_free (response);
 
