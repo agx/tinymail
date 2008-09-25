@@ -1060,10 +1060,11 @@ camel_imap_response_free (CamelImapStore *store, CamelImapResponse *response)
 			/* Update the summary */
 			camel_imap_folder_changed (response->folder,
 						   exists, expunged, NULL);
-			if (expunged)
-				g_array_free (expunged, TRUE);
 		}
 	}
+
+	if (expunged)
+		g_array_free (expunged, TRUE);
 
 	camel_object_unref (CAMEL_OBJECT (response->folder));
 
