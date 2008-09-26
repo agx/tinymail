@@ -202,7 +202,7 @@ summary_header_save (CamelFolderSummary *s, FILE *out)
 	if (camel_imap_summary_parent->summary_header_save (s, out) == -1)
 		return -1;
 
-	camel_file_util_encode_fixed_int32(out, CAMEL_IMAP_SUMMARY_VERSION);
+	if (camel_file_util_encode_fixed_int32(out, CAMEL_IMAP_SUMMARY_VERSION) == -1) return -1;
 
 	return camel_file_util_encode_fixed_int32(out, ims->validity);
 }
@@ -282,7 +282,7 @@ content_info_save (CamelFolderSummary *s, FILE *out,
 		   CamelMessageContentInfo *info)
 {
 	if (info && info->type) {
-		camel_file_util_encode_uint32 (out, 1);
+		if (camel_file_util_encode_uint32 (out, 1)== -1) return -1;
 		return camel_imap_summary_parent->content_info_save (s, out, info);
 	} else
 		return camel_file_util_encode_uint32 (out, 0);

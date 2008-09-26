@@ -852,9 +852,9 @@ summary_header_save(CamelStoreSummary *s, FILE *out)
 	io(printf("Savining header\n"));
 
 	/* always write latest version */
-	camel_file_util_encode_fixed_int32(out, CAMEL_STORE_SUMMARY_VERSION);
-	camel_file_util_encode_fixed_int32(out, s->flags);
-	camel_file_util_encode_time_t(out, s->time);
+	if (camel_file_util_encode_fixed_int32(out, CAMEL_STORE_SUMMARY_VERSION)==-1) return -1;
+	if (camel_file_util_encode_fixed_int32(out, s->flags)==-1) return -1;
+	if (camel_file_util_encode_time_t(out, s->time)==-1) return -1;
 	return camel_file_util_encode_fixed_int32(out, camel_store_summary_count(s));
 }
 

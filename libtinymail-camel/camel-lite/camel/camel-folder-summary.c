@@ -1950,7 +1950,8 @@ camel_folder_summary_encode_token(FILE *out, const char *str)
 						return 0;
 					else return -1;
 				}
-			}
+			} else
+				return -1;
 		}
 	}
 
@@ -2085,10 +2086,10 @@ summary_header_save(CamelFolderSummary *s, FILE *out)
 	io(printf("Savining header\n"));
 
 	/* we always write out the current version */
-	camel_file_util_encode_fixed_int32(out, CAMEL_FOLDER_SUMMARY_VERSION);
-	camel_file_util_encode_fixed_int32(out, s->flags);
-	camel_file_util_encode_fixed_int32(out, s->nextuid);
-	camel_file_util_encode_time_t(out, s->time);
+	if (camel_file_util_encode_fixed_int32(out, CAMEL_FOLDER_SUMMARY_VERSION) == -1) return -1;
+	if (camel_file_util_encode_fixed_int32(out, s->flags) == -1) return -1;
+	if (camel_file_util_encode_fixed_int32(out, s->nextuid) == -1) return -1;
+	if (camel_file_util_encode_time_t(out, s->time) == -1) return -1;
 
 	count = camel_folder_summary_count(s);
 	for (i=0; i<count; i++) {
@@ -2107,9 +2108,9 @@ summary_header_save(CamelFolderSummary *s, FILE *out)
 		camel_message_info_free(info);
 	}
 
-	camel_file_util_encode_fixed_int32(out, count);
-	camel_file_util_encode_fixed_int32(out, unread);
-	camel_file_util_encode_fixed_int32(out, deleted);
+	if (camel_file_util_encode_fixed_int32(out, count) == -1) return -1;
+	if (camel_file_util_encode_fixed_int32(out, unread) == -1) return -1;
+	if (camel_file_util_encode_fixed_int32(out, deleted) == -1) return -1;
 
 	return camel_file_util_encode_fixed_int32(out, junk);
 }
@@ -2550,37 +2551,37 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 
 	io(printf("Saving message info\n"));
 
-	camel_file_util_encode_string(out, camel_message_info_uid(mi));
+	if (camel_file_util_encode_string(out, camel_message_info_uid(mi))== -1) return -1;
 
-	camel_file_util_encode_uint32(out, mi->size);
-	camel_file_util_encode_uint32(out, mi->flags);
+	if (camel_file_util_encode_uint32(out, mi->size)== -1) return -1;
+	if (camel_file_util_encode_uint32(out, mi->flags)== -1) return -1;
 
-	camel_file_util_encode_time_t(out, mi->date_sent);
-	camel_file_util_encode_time_t(out, mi->date_received);
-	camel_file_util_encode_string(out, camel_message_info_subject(mi));
-	camel_file_util_encode_string(out, camel_message_info_from(mi));
-	camel_file_util_encode_string(out, camel_message_info_to(mi));
-	camel_file_util_encode_string(out, camel_message_info_cc(mi));
+	if (camel_file_util_encode_time_t(out, mi->date_sent)== -1) return -1;
+	if (camel_file_util_encode_time_t(out, mi->date_received)== -1) return -1;
+	if (camel_file_util_encode_string(out, camel_message_info_subject(mi))== -1) return -1;
+	if (camel_file_util_encode_string(out, camel_message_info_from(mi))== -1) return -1;
+	if (camel_file_util_encode_string(out, camel_message_info_to(mi))== -1) return -1;
+	if (camel_file_util_encode_string(out, camel_message_info_cc(mi))== -1) return -1;
 
 #ifdef NON_TINYMAIL_FEATURES
-	camel_file_util_encode_string(out, camel_message_info_mlist(mi));
+	if (camel_file_util_encode_string(out, camel_message_info_mlist(mi))== -1) return -1;
 #else
-	camel_file_util_encode_string(out, "");
+	if (camel_file_util_encode_string(out, "")== -1) return -1;
 #endif
 
-	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.hi);
-	camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.lo);
+	if (camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.hi)== -1) return -1;
+	if (camel_file_util_encode_fixed_int32(out, mi->message_id.id.part.lo)== -1) return -1;
 
 #ifdef NON_TINYMAIL_FEATURES
 	if (mi->references) {
-		camel_file_util_encode_uint32(out, mi->references->size);
+		if (camel_file_util_encode_uint32(out, mi->references->size)== -1) return -1;
 		for (i=0;i<mi->references->size;i++) {
-			camel_file_util_encode_fixed_int32(out, mi->references->references[i].id.part.hi);
-			camel_file_util_encode_fixed_int32(out, mi->references->references[i].id.part.lo);
+			if (camel_file_util_encode_fixed_int32(out, mi->references->references[i].id.part.hi)== -1) return -1;
+			if (camel_file_util_encode_fixed_int32(out, mi->references->references[i].id.part.lo)== -1) return -1;
 		}
 	} else {
 #endif
-		camel_file_util_encode_uint32(out, 0);
+		if (camel_file_util_encode_uint32(out, 0)== -1) return -1;
 
 #ifdef NON_TINYMAIL_FEATURES
 	}
@@ -2589,12 +2590,12 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	count = 0;
 #endif
 
-	camel_file_util_encode_uint32(out, count);
+	if (camel_file_util_encode_uint32(out, count)== -1) return -1;
 
 #ifdef NON_TINYMAIL_FEATURES
 	flag = mi->user_flags;
 	while (flag) {
-		camel_file_util_encode_string(out, flag->name);
+		if (camel_file_util_encode_string(out, flag->name)== -1) return -1;
 		flag = flag->next;
 	}
 #endif
@@ -2605,13 +2606,13 @@ message_info_save(CamelFolderSummary *s, FILE *out, CamelMessageInfo *info)
 	count = 0;
 #endif
 
-	camel_file_util_encode_uint32(out, count);
+	if (camel_file_util_encode_uint32(out, count)== -1) return -1;
 
 #ifdef NON_TINYMAIL_FEATURES
 	tag = mi->user_tags;
 	while (tag) {
-		camel_file_util_encode_string(out, tag->name);
-		camel_file_util_encode_string(out, tag->value);
+		if (camel_file_util_encode_string(out, tag->name)== -1) return -1;
+		if (camel_file_util_encode_string(out, tag->value)== -1) return -1;
 		tag = tag->next;
 	}
 #endif
@@ -2768,30 +2769,30 @@ content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentInfo *ci)
 		ct = ci->type;
 
 	if (ct) {
-		camel_folder_summary_encode_token(out, ct->type);
-		camel_folder_summary_encode_token(out, ct->subtype);
-		camel_file_util_encode_uint32(out, my_list_size((struct _node **)&ct->params));
+		if (camel_folder_summary_encode_token(out, ct->type) == -1) return -1;
+		if (camel_folder_summary_encode_token(out, ct->subtype)) return -1;
+		if (camel_file_util_encode_uint32(out, my_list_size((struct _node **)&ct->params))) return -1;
 		hp = ct->params;
 		while (hp) {
-			camel_folder_summary_encode_token(out, hp->name);
-			camel_folder_summary_encode_token(out, hp->value);
+			if (camel_folder_summary_encode_token(out, hp->name)) return -1;
+			if (camel_folder_summary_encode_token(out, hp->value)) return -1;
 			hp = hp->next;
 		}
 	} else {
-		camel_folder_summary_encode_token(out, NULL);
-		camel_folder_summary_encode_token(out, NULL);
-		camel_file_util_encode_uint32(out, 0);
+		if (camel_folder_summary_encode_token(out, NULL)) return -1;
+		if (camel_folder_summary_encode_token(out, NULL)) return -1;
+		if (camel_file_util_encode_uint32(out, 0)) return -1;
 	}
 
 	if (ci) {
-		camel_folder_summary_encode_token(out, ci->id);
-		camel_folder_summary_encode_token(out, ci->description);
-		camel_folder_summary_encode_token(out, ci->encoding);
+		if (camel_folder_summary_encode_token(out, ci->id)) return -1;
+		if (camel_folder_summary_encode_token(out, ci->description)) return -1;
+		if (camel_folder_summary_encode_token(out, ci->encoding)) return -1;
 		retval = camel_file_util_encode_uint32(out, ci->size);
 	} else {
-		camel_folder_summary_encode_token(out, "invalid");
-		camel_folder_summary_encode_token(out, "invalid");
-		camel_folder_summary_encode_token(out, "text/plain");
+		if (camel_folder_summary_encode_token(out, "invalid")) return -1;
+		if (camel_folder_summary_encode_token(out, "invalid")) return -1;
+		if (camel_folder_summary_encode_token(out, "text/plain")) return -1;
 		retval = camel_file_util_encode_uint32(out, 0);
 	}
 

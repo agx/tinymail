@@ -274,7 +274,7 @@ summary_header_save(CamelFolderSummary *s, FILE *out)
 	if (((CamelFolderSummaryClass *)camel_mbox_summary_parent)->summary_header_save(s, out) == -1)
 		return -1;
 
-	camel_file_util_encode_fixed_int32(out, CAMEL_MBOX_SUMMARY_VERSION);
+	if (camel_file_util_encode_fixed_int32(out, CAMEL_MBOX_SUMMARY_VERSION) == -1) return -1;
 
 	return camel_file_util_encode_size_t(out, mbs->folder_size);
 }
