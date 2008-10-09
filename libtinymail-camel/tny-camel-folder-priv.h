@@ -54,6 +54,7 @@ struct _TnyCamelFolderPriv
 	CamelException load_ex;
 	GList *obs, *sobs;
 	gboolean cant_reuse_iter;
+	GHashTable *known_folders;
 };
 
 CamelFolder* _tny_camel_folder_get_camel_folder (TnyCamelFolder *self);

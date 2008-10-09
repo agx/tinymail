@@ -37,6 +37,7 @@ G_BEGIN_DECLS
 typedef struct _TnyCamelQueue TnyCamelQueue;
 typedef struct _TnyCamelQueueable TnyCamelQueueable;
 typedef struct _TnyCamelQueueClass TnyCamelQueueClass;
+typedef void (*TnyCamelQueueStopCb)(gpointer);
 
 struct _TnyCamelQueue
 {
@@ -49,8 +50,13 @@ struct _TnyCamelQueue
 	GMutex *mutex;
 	gboolean is_waiting;
 	GStaticRecMutex *lock;
-	gboolean stopped, next_uncancel;
+	gboolean stop;
+	gboolean running;
+	gboolean dead;
+	gboolean next_uncancel;
 	gpointer current;
+	TnyCamelQueueStopCb stop_callback;
+	gpointer stop_user_data;
 };
 
 struct _TnyCamelQueueClass 
@@ -85,6 +91,7 @@ void _tny_camel_queue_launch (TnyCamelQueue *queue, GThreadFunc func, GSourceFun
 void _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 void _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
 gboolean _tny_camel_queue_has_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags);
+void _tny_camel_queue_stop (TnyCamelQueue *queue, TnyCamelQueueStopCb stop_cb, gpointer user_data);
 
 G_END_DECLS
 

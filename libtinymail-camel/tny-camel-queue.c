@@ -46,7 +46,7 @@ tny_camel_queue_finalize (GObject *object)
 {
 	TnyCamelQueue *self = (TnyCamelQueue*) object;
 
-	self->stopped = TRUE;
+	self->stop = TRUE;
 
 	g_mutex_lock (self->mutex);
 	if (self->account)
@@ -75,7 +75,7 @@ account_finalized (TnyCamelQueue *queue, GObject *finalized_account)
 {
 	g_mutex_lock (queue->mutex);
 	queue->account = NULL;
-	queue->stopped = TRUE;
+	queue->stop = TRUE;
 	if (queue->is_waiting) {
 		g_cond_broadcast (queue->condition);
 	}
@@ -100,6 +100,32 @@ _tny_camel_queue_new (TnyCamelAccount *account)
 
 	return TNY_CAMEL_QUEUE (self);
 }
+
+typedef struct _StopCallbackData StopCallbackData;
+struct _StopCallbackData
+{
+	TnyCamelQueueStopCb cb;
+	gpointer data;
+};
+
+static gboolean
+call_stop_callback (gpointer user_data)
+{
+	StopCallbackData *data = user_data;
+	data->cb(data->data);
+	g_slice_free (StopCallbackData, data);
+	return FALSE;
+}
+
+static void
+idle_add_stop_callback (TnyCamelQueueStopCb cb, gpointer data)
+{
+	StopCallbackData *scd = g_slice_new (StopCallbackData);
+	scd->cb = cb;
+	scd->data = data;
+	g_idle_add (call_stop_callback, scd);
+}
+
 
 typedef struct
 {
@@ -184,7 +210,7 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 {
 	TnyCamelQueue *queue = user_data;
 
-	while (!queue->stopped)
+	while (!queue->stop || queue->list)
 	{
 		GList *first = NULL;
 		QueueItem *item = NULL;
@@ -270,21 +296,28 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 		if (item)
 			g_slice_free (QueueItem, item);
 
-		if (wait) {
+		if (wait && !queue->stop) {
+			g_object_ref (queue);
 			g_mutex_lock (queue->mutex);
 			queue->is_waiting = TRUE;
 			g_cond_wait (queue->condition, queue->mutex);
 			queue->is_waiting = FALSE;
 			g_mutex_unlock (queue->mutex);
+			g_object_unref (queue);
 		}
 	}
 
-	queue->thread = NULL;
-	queue->stopped = TRUE;
+	queue->running = FALSE;
+
+	g_static_rec_mutex_lock (queue->lock);
+	if (queue->stop_callback) {
+		g_debug("Calling stop callback");
+		idle_add_stop_callback (queue->stop_callback, queue->stop_user_data);
+	}
+	g_static_rec_mutex_unlock (queue->lock);
 
 	g_object_unref (queue);
-
-	return NULL;
+	g_thread_exit (NULL);
 }
 
 
@@ -396,7 +429,16 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
 void 
 _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, GSourceFunc cancel_callback, GDestroyNotify cancel_destroyer, gboolean *cancel_field, gpointer data, gsize data_size, TnyCamelQueueItemFlags flags, const gchar *name)
 {
-	QueueItem *item = g_slice_new (QueueItem);
+	QueueItem *item;
+
+	if (queue->dead) {
+		/* just cancel straight away if this queue is dead*/
+		cancel_callback (data);
+		cancel_destroyer (data);
+		return;
+	}
+
+	item = g_slice_new (QueueItem);
 
 	if (!g_thread_supported ())
 		g_thread_init (NULL);
@@ -437,15 +479,18 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 	} else /* Normal items simply get appended */
 		queue->list = g_list_append (queue->list, item);
 
-	if (queue->stopped) 
+	if (!queue->running) 
 	{
 		GError *err = NULL;
-		queue->stopped = FALSE;
+		queue->stop = FALSE;
 		g_object_ref (queue);
+
+		queue->running = TRUE;
+
 		queue->thread = g_thread_create (tny_camel_queue_thread_main_func, 
-			queue, FALSE, &err);
+			queue, TRUE, &err);
 		if (err) {
-			queue->stopped = TRUE;
+			g_object_unref (queue);
 		}
 	} else {
 		g_mutex_lock (queue->mutex);
@@ -514,6 +559,47 @@ _tny_camel_queue_has_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flags)
 	return retval;
 }
 
+/**
+ * _tny_camel_queue_stop
+ * @queue: the queue
+ *
+ * Stop the thread and wait for it to finish
+ */
+void
+_tny_camel_queue_stop (TnyCamelQueue *queue, TnyCamelQueueStopCb stop_cb, gpointer user_data)
+{
+
+	g_static_rec_mutex_lock (queue->lock);
+
+	if (queue->dead) {
+		g_warning ("stop called on already dead queue");
+		if (stop_cb)
+			idle_add_stop_callback (stop_cb, user_data);
+		return;
+	}
+	queue->dead = TRUE;
+
+	if (stop_cb) {
+		if (!queue->running) {
+			idle_add_stop_callback (stop_cb, user_data);
+		} else {
+			queue->stop_callback = stop_cb;
+			queue->stop_user_data = user_data;
+		}
+	}
+
+	if (queue->running) {
+		queue->stop = TRUE;
+
+		g_mutex_lock (queue->mutex);
+		if (queue->is_waiting)
+			g_cond_broadcast (queue->condition);
+		g_mutex_unlock (queue->mutex);
+	}
+
+	g_static_rec_mutex_unlock (queue->lock);
+}
+
 static void 
 tny_camel_queue_class_init (TnyCamelQueueClass *class)
 {
@@ -537,7 +623,9 @@ tny_camel_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	self->mutex = g_mutex_new ();
 	self->condition = g_cond_new ();
 	self->account = NULL;
-	self->stopped = TRUE;
+	self->stop = FALSE;
+	self->running = FALSE;
+	self->dead = FALSE;
 	self->list = NULL;
 
 	/* We don't use a GThreadPool because we need control over the queued

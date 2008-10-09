@@ -32,7 +32,7 @@ G_BEGIN_DECLS
 #define TNY_CAMEL_ACCOUNT(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccount))
 #define TNY_CAMEL_ACCOUNT_CLASS(vtable)    (G_TYPE_CHECK_CLASS_CAST ((vtable), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountClass))
 #define TNY_IS_CAMEL_ACCOUNT(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TNY_TYPE_CAMEL_ACCOUNT))
-#define TNY_IS_ACAMEL_CCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_ACCOUNT))
+#define TNY_IS_CAMEL_ACCOUNT_CLASS(vtable) (G_TYPE_CHECK_CLASS_TYPE ((vtable), TNY_TYPE_CAMEL_ACCOUNT))
 #define TNY_CAMEL_ACCOUNT_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst), TNY_TYPE_CAMEL_ACCOUNT, TnyCamelAccountClass))
 
 /* This is an abstract type, you cannot (should not) instantiate it */
@@ -50,6 +50,7 @@ extern guint tny_camel_account_signals [TNY_CAMEL_ACCOUNT_LAST_SIGNAL];
 
 typedef void (*TnyCamelSetOnlineCallback) (TnyCamelAccount *account, gboolean canceled, GError *err, gpointer user_data);
 
+typedef void (*TnyCamelAccountStopCallback) (gpointer user_data);
 
 struct _TnyCamelAccount
 {
@@ -94,6 +95,7 @@ struct _TnyCamelAccountClass
 	void (*get_options) (TnyCamelAccount *self, TnyList *options);
 
 	void (*set_online) (TnyCamelAccount *self, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data);
+	void (*stop) (TnyCamelAccount *self, TnyCamelAccountStopCallback callback, gpointer user_data);
 
 	/* Abstract methods */
 	void (*prepare) (TnyCamelAccount *self, gboolean recon_if, gboolean reservice);
@@ -115,6 +117,7 @@ void tny_camel_account_set_online (TnyCamelAccount *self, gboolean online, TnyCa
 typedef void (*TnyCamelGetSupportedSecureAuthCallback) (TnyCamelAccount *self, gboolean cancelled, TnyList *auth_types, GError *err, gpointer user_data);
 void tny_camel_account_get_supported_secure_authentication(TnyCamelAccount *self, TnyCamelGetSupportedSecureAuthCallback callback, TnyStatusCallback status_callback, gpointer user_data);
 
+void tny_camel_account_stop (TnyCamelAccount *self, TnyCamelAccountStopCallback callback, gpointer user_data);
 G_END_DECLS
 
 #endif

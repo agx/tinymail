@@ -49,8 +49,8 @@ struct _TnyCamelStoreAccountClass
 	TnyCamelAccountClass parent;
 
 	/* virtual methods */
-	void (*get_folders_async) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data);
-	void (*get_folders) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err);
+	void (*get_folders_async) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, gboolean refresh, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data);
+	void (*get_folders) (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, gboolean refresh, GError **err);
 	void (*remove_folder) (TnyFolderStore *self, TnyFolder *folder, GError **err);
 	TnyFolder* (*create_folder) (TnyFolderStore *self, const gchar *name, GError **err);
 	void (*create_folder_async) (TnyFolderStore *self, const gchar *name, TnyCreateFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data);

@@ -399,7 +399,7 @@ recurse_poke (TnyFolderStore *f_store)
 	TnyList *folders = tny_simple_list_new ();
 	TnyIterator *f_iter;
 
-	tny_folder_store_get_folders (TNY_FOLDER_STORE (f_store), folders, NULL, NULL);
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (f_store), folders, NULL, TRUE, NULL);
 	f_iter = tny_list_create_iterator (folders);
 	while (!tny_iterator_is_done (f_iter))
 	{
@@ -1178,7 +1178,7 @@ fetch_folder_store_from_path (const gchar *path, TnyFolder *origin, gchar **name
 			tny_folder_store_query_add_item (query, folder_name, TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_NAME);
 			g_free (folder_name);
 			list = tny_simple_list_new ();
-			tny_folder_store_get_folders (origin_store, list, query, NULL);
+			tny_folder_store_get_folders (origin_store, list, query, TRUE, NULL);
 			g_object_unref (query);
 			if (tny_list_get_length (list) == 1) {
 				TnyIterator *iter;

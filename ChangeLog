@@ -1,5 +1,50 @@
 2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
 
+	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c:
+	* tests/c-demo/tny-demoui-summary-view.c: (recurse_poke),
+	* tests/functional/account-refresh.c: (recurse_folders),
+	* tests/functional/folder-lister-async.c: (callback), (dance):
+	* tests/functional/folder-lister.c: (recurse_folders):
+	* tests/functional/folder-remove.c: (recurse_folders):
+	* tests/functional/folder-transfer.c: (recurse_folders):
+	* tests/functional/msg-transfer.c: (find_folders):
+	* tests/memory/memory-test.c: (main):
+	Change all usage of tny_folder_store_get_folders over to the new api
+
+2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail-camel/tny-camel-folder.c:
+	* libtinymail-camel/tny-camel-folder.h:
+	* libtinymail-camel/tny-camel-store-account.c:
+	* libtinymail-camel/tny-camel-store-account.h:
+	* libtinymail/tny-combined-account.c:
+	* libtinymail/tny-folder-store.c: (tny_folder_store_get_folders),
+	* libtinymail/tny-folder-store.h:
+	* libtinymail/tny-shared.h:
+	Give tny_folder_store_get_folders a refresh parameter, for optionally not refreshing from the server.
+	Add tny_folder_store_refresh_async that will asynchronously refresh the store from the server, emitting TnyFolderStoreChanged events to observers.
+	Implement it all for camel.
+
+2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
+	* libtinymail-camel/tny-camel-folder.c:
+	* libtinymail-camel/tny-camel-store-account.c:
+	Notify observers about existing folders when they're attached.
+
+2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* libtinymail-camel/tny-camel-folder-priv.h:
+	* libtinymail-camel/tny-camel-folder.c:
+	* libtinymail-camel/tny-camel-store-account-priv.h:
+	* libtinymail-camel/tny-camel-store-account.c:
+	* libtinymail/tny-folder-store-change.c:
+	* libtinymail/tny-folder-store-change.h:
+	New observer behaviour. Observers will get folders_appeared events when a
+	tny_folder_store_refresh or tny_folder_store_get_folders occurs and the cache
+	is loaded for the first time. They get folders_created events when a new folder
+	appears that we didn't know about before.
+
+2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
+
 	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c
 	(pop3_sync): In pop3 provider, do a LIST before a folder sync so
 	failure doesnt happen if wait_for_login_delay kills the store

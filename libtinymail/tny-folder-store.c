@@ -266,6 +266,7 @@ tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, T
  * @self: a #TnyFolderStore
  * @list: a #TnyList to to which the folders will be prepended
  * @query: (null-ok): a #TnyFolderStoreQuery or NULL
+ * @refresh: synchronize with the service first
  * @err: (null-ok): a #GError or NULL
  *
  * Get a list of child folders from @self. You can use @query to limit the list 
@@ -277,7 +278,7 @@ tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, T
  * TnyFolderStore *store = ...
  * TnyIterator *iter; TnyFolderStoreQuery *query = ...
  * TnyList *folders = tny_simple_list_new ();
- * tny_folder_store_get_folders (store, folders, query, NULL);
+ * tny_folder_store_get_folders (store, folders, query, TRUE, NULL);
  * iter = tny_list_create_iterator (folders);
  * while (!tny_iterator_is_done (iter))
  * {
@@ -295,7 +296,7 @@ tny_folder_store_create_folder_async (TnyFolderStore *self, const gchar *name, T
  * audience: application-developer
  **/
 void 
-tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
+tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, gboolean refresh, GError **err)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER_STORE (self));
@@ -306,7 +307,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
 	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->get_folders!= NULL);
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders(self, list, query, err);
+	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders(self, list, query, refresh, err);
 
 #ifdef DBC /* ensure */
 #endif
@@ -343,6 +344,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * @self: a #TnyFolderStore
  * @list: a #TnyList to to which the folders will be prepended
  * @query: (null-ok): A #TnyFolderStoreQuery object
+ * @refresh: synchronize with the service first
  * @callback: (null-ok): a #TnyGetFoldersCallback or NULL
  * @status_callback: (null-ok): a #TnyStatusCallback or NULL
  * @user_data: (null-ok): user data that will be passed to the callbacks
@@ -363,7 +365,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  *         TnyList *folders = tny_simple_list_new ();
  *         g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
  *         tny_folder_store_get_folders_async (folder,
- *             folders, NULL, callback, NULL, NULL);
+ *             folders, NULL, true, callback, NULL, NULL);
  *         g_object_unref (folder);
  *         tny_iterator_next (iter);
  *     }
@@ -375,7 +377,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  *     TnyList *folders;
  *     folders = tny_simple_list_new ();
  *     tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
- *         folders, NULL, callback, NULL, NULL);
+ *         folders, NULL, TRUE, callback, NULL, NULL);
  *     g_object_unref (folders);
  * }
  * </programlisting></informalexample>
@@ -388,7 +390,7 @@ tny_folder_store_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStor
  * audience: application-developer
  **/
 void 
-tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, gboolean refresh, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 #ifdef DBC /* require */
 	g_assert (TNY_IS_FOLDER_STORE (self));
@@ -399,7 +401,7 @@ tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFold
 	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async!= NULL);
 #endif
 
-	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async(self, list, query, callback, status_callback, user_data);
+	TNY_FOLDER_STORE_GET_IFACE (self)->get_folders_async(self, list, query, refresh, callback, status_callback, user_data);
 
 #ifdef DBC /* ensure */
 #endif
@@ -408,6 +410,20 @@ tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFold
 }
 
 
+void tny_folder_store_refresh_async (TnyFolderStore *self, TnyFolderStoreCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_FOLDER_STORE (self));
+	g_assert (TNY_FOLDER_STORE_GET_IFACE (self)->refresh_async != NULL);
+#endif
+
+	TNY_FOLDER_STORE_GET_IFACE (self)->refresh_async(self, callback, status_callback, user_data);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return;
+}
 
 static void
 tny_folder_store_base_init (gpointer g_class)

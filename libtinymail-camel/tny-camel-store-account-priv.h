@@ -37,6 +37,7 @@ struct _TnyCamelStoreAccountPriv
 	gboolean cant_reuse_iter;
 	GStaticRecMutex *factory_lock, *obs_lock;
 	TnyCamelQueue *queue, *msg_queue;
+	GHashTable *known_folders;
 	gboolean deleted;
 };
 
