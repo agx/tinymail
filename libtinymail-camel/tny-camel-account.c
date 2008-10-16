@@ -1871,30 +1871,6 @@ tny_camel_account_set_online_default (TnyCamelAccount *self, gboolean online, Tn
 	}
 }
 
-
-/**
- * tny_camel_account_stop:
- * @self: a #TnyCamelAccount object
- * @callback: a callback when the account has stopped all operations
- * @user_data: user data for the callback
- *
- * Request a stop of all operations on an account
- * @callback will be called with @user_data when all operations have stopped.
- * The account will be unusable after calling this function.
- **/
-void
-tny_camel_account_stop (TnyCamelAccount *self, TnyCamelAccountStopCallback callback, gpointer user_data)
-{
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->stop(self, callback, user_data);
-}
-
-void
-tny_camel_account_stop_default (TnyCamelAccount *self, TnyCamelAccountStopCallback callback, gpointer user_data)
-{
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-	_tny_camel_queue_stop (priv->queue, callback, user_data);
-}
-
 static gboolean
 tny_camel_account_is_ready (TnyAccount *self)
 {
@@ -2222,7 +2198,6 @@ tny_camel_account_finalize (GObject *object)
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
-	_tny_camel_queue_stop (priv->queue, NULL, NULL);
 	g_object_unref (priv->queue);
 	g_object_unref (priv->con_strat);
 
@@ -2343,7 +2318,6 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->get_options= tny_camel_account_get_options_default;
 
 	class->set_online= tny_camel_account_set_online_default;
-	class->stop = tny_camel_account_stop_default;
 
 	object_class->finalize = tny_camel_account_finalize;
 

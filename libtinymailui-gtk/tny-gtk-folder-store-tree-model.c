@@ -115,7 +115,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 	TnyList *folders = tny_simple_list_new ();
 
 	/* TODO add error checking and reporting here */
-	tny_folder_store_get_folders (store, folders, self->query, TRUE, NULL);
+	tny_folder_store_get_folders (store, folders, self->query, NULL);
 	iter = tny_list_create_iterator (folders);
 
 	while (!tny_iterator_is_done (iter))
@@ -343,7 +343,7 @@ tny_gtk_folder_store_tree_model_on_constatus_changed (TnyAccount *account, TnyCo
 
 	list = tny_simple_list_new ();
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account), 
-		list, self->query, TRUE, get_folders_cb, NULL, g_object_ref (self));
+		list, self->query, get_folders_cb, NULL, g_object_ref (self));
 
 	return;
 }
@@ -522,7 +522,7 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 	 * before this one) */
 
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (folder_store), 
-		folders, self->query, TRUE,  get_folders_cb, NULL, g_object_ref (self));
+		folders, self->query, get_folders_cb, NULL, g_object_ref (self));
 
 	/* recurse_folders_sync (self, TNY_FOLDER_STORE (folder_store), &name_iter);  */
 

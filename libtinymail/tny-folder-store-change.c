@@ -36,7 +36,7 @@ typedef struct _TnyFolderStoreChangePriv TnyFolderStoreChangePriv;
 
 struct _TnyFolderStoreChangePriv
 {
-	TnyList *created, *removed, *appeared;
+	TnyList *created, *removed;
 	GMutex *lock;
 	TnyFolderStore *folderstore;
 	TnyFolderStoreChangeChanged changed;
@@ -125,35 +125,6 @@ tny_folder_store_change_add_removed_folder (TnyFolderStoreChange *self, TnyFolde
 }
 
 /**
- * tny_folder_store_change_add_appeared_folder:
- * @self: a #TnyFolderStoreChange
- * @folder: a #TnyFolder to add to the changeset
- *
- * Add @folder to the changeset of appeared folders. This is an internal
- * function not intended for application developers to alter.
- *
- * since: 1.0
- * audience: tinymail-developer
- **/
-void 
-tny_folder_store_change_add_appeared_folder (TnyFolderStoreChange *self, TnyFolder *folder)
-{
-	TnyFolderStoreChangePriv *priv = TNY_FOLDER_STORE_CHANGE_GET_PRIVATE (self);
-
-	g_mutex_lock (priv->lock);
-
-	if (!priv->appeared)
-		priv->appeared = tny_simple_list_new ();
-	tny_list_prepend (priv->appeared, G_OBJECT (folder));
-	priv->changed |= TNY_FOLDER_STORE_CHANGE_CHANGED_APPEARED_FOLDERS;
-
-	g_mutex_unlock (priv->lock);
-
-	return;
-}
-
-
-/**
  * tny_folder_store_change_get_created_folders:
  * @self: a #TnyFolderStoreChange
  * @folders: a #TnyList where the created folders will be prepended to
@@ -197,6 +168,8 @@ tny_folder_store_change_get_created_folders (TnyFolderStoreChange *self, TnyList
 }
 
 
+
+
 /**
  * tny_folder_store_change_get_removed_folders:
  * @self: a #TnyFolderStoreChange
@@ -224,51 +197,6 @@ tny_folder_store_change_get_removed_folders (TnyFolderStoreChange *self, TnyList
 	}
 
 	iter = tny_list_create_iterator (priv->removed);
-
-	while (!tny_iterator_is_done (iter))
-	{
-		GObject *folder = tny_iterator_get_current (iter);
-		tny_list_prepend (folders, folder);
-		g_object_unref (folder);
-		tny_iterator_next (iter);
-	}
-
-	g_object_unref (iter);
-
-	g_mutex_unlock (priv->lock);
-
-	return;
-}
-
-
-
-/**
- * tny_folder_store_change_get_appeared_folders:
- * @self: a #TnyFolderStoreChange
- * @folders: a #TnyList where the appeared folders will be prepended to
- *
- * Get the appeared folders in this changeset
- *
- * since: 1.0
- * audience: application-developer
- **/
-void 
-tny_folder_store_change_get_appeared_folders (TnyFolderStoreChange *self, TnyList *folders)
-{
-	TnyFolderStoreChangePriv *priv = TNY_FOLDER_STORE_CHANGE_GET_PRIVATE (self);
-	TnyIterator *iter;
-
-	g_assert (TNY_IS_LIST (folders));
-
-	g_mutex_lock (priv->lock);
-
-	if (!priv->appeared)
-	{
-		g_mutex_unlock (priv->lock);
-		return;
-	}
-
-	iter = tny_list_create_iterator (priv->appeared);
 
 	while (!tny_iterator_is_done (iter))
 	{
@@ -393,11 +321,8 @@ tny_folder_store_change_finalize (GObject *object)
 		g_object_unref (G_OBJECT (priv->created));
 	if (priv->removed)
 		g_object_unref (G_OBJECT (priv->removed));
-	if (priv->appeared)
-		g_object_unref (G_OBJECT (priv->appeared));
 	priv->created = NULL;
 	priv->removed = NULL;
-	priv->appeared = NULL;
 
 	if (priv->folderstore)
 		g_object_unref (G_OBJECT (priv->folderstore));

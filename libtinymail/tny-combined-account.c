@@ -299,27 +299,19 @@ tny_combined_account_create_folder (TnyFolderStore *self, const gchar *name, GEr
 }
 
 static void
-tny_combined_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, gboolean refresh, GError **err)
+tny_combined_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, GError **err)
 {
 	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
 
-	tny_folder_store_get_folders (TNY_FOLDER_STORE (priv->store_account), list, query, refresh, err);
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (priv->store_account), list, query, err);
 }
 
 static void
-tny_combined_account_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, gboolean refresh, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
+tny_combined_account_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, TnyGetFoldersCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
 
-	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (priv->store_account), list, query, refresh, callback, status_callback, user_data);
-}
-
-static void
-tny_combined_account_refresh_async (TnyFolderStore *self, TnyFolderStoreCallback callback, TnyStatusCallback status_callback, gpointer user_data)
-{
-	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
-
-	tny_folder_store_refresh_async (TNY_FOLDER_STORE (priv->store_account), callback, status_callback, user_data);
+	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (priv->store_account), list, query, callback, status_callback, user_data);
 }
 
 static void
@@ -548,7 +540,6 @@ tny_folder_store_init (TnyFolderStoreIface *klass)
 	klass->get_folders_async= tny_combined_account_get_folders_async;
 	klass->add_observer= tny_combined_account_add_observer;
 	klass->remove_observer= tny_combined_account_remove_observer;
-	klass->refresh_async = tny_combined_account_refresh_async;
 }
 
 static void

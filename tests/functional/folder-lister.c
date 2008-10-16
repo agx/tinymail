@@ -42,7 +42,7 @@ recurse_folders (TnyFolderStore *store, TnyFolderStoreQuery *query)
 	TnyIterator *iter;
 	TnyList *folders = tny_simple_list_new ();
 
-	tny_folder_store_get_folders (store, folders, query, TRUE, NULL);
+	tny_folder_store_get_folders (store, folders, query, NULL);
 	iter = tny_list_create_iterator (folders);
 
 	while (!tny_iterator_is_done (iter))

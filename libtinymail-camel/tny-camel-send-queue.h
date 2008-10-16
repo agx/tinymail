@@ -60,8 +60,6 @@ GType tny_camel_send_queue_get_type (void);
 
 TnySendQueue* tny_camel_send_queue_new (TnyCamelTransportAccount *trans_account);
 
-TnySendQueue* tny_camel_send_queue_new_with_folders (TnyCamelTransportAccount *trans_account, TnyFolder *outbox, TnyFolder *sentbox);
-
 void tny_camel_send_queue_flush (TnyCamelSendQueue *self);
 
 TnyCamelTransportAccount* tny_camel_send_queue_get_transport_account (TnyCamelSendQueue *self);

@@ -58,7 +58,7 @@ callback (TnyFolderStore *self, gboolean cancelled, TnyList *list, GError *err, 
 		TnyList *folders = tny_simple_list_new ();
 		g_print ("%s\n", tny_folder_get_name (TNY_FOLDER (folder)));
 		tny_folder_store_get_folders_async (folder,
-			folders, NULL, TRUE, callback, NULL, NULL);
+			folders, NULL, callback, NULL, NULL);
 		g_object_unref (G_OBJECT (folder));
 		tny_iterator_next (iter);
 	}
@@ -82,7 +82,7 @@ dance (gpointer data)
     
 	folders = tny_simple_list_new ();
     	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
-		folders, NULL, TRUE, callback, NULL, NULL);
+		folders, NULL, callback, NULL, NULL);
     
 	return FALSE;
 }

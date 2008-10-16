@@ -127,11 +127,11 @@ main (int argc, char **argv)
 	topfolders = tny_simple_list_new ();
 	folders = tny_simple_list_new ();
 
-	tny_folder_store_get_folders (TNY_FOLDER_STORE (account), topfolders, NULL, TRUE, NULL);
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (account), topfolders, NULL, NULL);
 	topiter = tny_list_create_iterator (topfolders);
 	inbox = TNY_FOLDER (tny_iterator_get_current (topiter));
 
-	tny_folder_store_get_folders (TNY_FOLDER_STORE (inbox), folders, NULL, TRUE, NULL);
+	tny_folder_store_get_folders (TNY_FOLDER_STORE (inbox), folders, NULL, NULL);
 
 	if (iter)
 		g_object_unref (iter);
