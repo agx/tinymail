@@ -1,3 +1,9 @@
+2008-10-16  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/camel-file-utils.c: (camel_write)
+	only write in chunks when writing to sockets, do not do it when
+	writing to a local filesystem. This speeds up writings a lot.
+
 2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
 
 	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c:

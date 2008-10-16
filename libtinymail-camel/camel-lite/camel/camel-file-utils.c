@@ -569,23 +569,8 @@ camel_read (int fd, char *buf, size_t n)
 	return nread;
 }
 
-
-/**
- * camel_write:
- * @fd: file descriptor
- * @buf: buffer to write
- * @n: number of bytes of @buf to write
- *
- * Cancellable libc write() replacement.
- *
- * Code that intends to be portable to Win32 should call this function
- * only on file descriptors returned from open(), not on sockets.
- *
- * Returns number of bytes written or -1 on fail. On failure, errno will
- * be set appropriately.
- **/
-ssize_t
-camel_write (int fd, const char *buf, size_t n)
+static ssize_t
+camel_write_shared (int fd, const char *buf, size_t n, gboolean write_in_chunks)
 {
 	ssize_t w, written = 0;
 	int cancel_fd;
@@ -601,12 +586,19 @@ camel_write (int fd, const char *buf, size_t n)
 #endif
 	if (cancel_fd == -1) {
 		do {
-			/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
-			ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
-
-			do {
-				w = write (fd, buf + written, actual /* n - written */);
-			} while (w == -1 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK));
+			if (write_in_chunks) {
+				/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
+				ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
+				do {
+					w = write (fd, buf + written, actual);
+				} while (w == -1 && (errno == EINTR || errno == EAGAIN || 
+						     errno == EWOULDBLOCK));			
+			} else {
+				do {
+					w = write (fd, buf + written, n - written);
+				} while (w == -1 && (errno == EINTR || errno == EAGAIN || 
+						     errno == EWOULDBLOCK));		
+			}
 			if (w > 0)
 				written += w;
 		} while (w != -1 && written < n);
@@ -625,9 +617,6 @@ camel_write (int fd, const char *buf, size_t n)
 			struct timeval tv;
 			int res;
 
-			/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
-			ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
-
 			FD_ZERO (&rdset);
 			FD_ZERO (&wrset);
 			FD_SET (fd, &wrset);
@@ -645,10 +634,19 @@ camel_write (int fd, const char *buf, size_t n)
 			else if (FD_ISSET (cancel_fd, &rdset))
 				errno = EINTR;
 			else {
-				do {
-					w = write (fd, buf + written, actual /*n - written*/);
-				} while (w == -1 && errno == EINTR);
-
+				if (write_in_chunks) {
+					/* Write in chunks of max WRITE_CHUNK_SIZE bytes */
+					ssize_t actual = MIN (n - written, WRITE_CHUNK_SIZE);
+					do {
+						w = write (fd, buf + written, actual);
+					} while (w == -1 && (errno == EINTR || errno == EAGAIN || 
+							     errno == EWOULDBLOCK));			
+				} else {
+					do {
+						w = write (fd, buf + written, n - written);
+					} while (w == -1 && (errno == EINTR || errno == EAGAIN || 
+							     errno == EWOULDBLOCK));	
+				}
 				if (w == -1) {
 					if (errno == EAGAIN || errno == EWOULDBLOCK)
 						w = 0;
@@ -667,6 +665,27 @@ camel_write (int fd, const char *buf, size_t n)
 		return -1;
 
 	return written;
+}
+
+
+/**
+ * camel_write:
+ * @fd: file descriptor
+ * @buf: buffer to write
+ * @n: number of bytes of @buf to write
+ *
+ * Cancellable libc write() replacement.
+ *
+ * Code that intends to be portable to Win32 should call this function
+ * only on file descriptors returned from open(), not on sockets.
+ *
+ * Returns number of bytes written or -1 on fail. On failure, errno will
+ * be set appropriately.
+ **/
+ssize_t
+camel_write (int fd, const char *buf, size_t n)
+{
+	camel_write_shared (fd, buf, n, FALSE);
 }
 
 ssize_t
@@ -906,7 +925,7 @@ ssize_t
 camel_write_socket (int fd, const char *buf, size_t n)
 {
 #ifndef G_OS_WIN32
-	return camel_write (fd, buf, n);
+	return camel_write_shared (fd, buf, n, TRUE);
 #else
 	ssize_t w, written = 0;
 	int cancel_fd;
