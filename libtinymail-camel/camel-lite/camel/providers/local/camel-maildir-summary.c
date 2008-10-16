@@ -494,7 +494,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 	if (mi) {
 		char *name;
 
-		if (mds->priv->load_map
+		if (mds->priv->load_map && camel_message_info_uid(mi)
 		    && (name = g_hash_table_lookup(mds->priv->load_map, camel_message_info_uid(mi)))) {
 			d(printf("Setting filename of %s to %s\n", camel_message_info_uid(mi), name));
 			camel_maildir_info_set_filename(mi, g_strdup(name));
