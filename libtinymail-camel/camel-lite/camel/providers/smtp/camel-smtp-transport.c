@@ -579,11 +579,13 @@ smtp_connect (CamelService *service, CamelException *ex)
 
 			authenticated = smtp_auth (transport, authtype->authproto, ex);
 			if (!authenticated) {
-				errbuf = g_markup_printf_escaped (
-					_("Unable to authenticate "
-					  "to SMTP server.\n%s\n\n"),
-					camel_exception_get_description (ex));
-				camel_exception_clear (ex);
+				if (camel_exception_is_set (ex)) {
+					errbuf = g_markup_printf_escaped (
+									  _("Unable to authenticate "
+									    "to SMTP server.\n%s\n\n"),
+									  camel_exception_get_description (ex));
+					camel_exception_clear (ex);
+				}
 			}
 		}
 	} else 
@@ -1103,6 +1105,7 @@ smtp_auth (CamelSmtpTransport *transport, const char *mech, CamelException *ex)
 	char *cmdbuf, *respbuf = NULL, *challenge;
 	gboolean auth_challenge = FALSE;
 	CamelSasl *sasl = NULL;
+	gboolean avoid_exception = FALSE;
 
 	camel_operation_start_transient (NULL, _("SMTP Authentication"));
 
@@ -1144,7 +1147,20 @@ smtp_auth (CamelSmtpTransport *transport, const char *mech, CamelException *ex)
 
 		/* the server challenge/response should follow a 334 code */
 		if (strncmp (respbuf, "334", 3) != 0) {
-			smtp_set_exception (transport, FALSE, respbuf, _("AUTH command failed"), ex);
+			if (strncmp (respbuf, "535", 3) == 0) {
+				/* Workaround for GMAIL smtp:
+				 * If connection sasl dialog is broken, we restart the connection.
+				 * This happens with Gmail SMTP server, where subsequent attempts
+				 * to try a password fail with a 535 if we use the original connection
+				 */
+				camel_service_disconnect (CAMEL_SERVICE (transport), FALSE, NULL);
+				camel_exception_clear (ex);
+				if (connect_to_server_wrapper (CAMEL_SERVICE (transport), ex))
+					avoid_exception = TRUE;
+			} 
+			if (!avoid_exception)  {
+				smtp_set_exception (transport, FALSE, respbuf, _("AUTH command failed"), ex);
+			}
 			g_free (respbuf);
 			goto lose;
 		}
@@ -1183,9 +1199,12 @@ smtp_auth (CamelSmtpTransport *transport, const char *mech, CamelException *ex)
 
 	/* check that the server says we are authenticated */
 	if (!respbuf || strncmp (respbuf, "235", 3)) {
-		if (respbuf && auth_challenge && !strncmp (respbuf, "334", 3)) {
+		if (respbuf && !strncmp (respbuf, "334", 3)) {
 			/* broken server, but lets try and work around it anyway... */
 			goto broken_smtp_server;
+		} else if (respbuf && strncmp (respbuf, "535", 3)) {
+			g_free (CAMEL_SERVICE (transport)->url->passwd);
+			CAMEL_SERVICE (transport)->url->passwd = NULL;
 		}
 		g_free (respbuf);
 		goto lose;
@@ -1205,7 +1224,7 @@ smtp_auth (CamelSmtpTransport *transport, const char *mech, CamelException *ex)
 	smtp_debug ("<- %s\n", respbuf ? respbuf : "(null)");
 
  lose:
-	if (!camel_exception_is_set (ex)) {
+	if (!camel_exception_is_set (ex) && !avoid_exception) {
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
 				     _("Bad authentication response from server.\n"));
 	}
