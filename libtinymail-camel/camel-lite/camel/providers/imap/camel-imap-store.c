@@ -4071,7 +4071,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 
 		/* No NAMESPACE capability */
 
-		if (strlen (top) > 0) {
+		/* if (strlen (top) > 0) {
 			char *pattern;
 			int i;
 			char *name;
@@ -4083,18 +4083,18 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 			strcpy (pattern, name);
 			g_free (name);
 
-			if (imap_store->dir_sep) {
+			if (imap_store->dir_sep != '\0') {
 				pattern[i] = imap_store->dir_sep;
 				pattern[i+1] = (flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?'*':'%';
 				pattern[i+2] = 0;
 				get_folders_sync(imap_store, pattern, ex);
 			} else {
-				pattern[i] = '/'; /* Guess */
+				pattern[i] = '/'; * Guess *
 				pattern[i+1] = (flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?'*':'%';
 				pattern[i+2] = 0;
 				get_folders_sync(imap_store, pattern, ex);
 			}
-		} else
+		} else */
 			get_folders_sync(imap_store, 
 				(flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?"*":"%", ex);
 
