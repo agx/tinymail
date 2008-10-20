@@ -3567,11 +3567,11 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 
 		if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
 			response = camel_imap_command (imap_store, NULL, ex,
-				"%s \"\" %G", "LIST (SUBSCRIBED)",
+				"%s \"\" %s", "LIST (SUBSCRIBED)",
 				pattern);
 		else
 			response = camel_imap_command (imap_store, NULL, ex,
-				"%s \"\" %G", j==1 ? "LSUB" : "LIST",
+				"%s \"\" %s", j==1 ? "LSUB" : "LIST",
 				pattern);
 
 		if (!response)
