@@ -4095,8 +4095,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 				get_folders_sync(imap_store, pattern, ex);
 			}
 		} else */
-			get_folders_sync(imap_store, 
-				(flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?"*":"%", ex);
+			get_folders_sync(imap_store, "*", ex);
 
 		if (camel_exception_is_set(ex))
 			goto fail;
