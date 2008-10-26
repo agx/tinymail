@@ -5,6 +5,8 @@
 	makes the patch atomic by adapting to the new api where needed
 	also honour the camel folders flags (caused some critical camel warnings else)
 
+	* This was a major API change
+
 2008-10-16  Philip Van Hoof  <philip@codeminded.be>
 
 	* Reverted `svn diff -r 3774:3775`, the behaviour of the folders was
