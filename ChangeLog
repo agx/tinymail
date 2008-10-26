@@ -1,3 +1,9 @@
+2008-10-26  Rob Taylor  <rob.taylor@codethink.co.uk>
+	    & Martin Bonnin  <martinbonnin@gmail.com>
+
+	* Re-submission for the add-tny_camel_send_queue_new_with_folders() patch:
+	It allows to create a Camel SendQueue with user-supplied outbox and sendbox
+
 2008-10-24  Rob Taylor  <rob.taylor@codethink.co.uk>
 	    & Martin Bonnin  <martinbonnin@gmail.com>
 

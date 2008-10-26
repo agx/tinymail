@@ -1297,6 +1297,37 @@ tny_camel_send_queue_new (TnyCamelTransportAccount *trans_account)
 	return TNY_SEND_QUEUE (self);
 }
 
+/**
+ * tny_camel_send_queue_new_with_folders:
+ * @trans_account: A #TnyCamelTransportAccount instance
+ *
+ * Create a new #TnySendQueue instance implemented for Camel,
+ * Using custom-supplied outbox and sentbox
+ *
+ * Return value: A new #TnySendQueue instance implemented for Camel
+ **/
+TnySendQueue*
+tny_camel_send_queue_new_with_folders (TnyCamelTransportAccount *trans_account, TnyFolder *outbox, TnyFolder *sentbox)
+{
+	TnyCamelSendQueue *self = g_object_new (TNY_TYPE_CAMEL_SEND_QUEUE, NULL);
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+
+	g_assert (TNY_IS_CAMEL_TRANSPORT_ACCOUNT (trans_account));
+
+	if (priv->sentbox_cache)
+		g_object_unref (priv->sentbox_cache);
+	if (priv->outbox_cache)
+		g_object_unref (priv->outbox_cache);
+
+	priv->outbox_cache  = g_object_ref(outbox);
+	priv->sentbox_cache = g_object_ref(sentbox);
+
+	tny_camel_send_queue_set_transport_account (self, trans_account);
+
+	return TNY_SEND_QUEUE (self);
+}
+
+
 static void
 on_setonline_happened (TnyCamelAccount *account, gboolean online, gpointer user_data)
 {
