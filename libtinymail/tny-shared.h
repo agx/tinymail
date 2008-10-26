@@ -137,6 +137,7 @@ typedef void (*TnyGetHeadersCallback) (TnyFolder *self, gboolean cancelled, TnyL
 
 typedef TnyStream* (*TnyStreamCacheOpenStreamFetcher) (TnyStreamCache *self, gint64 *expected_size, gpointer userdata);
 typedef gboolean (*TnyStreamCacheRemoveFilter) (TnyStreamCache *self, const gchar *id, gpointer userdata);
+typedef void (*TnyFolderStoreCallback) (TnyFolderStore *self, gboolean cancelled, GError *err, gpointer user_data);
 
 /** 
  * TnyGetMsgCallback:
