@@ -11,7 +11,7 @@ tny-signals-marshal.c: tny-signals-marshal.list tny-signals-marshal.h
 
 CLEANFILES=tny-signals-marshal.c tny-signals-marshal.h
 
-private_headers = tny-common-priv.h
+private_headers = tny-common-priv.h observer-mixin-priv.h
 
 libtinymail_1_0_headers = \
 	tny-signals-marshal.h \
@@ -54,7 +54,8 @@ libtinymail_1_0_headers = \
 	tny-cached-file.h \
 	tny-cached-file-stream.h \
 	tny-combined-account.h \
-	tny-connection-policy.h 
+	tny-connection-policy.h \
+	tny-merge-folder-store.h
 
 libtinymail_1_0_la_SOURCES = \
 	$(libtinymail_1_0_headers) \
@@ -104,6 +105,8 @@ libtinymail_1_0_la_SOURCES = \
 	tny-idle-stopper.c \
 	tny-progress-info.c \
 	tny-connection-policy.c \
+	tny-merge-folder-store.c \
+	observer-mixin.c \
 	$(private_headers)
 
 libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)

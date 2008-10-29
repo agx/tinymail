@@ -1,3 +1,8 @@
+2008-10-27  Rob Taylor  <rob.taylor@codethink.co.uk>
+
+	* Re-submission for the add-tny_merge_folder_store() patch.
+	It allows to merge folder stores.
+
 2008-10-26  Rob Taylor  <rob.taylor@codethink.co.uk>
 	    & Martin Bonnin  <martinbonnin@gmail.com>
 
