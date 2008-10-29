@@ -5,6 +5,11 @@
 	crashes on code using this if using the bodystructure retrieve
 	strategy.
 
+	* libtinymail-camel/camel-lite/camel/camel-tcp-stream-ssl.c:
+	Now we use PR_INTERVAL_NO_WAIT (value is 0) instead of putting
+	0 as interval parameter for PR_Connect. Should help code
+	readability.
+
 2008-10-27  Rob Taylor  <rob.taylor@codethink.co.uk>
 
 	* Re-submission for the add-tny_merge_folder_store() patch.

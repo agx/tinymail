@@ -1466,7 +1466,7 @@ socket_connect(CamelTcpStream *stream, struct addrinfo *host)
 
 	cancel_fd = camel_operation_cancel_prfd(NULL);
 
-	if (PR_Connect (fd, &netaddr, cancel_fd?0:(CONNECT_TIMEOUT*1000)) == PR_FAILURE) {
+	if (PR_Connect (fd, &netaddr, cancel_fd?PR_INTERVAL_NO_WAIT:(CONNECT_TIMEOUT*1000)) == PR_FAILURE) {
 		int errnosave;
 
 		set_errno (PR_GetError ());
