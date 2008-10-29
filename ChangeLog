@@ -1,3 +1,10 @@
+2008-10-29  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtininymail-camel/tny-camel-bs-msg.[ch]:
+	Added implementation of methods get/set allow external images to avoid
+	crashes on code using this if using the bodystructure retrieve
+	strategy.
+
 2008-10-27  Rob Taylor  <rob.taylor@codethink.co.uk>
 
 	* Re-submission for the add-tny_merge_folder_store() patch.
