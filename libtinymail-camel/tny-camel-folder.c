@@ -5836,6 +5836,7 @@ typedef struct {
 	gint unread;
 	gint total;
 	gboolean do_status;
+	gboolean cancelled;
 	TnySessionCamel *session;
 } PokeStatusInfo;
 
@@ -5846,6 +5847,9 @@ tny_camel_folder_poke_status_callback (gpointer data)
 	TnyFolder *self = (TnyFolder *) info->self;
 	TnyFolderChange *change = NULL;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	if (info->cancelled)
+		return FALSE;
 
 	if (info->total != -1) {
 		priv->cached_length = (guint) info->total;
@@ -5954,14 +5958,16 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 		}
 	}
 
-	_tny_camel_queue_launch (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
+	_tny_camel_queue_launch_wflags (TNY_FOLDER_PRIV_GET_QUEUE (priv), 
 		tny_camel_folder_poke_status_thread, 
 		tny_camel_folder_poke_status_callback, 
 		tny_camel_folder_poke_status_destroyer, 
 		tny_camel_folder_poke_status_callback, 
 		tny_camel_folder_poke_status_destroyer, 
-		NULL, 
+		&info->cancelled,
 		info, sizeof (PokeStatusInfo),
+		TNY_CAMEL_QUEUE_AUTO_CANCELLABLE_ITEM|
+		TNY_CAMEL_QUEUE_CANCELLABLE_ITEM,
 		__FUNCTION__);
 
 	return;

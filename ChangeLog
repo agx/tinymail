@@ -1,3 +1,7 @@
+2008-10-30  Rob Taylor  <rob.taylor@codethink.co.uk>
+ 
+	* Make folder pokes cancelable
+
 2008-10-30  Martin Bonnin  <martinbonnin@gmail.com>
 
 	Makes tny_camel_account_set_online (FALSE) send "QUIT" 
