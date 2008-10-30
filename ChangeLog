@@ -1,3 +1,11 @@
+2008-10-30  Martin Bonnin  <martinbonnin@gmail.com>
+
+	Makes tny_camel_account_set_online (FALSE) send "QUIT" 
+	for POP3 accounts. It also cleans up the logged_in 
+	variable that was unused. This fixes some problems I 
+	had with Yahoo servers when trying to connect twice in 
+	a row.
+
 2008-10-29  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtininymail-camel/tny-camel-bs-msg.[ch]:

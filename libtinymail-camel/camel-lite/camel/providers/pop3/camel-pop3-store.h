@@ -49,7 +49,7 @@ typedef struct {
 	guint delete_after;
 	gboolean immediate_delete_after;
 	gchar *storage_path, *base_url;
-	gboolean connected, logged_in, is_refreshing;
+	gboolean connected, is_refreshing;
 	GStaticRecMutex *eng_lock, *uidl_lock;
 	gpointer book;
 	guint login_delay;

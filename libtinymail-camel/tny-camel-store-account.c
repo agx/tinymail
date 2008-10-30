@@ -2145,10 +2145,19 @@ tny_camel_store_account_queue_going_online_thread (gpointer thr_user_data)
 
 	g_static_rec_mutex_lock (apriv->service_lock);
 	if (apriv->service) {
-		CamelException mex = CAMEL_EXCEPTION_INITIALISER;
-		camel_service_disconnect (apriv->service, FALSE, &mex);
-		if (camel_exception_is_set (&mex))
-			camel_exception_clear (&mex);
+		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+		/* We first try to disconnect cleanly. If this fails, we try the hard way */ 
+		camel_service_disconnect (apriv->service, TRUE, &ex);
+		if (camel_exception_is_set (&ex)){
+			CamelException subex = CAMEL_EXCEPTION_INITIALISER;
+
+			camel_service_disconnect (apriv->service, FALSE, &subex);
+			if (camel_exception_is_set (&subex))
+				camel_exception_clear (&subex);
+
+			camel_exception_clear (&ex);
+		}
 	}
 	g_static_rec_mutex_unlock (apriv->service_lock);
 

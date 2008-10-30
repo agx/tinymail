@@ -936,9 +936,6 @@ pop3_connect (CamelService *service, CamelException *ex)
 	int mytry;
 	gboolean auth = FALSE;
 
-	if (store->logged_in)
-		return TRUE;
-
 	session = camel_service_get_session (service);
 
 	if (!connect_to_server_wrapper (service, ex))
@@ -1002,8 +999,6 @@ pop3_disconnect (CamelService *service, gboolean clean, CamelException *ex)
 	CamelPOP3Store *store = CAMEL_POP3_STORE (service);
 
 	//g_static_rec_mutex_lock (store->eng_lock);
-
-	store->logged_in = FALSE;
 
 	if (store->engine == NULL) {
 		//g_static_rec_mutex_unlock (store->eng_lock);
