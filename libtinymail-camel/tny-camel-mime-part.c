@@ -720,7 +720,7 @@ camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stream)
 
 	if (dw->mime_type && (charset = camel_content_type_param 
 			(dw->mime_type, "charset")) && 
-		g_ascii_strncasecmp(charset, "iso-8859+-", 9) == 0) 
+		g_ascii_strncasecmp(charset, "iso-8859-", 9) == 0) 
 	{
 		CamelStream *null;
 

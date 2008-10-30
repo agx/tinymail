@@ -1,3 +1,7 @@
+2008-10-30  Thomas Guillem  <thomas.guillem@gmail.com>
+
+	* libtinymail-camel/tny-camel-mime-part.c: Fixed a typo
+
 2008-10-30  Rob Taylor  <rob.taylor@codethink.co.uk>
  
 	* Make folder pokes cancelable
