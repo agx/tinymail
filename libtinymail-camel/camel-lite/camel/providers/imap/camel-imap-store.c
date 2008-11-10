@@ -485,7 +485,7 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->dontdistridlehack = FALSE;
 
 	imap_store->idle_sleep_set = FALSE;
-	imap_store->idle_sleep = 810; /* default of 27m */
+	imap_store->idle_sleep = IDLE_DEFAULT_SLEEP_TIME * (1000000/IDLE_TICK_TIME);
 	imap_store->getsrv_sleep = 100; /* default of 100s */
 
 	imap_store->in_idle = FALSE;
@@ -1405,11 +1405,12 @@ connect_to_server_wrapper (CamelService *service, CamelException *ex)
 	if (ex)
 		camel_exception_clear (ex);
 
+	/* idle_delay is in seconds, so we have to adjust it to the tick */
 	if ((idle_sleep = camel_url_get_param (service->url, "idle_delay")))
 	{
 		int tmp = atoi (idle_sleep);
 		if (tmp != -1) {
-			CAMEL_IMAP_STORE (service)->idle_sleep = tmp;
+			CAMEL_IMAP_STORE (service)->idle_sleep = tmp * (1000000 / IDLE_TICK_TIME);
 			CAMEL_IMAP_STORE (service)->idle_sleep_set = TRUE;
 		}
 	}

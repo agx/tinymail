@@ -27,6 +27,14 @@
 
 G_BEGIN_DECLS
 
+/* This is the tick time for IDLE loop, the time we sleep in microseconds */
+#define IDLE_TICK_TIME 500000
+
+/* Default sleep time in seconds for IDLE for sending DONE and IDLE again to avoid
+ * TCP timeouts. As IMAP recommends 30 minutes, and we get some processing between
+ * each tick, we set 28 minutes */
+#define IDLE_DEFAULT_SLEEP_TIME 28*60
+
 void _camel_imap_store_current_folder_finalize (CamelObject *stream, gpointer event_data, gpointer user_data);
 void _camel_imap_store_old_folder_finalize (CamelObject *stream, gpointer event_data, gpointer user_data);
 void _camel_imap_store_last_folder_finalize (CamelObject *stream, gpointer event_data, gpointer user_data);

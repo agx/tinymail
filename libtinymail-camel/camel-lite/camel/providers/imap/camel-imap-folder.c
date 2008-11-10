@@ -4222,7 +4222,7 @@ idle_thread (gpointer data)
 		 * for this usleep() and cnt stuff. */
 
 		if (my_cont)
-			usleep (500000);
+			usleep (IDLE_TICK_TIME);
 
 		cnt++;
 	}

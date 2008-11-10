@@ -471,7 +471,7 @@ tny_camel_account_get_account_type_default (TnyAccount *self)
  * pending events for the IDLE state. This improve responsibility of the Push 
  * E-mail and expunge events, although it will cause a little bit more continuous
  * bandwidth consumption (each delayth second). For example idle_delay=20. The
- * defualt value is 20.
+ * defualt value is 28 minutes.
  *
  * Another option is getsrv_delay, also for IMAP accounts, which allows you to 
  * specify the delay before the connection that gets created for receiving 
