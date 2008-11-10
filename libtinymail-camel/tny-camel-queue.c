@@ -183,6 +183,7 @@ static gpointer
 tny_camel_queue_thread_main_func (gpointer user_data)
 {
 	TnyCamelQueue *queue = user_data;
+	TnyCamelAccountPriv *apriv;
 
 	while (!queue->stopped)
 	{
@@ -214,6 +215,9 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 			queue->current = item;
 		} else
 			wait = TRUE;
+		/* If no next item is scheduled then we can go idle after finishing operation */
+		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (queue->account);
+		camel_service_can_idle (apriv->service, !first || !first->next);
 		g_static_rec_mutex_unlock (queue->lock);
 
 		if (item) {
@@ -397,6 +401,7 @@ void
 _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceFunc callback, GDestroyNotify destroyer, GSourceFunc cancel_callback, GDestroyNotify cancel_destroyer, gboolean *cancel_field, gpointer data, gsize data_size, TnyCamelQueueItemFlags flags, const gchar *name)
 {
 	QueueItem *item = g_slice_new (QueueItem);
+	TnyCamelAccountPriv *apriv;
 
 	if (!g_thread_supported ())
 		g_thread_init (NULL);
@@ -436,6 +441,10 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 		queue->list = g_list_insert (queue->list, item, cnt);
 	} else /* Normal items simply get appended */
 		queue->list = g_list_append (queue->list, item);
+
+	/* If no next item is scheduled then we can go idle after finishing operation */
+	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (queue->account);
+	camel_service_can_idle (apriv->service, !queue->list || !queue->list->next);
 
 	if (queue->stopped) 
 	{

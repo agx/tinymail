@@ -59,6 +59,7 @@ static void construct (CamelService *service, CamelSession *session,
 static gboolean service_connect(CamelService *service, CamelException *ex);
 static gboolean service_disconnect(CamelService *service, gboolean clean,
 				   CamelException *ex);
+static void service_can_idle (CamelService *service, gboolean can_idle);
 static void cancel_connect (CamelService *service);
 static GList *query_auth_types (CamelService *service, CamelException *ex);
 static char *get_name (CamelService *service, gboolean brief);
@@ -87,6 +88,7 @@ camel_service_class_init (CamelServiceClass *camel_service_class)
 	camel_service_class->query_auth_types = query_auth_types;
 	camel_service_class->get_name = get_name;
 	camel_service_class->get_path = get_path;
+	camel_service_class->can_idle = service_can_idle;
 }
 
 static void
@@ -768,4 +770,29 @@ camel_service_query_auth_types (CamelService *service, CamelException *ex)
 	CAMEL_SERVICE_REC_UNLOCK (service, connect_lock);
 
 	return ret;
+}
+
+/**
+ * camel_service_can_idle:
+ * @service: a #CamelService
+ * @can_idle: a #gboolean
+ *
+ * Sets if service can do idle operations or not. This is for
+ * avoiding the service believe it can do idle operations in
+ * the middle of queued operations.
+ */
+void
+camel_service_can_idle (CamelService *service,
+			gboolean can_idle)
+{
+	g_return_val_if_fail (CAMEL_IS_SERVICE (service), NULL);
+
+	CSERV_CLASS (service)->can_idle (service, can_idle);
+}
+
+static void
+service_can_idle (CamelService *service,
+		  gboolean can_idle)
+{
+	/* Default implementation is empty */
 }

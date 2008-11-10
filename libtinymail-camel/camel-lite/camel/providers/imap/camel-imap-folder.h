@@ -92,6 +92,7 @@ time_t decode_internaldate (const unsigned char *in);
 CamelType camel_imap_folder_get_type (void);
 
 void camel_imap_folder_stop_idle (CamelFolder *folder);
+void camel_imap_folder_stop_idle_in_connect_lock (CamelFolder *folder);
 void camel_imap_folder_start_idle (CamelFolder *folder);
 
 char* camel_imap_folder_get_highestmodseq (CamelImapFolder *imap_folder);

@@ -122,7 +122,7 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 	va_list ap;
 	char *cmd = NULL;
 
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (store);
 
 	if (fmt) {
 		va_start (ap, fmt);
@@ -179,7 +179,7 @@ camel_imap_command (CamelImapStore *store, CamelFolder *folder,
 
 	if (!imap_command_start (store, folder, cmd, ex)) {
 		g_free (cmd);
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+		camel_imap_store_connect_unlock_start_idle (store);
 		return NULL;
 	}
 	g_free (cmd);
@@ -234,13 +234,13 @@ camel_imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	cmd = imap_command_strdup_vprintf (store, fmt, ap);
 	va_end (ap);
 
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (store);
 
 	ok = imap_command_start (store, folder, cmd, ex);
 	g_free (cmd);
 
 	if (!ok)
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+		camel_imap_store_connect_unlock_start_idle (store);
 
 	return ok;
 }
@@ -250,6 +250,7 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 		    const char *cmd, CamelException *ex)
 {
 	ssize_t nwritten;
+	ssize_t nread;
 	gchar *resp = NULL;
 	CamelException myex = CAMEL_EXCEPTION_INITIALISER;
 	gchar *full_cmd = NULL;
@@ -354,11 +355,19 @@ imap_command_start (CamelImapStore *store, CamelFolder *folder,
 	}
 
 	/* Read away whatever we got */
-	while (camel_imap_store_readline_nb (store, &resp, &myex) > 0)
+	while ((nread = camel_imap_store_readline_nb (store, &resp, &myex)) > 0)
 	{
+#ifdef IMAP_DEBUG
+		gchar *debug_resp;
+		gchar *debug_resp_escaped;
 		imap_debug ("unsolitcited: ");
-		imap_debug (resp);
+		debug_resp = g_strndup (resp, nread);
+		debug_resp_escaped = g_strescape (debug_resp, "");
+		g_free (debug_resp);
+		imap_debug (debug_resp_escaped);
+		g_free (debug_resp_escaped);
 		imap_debug ("\n");
+#endif
 
 		g_free (resp);
 		resp=NULL;
@@ -434,7 +443,7 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 					     _("Operation cancelled"));
 			camel_imap_recon (store, &mex, TRUE);
 			imap_debug ("Recon in cont: %s\n", camel_exception_get_description (&mex));
-			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+			camel_imap_store_connect_unlock_start_idle (store);
 			camel_exception_clear (&mex);
 			return NULL;
 		} else
@@ -442,7 +451,7 @@ camel_imap_command_continuation (CamelImapStore *store, const char *cmd,
 					     g_strerror (errno));
 		camel_service_disconnect (CAMEL_SERVICE (store), FALSE, NULL);
 
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+		camel_imap_store_connect_unlock_start_idle (store);
 		return NULL;
 	}
 
@@ -474,7 +483,7 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 	int len = -1;
 
 	if (camel_imap_store_readline (store, &respbuf, ex) < 0) {
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+		camel_imap_store_connect_unlock_start_idle (store);
 		return CAMEL_IMAP_RESPONSE_ERROR;
 	}
 
@@ -537,7 +546,7 @@ camel_imap_command_response (CamelImapStore *store, char **response,
 
 	if (type == CAMEL_IMAP_RESPONSE_ERROR ||
 	    type == CAMEL_IMAP_RESPONSE_TAGGED)
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+		camel_imap_store_connect_unlock_start_idle (store);
 
 	return type;
 }
@@ -622,7 +631,7 @@ imap_read_response (CamelImapStore *store, CamelException *ex)
 	 * and gets unlocked when response is freed.
 	 */
 
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (store);
 
 	response = g_new0 (CamelImapResponse, 1);
 	if (store->current_folder && camel_disco_store_status (CAMEL_DISCO_STORE (store)) != CAMEL_DISCO_STORE_RESYNCING) {
@@ -1071,7 +1080,7 @@ camel_imap_response_free (CamelImapStore *store, CamelImapResponse *response)
 
 	g_free (response);
 
-	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+	camel_imap_store_connect_unlock_start_idle (store);
 }
 
 /**

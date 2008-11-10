@@ -1,3 +1,25 @@
+2008-11-10  Jose Dapena Paz  <jdapena@igalia.com>
+
+	Complete rework of the lock behavior of Tinymail
+	(camel) imap IDLE implementation.
+
+        The problem we want to fix is: sometimes IDLE thread causes
+	deathlocks (connect lock, idle lock, g_thread_join, etc).
+	This happens easily when there are disconnects, or
+	when we switch fast among folders.
+
+        The main changes are:
+        * Provided a count of reasons to stop idle because of connect lock.
+        * If a caller has taken connect lock, then it should do the send done
+	stuff itself.
+        * Idle thread has the connect lock always when it's in the body of the
+	loop.
+        * In any point, if we want to  take the connect lock, then we should
+	stop idle. No partial idle can be alive when we want to connect.
+        * Camel queue enables/disables the possibility to start idle. That's
+	for avoiding running IDLE / SEND DONE in the middle of queued
+	operations.
+
 2008-11-10  Martin Bonnin  <martinbonnin@gmail.com>
 
 	* libtinymail-camel/tny-camel-folder.c: Uninitialized value, fixed

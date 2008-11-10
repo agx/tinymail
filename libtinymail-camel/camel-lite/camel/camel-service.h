@@ -73,6 +73,8 @@ struct _CamelService {
 	gpointer data;
 	gboolean reconnecting;
 
+	gboolean can_idle;
+
 	con_op connecting;
 	con_op disconnecting;
 	con_op reconnecter;
@@ -101,6 +103,7 @@ typedef struct {
 	char *    (*get_name)          (CamelService *service,
 					gboolean brief);
 	char *    (*get_path)          (CamelService *service);
+	void      (*can_idle)          (CamelService *service, gboolean can_idle);
 
 } CamelServiceClass;
 
@@ -140,6 +143,9 @@ gboolean            camel_service_connect_r           (CamelService *service,
 gboolean            camel_service_disconnect_r        (CamelService *service,
 						      gboolean clean,
 						      CamelException *ex);
+
+void                camel_service_can_idle            (CamelService *service,
+						       gboolean can_idle);
 
 /* Standard Camel function */
 CamelType camel_service_get_type (void);

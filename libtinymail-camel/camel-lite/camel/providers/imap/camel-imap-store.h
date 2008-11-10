@@ -170,11 +170,17 @@ struct _CamelImapStore {
 
 	GStaticRecMutex *idle_prefix_lock, *idle_lock, *sum_lock, *idle_t_lock;
 	GThread *idle_thread;
-	gboolean idle_cont, in_idle, idle_kill;
+	gboolean idle_cont, in_idle, idle_kill, idle_send_done_happened;
 	guint idle_sleep, getsrv_sleep;
 	gboolean courier_crap, idle_sleep_set;
 	gboolean going_online, got_online, clean_exit;
 	gboolean not_recon, needs_lsub;
+
+	GStaticRecMutex *idle_wait_reasons_lock;
+	guint idle_wait_reasons;
+	gboolean already_in_stop_idle;
+
+	gboolean idle_blocked;
 
 	struct addrinfo *addrinfo;
 };
@@ -183,6 +189,7 @@ typedef struct {
 	CamelDiscoStoreClass parent_class;
 
 } CamelImapStoreClass;
+
 
 
 /* Standard Camel function */
@@ -197,9 +204,20 @@ ssize_t camel_imap_store_readline (CamelImapStore *store, char **dest, CamelExce
 
 gboolean camel_imap_store_restore_stream_buffer (CamelImapStore *store);
 
-void camel_imap_store_stop_idle (CamelImapStore *store);
-void camel_imap_store_start_idle (CamelImapStore *store);
+void _camel_imap_store_stop_idle (CamelImapStore *store);
+void _camel_imap_store_stop_idle_connect_lock (CamelImapStore *store);
+void _camel_imap_store_start_idle (CamelImapStore *store);
+void _camel_imap_store_connect_unlock_start_idle (CamelImapStore *store);
+void _camel_imap_store_start_idle_if_unlocked (CamelImapStore *store);
+void _camel_imap_store_connect_unlock_no_start_idle (CamelImapStore *store);
 void camel_imap_recon (CamelImapStore *store, CamelException *mex, gboolean was_cancel);
+
+#define camel_imap_store_stop_idle_connect_lock(store) {idle_debug ("Thread %d StopIdle-ConnectLock(%x) %s:%d\n", (gint) g_thread_self (), (gint) store, __FUNCTION__, (gint) __LINE__);  _camel_imap_store_stop_idle_connect_lock((store));}
+#define camel_imap_store_connect_unlock_start_idle(store) {idle_debug ("Thread %d ConnectUnlock-StartIdle(%x) %s:%d\n", (gint) g_thread_self (), (gint) store, __FUNCTION__, (gint) __LINE__);  _camel_imap_store_connect_unlock_start_idle((store));}
+#define camel_imap_store_start_idle_if_unlocked(store) {idle_debug ("Thread %d StartIdle-IfUnlocked(%x) %s:%d\n", (gint) g_thread_self (), (gint) store, __FUNCTION__, (gint) __LINE__);  _camel_imap_store_start_idle_if_unlocked((store));}
+#define camel_imap_store_connect_unlock_no_start_idle(store) {idle_debug ("Thread %d ConnectUnlock-NO-StartIdle(%x) %s:%d\n", (gint) g_thread_self (), (gint) store, __FUNCTION__, (gint) __LINE__);  _camel_imap_store_connect_unlock_no_start_idle((store));}
+#define camel_imap_store_stop_idle(store) {idle_debug ("Thread %d StopIdle(%x) %s:%d\n", (gint) g_thread_self (), (gint) store, __FUNCTION__, (gint) __LINE__);  _camel_imap_store_stop_idle((store));}
+#define camel_imap_store_start_idle(store) {idle_debug ("Thread %d StartIdle(%x) %s:%d\n", (gint) g_thread_self (), (gint) store, __FUNCTION__, (gint) __LINE__);  _camel_imap_store_start_idle((store));}
 
 G_END_DECLS
 

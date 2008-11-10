@@ -935,7 +935,7 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 	 * us with a NOOP of new messages, so force a reselect which
 	 * should do it.  */
 	CAMEL_FOLDER_REC_LOCK(folder, lock);
-	CAMEL_SERVICE_REC_LOCK (imap_store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (imap_store);
 
 	if (!camel_disco_store_check_online ((CamelDiscoStore*)imap_store, ex))
 		goto done;
@@ -980,13 +980,11 @@ imap_refresh_info (CamelFolder *folder, CamelException *ex)
 		camel_store_summary_info_free((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary, si);
 	}
 done:
-	CAMEL_SERVICE_REC_UNLOCK (imap_store, connect_lock);
-	CAMEL_FOLDER_REC_UNLOCK(folder, lock);
-
 	camel_folder_summary_save(folder->summary, ex);
 	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary, ex);
 
-	camel_imap_folder_start_idle (folder);
+	camel_imap_store_connect_unlock_start_idle (imap_store);
+	CAMEL_FOLDER_REC_UNLOCK(folder, lock);
 
 }
 
@@ -1520,7 +1518,7 @@ imap_sync_online (CamelFolder *folder, CamelException *ex)
 	}
 
 	camel_exception_init (&local_ex);
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (store);
 
 	/* Find a message with changed flags, find all of the other
 	 * messages like it, sync them as a group, mark them as
@@ -1586,25 +1584,21 @@ imap_sync_online (CamelFolder *folder, CamelException *ex)
 		}
 		g_ptr_array_free (matches, TRUE);
 
-		/* We unlock here so that other threads can have a chance to grab the connect_lock */
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-
 		/* check for an exception */
 		if (camel_exception_is_set (&local_ex)) {
 
+			camel_imap_store_connect_unlock_start_idle (store);
+
 			camel_exception_xfer (ex, &local_ex);
-			camel_imap_folder_start_idle (folder);
 			return;
 		}
 
-		/* Re-lock the connect_lock */
-		CAMEL_SERVICE_REC_LOCK (store, connect_lock);
 	}
 
 	/* Save the summary */
 	imap_sync_offline (folder, ex);
 
-	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+	camel_imap_store_connect_unlock_start_idle (store);
 	camel_imap_folder_start_idle (folder);
 
 }
@@ -1658,12 +1652,12 @@ imap_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *
 	int uid = 0;
 	char *set;
 
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (store);
 
 	if ((store->capabilities & IMAP_CAPABILITY_UIDPLUS) == 0) {
 		((CamelFolderClass *)CAMEL_OBJECT_GET_CLASS(folder))->sync(folder, 0, ex);
 		if (camel_exception_is_set(ex)) {
-			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+			camel_imap_store_connect_unlock_start_idle (store);
 			return;
 		}
 	}
@@ -1678,7 +1672,7 @@ imap_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *
 		if (response)
 			camel_imap_response_free (store, response);
 		if (camel_exception_is_set (ex)) {
-			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+			camel_imap_store_connect_unlock_start_idle (store);
 			g_free (set);
 			return;
 		}
@@ -1705,10 +1699,7 @@ imap_expunge_uids_online (CamelFolder *folder, GPtrArray *uids, CamelException *
 		g_free (set);
 	}
 
-	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-
-	camel_imap_folder_start_idle (folder);
-
+	camel_imap_store_connect_unlock_start_idle (store);
 }
 
 static void
@@ -1733,11 +1724,11 @@ imap_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelExceptio
 	 * and any that aren't in our to-expunge list get temporarily
 	 * marked un-deleted. */
 
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (store);
 
 	((CamelFolderClass *)CAMEL_OBJECT_GET_CLASS(folder))->sync(folder, 0, ex);
 	if (camel_exception_is_set(ex)) {
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+		camel_imap_store_connect_unlock_start_idle (store);
 		return;
 	}
 
@@ -1748,7 +1739,7 @@ imap_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelExceptio
 	}
 	result = camel_imap_response_extract (store, response, "SEARCH", ex);
 	if (!result) {
-		CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+		camel_imap_store_connect_unlock_start_idle (store);
 		return;
 	}
 
@@ -1808,7 +1799,7 @@ imap_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelExceptio
 			if (!response) {
 				g_ptr_array_free (keep_uids, TRUE);
 				g_ptr_array_free (mark_uids, TRUE);
-				CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+				camel_imap_store_connect_unlock_start_idle (store);
 				return;
 			}
 			camel_imap_response_free (store, response);
@@ -1833,6 +1824,7 @@ imap_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelExceptio
 			if (!response) {
 				g_ptr_array_free (keep_uids, TRUE);
 				g_ptr_array_free (mark_uids, TRUE);
+				camel_imap_store_connect_unlock_start_idle (store);
 				CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 				return;
 			}
@@ -1872,9 +1864,7 @@ imap_expunge_uids_resyncing (CamelFolder *folder, GPtrArray *uids, CamelExceptio
 	/* now we can free this, now that we're done with keep_uids */
 	g_free (result);
 
-	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-
-	camel_imap_folder_start_idle (folder);
+	camel_imap_store_connect_unlock_start_idle (store);
 
 }
 
@@ -2065,13 +2055,11 @@ imap_append_online (CamelFolder *folder, CamelMimeMessage *message,
 	camel_imap_response_free (store, response);
 
 	/* Make sure a "folder_changed" is emitted. */
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (store);
 	if (store->current_folder != folder ||
 	    camel_folder_summary_count (folder->summary) == count)
 		imap_refresh_info (folder, ex);
-	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-
-	camel_imap_folder_start_idle (folder);
+	camel_imap_store_connect_unlock_start_idle (store);
 
 }
 
@@ -2127,10 +2115,10 @@ imap_transfer_offline (CamelFolder *source, GPtrArray *uids,
 	 * deadlock in the case where we're simultaneously also trying
 	 * to copy messages in the other direction from another thread.
 	 */
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (store);
 	CAMEL_IMAP_FOLDER_REC_LOCK (source, cache_lock);
 	CAMEL_IMAP_FOLDER_REC_LOCK (dest, cache_lock);
-	CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+	camel_imap_store_connect_unlock_start_idle (store);
 
 	if (transferred_uids) {
 		*transferred_uids = g_ptr_array_new ();
@@ -2834,16 +2822,16 @@ imap_get_message (CamelFolder *folder, const char *uid, CamelFolderReceiveType t
 				char *body, *found_uid;
 				int i;
 
-				CAMEL_SERVICE_REC_LOCK(store, connect_lock);
+				camel_imap_store_stop_idle_connect_lock (store);
 				if (!camel_disco_store_check_online ((CamelDiscoStore*)store, ex)) {
-					CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+					camel_imap_store_connect_unlock_start_idle (store);
 					camel_exception_set (ex, CAMEL_EXCEPTION_FOLDER_UID_NOT_AVAILABLE,
 							     _("This message is not currently available"));
 					goto fail;
 				}
 
 				response = camel_imap_command (store, folder, ex, "UID FETCH %s BODY", uid);
-				CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+				camel_imap_store_connect_unlock_start_idle (store);
 
 				if (response) {
 					for (i = 0, body = NULL; i < response->untagged->len; i++) {
@@ -3358,7 +3346,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 
 	if ((cnt < nextn) && more)
 	{
-		int i;
 
 		g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 		g_ptr_array_free (needheaders, TRUE);
@@ -3441,7 +3428,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 		/* If we still received too few */
 		if (tcnt < (exists - seq))
 		{
-			int i;
 
 			g_ptr_array_foreach (needheaders, (GFunc)g_free, NULL);
 			g_ptr_array_free (needheaders, TRUE);
@@ -3950,6 +3936,109 @@ consume_idle_line (CamelImapStore *store, CamelFolder *folder, char *resp, IdleR
 	return;
 }
 
+static void
+process_idle_body (CamelImapStore *store, CamelFolder *folder, IdleResponse **idle_response, CamelException *exception)
+{
+	char *resp = NULL;
+
+	while (camel_imap_store_readline_nb (store, &resp, exception) > 0) {
+		if (resp && strlen (resp) > 1 && resp[0] == '*') {
+			if (!*idle_response)
+				*idle_response = idle_response_new (folder);
+			consume_idle_line (store, folder, resp, *idle_response);
+		}
+		
+		if (resp)
+			g_free (resp);
+		resp = NULL;
+	}
+}
+
+static void
+process_idle_untagged_response (CamelImapStore *store, CamelFolder *folder, IdleResponse **idle_response, CamelException *exception)
+{
+	char *resp = NULL;
+	CamelImapResponseType type;
+
+	while ((type = camel_imap_command_response_idle (store, &resp, exception)) == CAMEL_IMAP_RESPONSE_UNTAGGED) {
+		if (resp && strlen (resp) > 1 && resp[0] == '*') {
+			if (!*idle_response)
+				*idle_response = idle_response_new (folder);
+			consume_idle_line (store, folder, resp, *idle_response);
+		}
+		
+		if (resp)
+			g_free (resp);
+		resp = NULL;
+	}
+}
+
+static void
+do_send_done (CamelImapStore *store, CamelFolder *folder, IdleResponse **idle_resp, CamelException *ex)
+{
+	if (store->idle_prefix) {
+		gboolean l = g_static_rec_mutex_trylock (store->idle_lock);
+
+		if (!store->idle_kill) {
+			int nwritten=0;
+			/* We read-away everything that we still
+			 * have. To find where idle_resp is handled,
+			 * read below at the g_thread_join for
+			 * this thread (we are returning it). */
+
+			process_idle_body (store, folder, idle_resp, ex);
+
+			/* We send the DONE to the server */
+			
+			nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
+			idle_debug ("(%d, 8) -> DONE\n", nwritten);
+
+			/* We read away everything the server sends
+			 * until the we see the untagged OK response */
+
+			process_idle_untagged_response (store, folder, idle_resp, ex);
+		}
+
+		if (l)
+			g_static_rec_mutex_unlock (store->idle_lock);
+
+		/* If we are continuing the loop, handle idle_resp
+		 * now (this can invoke fetching new headers). */
+
+		if (store->idle_cont && *idle_resp) {
+			process_idle_response (*idle_resp);
+			idle_response_free (*idle_resp);
+			*idle_resp = NULL;
+		}
+
+	}
+	store->idle_send_done_happened = TRUE;
+}
+
+static gpointer
+send_done_in_stop_idle (CamelImapStore *store, CamelFolder *folder)
+{
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+	IdleResponse *idle_resp = NULL;
+
+	/* This method is used for sending the commands we expect idle thread to do to finish
+	 * idle loop, when the caller thread has the connect lock (and then the idle thread cannot
+	 * do safely these commands */
+
+	if (g_static_rec_mutex_trylock (store->idle_lock)) {
+			/* Step B) (see idle_thread) */
+
+			if (!store->idle_kill) {
+				process_idle_body (store, folder, &idle_resp, &ex);
+			}
+			g_static_rec_mutex_unlock (store->idle_lock);
+	}
+
+	/* Step C) (see idle_thread). We're assuming idle_cont == FALSE, send_done == TRUE*/
+	do_send_done (store, folder, &idle_resp, &ex);
+	return idle_resp;
+}
+
 typedef struct {
 	CamelFolder *folder;
 	GCond *condition;
@@ -3966,7 +4055,6 @@ idle_thread (gpointer data)
 	CamelImapStore *store;
 	gboolean tfirst = TRUE, first = TRUE, my_cont, had_cond = FALSE;
 	int cnt = 0;
-	int nwritten=0;
 	gpointer retval = NULL;
 
 	idle_debug ("idle_thread starts\n");
@@ -4029,198 +4117,112 @@ idle_thread (gpointer data)
 		idle_debug ("idle_thread starting but immediately stopping\n");
 	}
 
+	store->idle_send_done_happened = FALSE;
 	/* While nothing has stopped us yet ...
 	 * TNY TODO: it would be nicer to use select() here, rather than usleep() */
-
-	while (my_cont && !store->idle_kill)
+	
+	while (my_cont && !store->idle_kill && 
+	       (store->idle_cont || !store->idle_send_done_happened))
 	{
 		CamelException ex = CAMEL_EXCEPTION_INITIALISER;
-		char *resp = NULL;
 		IdleResponse *idle_resp = NULL;
 		gboolean senddone = FALSE;
+		
+		if (CAMEL_SERVICE_REC_TRYLOCK (store, connect_lock)) {
+			/* A) The first time we will start the IDLE by sending IDLE to
+			 * the server and reading away the + continuation (check out the
+			 * idle_real_start function). We don't call this in the other
+			 * loop cycles of this while. */
 
-		/* A) The first time we will start the IDLE by sending IDLE to
-		 * the server and reading away the + continuation (check out the
-		 * idle_real_start function). We don't call this in the other
-		 * loop cycles of this while. */
-
-		if (store->idle_cont && first) {
-			gboolean l = g_static_rec_mutex_trylock (store->idle_lock);
-			if (!store->idle_kill)
-				idle_real_start (store);
-			if (l)
-				g_static_rec_mutex_unlock (store->idle_lock);
-			first = FALSE;
-		}
-
-		/* And we also send the broadcast to the caller of this thread:
-		 * We're started, and we're fine. It can continue. We don't call
-		 * this in the other loop cycles of this while. */
-
-		if (tfirst) {
-			if (info->condition) {
-				g_mutex_lock (info->mutex);
-				g_cond_broadcast (info->condition);
-				info->had_cond = TRUE; had_cond = TRUE;
-				g_mutex_unlock (info->mutex);
-			}
-			tfirst = FALSE;
-		}
-
-		if (g_static_rec_mutex_trylock (store->idle_lock))
-		{
-			/* B) This happens during the IDLE's body (after IDLE is
-			 * started and before DONE is sent). We read away the
-			 * lines in a non-blocking way. As soon as we have a
-			 * full line, that starts with '*', we consume it. */
-
-			if (!store->idle_kill) {
-				while (camel_imap_store_readline_nb (store, &resp, &ex) > 0)
-				{
-					if (resp && strlen (resp) > 1 && resp[0] == '*') {
-						if (!idle_resp)
-							idle_resp = idle_response_new (folder);
-						consume_idle_line (store, folder, resp, idle_resp);
-					}
-
-					if (resp)
-						g_free (resp);
-					resp = NULL;
-				}
-			}
-			g_static_rec_mutex_unlock (store->idle_lock);
-		}
-
-		if (resp)
-			g_free (resp);
-
-		if (store->idle_cont)
-		{
-			if (idle_resp && !idle_resp->exists_happened) {
-				/* We can process it already: nothing is at this moment
-				 * joining us, nothing is at this moment locking the
-				 * folder_changed handler of TnyCamelFolder */
-				process_idle_response (idle_resp);
-				idle_response_free (idle_resp);
-				idle_resp = NULL;
-				retval = NULL;
-			} else if (idle_resp && idle_resp->exists_happened) {
-
-				/* We can't deal with new EXISTS responses
-				 * without first stopping IDLE (we'll need to
-				 * fetch the new headers) */
-
-				senddone = TRUE;
-				retval = idle_resp;
-			}
-		} else {
-			/* If store->idle_cont was FALSE, we're going to handle
-			 * idle_resp differently (look below). */
-			senddone = TRUE;
-			retval = idle_resp;
-		}
-
-		/* C) So either we timed out (store->idle_sleep as been reached),
-		 * which means that we 'are' going to restart this entire while,
-		 * including resending the IDLE-start, after we're done with
-		 * this if-block of course.
-		 *
-		 * Or another thread called us to stop IDLE, and then we're
-		 * going to exit this while, of course. If it was an idle_kill,
-		 * we're not even going to try doing that in a nice way. In that
-		 * case we'll just exit ASAP (it's let_idle_die in CamelImapStore
-		 * trying to disconnect from the IMAP server). */
-
-		if ((cnt > store->idle_sleep) || senddone)
-		{
-			if (store->idle_prefix)
-			{
-				CamelImapResponseType type;
+			if (store->idle_cont && first) {
 				gboolean l = g_static_rec_mutex_trylock (store->idle_lock);
-
 				if (!store->idle_kill)
-				{
-					/* We read-away everything that we still
-					 * have. To find where idle_resp is handled,
-					 * read below at the g_thread_join for
-					 * this thread (we are returning it). */
-
-					resp = NULL;
-					while (camel_imap_store_readline_nb (store, &resp, &ex) > 0)
-					{
-						if (resp && strlen (resp) > 1 && resp[0] == '*') {
-							if (!idle_resp) {
-								idle_resp = idle_response_new (folder);
-								/* We will free this after the join */
-								if (!store->idle_cont)
-									retval = idle_resp;
-							}
-							consume_idle_line (store, folder, resp, idle_resp);
-						}
-
-						if (resp)
-							g_free (resp);
-						resp = NULL;
-					}
-					if (resp)
-						g_free (resp);
-					resp = NULL;
-
-					/* We send the DONE to the server */
-
-					nwritten = camel_stream_printf (store->ostream, "DONE\r\n");
-					idle_debug ("(%d, 8) -> DONE\n", nwritten);
-
-					/* We read away everything the server sends
-					 * until the we see the untagged OK response */
-
-					while ((type = camel_imap_command_response_idle (store, &resp, &ex)) == CAMEL_IMAP_RESPONSE_UNTAGGED)
-					{
-						if (resp && strlen (resp) > 1 && resp[0] == '*') {
-							if (!idle_resp) {
-								idle_resp = idle_response_new (folder);
-								/* We will free this after the join */
-								if (!store->idle_cont)
-									retval = idle_resp;
-							}
-							consume_idle_line (store, folder, resp, idle_resp);
-						}
-
-						if (resp)
-							g_free (resp);
-						resp = NULL;
-					}
-				}
-
+					idle_real_start (store);
 				if (l)
 					g_static_rec_mutex_unlock (store->idle_lock);
+				first = FALSE;
+			}
 
-				if (resp)
-					g_free (resp);
-				resp = NULL;
+			/* And we also send the broadcast to the caller of this thread:
+			 * We're started, and we're fine. It can continue. We don't call
+			 * this in the other loop cycles of this while. */
+			
+			if (tfirst) {
+				if (info->condition) {
+					g_mutex_lock (info->mutex);
+					g_cond_broadcast (info->condition);
+					info->had_cond = TRUE; had_cond = TRUE;
+					g_mutex_unlock (info->mutex);
+				}
+				tfirst = FALSE;
+			}
 
-				/* If we are continuing the loop, handle idle_resp
-				 * now (this can invoke fetching new headers). */
-
-				if (store->idle_cont && idle_resp) {
+			if (g_static_rec_mutex_trylock (store->idle_lock)) {
+				/* B) This happens during the IDLE's body (after IDLE is
+				 * started and before DONE is sent). We read away the
+				 * lines in a non-blocking way. As soon as we have a
+				 * full line, that starts with '*', we consume it. */
+				
+				if (!store->idle_kill) {
+					process_idle_body (store, folder, &idle_resp, &ex);
+				}
+				g_static_rec_mutex_unlock (store->idle_lock);
+			}
+			
+			if (store->idle_cont) {
+				if (idle_resp && !idle_resp->exists_happened) {
+					/* We can process it already: nothing is at this moment
+					 * joining us, nothing is at this moment locking the
+					 * folder_changed handler of TnyCamelFolder */
 					process_idle_response (idle_resp);
 					idle_response_free (idle_resp);
 					idle_resp = NULL;
 					retval = NULL;
+				} else if (idle_resp && idle_resp->exists_happened) {
+
+					/* We can't deal with new EXISTS responses
+					 * without first stopping IDLE (we'll need to
+					 * fetch the new headers) */
+					
+					senddone = TRUE;
+					retval = idle_resp;
 				}
+			} else {
+				/* If store->idle_cont was FALSE, we're going to handle
+				 * idle_resp differently (look below). */
+				senddone = TRUE;
+				retval = idle_resp;
 			}
 
-			if (store->idle_cont)
-				first = TRUE;
-			else
-				my_cont = FALSE;
+			/* C) So either we timed out (store->idle_sleep as been reached),
+			 * which means that we 'are' going to restart this entire while,
+			 * including resending the IDLE-start, after we're done with
+			 * this if-block of course.
+			 *
+			 * Or another thread called us to stop IDLE, and then we're
+			 * going to exit this while, of course. If it was an idle_kill,
+			 * we're not even going to try doing that in a nice way. In that
+			 * case we'll just exit ASAP (it's let_idle_die in CamelImapStore
+			 * trying to disconnect from the IMAP server). */
+
+			if ((cnt > store->idle_sleep) || senddone) {
+				do_send_done (store, folder, &idle_resp, &ex);
+				if (store->idle_cont) {
+					first = TRUE;
+					retval = NULL;
+				} else {
+					retval = idle_resp;
+					my_cont = FALSE;
+				}
 
 			cnt = 0;
+			}
+			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		}
 
 		/* TNY TODO: try to use the select() of the non-blocking read
 		 * for this usleep() and cnt stuff. */
-
+		
 		if (my_cont)
 			usleep (IDLE_TICK_TIME);
 
@@ -4246,6 +4248,45 @@ idle_thread (gpointer data)
 	return retval;
 }
 
+static void
+stop_idle (CamelImapStore *store, CamelFolder *folder, gboolean send_done)
+{
+	g_static_rec_mutex_lock (store->idle_t_lock);
+	if (store->in_idle && store->idle_thread && (g_thread_self () != store->idle_thread)) {
+		IdleResponse *idle_resp = NULL;
+
+		store->idle_cont = FALSE;
+		if (send_done && !store->idle_send_done_happened) {
+			idle_resp  = send_done_in_stop_idle (store, folder);
+			g_thread_join (store->idle_thread);
+		} else {
+			idle_resp = g_thread_join (store->idle_thread);
+		}
+				
+		g_static_rec_mutex_lock (store->idle_lock);
+		g_static_rec_mutex_lock (store->idle_prefix_lock);
+				
+		store->in_idle = FALSE;
+		store->idle_thread = NULL;
+		if (store->idle_prefix)
+			g_free (store->idle_prefix);
+		
+		g_static_rec_mutex_unlock (store->idle_prefix_lock);
+		g_static_rec_mutex_unlock (store->idle_lock);
+
+		/* We are doing this here because here we wont hit the
+		 * priv->folder's lock of TnyCamelFolder during its
+		 * folder_changed handler. */
+
+		if (idle_resp) {
+			process_idle_response (idle_resp);
+			idle_response_free (idle_resp);
+		}
+
+	}
+	store->idle_prefix = NULL;
+	g_static_rec_mutex_unlock (store->idle_t_lock);
+}
 
 void
 camel_imap_folder_stop_idle (CamelFolder *folder)
@@ -4264,35 +4305,39 @@ camel_imap_folder_stop_idle (CamelFolder *folder)
 
 	if ((store->capabilities & IMAP_CAPABILITY_IDLE))
 	{
-		g_static_rec_mutex_lock (store->idle_t_lock);
-		if (store->in_idle && store->idle_thread && (g_thread_self () != store->idle_thread)) {
-			IdleResponse *idle_resp = NULL;
-			store->idle_cont = FALSE;
-			idle_resp = g_thread_join (store->idle_thread);
-
-			g_static_rec_mutex_lock (store->idle_lock);
-			g_static_rec_mutex_lock (store->idle_prefix_lock);
-
-			store->in_idle = FALSE;
-			store->idle_thread = NULL;
-			if (store->idle_prefix)
-				g_free (store->idle_prefix);
-
-			g_static_rec_mutex_unlock (store->idle_prefix_lock);
-			g_static_rec_mutex_unlock (store->idle_lock);
-
-			/* We are doing this here because here we wont hit the
-			 * priv->folder's lock of TnyCamelFolder during its
-			 * folder_changed handler. */
-
-			if (idle_resp) {
-				process_idle_response (idle_resp);
-				idle_response_free (idle_resp);
-			}
-
+		/* We can safely do this, as the access to this from idle thread is always protected
+		 * by a lock (we replace the idle thread once we joined, not before */
+		if (g_thread_self () != store->idle_thread) {
+			stop_idle (store, folder, FALSE);
 		}
-		store->idle_prefix = NULL;
-		g_static_rec_mutex_unlock (store->idle_t_lock);
+
+	}
+
+	return;
+}
+
+void
+camel_imap_folder_stop_idle_in_connect_lock (CamelFolder *folder)
+{
+	CamelImapStore *store;
+	CamelException ex = CAMEL_EXCEPTION_INITIALISER;
+
+	idle_debug ("camel_imap_folder_stop_idle_in_connect_lock\n");
+
+	store = CAMEL_IMAP_STORE (folder->parent_store);
+
+	store->idle_cont = FALSE;
+
+	if (!camel_disco_store_check_online ((CamelDiscoStore*)store, &ex))
+		return;
+
+	if ((store->capabilities & IMAP_CAPABILITY_IDLE))
+	{
+		/* We can safely do this, as the access to this from idle thread is always protected
+		 * by a lock (we replace the idle thread once we joined, not before */
+		if (g_thread_self () != store->idle_thread) {
+			stop_idle (store, folder, TRUE);
+		}
 
 	}
 
@@ -4317,6 +4362,11 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 	if (!imap_folder->do_push_email)
 		return;
 
+	if (store->idle_blocked) {
+		idle_debug ("idle is blocked\n");
+		return;
+	}
+
 	g_static_rec_mutex_lock (store->idle_lock);
 
 	if (store->capabilities & IMAP_CAPABILITY_IDLE)
@@ -4329,6 +4379,8 @@ camel_imap_folder_start_idle (CamelFolder *folder)
 
 			g_static_rec_mutex_lock (store->idle_t_lock);
 
+			/* We should never enter into a start idle from the idle thread */
+			g_assert ((store->idle_thread == NULL) || (g_thread_self () != store->idle_thread));
 			if (!store->in_idle && store->idle_thread && (g_thread_self () != store->idle_thread)) {
 				IdleResponse *idle_resp = NULL;
 
@@ -4590,8 +4642,10 @@ check_gmsgstore_die (gpointer user_data)
 		{
 			if (imap_folder->gmsgstore) {
 				imap_debug ("Get-Message service dies\n");
+				/* camel_imap_store_stop_idle_connect_lock (imap_folder->gmsgstore); */
 				camel_service_disconnect (CAMEL_SERVICE (imap_folder->gmsgstore),
 					imap_folder->gmsgstore->clean_exit, NULL);
+				/* camel_imap_store_connect_unlock_start_idle (imap_folder->gmsgstore); */
 				camel_object_unref (CAMEL_OBJECT (imap_folder->gmsgstore));
 				imap_folder->gmsgstore = NULL;
 				camel_object_unref (imap_folder);
@@ -4955,7 +5009,7 @@ imap_convert (CamelFolder *folder, const char *uid, const char *spec, const char
 			}
 
 convert_berrorhander:
-			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+			camel_imap_store_connect_unlock_start_idle (store);
 
 			if (err)
 				goto convert_errorhandler;
@@ -5065,6 +5119,14 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 		{
 			retry = FALSE;
 
+			g_free (path);
+
+			if (binary && *binary && store->capabilities & IMAP_CAPABILITY_BINARY)
+			{
+				path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+			} else {
+				path = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
+			}
 			fil = fopen (path, "w");
 
 			if (!fil) {
@@ -5095,9 +5157,6 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 				gint length=0, rec=0;
 				char *pos, *ppos;
 				gboolean unsolicited = TRUE;
-
-				g_free (path);
-				path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
 
 				nread = 0;
 
@@ -5147,7 +5206,7 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 						unlink (path);
 						g_free (path);
 						path = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
-						CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+						camel_imap_store_connect_unlock_start_idle (store);
 						goto fetch_retry;
 					}
 
@@ -5228,7 +5287,7 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 					*binary = TRUE;
 
 fetch_berrorhander:
-				CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+				camel_imap_store_connect_unlock_start_idle (store);
 
 				if (err)
 					goto fetch_errorhandler;
@@ -5245,8 +5304,6 @@ fetch_berrorhander:
 
 				nread = 0;
 
-				g_free (path);
-				path = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
 
 				/*
 				a01 UID FETCH 1:10 BODY.PEEK[0]
@@ -5357,7 +5414,7 @@ fetch_berrorhander:
 				  }
 				}
 
-				CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+				camel_imap_store_connect_unlock_start_idle (store);
 
 				if (nread <= 0) {
 					err = TRUE;
@@ -5599,18 +5656,21 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 		return NULL;
 	}
 
+	g_message ("%s: BEGIN NOOP IMAP COMMAND", __FUNCTION__);
 
 	noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
 	if (noop_response)
 		camel_imap_response_free (store, noop_response);
 	else {
 		stop_gmsgstore (imap_folder, ctchecker, FALSE);
+		g_message ("%s: NO NOOP RESPONSE -> EXIT", __FUNCTION__);
 		return NULL;
 	}
+	g_message ("%s: END NOOP IMAP COMMAND", __FUNCTION__);
 
 	camel_operation_start (NULL, _("Retrieving message"));
 
-  CAMEL_SERVICE_REC_LOCK(store, connect_lock);
+	camel_imap_store_stop_idle_connect_lock (store);
 
 	CAMEL_IMAP_FOLDER_REC_LOCK (imap_folder, cache_lock);
 
@@ -5624,6 +5684,7 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	if (stream == NULL) {
 		ex_id = CAMEL_EXCEPTION_SYSTEM_IO_WRITE;
 		errmessage = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno));
+		g_message ("%s: AFTER STREAM CACHE MESSAGE INSERT", __FUNCTION__);
 		goto errorhander;
 	}
 
@@ -5635,6 +5696,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 	 * code. Right now, all who use this function should check for the 
 	 * instance being valid cause of this reason. */
 
+	g_message ("%s: BEGIN WHILE RETRY", __FUNCTION__);
+	
 	while (retry)
 	{
 	retry = FALSE;
@@ -5656,6 +5719,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 			char *pos, *ppos;
 			gboolean unsolicited = TRUE;
 
+			g_message ("%s: IMAP COMMAND START UID FETCH BINARY PEEK", __FUNCTION__);
+	
 			/* Stops idle */
 			camel_imap_command_start (store, folder, ex,
 				"UID FETCH %s BINARY.PEEK[%s]", uid, section_text);
@@ -5698,7 +5763,8 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 						" we use BINARY (%s)\n", line);
 					store->capabilities &= ~IMAP_CAPABILITY_BINARY;
 					retry = TRUE;
-					CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
+					/* This pais with the internal lock in imap_command_start */
+					camel_imap_store_connect_unlock_start_idle (store);
 					goto myretry;
 				}
 
@@ -5784,10 +5850,12 @@ camel_imap_folder_fetch_data (CamelImapFolder *imap_folder, const char *uid,
 					nread = camel_stream_read (store->ostream, two_bytes, 1);
 			}
 berrorhander:
-			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-
-			if (err)
+			/* This is for the imap_command_start internal lock */
+			camel_imap_store_connect_unlock_start_idle (store);
+			if (err) {
+				g_message ("ERROR: ERR MESSAGE %s", errmessage);
 				goto errorhander;
+			}
 		} else
 		{
 			CamelImapResponse *response;
@@ -5866,8 +5934,6 @@ Received: from nic.funet.fi
 				ex_id = CAMEL_EXCEPTION_FOLDER_INVALID_UID;
 				err = TRUE;
 			}
-
-			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 
 			camel_stream_reset (stream);
 
@@ -6055,8 +6121,6 @@ Received: from nic.funet.fi
 				memset (line, 0, MAX_LINE_LEN);
 			  }
 
-			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
-
 			if (nread <= 0) {
 				err = TRUE;
 				ex_id = CAMEL_EXCEPTION_SERVICE_PROTOCOL;
@@ -6072,6 +6136,9 @@ Received: from nic.funet.fi
 					g_free (boundary);
 				goto errorhander;
 			}
+			/* This is for the imap_command_start internal lock */
+			camel_imap_store_connect_unlock_start_idle (store);
+
 		}
 
 		if (boundary_len > 0)
@@ -6087,7 +6154,7 @@ myretry:
 
 	CAMEL_IMAP_FOLDER_REC_UNLOCK (imap_folder, cache_lock);
 
-  CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+	camel_imap_store_connect_unlock_start_idle (store);
 
 	stop_gmsgstore (imap_folder, ctchecker, FALSE);
 
@@ -6115,7 +6182,7 @@ errorhander:
 
 	if (store)
 	{
-  CAMEL_SERVICE_REC_UNLOCK(store, connect_lock);
+		camel_imap_store_connect_unlock_start_idle (store);
 
 		stop_gmsgstore (imap_folder, ctchecker, TRUE);
 	}
