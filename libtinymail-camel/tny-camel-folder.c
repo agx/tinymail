@@ -5937,6 +5937,7 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 	/* Thread reference */
 	info->self = TNY_FOLDER (g_object_ref (self));
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
+	info->cancelled = FALSE;
 	camel_object_ref (info->session);
 
 	if (priv->folder)

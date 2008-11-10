@@ -1,3 +1,7 @@
+2008-11-10  Martin Bonnin  <martinbonnin@gmail.com>
+
+	* libtinymail-camel/tny-camel-folder.c: Uninitialized value, fixed
+
 2008-11-10  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Specify with defines the IDLE tick time (time between iterations in
