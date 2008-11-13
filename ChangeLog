@@ -1,3 +1,10 @@
+2008-11-13  Thomas Guillem  <thomas.guillem@gmail.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-message-cache.c:
+	Change the default cache filename from "uid." to "uid.~" in order to
+	keep compatibility with FAT32 partitions. (a FAT32 file can't end with '.')
+	Old cache files ("uid.") are still compatible.
+	
 2008-11-10  Jose Dapena Paz  <jdapena@igalia.com>
 
 	Complete rework of the lock behavior of Tinymail

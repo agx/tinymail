@@ -260,7 +260,6 @@ insert_setup (CamelImapMessageCache *cache, const char *uid, const char *part_sp
 	CamelStream *stream;
 	int fd;
 
-#ifdef G_OS_WIN32
 	/* Trailing periods in file names are silently dropped on
 	 * Win32, argh. The code in this file requires the period to
 	 * be there. So in case part_spec is empty, use a tilde (just
@@ -268,7 +267,6 @@ insert_setup (CamelImapMessageCache *cache, const char *uid, const char *part_sp
 	 */
 	if (!*part_spec)
 		part_spec = "~";
-#endif
 	*path = g_strdup_printf ("%s/%s.%s", cache->path, uid, part_spec);
 	*key = strrchr (*path, '/') + 1;
 	stream = g_hash_table_lookup (cache->parts, *key);
@@ -343,18 +341,42 @@ camel_imap_message_cache_insert (CamelImapMessageCache *cache, const char *uid,
 	return insert_finish (cache, uid, path, key, stream);
 }
 
+static gchar*
+cachefile_get(const char *path, const char *uid, const char *part_spec)
+{
+	gchar *file;
+	if (part_spec && *part_spec) {
+		file = g_build_filename(path, uid, part_spec);
+	} else {
+		char tmp [512];
+
+		snprintf(tmp, 512, "%s.~", uid);
+		file = g_build_filename(path, tmp, NULL);
+		if (!g_file_test(tmp, G_FILE_TEST_IS_REGULAR)) {
+			/*  Test if old cache file exists (like "uid."*/
+			int len = strlen(file);
+			file [len -1] = '\0';
+			if (!g_file_test(file, G_FILE_TEST_IS_REGULAR)) {
+				file [len -1] = '~';
+			}
+		}
+	}
+	return file;
+}
+
 void
 camel_imap_message_cache_set_flags (const gchar *folder_dir, CamelMessageInfoBase *mi)
 {
-	char mystring [512];
+	gchar *cachefile;
 
 	if( !folder_dir ){
 		return;
 	}
-
-	snprintf (mystring, 512, "%s/%s.", folder_dir, mi->uid);
-	if (g_file_test (mystring, G_FILE_TEST_IS_REGULAR))
+	cachefile = cachefile_get(folder_dir, mi->uid, NULL);
+	if (g_file_test (cachefile, G_FILE_TEST_IS_REGULAR))
 	{
+		char mystring [512];
+
 		mi->flags |= CAMEL_MESSAGE_CACHED;
 		snprintf (mystring, 512, "%s/%s.partial", folder_dir, mi->uid);
 		if (g_file_test (mystring, G_FILE_TEST_IS_REGULAR))
@@ -365,6 +387,7 @@ camel_imap_message_cache_set_flags (const gchar *folder_dir, CamelMessageInfoBas
 		mi->flags &= ~CAMEL_MESSAGE_CACHED;
 		mi->flags &= ~CAMEL_MESSAGE_PARTIAL;
 	}
+	g_free(cachefile);
 }
 
 gboolean
@@ -557,12 +580,7 @@ camel_imap_message_cache_get (CamelImapMessageCache *cache, const char *uid,
 	if (uid[0] == 0)
 		return NULL;
 
-#ifdef G_OS_WIN32
-	/* See comment in insert_setup() */
-	if (!*part_spec)
-		part_spec = "~";
-#endif
-	path = g_strdup_printf ("%s/%s.%s", cache->path, uid, part_spec);
+	path = cachefile_get(cache->path, uid, part_spec);
 	key = strrchr (path, '/') + 1;
 
 	stream = g_hash_table_lookup (cache->parts, key);
@@ -735,8 +753,8 @@ recursive_insanity (CamelStreamBuffer *stream, CamelStream *to, gchar *boundary_
 void camel_imap_message_cache_replace_cache (CamelImapMessageCache *cache, const char *uid, const char *part_spec,
 					  const char *dest_uid, const char *dest_part_spec)
 {
-	gchar *real = g_strdup_printf ("%s/%s.%s", cache->path, uid, (part_spec)?part_spec:"");
-	gchar *dest_real = g_strdup_printf ("%s/%s.%s", cache->path, dest_uid, (dest_part_spec)?dest_part_spec:"");
+	gchar *real = cachefile_get(cache->path, uid, part_spec);
+	gchar *dest_real = cachefile_get(cache->path, dest_uid, dest_part_spec);
 
 	rename (dest_real, real);
 
@@ -747,9 +765,13 @@ void camel_imap_message_cache_replace_cache (CamelImapMessageCache *cache, const
 void
 camel_imap_message_cache_delete_attachments (CamelImapMessageCache *cache, const char *uid)
 {
+  char filename [512];
+
   CamelStream *in = camel_imap_message_cache_get (cache, uid, "", NULL);
-  gchar *real1 = g_strdup_printf ("%s/%s.", cache->path, uid);
-  gchar *real = g_strdup_printf ("%s.tmp", real1);
+  gchar *real1 = cachefile_get(cache->path, uid, NULL);
+
+  snprintf(filename, 512, "%s.tmp", uid);
+  gchar *real = g_build_filename (cache->path, filename, NULL);
   CamelStream *to = camel_stream_fs_new_with_name (real, O_RDWR|O_CREAT|O_TRUNC, 0600);
   int n;
 
