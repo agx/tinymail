@@ -189,9 +189,10 @@ camel_imap_message_cache_new (const char *path, CamelFolderSummary *summary,
 			uid = g_strndup (dname, p - dname);
 		else if ((p = strchr (dname, '_')))
 			uid = g_strndup (dname, p - dname);
-		else
-			uid = g_strdup (dname);
-
+		else {
+			g_warning("Cache file name Invalid\n");
+			continue;
+		}
 		info = camel_folder_summary_uid (summary, uid);
 		if (info) {
 			camel_message_info_free(info);
@@ -346,7 +347,7 @@ cachefile_get(const char *path, const char *uid, const char *part_spec)
 {
 	gchar *file;
 	if (part_spec && *part_spec) {
-		file = g_build_filename(path, uid, part_spec);
+		file = g_build_filename(path, uid, part_spec, NULL);
 	} else {
 		char tmp [512];
 
