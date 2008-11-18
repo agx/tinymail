@@ -572,7 +572,6 @@ load_folder_no_lock (TnyCamelFolderPriv *priv)
 				/* g_critical ("Can't load folder: %s", camel_exception_get_description (&priv->load_ex)); */
 
 				priv->folder = NULL;
-				priv->folder = NULL;
 				priv->loaded = FALSE;
 
 				return FALSE;
@@ -1265,7 +1264,7 @@ tny_camel_folder_remove_msgs_async_default (TnyFolder *self, TnyList *headers, T
 {
 	RemMsgsInfo *info;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	
+
 	/* Idle info for the callbacks */
 	info = g_slice_new (RemMsgsInfo);
 	info->session = TNY_FOLDER_PRIV_GET_SESSION (priv);
@@ -1276,6 +1275,7 @@ tny_camel_folder_remove_msgs_async_default (TnyFolder *self, TnyList *headers, T
 	info->callback = callback;
 	info->user_data = user_data;
 	info->err = NULL;
+	info->cancelled = FALSE;
 
 	/* thread reference */
 	g_object_ref (info->self);
@@ -1802,7 +1802,7 @@ tny_camel_folder_sync_async_default (TnyFolder *self, gboolean expunge, TnyFolde
 	info->user_data = user_data;
 	info->expunge = expunge;
 	info->err = NULL;
-
+	info->cancelled = FALSE;
 	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
@@ -2047,7 +2047,7 @@ tny_camel_folder_refresh_async_default (TnyFolder *self, TnyFolderCallback callb
 	info->status_callback = status_callback;
 	info->user_data = user_data;
 	info->err = NULL;
-
+	info->cancelled = FALSE;
 	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
@@ -2339,6 +2339,7 @@ tny_camel_folder_get_headers_async_default (TnyFolder *self, TnyList *headers, g
 	info->status_callback = status_callback;
 	info->user_data = user_data;
 	info->err = NULL;
+	info->cancelled = FALSE;
 	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
@@ -3578,18 +3579,14 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 
 		tny_debug ("tny_folder_copy: recurse_copy\n");
 
-		if (nerr != NULL)
-			g_error_free (nerr);
-		nerr = NULL;
-
 		/* The recurse_copy call deletes the original folder if del==TRUE */
 		cpyr = recurse_copy (self, into, new_name, del, &nerr, adds, rems);
 
 		if (nerr != NULL) {
 			if (!tried)
 				g_propagate_error (err, nerr);
-			/* else
-				g_error_free (nerr); */
+			else
+				g_error_free (nerr);
 		} else {
 			/* Unload the folder. This way we'll get the
 			   right CamelFolderInfo objects for the
@@ -5243,6 +5240,7 @@ tny_camel_folder_create_folder_async_default (TnyFolderStore *self, const gchar 
 	info->user_data = user_data;
 	info->new_folder = NULL;
 	info->err = NULL;
+	info->cancelled = FALSE;
 
 	/* thread reference */
 	_tny_camel_folder_reason (priv);
@@ -5365,7 +5363,7 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 	}
 
 	if (!cant_reuse_iter)
-		cant_reuse_iter = cant_reuse_iter;
+		cant_reuse_iter = priv->cant_reuse_iter;
 
 	if ((!priv->iter && priv->iter_parented) || cant_reuse_iter)
 	{
@@ -5572,6 +5570,7 @@ tny_camel_folder_get_folders_async_default (TnyFolderStore *self, TnyList *list,
 	info->query = query;
 	info->refresh = refresh;
 	info->err = NULL;
+	info->cancelled = FALSE;
 
 	/* thread reference */
 	_tny_camel_folder_reason (priv);
@@ -5770,6 +5769,7 @@ tny_camel_folder_store_refresh_async (TnyFolderStore *self, TnyFolderStoreCallba
 	info->callback = callback;
 	info->user_data = user_data;
 	info->err = NULL;
+	info->cancelled = FALSE;
 
 	/* thread reference */
 	_tny_camel_folder_reason (priv);

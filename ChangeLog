@@ -1,11 +1,17 @@
 2008-11-18  Sergio Villar Senin  <svillar@igalia.com>
 
-	* libtinymail-camel/tny-camel-mime-part-priv.h: Moved a function
-	header into the #ifdef
-
 	* libtinymail-camel/tny-camel-folder.c: several bugfixes. Fixed an
 	invalid comparison (a typo most likely). Fixed several memory
 	leaks as well in some lists that were not freed.
+	(load_folder_no_lock): removed a duplicated instruction.
+	Added several initializations of cancelled field all around the
+	code.
+	(tny_camel_folder_copy_shared): removed needless code and fixed a
+	memory leak.
+	(tny_camel_folder_get_folders_default): fixed an useless asignment
+
+	* libtinymail-camel/tny-camel-mime-part-priv.h: Moved a function
+	header into the #ifdef
 
 2008-11-13  Thomas Guillem  <thomas.guillem@gmail.com>
 
@@ -13,7 +19,7 @@
 	Change the default cache filename from "uid." to "uid.~" in order to
 	keep compatibility with FAT32 partitions. (a FAT32 file can't end with '.')
 	Old cache files ("uid.") are still compatible.
-	
+
 2008-11-10  Jose Dapena Paz  <jdapena@igalia.com>
 
 	Complete rework of the lock behavior of Tinymail
