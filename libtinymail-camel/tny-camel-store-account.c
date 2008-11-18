@@ -1669,16 +1669,17 @@ tny_camel_store_account_store_refresh (TnyFolderStore *self, GError **err)
 
 	priv->cant_reuse_iter = FALSE;
 
+	if (priv->iter_store) {
+		camel_object_unref (CAMEL_OBJECT (priv->iter_store));
+	}
+
 	camel_object_ref (CAMEL_OBJECT (store));
 	priv->iter_store = store;
 
 	iter = priv->iter;
 
-	if (iter)
+	while (iter)
 	{
-	  iter = iter->child;
-	  while (iter)
-	  {
 		/* Also take a look at camel-maildir-store.c:525 */
 		if (!(iter->flags & CAMEL_FOLDER_VIRTUAL))
 		{
@@ -1698,7 +1699,6 @@ tny_camel_store_account_store_refresh (TnyFolderStore *self, GError **err)
 			g_object_unref (folder);
 		}
 		iter = iter->next;
-	  }
 	}
 
 
