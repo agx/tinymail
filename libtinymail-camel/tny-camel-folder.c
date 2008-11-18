@@ -369,7 +369,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 				const char *uid = info->uid_added->pdata[i];
 
 				CamelMessageInfo *minfo = camel_folder_summary_uid (summary, uid);
-				if (info)
+				if (minfo)
 				{
 					TnyHeader *hdr = _tny_camel_header_new ();
 
@@ -3364,76 +3364,67 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 }
 
 
-
 static void
 notify_folder_observers_about_copy (GList *adds, GList *rems, gboolean del, gboolean in_idle, TnySessionCamel *session)
 {
 
- if (rems) 
- {
-	rems = g_list_first (rems);
-	while (rems)
-	{
-		CpyEvent *evt = rems->data;
-		if (del) {
+	if (rems) {
+		rems = g_list_first (rems);
+		while (rems) {
+			CpyEvent *evt = rems->data;
+			if (del) {
+				TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
+
+				tny_folder_store_change_add_removed_folder (change, evt->fol);
+
+				if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
+					if (in_idle)
+						notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change, session);
+					else
+						notify_folder_store_observers_about_for_store_acc (evt->str, change, session);
+				} else {
+					if (in_idle)
+						notify_folder_store_observers_about_in_idle (evt->str, change, session);
+					else
+						notify_folder_store_observers_about (evt->str, change, session);
+				}
+
+				g_object_unref (change);
+
+			}
+			cpy_event_free (evt);
+			rems = g_list_next (rems);
+		}
+	}
+
+	if (adds) {
+		adds = g_list_first (adds);
+		while (adds) {
+			CpyEvent *evt = adds->data;
 			TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
 
-			tny_folder_store_change_add_removed_folder (change, evt->fol);
-
+			tny_folder_store_change_add_created_folder (change, evt->fol);
 			if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
-				if (in_idle)
+				if (in_idle) {
 					notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change, session);
-				else
+				} else {
 					notify_folder_store_observers_about_for_store_acc (evt->str, change, session);
+				}
 			} else {
-				if (in_idle)
+				if (in_idle) {
 					notify_folder_store_observers_about_in_idle (evt->str, change, session);
-				else
+				} else {
 					notify_folder_store_observers_about (evt->str, change, session);
+				}
 			}
-
 			g_object_unref (change);
 
+			cpy_event_free (evt);
+			adds = g_list_next (adds);
 		}
-		cpy_event_free (evt);
-		rems = g_list_next (rems);
 	}
-	g_list_free (rems);
- }
 
- if (adds)
- {
-	adds = g_list_first (adds);
-
-	while (adds)
-	{
-		CpyEvent *evt = adds->data;
-		TnyFolderStoreChange *change = tny_folder_store_change_new (evt->str);
-
-		tny_folder_store_change_add_created_folder (change, evt->fol);
-
-		if (TNY_IS_CAMEL_STORE_ACCOUNT (evt->str)) {
-			if (in_idle) {
-				notify_folder_store_observers_about_for_store_acc_in_idle (evt->str, change, session);
-			} else {
-				notify_folder_store_observers_about_for_store_acc (evt->str, change, session);
-			}
-		} else {
-			if (in_idle) {
-				notify_folder_store_observers_about_in_idle (evt->str, change, session);
-			} else {
-				notify_folder_store_observers_about (evt->str, change, session);
-			}
-		}
-		g_object_unref (change);
-
-		cpy_event_free (evt);
-		adds = g_list_next (adds);
-	}
-	g_list_free (adds);
- }
-
- return;
+	return;
 }
 
 static CpyRecRet*
@@ -3704,6 +3695,11 @@ tny_camel_folder_copy_default (TnyFolder *self, TnyFolderStore *into, const gcha
 		notify_folder_observers_about_copy (adds, rems, del, TRUE,
 			TNY_FOLDER_PRIV_GET_SESSION (priv));
 
+	if (adds)
+		g_list_free (adds);
+	if (rems)
+		g_list_free (rems);
+
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
 	return retval;
@@ -3751,6 +3747,11 @@ tny_camel_folder_copy_async_destroyer (gpointer thr_user_data)
 
 	if (info->new_name)
 		g_free (info->new_name);
+
+	if (info->rems)
+		g_list_free (info->rems);
+	if (info->adds)
+		g_list_free (info->adds);
 
 	/**/
 
@@ -3877,12 +3878,20 @@ tny_camel_folder_copy_async_cancelled_destroyer (gpointer thr_user_data)
 {
 	CopyFolderInfo *info = (CopyFolderInfo *) thr_user_data;
 
+	if (info->new_folder)
+		g_object_unref (info->new_folder);
+
 	if (info->new_name)
 		g_free (info->new_name);
 	if (info->err)
 		g_error_free (info->err);
 	g_object_unref (info->self);
 	g_object_unref (info->into);
+
+	if (info->rems)
+		g_list_free (info->rems);
+	if (info->adds)
+		g_list_free (info->adds);
 
 	tny_idle_stopper_destroy (info->stopper);
 	info->stopper = NULL;
