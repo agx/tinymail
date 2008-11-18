@@ -217,7 +217,8 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 			wait = TRUE;
 		/* If no next item is scheduled then we can go idle after finishing operation */
 		apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (queue->account);
-		camel_service_can_idle (apriv->service, !first || !first->next);
+		if (apriv->service)
+			camel_service_can_idle (apriv->service, !first || !first->next);
 		g_static_rec_mutex_unlock (queue->lock);
 
 		if (item) {
@@ -444,7 +445,8 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 
 	/* If no next item is scheduled then we can go idle after finishing operation */
 	apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (queue->account);
-	camel_service_can_idle (apriv->service, !queue->list || !queue->list->next);
+	if (apriv->service)
+		camel_service_can_idle (apriv->service, !queue->list || !queue->list->next);
 
 	if (queue->stopped) 
 	{
