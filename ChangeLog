@@ -1,3 +1,7 @@
+2008-11-18  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Avoid criticals on calling can_idle if queue does not have service.
+
 2008-11-17  Martin Bonnin  <martinbonnin@gmail.com>
 
 	* libtinymail-camel/tny-camel-store-account.c: 2 small bugfixes in 
