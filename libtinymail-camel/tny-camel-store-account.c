@@ -771,6 +771,7 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	g_static_rec_mutex_init (priv->factory_lock);
 	priv->obs_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->obs_lock);
+	priv->iter_store = NULL;
 
 	return;
 }
