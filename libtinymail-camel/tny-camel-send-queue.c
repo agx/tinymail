@@ -1528,6 +1528,9 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->is_running = FALSE;
 	priv->thread = NULL;
 	priv->pending_send_notifies = 0;
+	priv->total = 0;
+	priv->cur_i = 0;
+	priv->trans_account = NULL;
 
 	return;
 }
