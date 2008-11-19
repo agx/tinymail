@@ -1599,7 +1599,6 @@ imap_sync_online (CamelFolder *folder, CamelException *ex)
 	imap_sync_offline (folder, ex);
 
 	camel_imap_store_connect_unlock_start_idle (store);
-	camel_imap_folder_start_idle (folder);
 
 }
 
@@ -2286,7 +2285,6 @@ imap_transfer_online (CamelFolder *source, GPtrArray *uids,
 	if (transferred_uids)
 		*transferred_uids = NULL;
 
-	camel_imap_folder_start_idle (source);
 
 }
 
@@ -4439,6 +4437,9 @@ static void
 imap_set_push_email (CamelFolder *folder, gboolean setting)
 {
 	CamelImapFolder *imap_folder = CAMEL_IMAP_FOLDER (folder);
+	CamelImapStore *store;
+
+	store = CAMEL_IMAP_STORE (folder->parent_store);
 
 	if (imap_folder->do_push_email && !setting) {
 		imap_folder->do_push_email = setting;
@@ -4447,7 +4448,7 @@ imap_set_push_email (CamelFolder *folder, gboolean setting)
 
 	if (!imap_folder->do_push_email && setting) {
 		imap_folder->do_push_email = setting;
-		camel_imap_folder_start_idle (folder);
+		camel_imap_store_start_idle_if_unlocked (store);
 	}
 
 	return;
