@@ -783,6 +783,7 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 	g_mutex_unlock (priv->part_lock);
 
 	wrapper = camel_medium_get_content_object (medium);
+	camel_object_ref (wrapper);
 
 	if (G_UNLIKELY (!wrapper)) {
 		g_warning (_("Mime part does not yet have a source stream, use "
@@ -796,6 +797,7 @@ tny_camel_mime_part_decode_to_stream_default (TnyMimePart *self, TnyStream *stre
 	else
 		bytes = (gssize) camel_data_wrapper_decode_to_stream (wrapper, cstream);
 
+	camel_object_unref (wrapper);
 	camel_object_unref (cstream);
 	camel_object_unref (medium);
 	

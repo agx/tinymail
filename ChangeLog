@@ -1,3 +1,9 @@
+2008-11-19  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-mime-part.c
+	(tny_camel_mime_part_decode_to_stream_default): 
+	adds a reference to protect wrapper when decoding to a stream
+
 2008-11-19  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
@@ -133,6 +139,10 @@
 	* libtinymail-camel/camel-lite/camel/camel-file-utils.c: (camel_write)
 	only write in chunks when writing to sockets, do not do it when
 	writing to a local filesystem. This speeds up writings a lot.
+	*
+	libtinymail-camel/camel-lite/camel/providers/local/camel-maildir-summary.c:
+	adds an extra check that prevents crashes when reading data from
+	corrupted media.
 
 2008-09-23  Rob Taylor  <rob.taylor@codethink.co.uk>
 
