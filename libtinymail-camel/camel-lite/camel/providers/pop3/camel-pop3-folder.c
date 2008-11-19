@@ -614,6 +614,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		;
 
 	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+	camel_operation_end (NULL);
 
 	if (i == -1) {
 		if (errno == EINTR)
