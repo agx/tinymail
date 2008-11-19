@@ -68,6 +68,9 @@ typedef struct {
 	TnyHeader *header;
 	gint i, total;
 	guint signal_id;
+	GCond *condition;
+	GMutex *mutex;
+	gboolean had_callback;
 } ControlInfo;
 
 
@@ -307,6 +310,13 @@ emit_queue_control_signals_on_mainloop (gpointer data)
 	g_signal_emit (info->self, tny_send_queue_signals [info->signal_id], 0);
 	if (apriv)
 		tny_lockable_unlock (apriv->session->priv->ui_lock);
+
+	if (info->mutex) {
+		g_mutex_lock (info->mutex);
+		g_cond_broadcast (info->condition);
+		info->had_callback = TRUE;
+		g_mutex_unlock (info->mutex);
+	}
 
 	return FALSE;
 }
@@ -567,6 +577,32 @@ sync_sync (TnyFolder *self, gboolean expunge, GError **err)
 	g_slice_free (SyncSync, info);
 }
 
+static void
+wait_for_queue_start_notification (TnySendQueue *self)
+{
+	ControlInfo *info = g_slice_new0 (ControlInfo);
+
+	info->mutex = g_mutex_new ();
+	info->condition = g_cond_new ();
+	info->had_callback = FALSE;
+
+	info->self = g_object_ref (self);
+	info->signal_id = TNY_SEND_QUEUE_START;
+
+	g_idle_add (emit_queue_control_signals_on_mainloop, info);
+
+	g_mutex_lock (info->mutex);
+	if (!info->had_callback)
+		g_cond_wait (info->condition, info->mutex);
+	g_mutex_unlock (info->mutex);
+
+	g_mutex_free (info->mutex);
+	g_cond_free (info->condition);
+
+	g_slice_free (GetHeadersSync, info);
+}
+
+
 static gpointer
 thread_main (gpointer data)
 {
@@ -578,7 +614,9 @@ thread_main (gpointer data)
 	TnyDevice *device = info->device;
 	GHashTable *failed_headers = NULL;
 
-	priv->is_running = TRUE;
+	/* Wait here until the user receives the queue-start notification */
+	wait_for_queue_start_notification (self);
+
 	list = tny_simple_list_new ();
 
 	g_static_rec_mutex_lock (priv->todo_lock);
@@ -621,7 +659,6 @@ thread_main (gpointer data)
 			if (tny_device_is_online (device)) 
 				get_headers_sync (info->outbox, headers, TRUE, &ferror);
 			else {
-				priv->is_running = FALSE;
 				g_static_rec_mutex_unlock (priv->todo_lock);
 				g_static_rec_mutex_unlock (priv->sending_lock);
 				goto errorhandler;
@@ -629,7 +666,6 @@ thread_main (gpointer data)
 
 			if (ferror != NULL)
 			{
-				priv->is_running = FALSE;
 				emit_error (self, NULL, NULL, ferror, i, priv->total);
 				g_error_free (ferror);
 				g_object_unref (headers);
@@ -676,7 +712,6 @@ thread_main (gpointer data)
 
 			if (length <= 0)
 			{
-				priv->is_running = FALSE;
 				g_object_unref (headers);
 				g_static_rec_mutex_unlock (priv->todo_lock);
 				g_static_rec_mutex_unlock (priv->sending_lock);
@@ -765,7 +800,6 @@ thread_main (gpointer data)
 			g_object_unref (header);
 		} else 
 		{
-			priv->is_running = FALSE;
 			/* Not good, or we just went offline, let's just kill this thread */ 
 			length = 0;
 			if (header && G_IS_OBJECT (header))
@@ -782,8 +816,6 @@ thread_main (gpointer data)
 	tny_folder_sync_async (info->outbox, TRUE, NULL, NULL, NULL);
 
 errorhandler:
-
-	priv->is_running = FALSE;
 
 	if (failed_headers)
 		g_hash_table_destroy (failed_headers);
@@ -814,6 +846,10 @@ errorhandler:
 
 	g_slice_free (MainThreadInfo, info);
 
+	g_static_mutex_lock (priv->running_lock);
+	priv->is_running = FALSE;
+	g_static_mutex_unlock (priv->running_lock);
+
 	/* Emit the queue-stop signal */
 	emit_queue_control_signals (self, TNY_SEND_QUEUE_STOP);
 
@@ -827,6 +863,7 @@ create_worker (TnySendQueue *self, GError **err)
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 
+	g_static_mutex_lock (priv->running_lock);
 	if (!priv->is_running && priv->trans_account && TNY_IS_TRANSPORT_ACCOUNT (priv->trans_account))
 	{
 		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->trans_account);
@@ -871,12 +908,19 @@ create_worker (TnySendQueue *self, GError **err)
 				_tny_camel_folder_reason (spriv);
 			}
 
-			emit_queue_control_signals (self, TNY_SEND_QUEUE_START);
-
+			priv->is_running = TRUE;
 			priv->thread = g_thread_create (thread_main, info, FALSE, NULL);
 
 			if (priv->thread == NULL) {
-				emit_queue_control_signals (self, TNY_SEND_QUEUE_STOP);
+				GError *error;
+
+				priv->is_running = FALSE;
+
+				g_set_error (err, TNY_ERROR_DOMAIN, 
+					     TNY_SYSTEM_ERROR_UNKNOWN,
+					     "Couldn't start thread for send queue");
+				emit_error (self, NULL, NULL, error, 0, 0);
+
 			        if (TNY_IS_CAMEL_FOLDER (info->outbox)) {
 		        	        TnyCamelFolderPriv *opriv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->outbox);
 					_tny_camel_folder_unreason (opriv);
@@ -888,6 +932,7 @@ create_worker (TnySendQueue *self, GError **err)
 			}
 		}
 	}
+	g_static_mutex_unlock (priv->running_lock);
 
 	return;
 }
@@ -909,7 +954,9 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 
 	g_static_rec_mutex_lock (priv->sending_lock);
 
+	g_static_mutex_lock (priv->running_lock);
 	priv->is_running = FALSE;
+	g_static_mutex_unlock (priv->running_lock);
 
 	outbox = tny_send_queue_get_outbox (self);
 
@@ -991,7 +1038,7 @@ on_added (TnyFolder *folder, gboolean cancelled, GError *err, gpointer user_data
 	if (!err)
 		priv->total++;
 
-	if (!err & !priv->is_running)
+	if (!err)
 		create_worker (info->self, &new_err);
 
 	/* Call user callback after msg has beed added to OUTBOX, waiting to be sent*/
@@ -1270,6 +1317,9 @@ tny_camel_send_queue_finalize (GObject *object)
 	g_free (priv->sending_lock);
 	priv->sending_lock = NULL;
 
+	g_free (priv->running_lock);
+	priv->running_lock = NULL;
+
 	g_object_unref (priv->trans_account);
 
 	(*parent_class->finalize) (object);
@@ -1472,6 +1522,8 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	g_static_rec_mutex_init (priv->todo_lock);
 	priv->sending_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->sending_lock);
+	priv->running_lock = g_new0 (GStaticMutex, 1);
+	g_static_mutex_init (priv->running_lock);
 
 	priv->is_running = FALSE;
 	priv->thread = NULL;

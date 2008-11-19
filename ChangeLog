@@ -1,7 +1,11 @@
 2008-11-19  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail-camel/tny-camel-send-queue-priv.h
+	* libtinymail-camel/tny-camel-send-queue.c: added some locking to
+	prevent two send queue threads running at the same time.
+
 	* libtinymail-camel/tny-camel-mime-part.c
-	(tny_camel_mime_part_decode_to_stream_default): 
+	(tny_camel_mime_part_decode_to_stream_default):
 	adds a reference to protect wrapper when decoding to a stream
 
 2008-11-19  Jose Dapena Paz  <jdapena@igalia.com>
