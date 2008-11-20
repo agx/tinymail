@@ -43,6 +43,7 @@ struct _status_stack {
 #define CAMEL_OPERATION_CANCELLED (1<<0)
 #endif
 #define CAMEL_OPERATION_TRANSIENT (1<<1)
+#define CAMEL_OPERATION_MUTE 	  (1<<2)
 
 /* Delay before a transient operation has any effect on the status */
 #define CAMEL_OPERATION_TRANSIENT_DELAY (5)
@@ -111,20 +112,60 @@ camel_operation_new (CamelOperationStatusFunc status, void *status_data)
 	return cc;
 }
 
+static void
+co_mute(CamelOperation *cc, gboolean mute)
+{
+	struct _status_stack *s;
+
+	if (cc == NULL)
+		cc = co_getcc();
+
+	if (cc == NULL)
+		return;
+
+	LOCK();
+
+	if (cc->status == NULL || cc->status_stack == NULL) {
+		UNLOCK();
+		return;
+	}
+
+	s = cc->status_stack->data;
+
+	if (mute){
+		s->flags |= CAMEL_OPERATION_MUTE;
+	} else {
+		s->flags &= ~CAMEL_OPERATION_MUTE;
+	} 
+
+	UNLOCK();
+}
+
+
 /**
  * camel_operation_mute:
  * @cc:
  *
- * mutes a camel operation permanently.  from this point on you will never
+ * mutes a camel operation. from this point on you will never
  * receive operation updates, even if more are sent.
  **/
 void
 camel_operation_mute(CamelOperation *cc)
 {
-	LOCK();
-	cc->status = NULL;
-	cc->status_data = NULL;
-	UNLOCK();
+	co_mute(cc, TRUE);
+}
+
+/**
+ * camel_operation_unmute:
+ * @cc:
+ *
+ * unmutes a camel operation. 
+ * Makes the operation send updates again
+ **/
+void
+camel_operation_unmute(CamelOperation *cc)
+{
+	co_mute(cc, FALSE);
 }
 
 /**
@@ -577,6 +618,12 @@ camel_operation_progress (CamelOperation *cc, int sofar, int oftotal)
 	}
 
 	s = cc->status_stack->data;
+
+	if( s->flags & CAMEL_OPERATION_MUTE ){
+		UNLOCK();
+		return;
+	}
+
 	s->sofar = sofar;
 	s->oftotal = oftotal;
 

@@ -1,5 +1,11 @@
 2008-11-20  Martin Bonnin  <martinbonnin@gmail.com>
  
+	* camel operation:
+	adding camel_operation_mute/unmute() and use it to filter the progress
+	events. This prevents to send bad progress when refreshing an IMAP folder
+
+2008-11-20  Martin Bonnin  <martinbonnin@gmail.com>
+ 
  	* libtinymail-camel/camel-lite/camel/providers/imap:
  	For IMAP, we open 2 sessions: one for standard operations, the other
  	for fetching messages. This makes concurrent accesses to the folder summary

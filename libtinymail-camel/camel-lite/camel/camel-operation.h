@@ -81,6 +81,7 @@ typedef enum _camel_operation_status_t {
 /* main thread functions */
 CamelOperation *camel_operation_new(CamelOperationStatusFunc status, void *status_data);
 void camel_operation_mute(CamelOperation *cc);
+void camel_operation_unmute(CamelOperation *cc);
 void camel_operation_ref(CamelOperation *cc);
 void camel_operation_unref(CamelOperation *cc);
 void camel_operation_cancel(CamelOperation *cc);
