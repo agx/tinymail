@@ -5284,6 +5284,31 @@ _tny_camel_folder_set_parent (TnyCamelFolder *self, TnyFolderStore *parent)
 	return;
 }
 
+static void
+_tny_camel_folder_guess_folder_type (TnyCamelFolder *folder, CamelFolderInfo *folder_info)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
+
+	if (folder_info->name) {
+		if (!g_ascii_strcasecmp (folder_info->name, "drafts")) {
+			priv->cached_folder_type = TNY_FOLDER_TYPE_DRAFTS;
+		} else if (!g_ascii_strcasecmp (folder_info->name, "sent")) {
+			priv->cached_folder_type = TNY_FOLDER_TYPE_SENT;
+		} else if (!g_ascii_strcasecmp (folder_info->name, "outbox")) {
+			priv->cached_folder_type = TNY_FOLDER_TYPE_OUTBOX;
+		} else if (!g_ascii_strcasecmp (folder_info->name, "inbox")) {
+			/* Needed as some dovecot servers report the inbox as
+			 * normal */
+			priv->cached_folder_type = TNY_FOLDER_TYPE_INBOX;
+		} else {
+			priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
+		}
+		
+	} else {
+		priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
+	}
+}
+
 void 
 _tny_camel_folder_set_folder_type (TnyCamelFolder *folder, CamelFolderInfo *folder_info)
 {
@@ -5310,7 +5335,7 @@ _tny_camel_folder_set_folder_type (TnyCamelFolder *folder, CamelFolderInfo *fold
 				priv->cached_folder_type = TNY_FOLDER_TYPE_SENT; 
 			break;
 			default:
-				priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
+				_tny_camel_folder_guess_folder_type (folder, folder_info);
 			break;
 		}
 	}

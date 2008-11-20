@@ -1,3 +1,8 @@
+2008-11-20  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c: guess folder type from name if
+	we couldn't know the folder type from camel.
+
 2008-11-19  Martin Bonnin  <martinbonnin@gmail.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c:
