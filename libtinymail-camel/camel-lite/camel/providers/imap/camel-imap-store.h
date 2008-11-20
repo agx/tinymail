@@ -133,6 +133,7 @@ typedef enum {
 #define IMAP_PARAM_FILTER_JUNK			(1 << 3)
 #define IMAP_PARAM_FILTER_JUNK_INBOX		(1 << 4)
 #define IMAP_PARAM_SUBSCRIPTIONS		(1 << 5)
+#define IMAP_PARAM_DONT_TOUCH_SUMMARY		(1 << 6)
 
 struct _CamelImapStore {
 	CamelDiscoStore parent_object;

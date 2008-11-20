@@ -1,3 +1,13 @@
+2008-11-20  Martin Bonnin  <martinbonnin@gmail.com>
+ 
+ 	* libtinymail-camel/camel-lite/camel/providers/imap:
+ 	For IMAP, we open 2 sessions: one for standard operations, the other
+ 	for fetching messages. This makes concurrent accesses to the folder summary
+ 	therefore corrupting it.
+ 	This happens e.g when you delete a message and fetch a new one afterwards.
+ 	This patch adds the "dont_touch_summary" parameter to prevent the GetMsg session to
+ 	mess up too much.
+
 2008-11-20  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c: guess folder type from name if

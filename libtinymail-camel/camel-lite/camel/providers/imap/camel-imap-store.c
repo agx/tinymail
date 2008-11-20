@@ -756,6 +756,8 @@ construct (CamelService *service, CamelSession *session,
 		imap_store->parameters |= IMAP_PARAM_FILTER_JUNK;
 	if (camel_url_get_param (url, "filter_junk_inbox"))
 		imap_store->parameters |= IMAP_PARAM_FILTER_JUNK_INBOX;
+	if (camel_url_get_param (url, "dont_touch_summary"))
+		imap_store->parameters |= IMAP_PARAM_DONT_TOUCH_SUMMARY;
 
 	/* setup journal*/
 	path = g_strdup_printf ("%s/journal", imap_store->storage_path);

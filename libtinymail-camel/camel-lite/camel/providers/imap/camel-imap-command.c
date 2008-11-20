@@ -1067,8 +1067,10 @@ camel_imap_response_free (CamelImapStore *store, CamelImapResponse *response)
 	if (response->folder && !fetching_message) {
 		if (exists > 0 || expunged) {
 			/* Update the summary */
-			camel_imap_folder_changed (response->folder,
+			if (!(store->parameters & IMAP_PARAM_DONT_TOUCH_SUMMARY)){
+				camel_imap_folder_changed (response->folder,
 						   exists, expunged, NULL);
+			}
 		}
 	}
 

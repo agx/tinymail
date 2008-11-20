@@ -4694,6 +4694,9 @@ create_gmsgstore (CamelImapFolder *imap_folder, gboolean *ctchecker, CamelExcept
 
 		store = CAMEL_IMAP_STORE (camel_object_new (CAMEL_IMAP_STORE_TYPE));
 		imap_debug ("Get-Message service created\n");
+
+		camel_url_set_param(CAMEL_SERVICE (folder->parent_store)->url, "dont_touch_summary", "yes");
+
 		camel_service_construct (CAMEL_SERVICE (store),
 			camel_service_get_session (CAMEL_SERVICE (folder->parent_store)),
 			camel_service_get_provider (CAMEL_SERVICE (folder->parent_store)),
