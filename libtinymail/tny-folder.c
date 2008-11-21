@@ -843,6 +843,9 @@ tny_folder_remove_msgs_async (TnyFolder *self, TnyList *headers, TnyFolderCallba
  * will get notified of new header additions. #TnyFolderMonitor copes with those
  * by publishing them to #TnyList instances, like a #TnyGtkHeaderListModel.
  *
+ * status_callback() will be called during this operation. It is guaranteed that the refresh 
+ * messages happen but it's not guaranteed that only refresh messages happen.
+ * 
  * Example:
  * <informalexample><programlisting>
  * static void

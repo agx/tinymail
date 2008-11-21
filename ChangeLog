@@ -1,5 +1,9 @@
 2008-11-21  Martin Bonnin  <martinbonnin@gmail.com>
  
+	Add some documentation about the behaviour of tny_folder_refresh_async()
+
+2008-11-21  Martin Bonnin  <martinbonnin@gmail.com>
+ 
 	* revert last changeset:
 	We want this to be fixed a better way
 

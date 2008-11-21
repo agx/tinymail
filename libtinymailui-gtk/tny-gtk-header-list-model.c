@@ -1255,6 +1255,9 @@ tny_gtk_header_list_model_set_no_duplicates (TnyGtkHeaderListModel *self, gboole
  * @status_callback: (null-ok): a #TnyStatusCallback or NULL
  * @user_data: (null-ok): user data for the callbacks
  *
+ * status_callback() will be called during this operation. It is guaranteed that the refresh 
+ * messages happen but it's not guaranteed that only refresh messages happen.
+ *
  * Set the @folder of @self where #TnyHeader instances are located
  * 
  * since: 1.0
