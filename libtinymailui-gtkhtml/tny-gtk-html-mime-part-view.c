@@ -135,99 +135,11 @@ tny_gtk_html_mime_part_view_clear (TnyMimePartView *self)
 	return;
 }
 
-
-
-
-#if 0
-typedef struct {
-	gpointer buffer;
-	GtkHTML *html;
-	GtkHTMLStream *stream;
-	gboolean html_finalized;
-} ImageFetcherInfo;
-
-static void
-html_finalized_notify (ImageFetcherInfo *ifinfo,
-		       GObject *destroyed)
-{
-	ifinfo->html_finalized = TRUE;
-}
-
-static void
-image_fetcher_close (GnomeVFSAsyncHandle *handle,
-		     GnomeVFSResult result,
-		     gpointer data)
-{
-}
-
-static void
-image_fetcher_read (GnomeVFSAsyncHandle *handle,
-		    GnomeVFSResult result,
-		    gpointer buffer,
-		    GnomeVFSFileSize bytes_requested,
-		    GnomeVFSFileSize bytes_read,
-		    ImageFetcherInfo *ifinfo)
-{
-
-	if (ifinfo->html_finalized || result != GNOME_VFS_OK) {
-		gnome_vfs_async_close (handle, (GnomeVFSAsyncCloseCallback) image_fetcher_close, (gpointer) NULL);
-		if (!ifinfo->html_finalized) {
-			gtk_html_stream_close (ifinfo->stream, GTK_HTML_STREAM_OK);
-			g_object_weak_unref ((GObject *) ifinfo->html, (GWeakNotify) html_finalized_notify, (gpointer) ifinfo);
-		}
-		g_slice_free1 (128, ifinfo->buffer);
-		g_slice_free (ImageFetcherInfo, ifinfo);
-		return;
-	}
-	gtk_html_stream_write (ifinfo->stream, buffer, bytes_read);
-	gnome_vfs_async_read (handle, ifinfo->buffer, 128, 
-			      (GnomeVFSAsyncReadCallback)image_fetcher_read, ifinfo);
-	return;
-}
-
-static void
-image_fetcher_open (GnomeVFSAsyncHandle *handle,
-		    GnomeVFSResult result,
-		    ImageFetcherInfo *ifinfo)
-{
-	if (!ifinfo->html_finalized && result == GNOME_VFS_OK) {
-		ifinfo->buffer = g_slice_alloc (128);
-		gnome_vfs_async_read (handle, ifinfo->buffer, 128, 
-				      (GnomeVFSAsyncReadCallback) image_fetcher_read, ifinfo);
-	} else {
-		if (!ifinfo->html_finalized) {
-			gtk_html_stream_close (ifinfo->stream, GTK_HTML_STREAM_OK);
-			g_object_weak_unref ((GObject *) ifinfo->html, (GWeakNotify) html_finalized_notify, (gpointer) ifinfo);
-		}
-		g_slice_free (ImageFetcherInfo, ifinfo);
-	}
-}
-
-#endif
-
 static gboolean
 on_url_requested (GtkWidget *widget, const gchar *uri, GtkHTMLStream *stream, TnyMimePartView *self)
 {
 	gboolean result;
 	TnyStream *tny_stream;
-
-#if 0
-	if (g_str_has_prefix (uri, "http:") && TRUE /* TODO: make optional */) {
-		GnomeVFSAsyncHandle *handle;
-		ImageFetcherInfo *ifinfo;
-
-		ifinfo = g_slice_new (ImageFetcherInfo);
-		ifinfo->html_finalized = FALSE;
-		ifinfo->html = (GtkHTML *) self;
-		ifinfo->buffer = NULL;
-		ifinfo->stream = stream;
-		g_object_weak_ref ((GObject *) self, (GWeakNotify) html_finalized_notify, (gpointer) ifinfo);
-		gnome_vfs_async_open (&handle, uri, GNOME_VFS_OPEN_READ,
-				      GNOME_VFS_PRIORITY_DEFAULT, 
-				      (GnomeVFSAsyncOpenCallback) image_fetcher_open, ifinfo);
-		return FALSE;
-	}
-#endif
 
 	tny_stream = TNY_STREAM (tny_gtk_html_stream_new (stream));
 	g_signal_emit_by_name (self, "fetch-url", uri, tny_stream, &result);

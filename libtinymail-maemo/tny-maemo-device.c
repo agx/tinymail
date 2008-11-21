@@ -139,7 +139,10 @@ tny_maemo_device_is_online (TnyDevice *self)
 static void
 tny_maemo_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	return;
+	TnyMaemoDevicePriv *priv = TNY_MAEMO_DEVICE_GET_PRIVATE (instance);
+
+	priv->forced = FALSE;
+	priv->fset = FALSE;
 }
 
 
