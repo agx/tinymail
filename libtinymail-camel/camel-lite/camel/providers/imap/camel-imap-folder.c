@@ -3284,7 +3284,6 @@ imap_update_summary (CamelFolder *folder, int exists,
    tcnt = 0;
 
    camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
-   camel_operation_mute (NULL);
 
    camel_folder_summary_prepare_hash (folder->summary);
 
@@ -3552,11 +3551,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 				  ucnt++;
 
 				  allhdrs++;
-
-				  camel_operation_unmute (NULL);
 				  camel_operation_progress (NULL, allhdrs , ineed);
-				  camel_operation_mute (NULL);
-
 				  sequence = GPOINTER_TO_INT (g_datalist_get_data (&data, "SEQUENCE"));
 				  curlen = camel_folder_summary_count (folder->summary);
 

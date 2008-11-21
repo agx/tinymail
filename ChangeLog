@@ -1,3 +1,8 @@
+2008-11-21  Martin Bonnin  <martinbonnin@gmail.com>
+ 
+	* revert last changeset:
+	We want this to be fixed a better way
+
 2008-11-20  Martin Bonnin  <martinbonnin@gmail.com>
  
 	* camel operation:
