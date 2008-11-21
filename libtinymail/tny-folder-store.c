@@ -410,6 +410,21 @@ tny_folder_store_get_folders_async (TnyFolderStore *self, TnyList *list, TnyFold
 }
 
 
+/**
+ * tny_folder_store_refresh_async:
+ * @self: a #TnyFolderStore
+ * @callback: (null-ok): a #TnyFolderStoreCallback or NULL
+ * @status_callback: (null-ok): a #TnyStatusCallback or NULL
+ * @user_data: (null-ok): user data that will be passed to the callbacks
+ *
+ * Refresh @self and callback when finished. 
+ *
+ * While the refresh takes place, it's possible that event observers of @self
+ * will get notified of new folders.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
 void tny_folder_store_refresh_async (TnyFolderStore *self, TnyFolderStoreCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 #ifdef DBC /* require */
