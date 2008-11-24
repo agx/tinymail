@@ -65,6 +65,8 @@
 
 #include "tny-gtk-folder-store-tree-model-iterator-priv.h"
 
+#define PATH_SEPARATOR " "
+
 static GObjectClass *parent_class = NULL;
 
 typedef void (*treeaddfunc) (GtkTreeStore *tree_store, GtkTreeIter *iter, GtkTreeIter *parent);
@@ -109,7 +111,10 @@ remove_folder_store_observer_weak (TnyGtkFolderStoreTreeModel *self, TnyFolderSt
 }
 
 static void
-recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, GtkTreeIter *parent_tree_iter)
+recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, 
+		      TnyFolderStore *store, 
+		      const gchar *parent_name,
+		      GtkTreeIter *parent_tree_iter)
 {
 	TnyIterator *iter;
 	TnyList *folders = tny_simple_list_new ();
@@ -117,6 +122,9 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 	/* TODO add error checking and reporting here */
 	tny_folder_store_get_folders (store, folders, self->query, TRUE, NULL);
 	iter = tny_list_create_iterator (folders);
+
+	if (parent_name == NULL)
+		parent_name = "";
 
 	while (!tny_iterator_is_done (iter))
 	{
@@ -186,6 +194,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 
 		if (!found)
 		{
+			gchar *name;
 			gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
 
 			/* Making self both a folder-store as a folder observer
@@ -201,9 +210,22 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 
 				add_folder_observer_weak (self, folder);
 
+				if (self->flags & TNY_GTK_FOLDER_STORE_TREE_MODEL_FLAG_SHOW_PATH) {
+					if ((parent_name == NULL) || *parent_name == '\0') {
+						name = g_strdup (tny_folder_get_name (folder));
+					} else {
+						name = g_strconcat (parent_name,
+								    PATH_SEPARATOR,
+								    tny_folder_get_name (folder), 
+								    NULL);
+					}
+				} else {
+					name = g_strdup (tny_folder_get_name (folder));
+				}
+
 				gtk_tree_store_set  (model, &tree_iter,
 					TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
-					tny_folder_get_name (TNY_FOLDER (folder)),
+					name,
 					TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
 					tny_folder_get_unread_count (TNY_FOLDER (folder)),
 					TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
@@ -213,13 +235,17 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self, TnyFolderStore *store, G
 					TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 					folder, -1);
 
+			} else {
+				name = g_strdup (tny_folder_get_name (folder));
 			}
 
 			/* it's a store by itself, so keep on recursing */
 			if (folder_store) {
 				add_folder_store_observer_weak (self, folder_store);
-				recurse_folders_sync (self, folder_store, &tree_iter);
+				recurse_folders_sync (self, folder_store, name, &tree_iter);
 			}
+
+			g_free (name);
 
 			/* We're a folder, we'll request a status, since we've
 			 * set self to be a folder observers of folder, we'll 
@@ -318,7 +344,7 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 	 * folders that already exist (it wont add them a second time). */
 
 	if (found)
-		recurse_folders_sync (self, fstore, &name_iter);
+		recurse_folders_sync (self, fstore, NULL, &name_iter);
 
 	g_object_unref (self);
 
@@ -542,7 +568,7 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
  * tny_gtk_folder_store_tree_model_new:
  * @query: the #TnyFolderStoreQuery that will be used to retrieve the child folders of each #TnyFolderStore
  *
- * Create a new #GtkTreeModel for showing #TnyFolderStore instances
+ * Create a new #GtkTreeModel for showing #TnyFolderStore instances, with default flags
  * 
  * returns: (caller-owns): a new #GtkTreeModel for #TnyFolderStore instances
  * since: 1.0
@@ -551,10 +577,30 @@ tny_gtk_folder_store_tree_model_add_i (TnyGtkFolderStoreTreeModel *self, TnyFold
 GtkTreeModel*
 tny_gtk_folder_store_tree_model_new (TnyFolderStoreQuery *query)
 {
+	return tny_gtk_folder_store_tree_model_new_with_flags (query, 0);
+}
+
+/**
+ * tny_gtk_folder_store_tree_model_new:
+ * @query: the #TnyFolderStoreQuery that will be used to retrieve the child folders of each #TnyFolderStore
+ * @flags: #TnyGtkFolderStoreTreeModelFlags for setting the store
+ *
+ * Create a new #GtkTreeModel for showing #TnyFolderStore instances
+ * 
+ * returns: (caller-owns): a new #GtkTreeModel for #TnyFolderStore instances
+ * since: 1.0
+ * audience: application-developer
+ **/
+GtkTreeModel*
+tny_gtk_folder_store_tree_model_new_with_flags (TnyFolderStoreQuery *query,
+						TnyGtkFolderStoreTreeModelFlags flags)
+{
 	TnyGtkFolderStoreTreeModel *self = g_object_new (TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL, NULL);
 
 	if (query) 
 		self->query = g_object_ref (query);
+
+	self->flags = flags;
 
 	return GTK_TREE_MODEL (self);
 }
@@ -646,6 +692,8 @@ tny_gtk_folder_store_tree_model_instance_init (GTypeInstance *instance, gpointer
 	me->store_obs = NULL;
 	me->iterator_lock = g_mutex_new ();
 	me->first_needs_unref = FALSE;
+
+	me->flags = 0;
 
 	gtk_tree_store_set_column_types (store, 
 		TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS, types);
@@ -849,6 +897,166 @@ tny_gtk_folder_store_tree_model_foreach_in_the_list (TnyList *self, GFunc func, 
 	return;
 }
 
+typedef struct _FindParentHelperInfo {
+	GtkTreeIter *iter;
+	TnyFolder *folder;
+	TnyAccount *account;
+	gboolean found;
+} FindParentHelperInfo;
+
+static gboolean
+find_parent_helper (GtkTreeModel *model,
+		    GtkTreePath *path,
+		    GtkTreeIter *iter,
+		    gpointer userdata)
+{
+	TnyFolderStore *folder_store;
+	FindParentHelperInfo *helper_info = (FindParentHelperInfo *) userdata;
+	TnyList *children;
+	TnyIterator *iterator;
+
+	gtk_tree_model_get (model, iter, 
+			    TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			    &folder_store, -1);
+
+	/* Only search on same account */
+	if (TNY_IS_ACCOUNT (folder_store) && ((TnyAccount *)folder_store == helper_info->account))
+		return FALSE;
+
+	if (TNY_IS_FOLDER (folder_store)) {
+		TnyAccount *account = NULL;
+		account = tny_folder_get_account (TNY_FOLDER (folder_store));
+		g_object_unref (account);
+		if (account == helper_info->account)
+			return FALSE;
+	}
+
+	children = TNY_LIST (tny_simple_list_new ());
+	tny_folder_store_get_folders (folder_store, children, NULL, FALSE, NULL);
+	iterator = tny_list_create_iterator (children);
+
+	while (!tny_iterator_is_done (iterator)) {
+		TnyFolderStore *child;
+
+		child = (TnyFolderStore *) tny_iterator_get_current (iterator);
+		g_object_unref (child);
+		if (child == (TnyFolderStore *) helper_info->folder) {
+			helper_info->found = TRUE;
+			*helper_info->iter = *iter;
+			break;
+		}
+		tny_iterator_next (iterator);
+	}
+	g_object_unref (iterator);
+	g_object_unref (children);
+
+	return helper_info->found;
+	
+}
+
+static gboolean
+find_parent (GtkTreeModel *model, TnyFolder *folder, GtkTreeIter *iter)
+{
+	FindParentHelperInfo *helper_info;
+	gboolean result;
+
+	helper_info = g_slice_new0 (FindParentHelperInfo);
+
+	helper_info->folder = folder;
+	helper_info->iter = iter;
+	helper_info->account = tny_folder_get_account (folder);
+
+	gtk_tree_model_foreach (model, find_parent_helper, helper_info);
+
+	g_object_unref (helper_info->account);
+	result = helper_info->found;
+	g_slice_free (FindParentHelperInfo, helper_info);
+
+	return result;
+}
+
+typedef struct _FindHelperInfo {
+	GtkTreeIter *iter;
+	TnyFolder *folder;
+	gboolean found;
+} FindHelperInfo;
+
+static gboolean
+find_node_helper (GtkTreeModel *model,
+		  GtkTreePath *path,
+		  GtkTreeIter *iter,
+		  gpointer userdata)
+{
+	TnyFolderStore *folder_store;
+	FindHelperInfo *helper_info = (FindHelperInfo *) userdata;
+
+	gtk_tree_model_get (model, iter, 
+			    TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN, 
+			    &folder_store, -1);
+
+	if ((TnyFolderStore *) helper_info->folder == folder_store) {
+		helper_info->found = TRUE;
+		*helper_info->iter = *iter;
+	}
+
+	return helper_info->found;
+	
+}
+
+static gboolean
+find_node (GtkTreeModel *model, TnyFolder *folder, GtkTreeIter *iter)
+{
+	FindHelperInfo *helper_info;
+	gboolean result;
+
+	helper_info = g_slice_new0 (FindHelperInfo);
+
+	helper_info->folder = folder;
+	helper_info->iter = iter;
+
+	gtk_tree_model_foreach (model, find_node_helper, helper_info);
+
+	result = helper_info->found;
+	g_slice_free (FindHelperInfo, helper_info);
+
+	return result;
+}
+
+static void
+update_children_names (GtkTreeModel *model, TnyFolder *folder, const gchar *name)
+{
+	TnyList *children;
+	TnyIterator *iterator;
+
+	children = TNY_LIST (tny_simple_list_new ());
+	iterator = tny_list_create_iterator (children);
+
+	while (!tny_iterator_is_done (iterator)) {
+		GtkTreeIter iter;
+		TnyFolder *child;
+
+		child = TNY_FOLDER (tny_iterator_get_current (iterator));
+		if (find_node (model, child, &iter)) {
+			gchar *new_name;
+			new_name = g_strconcat (name, PATH_SEPARATOR,
+						tny_folder_get_name (TNY_FOLDER (child)),
+						NULL);
+			gtk_tree_store_set (GTK_TREE_STORE (model), &iter,
+					    TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+					    new_name,
+					    -1);
+			update_children_names (model, child, new_name);
+			g_free (new_name);
+		}
+
+		g_object_unref (folder);
+		tny_iterator_next (iterator);
+	}
+
+	g_object_unref (iterator);
+	g_object_unref (children);
+}
+
 
 static gboolean 
 updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
@@ -906,17 +1114,50 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 
 		if (folder == changed_folder)
 		{
-
 			/* TNY TODO: This is not enough: Subfolders will be incorrect because the
 			   the full_name of the subfolders will still be the old full_name!*/
 
 			gtk_tree_store_set (GTK_TREE_STORE (model), iter,
-				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
-				tny_folder_get_name (TNY_FOLDER (folder)),
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
 				unread,
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
 				total, -1);
+
+			if (changed & TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME) {
+				GtkTreeIter parent_iter;
+				gchar *name = NULL;
+
+				if (TNY_GTK_FOLDER_STORE_TREE_MODEL (model)->flags &
+				    TNY_GTK_FOLDER_STORE_TREE_MODEL_FLAG_SHOW_PATH) {
+					if (find_parent (model, folder, &parent_iter)) {
+						gchar *parent_name;
+						gtk_tree_model_get (model, &parent_iter, 
+								    TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+								    &parent_name, -1);
+						if (parent_name && parent_name[0] == '\0')
+							name = g_strconcat (parent_name, PATH_SEPARATOR,
+									    tny_folder_get_name (TNY_FOLDER (folder)),
+									    NULL);
+						g_free (parent_name);
+
+
+					}
+				}
+
+				
+				if (name == NULL)
+					name = g_strdup (tny_folder_get_name (TNY_FOLDER (folder)));
+
+				gtk_tree_store_set (GTK_TREE_STORE (model), iter,
+						    TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
+						    name,
+						    -1);
+				if (TNY_GTK_FOLDER_STORE_TREE_MODEL (model)->flags &
+				    TNY_GTK_FOLDER_STORE_TREE_MODEL_FLAG_SHOW_PATH) {
+					update_children_names (model, folder, name);
+				}
+				g_free (name);
+			}
 		}
 
 		g_object_unref (folder);
@@ -1031,14 +1272,21 @@ creater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *in_iter, gpointer 
 	{
 		TnyList *created = tny_simple_list_new ();
 		TnyIterator *miter;
+		gchar *parent_name;
 
 		tny_folder_store_change_get_created_folders (change, created);
 		miter = tny_list_create_iterator (created);
+
+		/* We assume parent name is already the expected one in full path style */
+		gtk_tree_model_get (model, in_iter,
+				    TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, &parent_name, 
+				    -1);
 
 		while (!tny_iterator_is_done (miter))
 		{
 			GtkTreeIter newiter;
 			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
+			gchar *finalname;
 
 			add_folder_observer_weak (self, folder);
 			add_folder_store_observer_weak (self, TNY_FOLDER_STORE (folder));
@@ -1047,12 +1295,22 @@ creater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *in_iter, gpointer 
 			   removed, that reference count is decreased automatically by 
 			   the gtktreestore infrastructure. */
 
+			if (TNY_GTK_FOLDER_STORE_TREE_MODEL (self)->flags &
+			    TNY_GTK_FOLDER_STORE_TREE_MODEL_FLAG_SHOW_PATH) {
+				if (parent_name && *parent_name != '\0')
+					finalname = g_strconcat (parent_name, PATH_SEPARATOR,
+								 tny_folder_get_name (TNY_FOLDER (folder)), NULL);
+				else
+					finalname = g_strdup (tny_folder_get_name (TNY_FOLDER (folder)));
+			} else {
+				finalname = g_strdup (tny_folder_get_name (TNY_FOLDER (folder)));
+			}
 
 			gtk_tree_store_prepend (GTK_TREE_STORE (model), &newiter, in_iter);
 
 			gtk_tree_store_set (GTK_TREE_STORE (model), &newiter,
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN, 
-				tny_folder_get_name (TNY_FOLDER (folder)),
+				finalname,
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN, 
 				tny_folder_get_unread_count (TNY_FOLDER (folder)),
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_ALL_COLUMN, 
@@ -1061,10 +1319,12 @@ creater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *in_iter, gpointer 
 				tny_folder_get_folder_type (TNY_FOLDER (folder)),
 				TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 				folder, -1);
+			g_free (finalname);
 
 			g_object_unref (folder);
 			tny_iterator_next (miter);
 		}
+		g_free (parent_name);
 		g_object_unref (miter);
 		g_object_unref (created);
 	}

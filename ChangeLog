@@ -1,3 +1,10 @@
+2008-11-24  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.[ch]:
+	Added support for settings construction flags. Also added a flag
+	"show path" for the tree model, that makes it store the full path 
+	name.
+
 2008-11-21  Sergio Villar Senin  <svillar@iglaia.com>
 
 	* libtinymail-camel/tny-camel-default-connection-policy.c: added

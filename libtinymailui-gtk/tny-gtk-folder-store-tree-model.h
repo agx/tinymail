@@ -54,6 +54,13 @@ enum _TnyGtkFolderStoreTreeModelColumn
 
 typedef enum _TnyGtkFolderStoreTreeModelColumn TnyGtkFolderStoreTreeModelColumn;
 
+enum _TnyGtkFolderStoreTreeModelFlags
+{
+	TNY_GTK_FOLDER_STORE_TREE_MODEL_FLAG_SHOW_PATH = 1<<0,
+};
+
+typedef enum _TnyGtkFolderStoreTreeModelFlags TnyGtkFolderStoreTreeModelFlags;
+
 struct _TnyGtkFolderStoreTreeModel
 {
 	GtkTreeStore parent;
@@ -62,6 +69,8 @@ struct _TnyGtkFolderStoreTreeModel
 	TnyFolderStoreQuery *query;
 	gboolean first_needs_unref;
 	GPtrArray *signals;
+
+	TnyGtkFolderStoreTreeModelFlags flags;
 };
 
 struct _TnyGtkFolderStoreTreeModelClass
@@ -72,7 +81,8 @@ struct _TnyGtkFolderStoreTreeModelClass
 GType tny_gtk_folder_store_tree_model_get_type (void);
 GType tny_gtk_folder_store_tree_model_column_get_type (void);
 GtkTreeModel* tny_gtk_folder_store_tree_model_new (TnyFolderStoreQuery *query);
-
+GtkTreeModel* tny_gtk_folder_store_tree_model_new_with_flags (TnyFolderStoreQuery *query, 
+							      TnyGtkFolderStoreTreeModelFlags flags);
 void tny_gtk_folder_store_tree_model_prepend (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name);
 void tny_gtk_folder_store_tree_model_append (TnyGtkFolderStoreTreeModel *self, TnyFolderStore* item, const gchar *root_name);
 
