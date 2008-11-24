@@ -20,6 +20,7 @@ libtinymailui_gtk_1_0_headers = \
 	tny-gtk-attachment-mime-part-view.h\
 	tny-gtk-header-list-model.h \
 	tny-gtk-account-list-model.h \
+	tny-gtk-folder-list-store.h \
 	tny-gtk-folder-store-tree-model.h \
 	tny-gtk-attach-list-model.h \
 	tny-gtk-text-buffer-stream.h \
@@ -37,6 +38,9 @@ libtinymailui_gtk_1_0_la_SOURCES = \
 	tny-gtk-image-mime-part-view.c \
 	tny-gtk-attachment-mime-part-view.c \
 	tny-gtk-msg-window.c \
+	tny-gtk-folder-list-store.c \
+	tny-gtk-folder-list-store-iterator-priv.h \
+	tny-gtk-folder-list-store-iterator.c \
 	tny-gtk-folder-store-tree-model.c \
 	tny-gtk-folder-store-tree-model-iterator-priv.h \
 	tny-gtk-folder-store-tree-model-iterator.c \
