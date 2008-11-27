@@ -63,7 +63,7 @@ typedef enum _TnyGtkFolderListStoreFlags TnyGtkFolderListStoreFlags;
 
 struct _TnyGtkFolderListStore
 {
-	GtkTreeStore parent;
+	GtkListStore parent;
 	GList *first, *store_obs, *fol_obs;
 	GMutex *iterator_lock;
 	TnyFolderStoreQuery *query;
@@ -76,7 +76,7 @@ struct _TnyGtkFolderListStore
 
 struct _TnyGtkFolderListStoreClass
 {
-	GtkTreeStoreClass parent_class;
+	GtkListStoreClass parent_class;
 };
 
 GType tny_gtk_folder_list_store_get_type (void);

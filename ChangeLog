@@ -2,7 +2,12 @@
 
 	* libtinymail-camel/tny-camel-folder.c: set priv->account to NULL in
 	dispose after unref'ing it.
+
 2008-11-27  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c
+	Fix big typo: folder list store inherits from list store, not 
+	tree store.
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.[ch]:
 	Folder list store path separator is now configurable.

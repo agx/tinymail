@@ -692,6 +692,7 @@ tny_gtk_folder_store_tree_model_instance_init (GTypeInstance *instance, gpointer
 	me->store_obs = NULL;
 	me->iterator_lock = g_mutex_new ();
 	me->first_needs_unref = FALSE;
+	me->first = NULL;
 
 	me->flags = 0;
 

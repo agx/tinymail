@@ -671,6 +671,7 @@ tny_gtk_folder_list_store_instance_init (GTypeInstance *instance, gpointer g_cla
 	me->signals = g_ptr_array_new ();
 	me->fol_obs = NULL;
 	me->store_obs = NULL;
+	me->first = NULL;
 	me->iterator_lock = g_mutex_new ();
 	me->first_needs_unref = FALSE;
 
