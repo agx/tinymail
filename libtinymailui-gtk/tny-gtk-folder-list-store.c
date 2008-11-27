@@ -901,15 +901,19 @@ find_parent_helper (GtkTreeModel *model,
 			    &folder_store, -1);
 
 	/* Only search on same account */
-	if (TNY_IS_ACCOUNT (folder_store) && ((TnyAccount *)folder_store == helper_info->account))
+	if (TNY_IS_ACCOUNT (folder_store) && ((TnyAccount *)folder_store == helper_info->account)) {
+		g_object_unref (folder_store);
 		return FALSE;
+	}
 
 	if (TNY_IS_FOLDER (folder_store)) {
 		TnyAccount *account = NULL;
 		account = tny_folder_get_account (TNY_FOLDER (folder_store));
 		g_object_unref (account);
-		if (account == helper_info->account)
+		if (account == helper_info->account) {
+			g_object_unref (folder_store);
 			return FALSE;
+		}
 	}
 
 	children = TNY_LIST (tny_simple_list_new ());
@@ -930,6 +934,7 @@ find_parent_helper (GtkTreeModel *model,
 	}
 	g_object_unref (iterator);
 	g_object_unref (children);
+	g_object_unref (folder_store);
 
 	return helper_info->found;
 	
@@ -979,6 +984,7 @@ find_node_helper (GtkTreeModel *model,
 		helper_info->found = TRUE;
 		*helper_info->iter = *iter;
 	}
+	g_object_unref (folder_store);
 
 	return helper_info->found;
 	
