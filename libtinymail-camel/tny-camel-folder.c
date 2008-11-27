@@ -6312,8 +6312,10 @@ tny_camel_folder_dispose (GObject *object)
 	if (priv->account)
 		g_object_weak_unref (G_OBJECT (priv->account), notify_account_del, self);
 #else
-	if (priv->account)
+	if (priv->account) {
 		g_object_unref (priv->account);
+		priv->account = NULL;
+	}
 #endif
 
 	if (priv->parent)
