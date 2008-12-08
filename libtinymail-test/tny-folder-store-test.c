@@ -72,7 +72,7 @@ START_TEST (tny_folder_store_test_get_folders)
 
      /* Test server has only one root folder */
      folders = tny_simple_list_new ();
-     tny_folder_store_get_folders (account, folders, NULL, NULL);
+     tny_folder_store_get_folders (account, folders, NULL, TRUE, NULL);
      fail_unless (tny_list_get_length (folders) == 1, "There should be only one root folder");
      g_object_unref (G_OBJECT (folders));
 
@@ -119,7 +119,7 @@ START_TEST (tny_folder_store_test_get_folders_async)
      }
 
      folders = tny_simple_list_new ();
-     tny_folder_store_get_folders_async (account, folders, NULL, callback, status_cb, NULL);
+     tny_folder_store_get_folders_async (account, folders, NULL, TRUE, callback, status_cb, NULL);
      g_timeout_add (1000*4, timeout, NULL);
      gtk_main ();
      fail_unless (tny_list_get_length (folders) == 1, "Did not find one root folder as expected");
@@ -135,7 +135,7 @@ get_inbox (void)
      TnyIterator *iter;
      TnyFolder *folder;
 
-     tny_folder_store_get_folders (account, folders, NULL, NULL);
+     tny_folder_store_get_folders (account, folders, NULL, TRUE, NULL);
      /*fail_unless (tny_list_get_length (folders) == 1, "Asserted that there was only one root folder");*/
      iter = tny_list_create_iterator (TNY_LIST (folders));
      folder = TNY_FOLDER (tny_iterator_get_current (iter));

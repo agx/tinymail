@@ -64,9 +64,14 @@ START_TEST (tny_header_test_set_from)
 	const gchar *str_in = "Me myself and I <me.myself@and.i.com>", *str_out;
 	
 	tny_header_set_from (iface, str_in);
-	str_out = tny_header_get_from (iface);
+	str_out = tny_header_dup_from (iface);
 
 	fail_unless(!strcmp (str_in, str_out), "Unable to set from!\n");
+
+        if (NULL != str_out)
+        {
+            g_free (str_out);
+        }
 
 	return;
 }
@@ -79,7 +84,7 @@ START_TEST (tny_header_test_set_to)
 	int i=0;
 	
 	tny_header_set_to (iface, (const gchar*)str_in);
-	str_out = tny_header_get_to (iface);
+	str_out = tny_header_dup_to (iface);
 
 	/* The implementation will always return a comma separated list
 	 * but should also accept ; separated lists. Even mixed (both
@@ -93,6 +98,11 @@ START_TEST (tny_header_test_set_to)
 
 	g_free (str_in);
 
+        if (NULL != str_out)
+        {
+             g_free (str_out);
+        }
+
 	return;
 }
 END_TEST
@@ -102,9 +112,14 @@ START_TEST (tny_header_test_set_cc)
 	const gchar *str_in = "First user <first@user.be>, Second user <second@user.com>", *str_out;
 
 	tny_header_set_cc (iface, str_in);
-	str_out = tny_header_get_cc (iface);
+	str_out = tny_header_dup_cc (iface);
 
 	fail_unless(!strcmp (str_in, str_out), "Unable to set cc!\n");
+
+        if (NULL != str_out)
+        {
+             g_free (str_out);
+        }
 
 	return;
 }
@@ -115,9 +130,14 @@ START_TEST (tny_header_test_set_bcc)
 	const gchar *str_in = "The Invisible man <the.invisible@man.com>, mark@here.there.com", *str_out;
 
 	tny_header_set_bcc (iface, str_in);
-	str_out = tny_header_get_bcc (iface);
+	str_out = tny_header_dup_bcc (iface);
 
 	fail_unless(!strcmp (str_in, str_out), "Unable to set bcc!\n");
+
+        if (NULL != str_out)
+        {
+             g_free (str_out);
+        }
 
 	return;
 }
@@ -128,9 +148,17 @@ START_TEST (tny_header_test_set_subject)
 	const gchar *str_in = "I'm the nice subject", *str_out;
 	
 	tny_header_set_subject (iface, str_in);
-	str_out = tny_header_get_subject (iface);
+	str_out = tny_header_dup_subject (iface);
 
 	fail_unless(!strcmp (str_in, str_out), "Unable to set subject!\n");
+
+        if (NULL != str_out)
+        {
+             g_free (str_out);
+        }
+
+        return;
+        
 }
 END_TEST
 
