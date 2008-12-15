@@ -986,8 +986,8 @@ tny_session_camel_set_device (TnySessionCamel *self, TnyDevice *device)
 			priv->connchanged_signal);
 	}
 
-	/* TNY TODO: proper reference counting here please! Note that we can't
-	 * have embraced references either. So be careful! */
+	if (priv->device)
+		g_object_unref (device);
 
 	priv->device = g_object_ref (device);
 
