@@ -1,5 +1,8 @@
 2008-12-15  Jose Dapena Paz  <jdapena@igalia.com>
 
+	* libtinymail-camel/tny-camel-account-store.c: removed unnecesary camel
+	exception checks.
+
 	* libtinymail-camel/tny-session-camel.c: added missing unref in
 	set_device.
 

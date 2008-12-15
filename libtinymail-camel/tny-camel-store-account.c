@@ -871,14 +871,6 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 
 	store = CAMEL_STORE (apriv->service);
 
-	if (camel_exception_is_set (&ex)) 
-	{
-		_tny_camel_exception_to_tny_error (&ex, err);
-		camel_exception_clear (&ex);
-		_tny_session_stop_operation (apriv->session);
-		return;
-	}
-
 	g_assert (CAMEL_IS_STORE (store));
 
 	g_static_rec_mutex_lock (aspriv->factory_lock);
@@ -1108,14 +1100,6 @@ tny_camel_store_account_create_folder_default (TnyFolderStore *self, const gchar
 	}
 
 	store = CAMEL_STORE (apriv->service);
-
-	if (camel_exception_is_set (&ex)) 
-	{
-		_tny_camel_exception_to_tny_error (&ex, err);
-		camel_exception_clear (&ex);
-		_tny_session_stop_operation (apriv->session);
-		return NULL;
-	}
 
 	g_assert (CAMEL_IS_STORE (store));
 
@@ -1382,14 +1366,6 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	store = CAMEL_STORE (apriv->service);
 
-	if (camel_exception_is_set (&ex))
-	{
-		_tny_camel_exception_to_tny_error (&ex, err);
-		camel_exception_clear (&ex);
-		_tny_session_stop_operation (apriv->session);
-		return;
-	}
-
 	g_assert (CAMEL_IS_STORE (store));
 
 	flags = CAMEL_STORE_FOLDER_INFO_FAST | CAMEL_STORE_FOLDER_INFO_NO_VIRTUAL |
@@ -1638,14 +1614,6 @@ tny_camel_store_account_store_refresh (TnyFolderStore *self, GError **err)
 	}
 
 	store = CAMEL_STORE (apriv->service);
-
-	if (camel_exception_is_set (&ex))
-	{
-		_tny_camel_exception_to_tny_error (&ex, err);
-		camel_exception_clear (&ex);
-		_tny_session_stop_operation (apriv->session);
-		return;
-	}
 
 	g_assert (CAMEL_IS_STORE (store));
 
@@ -1987,14 +1955,6 @@ tny_camel_store_account_find_folder_default (TnyStoreAccount *self, const gchar 
 	}
 
  	store = CAMEL_STORE (apriv->service);
-
-	if (camel_exception_is_set (&ex))
-	{
-		_tny_camel_exception_to_tny_error (&ex, err);
-		camel_exception_clear (&ex);
-		_tny_session_stop_operation (apriv->session);
-		return NULL;
-	}
 
 	g_assert (CAMEL_IS_STORE (store));
 
