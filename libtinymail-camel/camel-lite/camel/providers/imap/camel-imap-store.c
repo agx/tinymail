@@ -83,6 +83,7 @@
 /* Specified in RFC 2060 */
 #define IMAP_PORT "143"
 #define IMAPS_PORT "993"
+#define STOP_IDLE_LOOP_WAIT 100000
 
 #ifdef G_OS_WIN32
 /* The strtok() in Microsoft's C library is MT-safe (but still uses
@@ -325,6 +326,7 @@ _camel_imap_store_stop_idle_connect_lock (CamelImapStore *store)
 #ifdef IDLE_DEBUG
 	gint depth;
 #endif
+	gboolean connection_locked = FALSE;
 	/* This operation should behave as atomic. This should open
 	 * an area where imap operations requested by user are executed,
 	 * and block idle loop meanwhile.
@@ -341,24 +343,33 @@ _camel_imap_store_stop_idle_connect_lock (CamelImapStore *store)
 	}
 
 	idle_debug ("Waiting for idle wait reasons lock\n");
-	g_static_rec_mutex_lock (store->idle_wait_reasons_lock);
-	idle_debug ("Idle wait reasons lock depth: %d\n", store->idle_wait_reasons_lock->depth);
+	while (!connection_locked) {
+		g_static_rec_mutex_lock (store->idle_wait_reasons_lock);
+		idle_debug ("Idle wait reasons lock depth: %d\n", store->idle_wait_reasons_lock->depth);
 
-	store->idle_wait_reasons++;
-	idle_debug ("Idle wait reasons %d -> %d\n", store->idle_wait_reasons - 1, store->idle_wait_reasons);
+		store->idle_wait_reasons++;
+		idle_debug ("Idle wait reasons %d -> %d\n", store->idle_wait_reasons - 1, store->idle_wait_reasons);
 		
-	CAMEL_SERVICE_REC_LOCK (store, connect_lock);
-	if (store->capabilities & IMAP_CAPABILITY_IDLE) {
-		if (!store->already_in_stop_idle) {
-			store->already_in_stop_idle = TRUE;
-			camel_imap_store_stop_idle (store);
-			store->already_in_stop_idle = FALSE;
+		if (connection_locked = CAMEL_SERVICE_REC_TRYLOCK (store, connect_lock)) {
+			if (store->capabilities & IMAP_CAPABILITY_IDLE) {
+				if (!store->already_in_stop_idle) {
+					store->already_in_stop_idle = TRUE;
+					camel_imap_store_stop_idle (store);
+					store->already_in_stop_idle = FALSE;
+				}
+			}
+#ifdef IDLE_DEBUG
+			depth = store->idle_wait_reasons_lock->depth;
+#endif
+		}
+		
+		g_static_rec_mutex_unlock (store->idle_wait_reasons_lock);
+		if (!connection_locked) {
+			store->idle_wait_reasons--;
+			idle_debug ("Looping stop_idle_connect_lock\n");
+			usleep (STOP_IDLE_LOOP_WAIT);
 		}
 	}
-#ifdef IDLE_DEBUG
-	depth = store->idle_wait_reasons_lock->depth;
-#endif
-	g_static_rec_mutex_unlock (store->idle_wait_reasons_lock);
 	idle_debug ("Idle wait reasons lock depth (%d->%d)\n", depth, depth - 1);
 		
 }
