@@ -4,6 +4,9 @@
 	variables, and also free properly some vars (to avoid leaks). 
 	Patch contributed by Qasim Ahmad.
 
+	* libtinymail-camel/tny-camel-folder.c: leak fix in TnyCamelFolder
+	copy_shared implementation (contributed by Qashim Ahmad).
+
 2009-01-08  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:

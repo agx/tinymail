@@ -3549,7 +3549,14 @@ tny_camel_folder_copy_shared (TnyFolder *self, TnyFolderStore *into, const gchar
 						if (!rpriv->folder_name || strlen (rpriv->folder_name) <= 0)
 							rpriv->folder_name = g_strdup (to);
 						_tny_camel_folder_set_parent (TNY_CAMEL_FOLDER (retval), into);
-						rpriv->folder = NULL; /* This might be a leak */
+												
+						if (G_LIKELY (rpriv->folder) && CAMEL_IS_FOLDER (rpriv->folder))
+							{
+								if (rpriv->folder_changed_id != 0)
+  									camel_object_remove_event (rpriv->folder, rpriv->folder_changed_id);
+							 	camel_object_unref (CAMEL_OBJECT (rpriv->folder));
+							}
+						rpriv->folder = NULL;
 					} 
 				}
 
