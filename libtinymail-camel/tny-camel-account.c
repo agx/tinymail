@@ -1520,6 +1520,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->custom_url_string = FALSE;
 	priv->inuse_spin = FALSE;
 
+	priv->name = NULL;
 	priv->options = NULL;
 	priv->id = NULL;
 	priv->user = NULL;
@@ -1529,6 +1530,7 @@ tny_camel_account_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->forget_pass_func_set = FALSE;
 	priv->pass_func_set = FALSE;
 	priv->cancel = NULL;
+	priv->getmsg_cancel = NULL;
 
 	priv->service_lock = g_new (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->service_lock);
@@ -2143,7 +2145,19 @@ tny_camel_account_finalize (GObject *object)
 	g_static_rec_mutex_lock (priv->cancel_lock);
 	if (G_UNLIKELY (priv->cancel))
 		camel_operation_unref (priv->cancel);
+	if (G_UNLIKELY (priv->getmsg_cancel))
+		camel_operation_unref (priv->getmsg_cancel);
 	g_static_rec_mutex_unlock (priv->cancel_lock);
+	
+	if (priv->csyncop) {
+  		RefreshStatusInfo *info = priv->csyncop;
+		tny_idle_stopper_stop (info->stopper);
+		tny_idle_stopper_destroy (info->stopper);
+		info->stopper = NULL;
+		g_object_unref (info->self);
+		g_slice_free (RefreshStatusInfo, info);
+		priv->csyncop = NULL; 
+	}
 
 	/* g_static_rec_mutex_free (priv->cancel_lock); */
 	g_free (priv->cancel_lock);

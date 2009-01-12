@@ -1,3 +1,9 @@
+2009-01-09  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-account.c: initialize properly some 
+	variables, and also free properly some vars (to avoid leaks). 
+	Patch contributed by Qasim Ahmad.
+
 2009-01-08  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
