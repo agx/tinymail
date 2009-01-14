@@ -2210,6 +2210,7 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	}
 
 	if (!auth) {
+		camel_imap_store_connect_unlock_no_start_idle (store);
 		camel_exception_set (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
 			_("Authentication failure"));
 		return FALSE;
