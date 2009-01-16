@@ -815,28 +815,43 @@ tny_gtk_folder_list_store_remove (TnyList *self, GObject* item)
 
 	me->first = g_list_remove (me->first, (gconstpointer)item);
 
-	/* This doesn't have to be recursive as only the first-level folders are
-	   actually really part of the list. */
+	if (gtk_tree_model_get_iter_first (model, &iter)) {
+		gboolean more_items = TRUE;
 
-	if (gtk_tree_model_get_iter_first (model, &iter))
-	  do 
-	  {
-		GObject *citem = NULL;
-		gtk_tree_model_get (model, &iter, 
-			TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN, 
-			&citem, -1);
-		if (citem == item)
-		{
-			/* This removes a reference count */
-			gtk_list_store_remove (GTK_LIST_STORE (me), &iter);
+		do {
+			GObject *citem = NULL;
+			gboolean deleted;
+
+			deleted = FALSE;
+			gtk_tree_model_get (model, &iter, 
+					    TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN, 
+					    &citem, -1);
+
+			if (TNY_IS_ACCOUNT (citem) || TNY_IS_MERGE_FOLDER (citem)) {
+				if (citem == item) {
+					more_items = gtk_list_store_remove (GTK_LIST_STORE (me), &iter);
+					deleted = TRUE;
+				}
+			} else if (TNY_IS_FOLDER (citem)) {
+				TnyAccount *account = tny_folder_get_account (TNY_FOLDER (citem));
+				if (account) {
+					if ((GObject *) account == item) {
+						more_items = gtk_list_store_remove (GTK_LIST_STORE (me), &iter);
+						deleted = TRUE;
+					}
+					g_object_unref (account);
+				}
+			}
 			if (citem)
 				g_object_unref (citem);
-			break;
-		}
-		if (citem)
-			g_object_unref (citem);
 
-	  } while (gtk_tree_model_iter_next (model, &iter));
+			/* If the item was deleted then the iter was
+			   moved to the next row */
+			if (!deleted)
+				more_items = gtk_tree_model_iter_next (model, &iter);
+		} while (more_items);
+	}
+
 
 	g_mutex_unlock (me->iterator_lock);
 }
