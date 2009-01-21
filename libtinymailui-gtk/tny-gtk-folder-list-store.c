@@ -1330,7 +1330,7 @@ creater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *in_iter, gpointer 
 
 			if (TNY_GTK_FOLDER_LIST_STORE (self)->flags &
 			    TNY_GTK_FOLDER_LIST_STORE_FLAG_SHOW_PATH) {
-				if (parent_name && *parent_name != '\0')
+				if (TNY_IS_FOLDER (fol) && parent_name && *parent_name != '\0')
 					finalname = g_strconcat (parent_name, self->path_separator,
 								 tny_folder_get_name (TNY_FOLDER (folder)), NULL);
 				else

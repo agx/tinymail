@@ -1,3 +1,9 @@
+2009-01-20  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c:
+	on creating new items (ie. after creating a new folder, don't add
+	the account name in the full path).
+
 2009-01-15  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c
