@@ -1202,11 +1202,17 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 }
 
 static gboolean
-is_folder_ancestor (TnyFolder *parent, TnyFolder* item)
+is_folder_ancestor (GObject *parent, GObject *item)
 {
 	gboolean retval = FALSE;
-	TnyFolderStore *parent_store = tny_folder_get_folder_store (TNY_FOLDER (item));
+	TnyFolderStore *parent_store;
 
+	if (!TNY_IS_FOLDER (item) || 
+	    !TNY_IS_FOLDER (parent) || 
+	    TNY_IS_MERGE_FOLDER (item))
+		return FALSE;
+
+	parent_store = tny_folder_get_folder_store (TNY_FOLDER (item));
 	while (TNY_IS_FOLDER (parent_store) && !retval) {
 		if (parent_store == (TnyFolderStore *) parent) {
 			retval = TRUE;
@@ -1256,7 +1262,7 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 			if (TNY_IS_FOLDER (citem)) {
 				/* We need to remove both the folder and its children */
 				if ((citem == folder) ||
-				    is_folder_ancestor (TNY_FOLDER (folder), TNY_FOLDER (citem))) {
+				    is_folder_ancestor (folder, citem)) {
 
 					remove_folder_observer_weak (me, TNY_FOLDER (citem), FALSE);
 					remove_folder_store_observer_weak (me, TNY_FOLDER_STORE (citem), FALSE);
