@@ -1,3 +1,8 @@
+2009-01-23  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c (deleter): Remove
+	the children of a folder whenever it is deleted
+
 2009-01-20  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c:

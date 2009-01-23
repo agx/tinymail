@@ -1201,6 +1201,26 @@ updater (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	return FALSE;
 }
 
+static gboolean
+is_folder_ancestor (TnyFolder *parent, TnyFolder* item)
+{
+	gboolean retval = FALSE;
+	TnyFolderStore *parent_store = tny_folder_get_folder_store (TNY_FOLDER (item));
+
+	while (TNY_IS_FOLDER (parent_store) && !retval) {
+		if (parent_store == (TnyFolderStore *) parent) {
+			retval = TRUE;
+		} else {
+			GObject *old = parent_store;
+			parent_store = tny_folder_get_folder_store (TNY_FOLDER (parent_store));
+			g_object_unref (old);
+		}
+	}
+	g_object_unref (parent_store);
+
+	return retval;
+}
+
 static gboolean 
 deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
 {
@@ -1208,34 +1228,52 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 	TnyFolderType type = TNY_FOLDER_TYPE_UNKNOWN;
 	GObject *folder = user_data1;
 	TnyGtkFolderListStore *me = (TnyGtkFolderListStore*) model;
+	GtkTreeIter tmp_iter;
 
 	/* The deleter will compare all folders in the model with the deleted 
 	 * folder @folder, and if there's a match it will delete the folder's
 	 * row from the model. */
 
-	gtk_tree_model_get (model, iter, 
-		TNY_GTK_FOLDER_LIST_STORE_TYPE_COLUMN, 
+	gtk_tree_model_get (model, iter,
+		TNY_GTK_FOLDER_LIST_STORE_TYPE_COLUMN,
 		&type, -1);
 
-	if (type != TNY_FOLDER_TYPE_ROOT) 
-	{
-		GObject *fol = NULL;
+	if (type == TNY_FOLDER_TYPE_ROOT)
+		return FALSE;
 
-		gtk_tree_model_get (model, iter, 
-			TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN, 
-			&fol, -1);
+	if (gtk_tree_model_get_iter_first (model, &tmp_iter)) {
+		gboolean more_items = TRUE;
 
-		if (fol == folder) {
+		do {
+			GObject *citem = NULL;
+			gboolean deleted;
 
-			remove_folder_observer_weak (me, TNY_FOLDER (folder), FALSE);
-			remove_folder_store_observer_weak (me, TNY_FOLDER_STORE (folder), FALSE);
+			deleted = FALSE;
+			gtk_tree_model_get (model, &tmp_iter,
+					    TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN,
+					    &citem, -1);
 
-			gtk_list_store_remove (GTK_LIST_STORE (model), iter);
-			retval = TRUE;
-		}
+			if (TNY_IS_FOLDER (citem)) {
+				/* We need to remove both the folder and its children */
+				if ((citem == folder) ||
+				    is_folder_ancestor (TNY_FOLDER (folder), TNY_FOLDER (citem))) {
 
-		if (fol)
-			g_object_unref (fol);
+					remove_folder_observer_weak (me, TNY_FOLDER (citem), FALSE);
+					remove_folder_store_observer_weak (me, TNY_FOLDER_STORE (citem), FALSE);
+
+					gtk_list_store_remove (GTK_LIST_STORE (model), &tmp_iter);
+					deleted = TRUE;
+				}
+			}
+
+			if (citem)
+				g_object_unref (citem);
+
+			/* If the item was deleted then the iter was
+			   moved to the next row */
+			if (!deleted)
+				more_items = gtk_tree_model_iter_next (model, &tmp_iter);
+		} while (more_items);
 	}
 
 	return retval;
