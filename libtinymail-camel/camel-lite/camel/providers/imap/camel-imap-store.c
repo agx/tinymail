@@ -616,6 +616,9 @@ camel_imap_store_finalize (CamelObject *object)
 		disco->diary = NULL;
 	}
 
+	g_free (imap_store->namespace);
+	imap_store->namespace = NULL;
+
 	if (imap_store->namespaces)
 		imap_namespaces_destroy (imap_store->namespaces);
 
@@ -703,6 +706,11 @@ camel_imap_store_init (gpointer object, gpointer klass)
 	imap_store->tag_prefix = imap_tag_prefix++;
 	if (imap_tag_prefix > 'Z')
 		imap_tag_prefix = 'A';
+
+	imap_store->namespaces = NULL;
+	imap_store->namespace = NULL;
+	imap_store->base_url = NULL;
+	imap_store->storage_path = NULL;
 }
 
 CamelType
@@ -832,8 +840,10 @@ construct (CamelService *service, CamelSession *session,
 				lst = lst->next;
 			}
 
+			if (imap_store->namespace)
+				g_free (imap_store->namespace);
 			if (imap_store->namespaces && imap_store->namespaces->personal) {
-				imap_store->namespace = imap_store->namespaces->personal->prefix;
+				imap_store->namespace = g_strdup (imap_store->namespaces->personal->prefix);
 				imap_store->dir_sep = imap_store->namespaces->personal->delim;
 			} else {
 				imap_store->namespace = NULL;
@@ -847,6 +857,8 @@ construct (CamelService *service, CamelSession *session,
 			if (imap_store->namespace && strcmp(imap_store->namespace, is->namespace->full_name) != 0) {
 				camel_store_summary_clear((CamelStoreSummary *)is);
 			} else {
+				if (imap_store->namespace)
+					g_free (imap_store->namespace);
 				imap_store->namespace = g_strdup(is->namespace->full_name);
 				imap_store->dir_sep = is->namespace->sep;
 			}
@@ -2236,8 +2248,10 @@ imap_connect_online (CamelService *service, CamelException *ex)
 		store->namespaces = imap_parse_namespace_response (result);
 		namespaces = store->namespaces;
 
+		if (store->namespace)
+			g_free (store->namespace);
 		if (namespaces && namespaces->personal) {
-			store->namespace = namespaces->personal->prefix;
+			store->namespace = g_strdup (namespaces->personal->prefix);
 			store->dir_sep = namespaces->personal->delim;
 		} else {
 			store->namespace = NULL;
@@ -2256,8 +2270,10 @@ imap_connect_online (CamelService *service, CamelException *ex)
 		camel_imap_store_summary_namespace_add(store->summary,ns);
 	}
 
-	if (store->namespace && strlen (store->namespace) == 0)
+	if (store->namespace && strlen (store->namespace) == 0) {
+		g_free (store->namespace);
 		store->namespace = NULL;
+	}
 
 	if (store->namespace && !store->dir_sep) {
 		if (FALSE && store->server_level >= IMAP_LEVEL_IMAP4REV1) {
@@ -2422,8 +2438,10 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 		store->authtypes = NULL;
 	}
 
-	if (store->namespace && !(store->parameters & IMAP_PARAM_OVERRIDE_NAMESPACE))
+	if (store->namespace && !(store->parameters & IMAP_PARAM_OVERRIDE_NAMESPACE)) {
+		g_free (store->namespace);
 		store->namespace = NULL;
+	}
 
 	return TRUE;
 }
