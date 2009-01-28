@@ -1,3 +1,10 @@
+2009-01-27  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-store-account.c
+	(tny_camel_store_account_delete_cache_default): fixes a crash when
+	deleting the cache of an account that does not have a CamelStore
+	yet
+
 2009-01-23  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c (deleter): Remove
