@@ -780,12 +780,25 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	return;
 }
 
+static void 
+notify_factory_del (TnyCamelStoreAccount *self, GObject *folder)
+{
+	if (self && TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
+		TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+		g_static_rec_mutex_lock (priv->factory_lock);
+		priv->managed_folders = g_list_remove_all (priv->managed_folders, folder);
+		g_static_rec_mutex_unlock (priv->factory_lock);
+	}
+}
+
 static void
 foreach_managed_folder (gpointer data, gpointer user_data)
 {
 	if (data && TNY_IS_CAMEL_FOLDER (data))
 	{
 		TnyCamelFolder *folder = (TnyCamelFolder*) data;
+
+		g_object_weak_unref (G_OBJECT (folder), (GWeakNotify) notify_factory_del, user_data);
 
 		TNY_CAMEL_FOLDER_GET_PRIVATE (folder)->iter = NULL;
 		TNY_CAMEL_FOLDER_GET_PRIVATE (folder)->iter_parented = FALSE;
@@ -914,6 +927,7 @@ tny_camel_store_account_remove_folder_actual (TnyFolderStore *self, TnyFolder *f
 
 		/* g_free (cpriv->folder_name); 
 		cpriv->folder_name = NULL; */
+		g_object_weak_unref (G_OBJECT (folder), (GWeakNotify) notify_factory_del, self);
 
 		aspriv->managed_folders = 
 			g_list_remove (aspriv->managed_folders, cfol);
@@ -1287,18 +1301,6 @@ TnyFolder *
 tny_camel_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)
 {
 	return TNY_CAMEL_STORE_ACCOUNT_GET_CLASS (self)->factor_folder(self, full_name, was_new);
-}
-
-
-static void 
-notify_factory_del (TnyCamelStoreAccount *self, GObject *folder)
-{
-	if (self && TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
-		TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
-		g_static_rec_mutex_lock (priv->factory_lock);
-		priv->managed_folders = g_list_remove_all (priv->managed_folders, folder);
-		g_static_rec_mutex_unlock (priv->factory_lock);
-	}
 }
 
 
