@@ -832,9 +832,11 @@ tny_camel_store_account_dispose (GObject *object)
 		priv->sobs = NULL;
 	}
 
-	g_list_foreach (priv->managed_folders, foreach_managed_folder, self);
-	g_list_free (priv->managed_folders);
-	priv->managed_folders = NULL;
+	if (priv->managed_folders) {
+		g_list_foreach (priv->managed_folders, foreach_managed_folder, self);
+		g_list_free (priv->managed_folders);
+		priv->managed_folders = NULL;
+	}
 
 	if (priv->iter_store && CAMEL_IS_STORE (priv->iter_store))
 	{

@@ -1227,27 +1227,18 @@ is_folder_ancestor (GObject *parent, GObject *item)
 	return retval;
 }
 
-static gboolean 
-deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data1)
+static void
+deleter (GtkTreeModel *model, TnyFolder *folder)
 {
 	gboolean retval = FALSE;
 	TnyFolderType type = TNY_FOLDER_TYPE_UNKNOWN;
-	GObject *folder = user_data1;
 	TnyGtkFolderListStore *me = (TnyGtkFolderListStore*) model;
-	GtkTreeIter tmp_iter;
+	GtkTreeIter iter;
 
 	/* The deleter will compare all folders in the model with the deleted 
 	 * folder @folder, and if there's a match it will delete the folder's
 	 * row from the model. */
-
-	gtk_tree_model_get (model, iter,
-		TNY_GTK_FOLDER_LIST_STORE_TYPE_COLUMN,
-		&type, -1);
-
-	if (type == TNY_FOLDER_TYPE_ROOT)
-		return FALSE;
-
-	if (gtk_tree_model_get_iter_first (model, &tmp_iter)) {
+	if (gtk_tree_model_get_iter_first (model, &iter)) {
 		gboolean more_items = TRUE;
 
 		do {
@@ -1255,7 +1246,7 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 			gboolean deleted;
 
 			deleted = FALSE;
-			gtk_tree_model_get (model, &tmp_iter,
+			gtk_tree_model_get (model, &iter,
 					    TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN,
 					    &citem, -1);
 
@@ -1267,7 +1258,7 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 					remove_folder_observer_weak (me, TNY_FOLDER (citem), FALSE);
 					remove_folder_store_observer_weak (me, TNY_FOLDER_STORE (citem), FALSE);
 
-					gtk_list_store_remove (GTK_LIST_STORE (model), &tmp_iter);
+					more_items = gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
 					deleted = TRUE;
 				}
 			}
@@ -1278,11 +1269,9 @@ deleter (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer use
 			/* If the item was deleted then the iter was
 			   moved to the next row */
 			if (!deleted)
-				more_items = gtk_tree_model_iter_next (model, &tmp_iter);
+				more_items = gtk_tree_model_iter_next (model, &iter);
 		} while (more_items);
 	}
-
-	return retval;
 }
 
 static gboolean
@@ -1467,7 +1456,7 @@ delete_these_folders (GtkTreeModel *model, TnyList *list)
 		while (!tny_iterator_is_done (miter))
 		{
 			TnyFolder *folder = TNY_FOLDER (tny_iterator_get_current (miter));
-			gtk_tree_model_foreach (model, deleter, folder);
+			deleter (model, folder);
 			g_object_unref (folder);
 			tny_iterator_next (miter);
 		}
