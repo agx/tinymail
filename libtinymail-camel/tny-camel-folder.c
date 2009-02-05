@@ -4865,8 +4865,7 @@ _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder,
 				/* g_free (cpriv->folder_name); 
 				   cpriv->folder_name = NULL; */
 
-				apriv->managed_folders = 
-					g_list_remove (apriv->managed_folders, cfol);
+				_tny_camel_store_account_remove_from_managed_folders (TNY_CAMEL_STORE_ACCOUNT (priv->account), cfol);
 			}
 		}
 	}
@@ -6309,10 +6308,8 @@ tny_camel_folder_dispose (GObject *object)
 		camel_object_unref (priv->store);
 
 	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account)) {
-		TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
-		g_static_rec_mutex_lock (apriv->factory_lock);
-		apriv->managed_folders = g_list_remove (apriv->managed_folders, self);
-		g_static_rec_mutex_unlock (apriv->factory_lock);
+		_tny_camel_store_account_remove_from_managed_folders (TNY_CAMEL_STORE_ACCOUNT (priv->account), 
+								      self);
 	}
 
 #ifdef ACCOUNT_WEAK_REF
@@ -6382,10 +6379,8 @@ tny_camel_folder_finalize (GObject *object)
 	priv->dont_fkill = FALSE;
 
 	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account)) {
-		TnyCamelStoreAccountPriv *apriv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (priv->account);
-		g_static_rec_mutex_lock (apriv->factory_lock);
-		apriv->managed_folders = g_list_remove (apriv->managed_folders, self);
-		g_static_rec_mutex_unlock (apriv->factory_lock);
+		_tny_camel_store_account_remove_from_managed_folders (TNY_CAMEL_STORE_ACCOUNT (priv->account), 
+								      self);
 	}
 
 	if (G_LIKELY (priv->folder))

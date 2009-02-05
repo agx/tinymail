@@ -1,8 +1,16 @@
 2009-02-04  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail-camel/tny-camel-store-account-priv.h:
+	* libtinymail-camel/tny-camel-pop-store-account.c (notify_factory_del)
+	(tny_camel_pop_store_account_factor_folder):
+	* libtinymail-camel/tny-camel-imap-store-account.c (tny_camel_imap_store_account_factor_folder)
+	(notify_factory_del, tny_camel_imap_store_account_factor_folder):
+	* libtinymail-camel/tny-camel-folder.c (_tny_camel_folder_remove_folder_actual)
+	(tny_camel_folder_dispose, tny_camel_folder_finalize):
 	* libtinymail-camel/tny-camel-store-account.c
-	(tny_camel_store_account_remove_folder_actual): 
-	fixed a weak unref.
+	(tny_camel_store_account_remove_folder_actual):
+	added "protected" functions to properly add/remove folders to/from
+	managed_folders list.
 
 2009-01-29  Sergio Villar Senin  <svillar@igalia.com>
 

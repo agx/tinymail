@@ -780,40 +780,77 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 	return;
 }
 
-static void 
+static void notify_factory_del (TnyCamelStoreAccount *self, GObject *folder);
+
+/**
+ * Removes the weak reference the account has for every managed
+ * folder. It can also remove the folder from the list, we don't do it
+ * always in order to allow the use of this function from
+ * g_list_foreach like funtions
+ */
+static void
+remove_weak_reference (TnyCamelStoreAccount *self,
+		       TnyCamelFolder *folder,
+		       gboolean remove_from_list)
+{
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	g_static_rec_mutex_lock (priv->factory_lock);
+
+	/* Remove weak reference */
+	g_object_weak_unref (G_OBJECT (folder), (GWeakNotify) notify_factory_del, self);
+
+	TNY_CAMEL_FOLDER_GET_PRIVATE (folder)->iter = NULL;
+	TNY_CAMEL_FOLDER_GET_PRIVATE (folder)->iter_parented = FALSE;
+
+	/* Remove from list */
+	if (remove_from_list)
+		priv->managed_folders = g_list_remove_all (priv->managed_folders, folder);
+
+	g_static_rec_mutex_unlock (priv->factory_lock);
+}
+
+void
+_tny_camel_store_account_remove_from_managed_folders (TnyCamelStoreAccount *self,
+						      TnyCamelFolder *folder)
+{
+	remove_weak_reference (self, folder, TRUE);
+}
+
+void 
+_tny_camel_store_account_add_to_managed_folders (TnyCamelStoreAccount *self, 
+						 TnyCamelFolder *folder)
+{
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	g_static_rec_mutex_lock (priv->factory_lock);
+
+	g_object_weak_ref (G_OBJECT (folder), (GWeakNotify) notify_factory_del, self);
+	priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
+
+	g_static_rec_mutex_unlock (priv->factory_lock);
+}
+
+static void
 notify_factory_del (TnyCamelStoreAccount *self, GObject *folder)
 {
 	if (self && TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
-		GList *tmp = NULL;
-		TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
-		g_static_rec_mutex_lock (priv->factory_lock);
-		tmp = g_list_find (priv->managed_folders, folder);
-		while (tmp) {
-			g_object_weak_unref (G_OBJECT (tmp->data), (GWeakNotify) notify_factory_del, self);
-			tmp = g_list_find (priv->managed_folders, folder);
-		}
-		priv->managed_folders = g_list_remove_all (priv->managed_folders, folder);
-		g_static_rec_mutex_unlock (priv->factory_lock);
+		_tny_camel_store_account_remove_from_managed_folders (self,
+								      TNY_CAMEL_FOLDER (folder));
 	}
 }
 
 static void
 foreach_managed_folder (gpointer data, gpointer user_data)
 {
-	if (data && TNY_IS_CAMEL_FOLDER (data))
-	{
-		TnyCamelFolder *folder = (TnyCamelFolder*) data;
-
-		g_object_weak_unref (G_OBJECT (folder), (GWeakNotify) notify_factory_del, user_data);
-
-		TNY_CAMEL_FOLDER_GET_PRIVATE (folder)->iter = NULL;
-		TNY_CAMEL_FOLDER_GET_PRIVATE (folder)->iter_parented = FALSE;
+	if (data && TNY_IS_CAMEL_FOLDER (data))	{
+		remove_weak_reference (TNY_CAMEL_STORE_ACCOUNT (user_data),
+				       TNY_CAMEL_FOLDER (data),
+				       FALSE);
 	}
-
-	return;
 }
 
-static void 
+static void
 notify_store_observer_del (gpointer user_data, GObject *observer)
 {
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (user_data);
@@ -1339,8 +1376,7 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 
 	if (!folder) {
 		folder = TNY_CAMEL_FOLDER (_tny_camel_folder_new ());
-		g_object_weak_ref (G_OBJECT (folder), (GWeakNotify) notify_factory_del, self);
-		priv->managed_folders = g_list_prepend (priv->managed_folders, folder);
+		_tny_camel_store_account_add_to_managed_folders (self, folder);
 		*was_new = TRUE;
 	}
 

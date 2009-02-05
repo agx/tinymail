@@ -46,4 +46,7 @@ struct _TnyCamelStoreAccountPriv
 void _tny_camel_store_account_emit_conchg_signal (TnyCamelStoreAccount *self);
 void _tny_camel_store_account_queue_going_online (TnyCamelStoreAccount *self, TnySessionCamel *session, gboolean online, TnyCamelSetOnlineCallback callback, gpointer user_data);
 
+void _tny_camel_store_account_add_to_managed_folders (TnyCamelStoreAccount *self, TnyCamelFolder *folder);
+void _tny_camel_store_account_remove_from_managed_folders (TnyCamelStoreAccount *self, TnyCamelFolder *folder);
+
 #endif
