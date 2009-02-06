@@ -64,14 +64,6 @@ stay as an abstract TnyStoreAccount type. */
 static GObjectClass *parent_class = NULL;
 
 
-static void 
-notify_factory_del (TnyCamelStoreAccount *self, GObject *folder)
-{
-	if (self && TNY_IS_CAMEL_STORE_ACCOUNT (self)) {
-		_tny_camel_store_account_remove_from_managed_folders (self, (TnyCamelFolder *) folder);
-	}
-}
-
 static TnyFolder * 
 tny_camel_imap_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)
 {
