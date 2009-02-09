@@ -1,3 +1,10 @@
+2009-02-09  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-account.c
+	(tny_camel_account_get_supported_secure_authentication):
+	Properly initialize a boolean. Valgrind complained about
+	uninitialized value
+
 2009-02-04  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-store-account-priv.h:

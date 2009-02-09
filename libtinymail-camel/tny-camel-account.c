@@ -2094,7 +2094,7 @@ tny_camel_account_get_supported_secure_authentication (TnyCamelAccount *self, Tn
 	info->result = NULL;
 	info->status_callback = status_callback;
 	info->user_data = user_data;
-	
+	info->cancelled = FALSE;
 	info->stopper = tny_idle_stopper_new();
 
 	/* thread reference */
