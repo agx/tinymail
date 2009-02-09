@@ -4229,10 +4229,13 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 			get_folders_sync_ns (imap_store, ns->personal, 
 				(gboolean) ns->other, 
 				(gboolean) ns->shared, ex);
-			delim = ns->personal->delim;
-			has_d = TRUE;
-			if (g_ascii_strncasecmp (ns->personal->prefix, "INBOX", 5) == 0) {
-				get_folders_sync (imap_store, "%", ex);
+			ns = imap_store->namespaces;
+			if (ns->personal) {
+				delim = ns->personal->delim;
+				has_d = TRUE;
+				if (g_ascii_strncasecmp (ns->personal->prefix, "INBOX", 5) == 0) {
+					get_folders_sync (imap_store, "%", ex);
+				}
 			}
 		}
 
@@ -4247,14 +4250,18 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 		 * character. (recursively fetching alt.* of NNTP is not a 
 		 * very good idea nowadays...) */
 
-		if (ns->other)
+		if (ns->other) {
 			get_folders_sync_ns_only_lsub (imap_store, ns->other, ex);
+			ns = imap_store->namespaces;
+		}
 
 		if (camel_exception_is_set(ex))
 			goto fail;
 
-		if (ns->shared)
+		if (ns->shared) {
 			get_folders_sync_ns_only_lsub (imap_store, ns->shared, ex);
+			ns = imap_store->namespaces;
+		}
 
 		if (camel_exception_is_set(ex))
 			goto fail;
