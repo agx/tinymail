@@ -1,3 +1,9 @@
+2009-02-16  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/camel-mime-utils.c: fix
+	camel_header_set_param as it could cause crashes on setting params
+	if a param struct was already available.
+
 2009-02-09  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:

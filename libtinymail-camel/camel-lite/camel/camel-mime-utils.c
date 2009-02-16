@@ -2162,12 +2162,12 @@ camel_header_param (struct _camel_header_param *p, const char *name)
 struct _camel_header_param *
 camel_header_set_param (struct _camel_header_param **l, const char *name, const char *value)
 {
-	struct _camel_header_param *p = (struct _camel_header_param *)l, *pn;
+	struct _camel_header_param *p = (struct _camel_header_param *) *l, *pn;
 
 	if (name == NULL)
 		return NULL;
 
-	while (p->next) {
+	while (p && p->next) {
 		pn = p->next;
 		if (!g_ascii_strcasecmp (pn->name, name)) {
 			g_free (pn->value);
@@ -2191,7 +2191,12 @@ camel_header_set_param (struct _camel_header_param **l, const char *name, const 
 	pn->next = 0;
 	pn->name = g_strdup (name);
 	pn->value = g_strdup (value);
-	p->next = pn;
+
+	if (p) {
+		p->next = pn;
+	} else {
+		*l = pn;
+	}
 
 	return pn;
 }
