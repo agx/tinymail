@@ -4213,7 +4213,6 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 
 	if (imap_store->namespaces && imap_store->capabilities & IMAP_CAPABILITY_NAMESPACE) 
 	{
-		struct _namespaces *ns = imap_store->namespaces;
 		char delim = '.';
 		gboolean has_d = FALSE;
 
@@ -4225,15 +4224,14 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 		if (camel_exception_is_set(ex))
 			goto fail;*/
 
-		if (ns->personal) {
-			get_folders_sync_ns (imap_store, ns->personal, 
-				(gboolean) ns->other, 
-				(gboolean) ns->shared, ex);
-			ns = imap_store->namespaces;
-			if (ns->personal) {
-				delim = ns->personal->delim;
+		if (imap_store->namespaces->personal) {
+			get_folders_sync_ns (imap_store, imap_store->namespaces->personal, 
+				(gboolean) imap_store->namespaces->other, 
+				(gboolean) imap_store->namespaces->shared, ex);
+			if (imap_store->namespaces->personal) {
+				delim = imap_store->namespaces->personal->delim;
 				has_d = TRUE;
-				if (g_ascii_strncasecmp (ns->personal->prefix, "INBOX", 5) == 0) {
+				if (g_ascii_strncasecmp (imap_store->namespaces->personal->prefix, "INBOX", 5) == 0) {
 					get_folders_sync (imap_store, "%", ex);
 				}
 			}
@@ -4250,17 +4248,15 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 		 * character. (recursively fetching alt.* of NNTP is not a 
 		 * very good idea nowadays...) */
 
-		if (ns->other) {
-			get_folders_sync_ns_only_lsub (imap_store, ns->other, ex);
-			ns = imap_store->namespaces;
+		if (imap_store->namespaces->other) {
+			get_folders_sync_ns_only_lsub (imap_store, imap_store->namespaces->other, ex);
 		}
 
 		if (camel_exception_is_set(ex))
 			goto fail;
 
-		if (ns->shared) {
-			get_folders_sync_ns_only_lsub (imap_store, ns->shared, ex);
-			ns = imap_store->namespaces;
+		if (imap_store->namespaces->shared) {
+			get_folders_sync_ns_only_lsub (imap_store, imap_store->namespaces->shared, ex);
 		}
 
 		if (camel_exception_is_set(ex))
