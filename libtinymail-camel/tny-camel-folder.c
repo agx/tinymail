@@ -463,6 +463,8 @@ unload_folder_no_lock (TnyCamelFolderPriv *priv, gboolean destroy)
 		if (priv->folder_changed_id != 0)
 			camel_object_remove_event (priv->folder, priv->folder_changed_id);
 
+		camel_folder_set_push_email (priv->folder, FALSE);
+
 		/* printf ("UNLOAD (%s): %d\n",
 				priv->folder_name?priv->folder_name:"NUL",
 				(((CamelObject*)priv->folder)->ref_count));  */

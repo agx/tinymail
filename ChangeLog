@@ -1,3 +1,9 @@
+2009-02-27  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/tny-camel-folder.c: disable push email
+	on uncaching (to avoid keeping current folder active in store when
+	we're not reading it anymore).
+
 2009-02-16  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:

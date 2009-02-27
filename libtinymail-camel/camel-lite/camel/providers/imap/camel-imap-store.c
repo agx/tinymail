@@ -252,7 +252,7 @@ let_idle_die (CamelImapStore *store, gboolean connect_buz)
 			CAMEL_SERVICE_REC_UNLOCK (store, connect_lock);
 		}
 		g_free (store->idle_prefix);
-		store->idle_prefix=NULL;
+		store->idle_prefix = NULL;
 	}
 
 	g_static_rec_mutex_unlock (store->idle_prefix_lock);
