@@ -5298,20 +5298,29 @@ _tny_camel_folder_guess_folder_type (TnyCamelFolder *folder, CamelFolderInfo *fo
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
 
 	if (folder_info->name) {
-		if (!g_ascii_strcasecmp (folder_info->name, "drafts")) {
+		if (!g_ascii_strcasecmp (folder_info->name, "inbox")) {
+			/* Needed as some dovecot servers report the inbox as
+			 * normal */
+			TnyFolderStore *store = tny_folder_get_folder_store (folder);
+			if (store) {
+				if (TNY_IS_ACCOUNT (store))
+					priv->cached_folder_type = TNY_FOLDER_TYPE_INBOX;
+				else
+					priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
+				g_object_unref (store);
+			} else {
+				priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
+			}
+		}
+		else if (!g_ascii_strcasecmp (folder_info->name, "drafts")) {
 			priv->cached_folder_type = TNY_FOLDER_TYPE_DRAFTS;
 		} else if (!g_ascii_strcasecmp (folder_info->name, "sent")) {
 			priv->cached_folder_type = TNY_FOLDER_TYPE_SENT;
 		} else if (!g_ascii_strcasecmp (folder_info->name, "outbox")) {
 			priv->cached_folder_type = TNY_FOLDER_TYPE_OUTBOX;
-		} else if (!g_ascii_strcasecmp (folder_info->name, "inbox")) {
-			/* Needed as some dovecot servers report the inbox as
-			 * normal */
-			priv->cached_folder_type = TNY_FOLDER_TYPE_INBOX;
 		} else {
 			priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
 		}
-		
 	} else {
 		priv->cached_folder_type = TNY_FOLDER_TYPE_NORMAL;
 	}

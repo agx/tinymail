@@ -1,3 +1,10 @@
+2009-03-02  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c
+	(_tny_camel_folder_guess_folder_type): Improved detection of
+	folders called 'inbox'. If the parent is not an account then it's
+	unlikely to be a 'real' inbox
+
 2009-02-27  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/tny-camel-folder.c: disable push email
