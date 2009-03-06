@@ -771,7 +771,6 @@ set_online_happened_destroy (gpointer user_data)
 static void 
 tny_session_queue_going_online_for_account (TnySessionCamel *self, TnyCamelAccount *account, gboolean online)
 {
-
 	/* So this is that wrapper that I talked about (see below). In case we 
 	 * are a store account, this means that we need to throw the request to
 	 * go online to the account's queue. This is implemented in a protected
@@ -779,13 +778,15 @@ tny_session_queue_going_online_for_account (TnySessionCamel *self, TnyCamelAccou
 
 	if (TNY_IS_CAMEL_STORE_ACCOUNT (account)) {
 		camel_object_ref (self);
+		if (online)
+			camel_session_set_online ((CamelSession *) self, TRUE);
 		_tny_camel_store_account_queue_going_online (
-			TNY_CAMEL_STORE_ACCOUNT (account), self, online, 
+			TNY_CAMEL_STORE_ACCOUNT (account), self, online,
 			on_account_connect_done, self);
 	}
 
-	/* Else, if it's a transport account, we don't have any transport 
-	 * account implementations that actually need to go online at this 
+	/* Else, if it's a transport account, we don't have any transport
+	 * account implementations that actually need to go online at this
 	 * moment yet. At the moment of transferring the first message, the
 	 * current implementations will automatically connect themselves. */
 

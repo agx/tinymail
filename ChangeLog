@@ -1,3 +1,10 @@
+2009-03-06  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-session-camel.c
+	(tny_session_queue_going_online_for_account):
+	set the session to online before trying to connect the
+	account. Otherwise the connection won't success
+
 2009-03-02  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c
