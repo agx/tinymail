@@ -1428,6 +1428,10 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 
 	iter = priv->iter;
 
+	if (refresh && CAMEL_IS_DISCO_STORE (store)) {
+		priv->cant_reuse_iter = TRUE;
+	}
+
 	if (!iter || priv->cant_reuse_iter) {
 		if (!refresh && CAMEL_IS_DISCO_STORE(store)) {
 			iter = CAMEL_DISCO_STORE_CLASS(CAMEL_OBJECT_GET_CLASS(store))->get_folder_info_offline(store,  "", flags, &ex);
