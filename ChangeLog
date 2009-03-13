@@ -1,3 +1,7 @@
+2009-03-13  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Fix for previous "refresh" commit.
+
 2009-03-11  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-store-account.c: now

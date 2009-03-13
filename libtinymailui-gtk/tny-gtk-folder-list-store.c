@@ -122,7 +122,7 @@ recurse_folders_sync (TnyGtkFolderListStore *self,
 	TnyList *folders = tny_simple_list_new ();
 
 	/* TODO add error checking and reporting here */
-	tny_folder_store_get_folders (store, folders, self->query, TRUE, NULL);
+	tny_folder_store_get_folders (store, folders, self->query, FALSE, NULL);
 	iter = tny_list_create_iterator (folders);
 
 	if (parent_name == NULL)
