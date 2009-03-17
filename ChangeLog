@@ -1,3 +1,8 @@
+2009-03-17  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c (get_folders_cb): 
+	get the folders of the model using asynchronous calls
+
 2009-03-13  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Fix for previous "refresh" commit.

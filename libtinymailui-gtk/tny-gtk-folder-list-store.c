@@ -103,7 +103,7 @@ remove_folder_observer_weak (TnyGtkFolderListStore *self, TnyFolder *folder, gbo
 	}
 }
 
-static void 
+static void
 remove_folder_store_observer_weak (TnyGtkFolderListStore *self, TnyFolderStore *store, gboolean final)
 {
 	if (TNY_IS_FOLDER_STORE (store)) {
@@ -113,20 +113,70 @@ remove_folder_store_observer_weak (TnyGtkFolderListStore *self, TnyFolderStore *
 	}
 }
 
+static gchar *
+get_parent_full_name (TnyFolderStore *store, gchar *path_separator)
+{
+	TnyList *folders;
+	TnyIterator *iter;
+	TnyFolderStore *current;
+	gchar *name = NULL;
+
+	folders = tny_simple_list_new ();
+	current = store;
+
+	while (!TNY_IS_ACCOUNT (current)) {
+		tny_list_prepend (folders, (GObject *) current);
+		current = tny_folder_get_folder_store (TNY_FOLDER (current));
+	}
+
+	iter = tny_list_create_iterator (folders);
+	while (!tny_iterator_is_done (iter)) {
+		current = (TnyFolderStore *) tny_iterator_get_current (iter);
+		if (current) {
+			gchar *tmp = NULL;
+			if (G_LIKELY (!name)) {
+				tmp = g_strdup (tny_folder_get_name (TNY_FOLDER (current)));
+			} else {
+				tmp = g_strconcat (name, path_separator,
+						   tny_folder_get_name (TNY_FOLDER (current)),
+						   NULL);
+			}
+			g_free (name);
+			name = tmp;
+
+			g_object_unref (current);
+		}
+		tny_iterator_next (iter);
+	}
+	g_object_unref (iter);
+	g_object_unref (folders);
+
+	return name;
+}
+
 static void
-recurse_folders_sync (TnyGtkFolderListStore *self, 
-		      TnyFolderStore *store, 
-		      const gchar *parent_name)
+recurse_folders_async_cb (TnyFolderStore *store,
+			  gboolean cancelled,
+			  TnyList *folders,
+			  GError *err,
+			  gpointer user_data)
 {
 	TnyIterator *iter;
-	TnyList *folders = tny_simple_list_new ();
+	TnyGtkFolderListStore *self;
+	gchar *parent_name;
+
+	self = TNY_GTK_FOLDER_LIST_STORE (user_data);
+
+	if (cancelled || err) {
+		g_warning ("%s Error getting the folders", __FUNCTION__);
+		g_object_unref (self);
+		return;
+	}
 
 	/* TODO add error checking and reporting here */
-	tny_folder_store_get_folders (store, folders, self->query, FALSE, NULL);
 	iter = tny_list_create_iterator (folders);
 
-	if (parent_name == NULL)
-		parent_name = "";
+	parent_name = get_parent_full_name (store, self->path_separator);
 
 	while (!tny_iterator_is_done (iter))
 	{
@@ -151,9 +201,9 @@ recurse_folders_sync (TnyGtkFolderListStore *self,
 		  {
 			GObject *citem = NULL;
 			TnyIterator *niter = NULL;
-			
-			gtk_tree_model_get (mmodel, &miter, 
-				TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN, 
+
+			gtk_tree_model_get (mmodel, &miter,
+				TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN,
 				&citem, -1);
 
 			if (citem == instance)
@@ -164,7 +214,7 @@ recurse_folders_sync (TnyGtkFolderListStore *self,
 				break;
 			}
 
-			/* We search whether this folder that we have in the 
+			/* We search whether this folder that we have in the
 			 * model, still exists in the actual list. Because if
 			 * not, it probably got removed remotely (and we need
 			 * to get rid of it in the model now) */
@@ -239,8 +289,14 @@ recurse_folders_sync (TnyGtkFolderListStore *self,
 
 			/* it's a store by itself, so keep on recursing */
 			if (folder_store) {
+				TnyList *folders = tny_simple_list_new ();
+
 				add_folder_store_observer_weak (self, folder_store);
-				recurse_folders_sync (self, folder_store, name);
+				tny_folder_store_get_folders_async (folder_store,
+								    folders, NULL, TRUE,
+								    recurse_folders_async_cb,
+								    NULL, g_object_ref (self));
+				g_object_unref (folders);
 			}
 
 			g_free (name);
@@ -278,9 +334,10 @@ recurse_folders_sync (TnyGtkFolderListStore *self,
 
 		tny_iterator_next (iter);
 	}
-
 	g_object_unref (iter);
-	g_object_unref (folders);
+
+	g_free (parent_name);
+	g_object_unref (self);
 }
 
 
@@ -341,8 +398,14 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 	 * folders and subfolders. The recurse_folders_sync can indeed cope with
 	 * folders that already exist (it wont add them a second time). */
 
-	if (found)
-		recurse_folders_sync (self, fstore, NULL);
+	if (found) {
+		TnyList *folders = tny_simple_list_new ();
+		tny_folder_store_get_folders_async (fstore,
+						    folders, NULL, TRUE,
+						    recurse_folders_async_cb,
+						    NULL, g_object_ref (self));
+		g_object_unref (folders);
+	}
 
 	g_object_unref (self);
 
@@ -1217,7 +1280,7 @@ is_folder_ancestor (GObject *parent, GObject *item)
 		if (parent_store == (TnyFolderStore *) parent) {
 			retval = TRUE;
 		} else {
-			GObject *old = parent_store;
+			GObject *old = (GObject *) parent_store;
 			parent_store = tny_folder_get_folder_store (TNY_FOLDER (parent_store));
 			g_object_unref (old);
 		}
@@ -1252,8 +1315,8 @@ deleter (GtkTreeModel *model, TnyFolder *folder)
 
 			if (TNY_IS_FOLDER (citem)) {
 				/* We need to remove both the folder and its children */
-				if ((citem == folder) ||
-				    is_folder_ancestor (folder, citem)) {
+				if ((citem == (GObject *) folder) ||
+				    is_folder_ancestor ((GObject *) folder, citem)) {
 
 					remove_folder_observer_weak (me, TNY_FOLDER (citem), FALSE);
 					remove_folder_store_observer_weak (me, TNY_FOLDER_STORE (citem), FALSE);
