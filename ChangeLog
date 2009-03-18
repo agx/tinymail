@@ -1,3 +1,8 @@
+2009-03-18  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-send-queue.c: fix
+	bad usage of GSlice that could cause crashes.
+
 2009-03-17  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c (get_folders_cb): 

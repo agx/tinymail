@@ -599,7 +599,7 @@ wait_for_queue_start_notification (TnySendQueue *self)
 	g_mutex_free (info->mutex);
 	g_cond_free (info->condition);
 
-	g_slice_free (GetHeadersSync, info);
+	g_slice_free (ControlInfo, info);
 }
 
 
