@@ -124,10 +124,13 @@ get_parent_full_name (TnyFolderStore *store, gchar *path_separator)
 	folders = tny_simple_list_new ();
 	current = store;
 
-	while (!TNY_IS_ACCOUNT (current)) {
+	while (current && !TNY_IS_ACCOUNT (current)) {
 		tny_list_prepend (folders, (GObject *) current);
 		current = tny_folder_get_folder_store (TNY_FOLDER (current));
 	}
+
+	if (current && (current != store))
+		g_object_unref (current);
 
 	iter = tny_list_create_iterator (folders);
 	while (!tny_iterator_is_done (iter)) {
