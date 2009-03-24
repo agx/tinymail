@@ -72,11 +72,15 @@ struct _TnyGtkFolderListStore
 
 	TnyGtkFolderListStoreFlags flags;
 	gchar *path_separator;
+	gint progress_count;
 };
 
 struct _TnyGtkFolderListStoreClass
 {
 	GtkListStoreClass parent_class;
+
+	/* Signals */
+	void (*activity_changed) (TnyGtkFolderListStore *self, gboolean activity);
 };
 
 GType tny_gtk_folder_list_store_get_type (void);
@@ -88,6 +92,7 @@ void tny_gtk_folder_list_store_set_path_separator (TnyGtkFolderListStore *self, 
 const gchar *tny_gtk_folder_list_store_get_path_separator (TnyGtkFolderListStore *self);
 void tny_gtk_folder_list_store_prepend (TnyGtkFolderListStore *self, TnyFolderStore* item, const gchar *root_name);
 void tny_gtk_folder_list_store_append (TnyGtkFolderListStore *self, TnyFolderStore* item, const gchar *root_name);
+gboolean tny_gtk_folder_list_store_get_activity (TnyGtkFolderListStore *self);
 
 G_END_DECLS
 

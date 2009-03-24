@@ -72,6 +72,13 @@
 
 static GObjectClass *parent_class = NULL;
 
+enum {
+	ACTIVITY_CHANGED_SIGNAL,
+	LAST_SIGNAL
+};
+
+guint tny_gtk_folder_list_store_signals [LAST_SIGNAL];
+
 typedef void (*listaddfunc) (GtkListStore *list_store, GtkTreeIter *iter);
 
 
@@ -172,6 +179,11 @@ recurse_folders_async_cb (TnyFolderStore *store,
 
 	if (cancelled || err) {
 		g_warning ("%s Error getting the folders", __FUNCTION__);
+		if (self->progress_count > 0) {
+			self->progress_count--;
+			if (self->progress_count == 0)
+				g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, FALSE);
+		}
 		g_object_unref (self);
 		return;
 	}
@@ -295,6 +307,7 @@ recurse_folders_async_cb (TnyFolderStore *store,
 				TnyList *folders = tny_simple_list_new ();
 
 				add_folder_store_observer_weak (self, folder_store);
+				self->progress_count++;
 				tny_folder_store_get_folders_async (folder_store,
 								    folders, NULL, TRUE,
 								    recurse_folders_async_cb,
@@ -340,6 +353,13 @@ recurse_folders_async_cb (TnyFolderStore *store,
 	g_object_unref (iter);
 
 	g_free (parent_name);
+
+	if (self->progress_count > 0) {
+		self->progress_count--;
+		if (self->progress_count == 0)
+			g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, FALSE);
+	}
+
 	g_object_unref (self);
 }
 
@@ -403,11 +423,21 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 
 	if (found) {
 		TnyList *folders = tny_simple_list_new ();
+		self->progress_count++;
+		if (self->progress_count == 1) {
+			g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
+		}
 		tny_folder_store_get_folders_async (fstore,
 						    folders, NULL, TRUE,
 						    recurse_folders_async_cb,
 						    NULL, g_object_ref (self));
 		g_object_unref (folders);
+	}
+	if (self->progress_count > 0) {
+		self->progress_count --;
+
+		if (self->progress_count == 0)
+			g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, FALSE);
 	}
 
 	g_object_unref (self);
@@ -432,6 +462,10 @@ tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account, TnyConnecti
 		return;
 
 	list = tny_simple_list_new ();
+	self->progress_count++;
+	if (self->progress_count == 1) {
+		g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
+	}
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account), 
 		list, self->query, TRUE, get_folders_cb, NULL, g_object_ref (self));
 
@@ -611,6 +645,10 @@ tny_gtk_folder_list_store_add_i (TnyGtkFolderListStore *self, TnyFolderStore *fo
 	 * already return the offline folders (if we had those from a session
 	 * before this one) */
 
+	self->progress_count++;
+	if (self->progress_count == 1) {
+		g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
+	}
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (folder_store), 
 		folders, self->query, TRUE,  get_folders_cb, NULL, g_object_ref (self));
 
@@ -724,6 +762,15 @@ tny_gtk_folder_list_store_class_init (TnyGtkFolderListStoreClass *class)
 
 	object_class->finalize = tny_gtk_folder_list_store_finalize;
 
+	tny_gtk_folder_list_store_signals [ACTIVITY_CHANGED_SIGNAL] =
+		g_signal_new ("activity_changed",
+			      TNY_TYPE_GTK_FOLDER_LIST_STORE,
+			      G_SIGNAL_RUN_FIRST,
+			      G_STRUCT_OFFSET (TnyGtkFolderListStoreClass, activity_changed),
+			      NULL, NULL,
+			      g_cclosure_marshal_VOID__BOOLEAN,
+			      G_TYPE_NONE, 1, G_TYPE_BOOLEAN);
+
 	return;
 }
 
@@ -743,6 +790,8 @@ tny_gtk_folder_list_store_instance_init (GTypeInstance *instance, gpointer g_cla
 
 	me->flags = 0;
 	me->path_separator = g_strdup (DEFAULT_PATH_SEPARATOR);
+
+	me->progress_count = 0;
 
 	gtk_list_store_set_column_types (store, 
 		TNY_GTK_FOLDER_LIST_STORE_N_COLUMNS, types);
@@ -1296,8 +1345,6 @@ is_folder_ancestor (GObject *parent, GObject *item)
 static void
 deleter (GtkTreeModel *model, TnyFolder *folder)
 {
-	gboolean retval = FALSE;
-	TnyFolderType type = TNY_FOLDER_TYPE_UNKNOWN;
 	TnyGtkFolderListStore *me = (TnyGtkFolderListStore*) model;
 	GtkTreeIter iter;
 
@@ -1496,6 +1543,13 @@ tny_gtk_folder_list_store_get_path_separator (TnyGtkFolderListStore *self)
 }
 
 
+gboolean 
+tny_gtk_folder_list_store_get_activity (TnyGtkFolderListStore *self)
+{
+	g_return_val_if_fail (TNY_IS_GTK_FOLDER_LIST_STORE (self), FALSE);
+
+	return (self->progress_count > 0);
+}
 
 
 static void
