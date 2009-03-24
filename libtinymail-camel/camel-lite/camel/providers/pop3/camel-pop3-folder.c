@@ -581,9 +581,6 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	check_dir (pop3_store, NULL);
 
-	if (!pop3_store->delete_after && !expunge)
-		return;
-
 	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
 		return;
 
@@ -642,46 +639,40 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		camel_operation_end (NULL);
 	}
 
-	if (!expunge) {
-		g_static_rec_mutex_unlock (pop3_store->eng_lock);
-		return;
-	}
-
 	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	camel_operation_start(NULL, _("Expunging deleted messages"));
 
 	max = camel_folder_summary_count (folder->summary);
 	for (i = 0; i < max; i++) {
-		gchar *expunged_path = NULL;
 
 		info = (CamelMessageInfoBase*) camel_folder_summary_index (folder->summary, i);
 
 		if (!info)
 			continue;
 
-		expunged_path = g_strdup_printf ("%s/%s.expunged", pop3_store->storage_path, info->uid);
-
-		if ((info->flags & CAMEL_MESSAGE_DELETED)&& g_file_test (expunged_path, G_FILE_TEST_EXISTS))
+		if (info->flags & CAMEL_MESSAGE_DELETED)
 		{
 			struct _CamelPOP3Command *cmd;
 
 			g_static_rec_mutex_lock (pop3_store->eng_lock);
 
-			if (pop3_store->engine == NULL) {
-				g_static_rec_mutex_unlock (pop3_store->eng_lock);
-				return;
-			}
-
-			g_unlink (expunged_path);
-			cmd = camel_pop3_engine_command_new(pop3_store->engine, 0, NULL, NULL, "DELE %s\r\n", info->uid);
-			while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
 			if (pop3_store->cache && info->uid)
 				camel_data_cache_remove(pop3_store->cache, "cache", info->uid, NULL);
-			camel_pop3_engine_command_free(pop3_store->engine, cmd);
 
+			if (expunge) {
+				if (pop3_store->engine == NULL) {
+					g_static_rec_mutex_unlock (pop3_store->eng_lock);
+					return;
+				}
+
+				cmd = camel_pop3_engine_command_new(pop3_store->engine, 
+								    0, NULL, NULL, "DELE %s\r\n", 
+								    info->uid);
+				while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
+				camel_pop3_engine_command_free(pop3_store->engine, cmd);
+			}
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
-
 		}
 
 		if (info->flags & CAMEL_MESSAGE_DELETED) {
@@ -709,8 +700,6 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		}
 
 		camel_message_info_free((CamelMessageInfo *)info);
-
-		g_free (expunged_path);
 	}
 
 	while (deleted)
