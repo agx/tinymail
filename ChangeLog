@@ -5,6 +5,12 @@
 	running when we cancel, then we request cancel to be done by
 	the send queue thread.
 
+2009-03-30  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/camel-mime-utils.c
+	(camel_header_address_decode): also consider semi-colon
+	for reading split addresses.
+
 2009-03-24  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.[ch]: added

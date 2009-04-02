@@ -3054,7 +3054,7 @@ camel_header_address_decode(const char *in, const char *charset)
 		if (addr)
 			camel_header_address_list_append(&list, addr);
 		header_decode_lwsp(&inptr);
-		if (*inptr == ',')
+		if (*inptr == ',' || *inptr == ';')
 			inptr++;
 		else
 			break;
