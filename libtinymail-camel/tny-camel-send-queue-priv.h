@@ -36,7 +36,9 @@ struct _TnyCamelSendQueuePriv
 	gboolean do_continue, is_running;
 	gboolean observer_attached;
 	gint pending_send_notifies;
-	GStaticMutex *running_lock; 
+	GStaticMutex *running_lock;
+	gboolean cancel_requested;
+	TnySendQueueCancelAction cancel_action;
 };
 
 #endif

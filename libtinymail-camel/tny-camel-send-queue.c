@@ -602,6 +602,25 @@ wait_for_queue_start_notification (TnySendQueue *self)
 	g_slice_free (ControlInfo, info);
 }
 
+static void
+check_cancel (TnySendQueue *self, gboolean new_is_running, gboolean *cancel_requested)
+{
+	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
+	TnySendQueueCancelAction cancel_action;
+
+	g_static_mutex_lock (priv->running_lock);
+	*cancel_requested = priv->cancel_requested;
+	cancel_action = priv->cancel_action;
+	priv->cancel_requested = FALSE;
+	priv->is_running = new_is_running;
+	g_static_mutex_unlock (priv->running_lock);
+	
+	if (cancel_requested) {
+		tny_send_queue_cancel (self, cancel_action, NULL);
+	}
+
+}
+
 
 static gpointer
 thread_main (gpointer data)
@@ -613,6 +632,7 @@ thread_main (gpointer data)
 	TnyList *list = NULL;
 	TnyDevice *device = info->device;
 	GHashTable *failed_headers = NULL;
+	gboolean cancel_requested = FALSE;
 
 	/* Wait here until the user receives the queue-start notification */
 	wait_for_queue_start_notification (self);
@@ -642,7 +662,7 @@ thread_main (gpointer data)
 
 	failed_headers = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
-	while ((length - g_hash_table_size (failed_headers)) > 0 && tny_device_is_online (device))
+	while ((length - g_hash_table_size (failed_headers)) > 0 && tny_device_is_online (device) && !cancel_requested)
 	{
 		TnyHeader *header = NULL;
 
@@ -763,6 +783,8 @@ thread_main (gpointer data)
 				g_object_unref (msg);
 			msg = NULL;
 
+			check_cancel (self, TRUE, &cancel_requested);
+
 			g_static_rec_mutex_lock (priv->todo_lock);
 			{
 				if (err == NULL) {
@@ -810,6 +832,8 @@ thread_main (gpointer data)
 
 		g_static_rec_mutex_unlock (priv->sending_lock);
 
+		check_cancel (self, TRUE, &cancel_requested);
+
 	}
 
 	tny_folder_sync_async (info->sentbox, TRUE, NULL, NULL, NULL);
@@ -846,9 +870,7 @@ errorhandler:
 
 	g_slice_free (MainThreadInfo, info);
 
-	g_static_mutex_lock (priv->running_lock);
-	priv->is_running = FALSE;
-	g_static_mutex_unlock (priv->running_lock);
+	check_cancel (self, FALSE, &cancel_requested);
 
 	/* Emit the queue-stop signal */
 	emit_queue_control_signals (self, TNY_SEND_QUEUE_STOP);
@@ -951,6 +973,16 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 	TnyFolder *outbox;
 	TnyList *headers = tny_simple_list_new ();
 	TnyIterator *iter;
+
+	g_static_mutex_lock (priv->running_lock);
+	if (priv->is_running) {
+		priv->cancel_requested = TRUE;
+		priv->cancel_action = cancel_action;
+		g_static_mutex_unlock (priv->running_lock);
+		return;
+	}
+	g_static_mutex_unlock (priv->running_lock);
+	
 
 	g_static_rec_mutex_lock (priv->sending_lock);
 
@@ -1531,6 +1563,9 @@ tny_camel_send_queue_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->total = 0;
 	priv->cur_i = 0;
 	priv->trans_account = NULL;
+
+	priv->cancel_requested = FALSE;
+	priv->cancel_action = TNY_SEND_QUEUE_CANCEL_ACTION_SUSPEND;
 
 	return;
 }
