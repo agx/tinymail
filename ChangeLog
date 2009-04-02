@@ -11,6 +11,13 @@
 	(camel_header_address_decode): also consider semi-colon
 	for reading split addresses.
 
+2009-03-29  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/camel-mime-part-utils.c:
+	take into account the original substream bounds to calculate the new
+	substream bounds on creating new message structure (fixes parsing
+	of PGP signed messages)
+
 2009-03-24  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.[ch]: added

@@ -90,9 +90,15 @@ simple_data_wrapper_construct_from_parser (CamelDataWrapper *dw, CamelMimeParser
 	if (buffer == NULL) {
 		end = camel_mime_parser_tell (mp);
 		
-		if (stream != NULL)
-			stream = camel_seekable_substream_new ((CamelSeekableStream *) stream, start, end);
-		else
+		if (stream != NULL) {
+			uint offset;
+			if (CAMEL_IS_SEEKABLE_SUBSTREAM (stream)) {
+				offset = ((CamelSeekableStream *)stream)->bound_start;
+			} else {
+				offset = 0;
+			}
+			stream = camel_seekable_substream_new ((CamelSeekableStream *) stream, start + offset, end + offset);
+		} else
 			stream = camel_stream_fs_new_with_fd_and_bounds (dup (fd), start, end);
 	} else {
 		stream = camel_stream_mem_new_with_byte_array (buffer);
