@@ -1346,12 +1346,18 @@ tny_camel_folder_remove_msgs_default (TnyFolder *self, TnyList *headers, GError 
 	tny_folder_change_set_check_duplicates (change, TRUE);
 	iter = tny_list_create_iterator (headers);
 	while (!tny_iterator_is_done (iter)) {
+		TnyFolder *folder;
+
 		header = TNY_HEADER(tny_iterator_get_current (iter));
-		/* Performs remove */
-		tny_msg_remove_strategy_perform_remove (priv->remove_strat, self, header, err);
-		/* Add expunged headers to change event */
-		tny_folder_change_add_expunged_header (change, header);
+		folder = tny_header_get_folder (header);
+		if (folder == self) {
+			/* Performs remove */
+			tny_msg_remove_strategy_perform_remove (priv->remove_strat, self, header, err);
+			/* Add expunged headers to change event */
+			tny_folder_change_add_expunged_header (change, header);
+		}
 		g_object_unref (header);
+		g_object_unref (folder);
 		tny_iterator_next (iter);
 	}
 
