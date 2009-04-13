@@ -1472,7 +1472,7 @@ rfail:
 	}
 
 	mi = (CamelMessageInfoBase *) camel_folder_summary_uid (summary, uid);
-	if (!mi && !camel_pop3_logbook_is_registered (pop3_store->book, uid)) {
+	if (!mi && !camel_pop3_logbook_is_registered (pop3_store->book, uid) && message) {
 		mi = (CamelMessageInfoBase *) camel_folder_summary_info_new_from_message (summary, message);
 		if (mi->uid)
 			g_free (mi->uid);
