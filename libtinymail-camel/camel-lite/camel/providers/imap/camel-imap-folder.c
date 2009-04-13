@@ -3763,9 +3763,9 @@ process_idle_response (IdleResponse *idle_resp)
 		}
 	}
 
-	camel_imap_folder_changed_for_idle (idle_resp->folder, idle_resp->exists,
-		idle_resp->expunged, &ex, changes, idle_resp->exists_happened);
-
+	if (idle_resp->folder)
+		camel_imap_folder_changed_for_idle (idle_resp->folder, idle_resp->exists,
+						    idle_resp->expunged, &ex, changes, idle_resp->exists_happened);
 }
 
 static void
