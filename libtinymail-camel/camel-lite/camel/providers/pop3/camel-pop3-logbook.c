@@ -123,10 +123,10 @@ camel_pop3_logbook_is_registered (CamelPOP3Logbook *book, const gchar *uid)
 			char *buffer = (char *) malloc (1024);
 			while (!feof (f) && !truth)
 			{
-				buffer = fgets (buffer, 1024, f);
-				stripit (buffer);
-				if (buffer) {
-					if (buffer && !strcmp (buffer, uid))
+				gchar *tmp_buffer = fgets (buffer, 1024, f);
+				stripit (tmp_buffer);
+				if (tmp_buffer) {
+					if (!strcmp (tmp_buffer, uid))
 						truth = TRUE;
 					memset (buffer, 0, 1024);
 				}
@@ -159,11 +159,11 @@ camel_pop3_logbook_open (CamelPOP3Logbook *book)
 			char *buffer = (char *) malloc (1024);
 			while (!feof (f))
 			{
-				buffer = fgets (buffer, 1024, f);
-				stripit (buffer);
-				if (buffer) {
+				gchar *tmp_buffer = fgets (buffer, 1024, f);
+				stripit (tmp_buffer);
+				if (tmp_buffer) {
 					book->registered = g_list_prepend (book->registered,
-						g_strdup (buffer));
+									   g_strdup (tmp_buffer));
 					memset (buffer, 0, 1024);
 				}
 			}
