@@ -1244,7 +1244,7 @@ imap_command_strdup_vprintf (CamelImapStore *store, const char *fmt,
 			if (string)
 				arglen = strlen (string);
 			g_ptr_array_add (args, string);
-			if (imap_is_atom (string)) {
+			if (string && imap_is_atom (string)) {
 				len += arglen;
 			} else {
 				if (store->capabilities & IMAP_CAPABILITY_LITERALPLUS)
