@@ -5892,6 +5892,7 @@ Received: from nic.funet.fi
 			}
 
 			if (response) {
+			 if (response->untagged) {
 			  for (i = 0; i < response->untagged->len; i++) {
 				char *line = response->untagged->pdata[i];
 
@@ -5923,7 +5924,8 @@ Received: from nic.funet.fi
 
 				} while (!done && line && *line != ')');
 			  }
-			  camel_imap_response_free (store, response);
+			 }
+			 camel_imap_response_free (store, response);
 			}
 
 			if (body) {
