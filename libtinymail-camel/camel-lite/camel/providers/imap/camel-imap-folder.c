@@ -1496,7 +1496,8 @@ imap_sync_offline (CamelFolder *folder, CamelException *ex)
 		}
 	}
 
-	camel_folder_summary_save (folder->summary, ex);
+	if (folder->summary)
+		camel_folder_summary_save (folder->summary, ex);
 	camel_store_summary_save((CamelStoreSummary *)((CamelImapStore *)folder->parent_store)->summary, ex);
 }
 
