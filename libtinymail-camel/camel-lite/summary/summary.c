@@ -517,13 +517,13 @@ summary_item_set_flags (SummaryItem *i, int new_flags)
 const char*
 summary_item_get_subject (SummaryItem *i)
 {
-	const char* retval;
+	const char* retval = NULL;
 
 	if (i->block)
 		g_static_rec_mutex_lock (i->block->lock);
 	if (i->mem == 1)
 		retval = i->mmappable.pointers.subject;
-	else
+	else if (i->block)
 		retval = i->block->data + i->mmappable.offsets.subject_offset;
 	if (i->block)
 		g_static_rec_mutex_unlock (i->block->lock);
@@ -534,13 +534,13 @@ summary_item_get_subject (SummaryItem *i)
 const char*
 summary_item_get_from (SummaryItem *i)
 {
-	const char *retval;
+	const char *retval = NULL;
 
 	if (i->block)
 		g_static_rec_mutex_lock (i->block->lock);
 	if (i->mem == 1)
 		retval = i->mmappable.pointers.from;
-	else 
+	else if (i->block)
 		retval = i->block->data + i->mmappable.offsets.from_offset;
 	if (i->block)
 		g_static_rec_mutex_unlock (i->block->lock);
@@ -552,13 +552,13 @@ summary_item_get_from (SummaryItem *i)
 const char*
 summary_item_get_to (SummaryItem *i)
 {
-	const char *retval;
+	const char *retval = NULL;
 
 	if (i->block)
 		g_static_rec_mutex_lock (i->block->lock);
 	if (i->mem == 1)
 		retval = i->mmappable.pointers.to;
-	else
+	else if (i->block)
 		retval = i->block->data + i->mmappable.offsets.to_offset;
 	if (i->block)
 		g_static_rec_mutex_unlock (i->block->lock);
@@ -569,13 +569,13 @@ summary_item_get_to (SummaryItem *i)
 const char*
 summary_item_get_cc (SummaryItem *i)
 {
-	const char *retval;
+	const char *retval = NULL;
 
 	if (i->block)
 		g_static_rec_mutex_lock (i->block->lock);
 	if (i->mem == 1)
 		retval = i->mmappable.pointers.cc;
- 	else
+ 	else if (i->block)
 		retval = i->block->data + i->mmappable.offsets.cc_offset;
 	if (i->block)
 		g_static_rec_mutex_unlock (i->block->lock);
@@ -583,7 +583,7 @@ summary_item_get_cc (SummaryItem *i)
 	return retval;
 }
 
-static inline void 
+static inline void
 summary_block_kill (SummaryBlock *b)
 {
 	summary_block_persist (b);
