@@ -513,12 +513,16 @@ get_sync (TnyFolder *folder, TnyHeader *header, GError **err)
 	g_mutex_free (info->mutex);
 	g_cond_free (info->condition);
 
-	if (info->msg)
+	/* Ref and unref, I know it makes no sense but helps us seeing
+	   at first sight that the reference in info->msg is properly
+	   removed */
+	if (info->msg) {
 		retval = g_object_ref (info->msg);
+		g_object_unref (info->msg);
+	}
 
 	g_object_unref (info->folder);
 	g_object_unref (info->header);
-	g_object_unref (info->msg);
 
 	g_slice_free (GetSync, info);
 	return retval;
