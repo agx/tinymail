@@ -1352,7 +1352,8 @@ tny_camel_send_queue_finalize (GObject *object)
 	g_free (priv->running_lock);
 	priv->running_lock = NULL;
 
-	g_object_unref (priv->trans_account);
+	if (priv->trans_account)
+		g_object_unref (priv->trans_account);
 
 	(*parent_class->finalize) (object);
 
