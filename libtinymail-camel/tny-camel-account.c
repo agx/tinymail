@@ -382,7 +382,7 @@ tny_camel_account_matches_url_string_default (TnyAccount *self, const gchar *url
 		retval = FALSE;
 
 	/* For local maildir accounts, compare their paths, before the folder part. */
-	if (in->path && org->path && (strcmp (in->protocol, "maildir") == 0)) {
+	if (in && org && in->path && org->path && (in->protocol && strcmp (in->protocol, "maildir") == 0)) {
 		gchar *in_path = NULL;
 		gchar *in_pos_hash = NULL;
 		gchar *org_path = NULL;
