@@ -257,7 +257,6 @@ recurse_folders_async_cb (TnyFolderStore *store,
 
 		if (!found)
 		{
-			gchar *name;
 			gtk_list_store_append (model, &tree_iter);
 
 			/* Making self both a folder-store as a folder observer
@@ -267,6 +266,8 @@ recurse_folders_async_cb (TnyFolderStore *store,
 
 			if (folder)
 			{
+				gchar *name;
+
 				/* This adds a reference count to folder too. When it gets removed, that
 				   reference count is decreased automatically by the gtktreestore infra-
 				   structure. */
@@ -298,8 +299,7 @@ recurse_folders_async_cb (TnyFolderStore *store,
 					TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN,
 					folder, -1);
 
-			} else {
-				name = g_strdup (tny_folder_get_name (folder));
+				g_free (name);
 			}
 
 			/* it's a store by itself, so keep on recursing */
@@ -314,8 +314,6 @@ recurse_folders_async_cb (TnyFolderStore *store,
 								    NULL, g_object_ref (self));
 				g_object_unref (folders);
 			}
-
-			g_free (name);
 
 			/* We're a folder, we'll request a status, since we've
 			 * set self to be a folder observers of folder, we'll 
