@@ -194,7 +194,7 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self,
 
 		if (!found)
 		{
-			gchar *name;
+			gchar *name = NULL;
 			gtk_tree_store_append (model, &tree_iter, parent_tree_iter);
 
 			/* Making self both a folder-store as a folder observer
@@ -235,8 +235,6 @@ recurse_folders_sync (TnyGtkFolderStoreTreeModel *self,
 					TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 					folder, -1);
 
-			} else {
-				name = g_strdup (tny_folder_get_name (folder));
 			}
 
 			/* it's a store by itself, so keep on recursing */
