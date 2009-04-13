@@ -1,3 +1,62 @@
+2009-04-08  Sergio Villar Senin  <svillar@igalia.com>
+
+	Several changes improving robustness
+
+	* libtinymail-camel/camel-lite/summary/summary.c (summary_item_get_cc, summary_item_get_to)
+	(summary_item_get_subject, summary_item_get_from): added an extra
+	check to prevent an invalid dereference
+
+	* libtinymail-camel/camel-lite/camel/camel-mime-parser.c
+	(folder_scan_header): Moved a call to prevent an invalid
+	dereference
+
+	* libtinymail-camel/camel-lite/camel/providers/local/camel-maildir-summary.c
+	(maildir_summary_check): Moved a call to prevent an invalid dereference
+
+	* libtinymail-camel/camel-lite/camel/camel-store.c
+	(camel_store_rename_folder): added an extra check to prevent an
+	invalid dereference
+
+	* libtinymail-camel/camel-lite/camel/camel-disco-diary.c
+	(camel_disco_diary_log): fixed a typo in a comparison
+
+	* libtinymail-camel/camel-lite/camel/camel-vee-folder.c
+	(subfolder_renamed_update): fixed a NULL deref
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c
+	(imap_forget_folder):
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-command.c
+	(imap_command_strdup_vprintf): added an extra check to prevent an
+	invalid dereference
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c
+	(camel_imap_folder_fetch_data, process_idle_response)
+	(imap_sync_offline): added an extra check to
+	prevent an invalid dereference
+
+	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c
+	(pop3_get_message, pop3_get_top): added an extra check to prevent an invalid dereference
+
+	* libtinymail-camel/tny-camel-account.c
+	(tny_camel_account_matches_url_string_default): adds an extra
+	check to prevent a crash in a strcmp()
+
+	* libtinymailui-gtk/tny-gtk-folder-store-tree-model.c
+	(recurse_folders_sync): removed an invalid deref
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c
+	(recurse_folders_async_cb): removed an invalid deref
+
+	* libtinymail-camel/tny-camel-send-queue.c (get_sync): fixes a
+	potential NULL deref
+
+	* libtinymail-camel/tny-camel-send-queue.c
+	(tny_camel_send_queue_finalize): added an extra check
+
+	* libtinymail-camel/tny-camel-folder.c (recurse_evt): added an
+	extra check
+
 2009-04-06  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c
