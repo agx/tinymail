@@ -1,5 +1,11 @@
 2009-04-13  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail-camel/tny-camel-folder.c (tny_camel_folder_refresh_async_thread)
+	(tny_camel_folder_refresh_default)
+	(tny_camel_folder_get_headers_default): added calls to
+	refresh_local_size to properly update the value when refreshing
+	folders and when retrieving the headers.
+
 	* libtinymail/tny-merge-folder.c (sync_async_thread): refresh the
 	subfolders using an async call to prevent a crash when rewritting
 	the summary.

@@ -1973,6 +1973,8 @@ tny_camel_folder_refresh_async_thread (gpointer thr_user_data)
 			"Can't load folder %s\n", 
 			priv->folder_name?priv->folder_name:"(null)");
 
+	reset_local_size (priv);
+
 	_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (priv->account));
 
 	info->err = NULL;
@@ -2134,6 +2136,8 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 		_tny_camel_exception_to_tny_error (&ex, err);
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
+
+	reset_local_size (priv);
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
@@ -2442,6 +2446,8 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 	_tny_camel_folder_unreason (priv);
 	g_static_rec_mutex_unlock (priv->folder_lock);
+
+	reset_local_size (priv);
 
 	_tny_session_stop_operation (TNY_FOLDER_PRIV_GET_SESSION (priv));
 
