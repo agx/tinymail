@@ -3354,7 +3354,8 @@ recurse_evt (TnyFolder *folder, TnyFolderStore *into, GList *list, lstmodfunc fu
 		}
 	}
 
-	g_object_unref (acc);
+	if (acc)
+		g_object_unref (acc);
 
 	list = func (list, cpy_event_new (TNY_FOLDER_STORE (into), folder));
 	tny_folder_store_get_folders (TNY_FOLDER_STORE (folder), folders, NULL, TRUE, NULL);
