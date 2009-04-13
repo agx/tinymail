@@ -1197,6 +1197,8 @@ folder_scan_header(struct _header_scan_state *s, int *lastone)
 			inend = s->inend-s->atleast+1;
 
 			while (inptr<inend) {
+				start = inptr;
+
 				if (!s->midline) {
 					if (folder_boundary_check(s, inptr, lastone)) {
 						if ((s->outptr>s->outbuf))
@@ -1205,8 +1207,6 @@ folder_scan_header(struct _header_scan_state *s, int *lastone)
 						goto header_done;
 					}
 				}
-
-				start = inptr;
 
 				/* goto next line/sentinal */
 				while ((*inptr++)!='\n')
