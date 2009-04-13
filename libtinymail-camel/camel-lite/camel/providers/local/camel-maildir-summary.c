@@ -747,8 +747,8 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 		}
 
 		camel_operation_end(NULL);
+		closedir(dir);
 	}
-	closedir(dir);
 
 	g_free(new);
 	g_free(cur);
