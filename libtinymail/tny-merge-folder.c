@@ -382,7 +382,7 @@ sync_async_thread (gpointer thr_user_data)
 	{
 		TnyFolder *cur = TNY_FOLDER (tny_iterator_get_current (iter));
 
-		tny_folder_sync (cur, info->expunge, &err);
+		tny_folder_sync_async (cur, info->expunge, NULL, NULL, NULL);
 
 		/* TODO: Handler err */
 

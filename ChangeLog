@@ -1,3 +1,9 @@
+2009-04-13  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail/tny-merge-folder.c (sync_async_thread): refresh the
+	subfolders using an async call to prevent a crash when rewritting
+	the summary.
+
 2009-04-08  Sergio Villar Senin  <svillar@igalia.com>
 
 	Several changes improving robustness
