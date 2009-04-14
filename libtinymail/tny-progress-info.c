@@ -179,7 +179,7 @@ tny_progress_info_idle_func (gpointer data)
 	 * has already been called, because we should assume that 
 	 * the user_data is invalid after that time: */
 
-	if (tny_idle_stopper_is_stopped (info->stopper))
+	if (info && tny_idle_stopper_is_stopped (info->stopper))
 		return FALSE;
 
 	if (info && info->status_callback)
