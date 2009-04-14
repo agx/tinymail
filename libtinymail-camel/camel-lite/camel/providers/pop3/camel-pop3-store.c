@@ -821,7 +821,7 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 
 		g_static_rec_mutex_unlock (store->eng_lock);
 
-	} else if (strcmp(service->url->authmech, "+APOP") == 0 && store->engine->apop) {
+	} else if (strcmp(service->url->authmech, "+APOP") == 0 && store->engine && store->engine->apop) {
 		char *secret, md5asc[33], *d;
 		unsigned char md5sum[16], *s;
 

@@ -1,5 +1,8 @@
 2009-04-14  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-store.c
+	(pop3_try_authenticate): fixes a potential NULL dereference
+
 	* libtinymail-camel/camel-lite/camel/providers/pop3/camel-pop3-folder.c
 	(camel_pop3_folder_new): fixes a potential NULL dereference
 
