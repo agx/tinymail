@@ -613,15 +613,17 @@ check_cancel (TnySendQueue *self, gboolean new_is_running, gboolean *cancel_requ
 	TnySendQueueCancelAction cancel_action;
 
 	g_static_mutex_lock (priv->running_lock);
-	*cancel_requested = priv->cancel_requested;
+
+	if (cancel_requested)
+		*cancel_requested = priv->cancel_requested;
+
 	cancel_action = priv->cancel_action;
 	priv->cancel_requested = FALSE;
 	priv->is_running = new_is_running;
 	g_static_mutex_unlock (priv->running_lock);
-	
-	if (cancel_requested) {
+
+	if (cancel_requested)
 		tny_send_queue_cancel (self, cancel_action, NULL);
-	}
 
 }
 

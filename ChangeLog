@@ -1,3 +1,8 @@
+2009-04-14  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-send-queue.c (check_cancel): fixes a
+	potential NULL dereference
+
 2009-04-13  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c (tny_camel_folder_refresh_async_thread)
