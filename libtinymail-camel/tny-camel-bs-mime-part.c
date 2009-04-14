@@ -579,7 +579,7 @@ decode_async_thread (gpointer user_data)
 
 	camel_operation_unregister (cancel);
 	camel_operation_end (cancel);
-	if (cancel)
+	if (CAMEL_IS_OBJECT (cancel))
 		camel_operation_unref (cancel);
 
 
