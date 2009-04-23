@@ -309,7 +309,8 @@ recurse_folders_async_cb (TnyFolderStore *store,
 				add_folder_store_observer_weak (self, folder_store);
 				self->progress_count++;
 				tny_folder_store_get_folders_async (folder_store,
-								    folders, NULL, TRUE,
+								    folders, NULL, 
+								    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
 								    recurse_folders_async_cb,
 								    NULL, g_object_ref (self));
 				g_object_unref (folders);
@@ -426,7 +427,8 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 			g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
 		}
 		tny_folder_store_get_folders_async (fstore,
-						    folders, NULL, TRUE,
+						    folders, NULL, 
+						    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
 						    recurse_folders_async_cb,
 						    NULL, g_object_ref (self));
 		g_object_unref (folders);
@@ -648,7 +650,9 @@ tny_gtk_folder_list_store_add_i (TnyGtkFolderListStore *self, TnyFolderStore *fo
 		g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
 	}
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (folder_store), 
-		folders, self->query, TRUE,  get_folders_cb, NULL, g_object_ref (self));
+					    folders, self->query, 
+					    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),  
+					    get_folders_cb, NULL, g_object_ref (self));
 
 	/* Add an observer for the root folder store, so that we can observe 
 	 * the actual account too. */

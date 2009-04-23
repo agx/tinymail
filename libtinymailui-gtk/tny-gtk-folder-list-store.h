@@ -57,6 +57,7 @@ typedef enum _TnyGtkFolderListStoreColumn TnyGtkFolderListStoreColumn;
 enum _TnyGtkFolderListStoreFlags
 {
 	TNY_GTK_FOLDER_LIST_STORE_FLAG_SHOW_PATH = 1<<0,
+	TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH = 1<<2,
 };
 
 typedef enum _TnyGtkFolderListStoreFlags TnyGtkFolderListStoreFlags;

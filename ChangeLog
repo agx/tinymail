@@ -1,3 +1,10 @@
+2009-04-23  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c:
+	added flag "no refresh" to allow creating folder list stores
+	that don't do any "forced" refresh (unless it's caused by
+	reconnects).
+
 2009-04-14  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail/tny-progress-info.c (tny_progress_info_idle_func):
