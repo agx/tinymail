@@ -418,15 +418,13 @@ nntp_folder_get_allow_external_images (CamelFolder *folder, const char *uid)
 	return retval;
 }
 
-static gboolean
+static void
 nntp_folder_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow)
 {
 	CamelNNTPStore *nntp_store;
 
 	nntp_store = (CamelNNTPStore *) folder->parent_store;
 	camel_data_cache_set_allow_external_images (nntp_store->cache, "cache", uid, allow);
-	
-	return;
 }
 
 static void
