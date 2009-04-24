@@ -1140,11 +1140,13 @@ static inline unsigned long
 get_summary_uid_numeric (CamelFolderSummary *summary, int index)
 {
 	CamelMessageInfo *info;
-	unsigned long uid;
+	unsigned long uid = 0;
 
 	info = camel_folder_summary_index (summary, index);
-	uid = strtoul (camel_message_info_uid (info), NULL, 10);
-	camel_message_info_free(info);
+	if (info) {
+		uid = strtoul (camel_message_info_uid (info), NULL, 10);
+		camel_message_info_free(info);
+	}
 	return uid;
 }
 
