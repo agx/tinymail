@@ -413,6 +413,7 @@ report_status (CamelFilterDriver *driver, enum camel_filter_status_t status, int
 	if (p->statusfunc) {
 		va_start (ap, desc);
 		str = g_strdup_vprintf (desc, ap);
+		va_end (ap);
 		p->statusfunc (driver, status, pc, str, p->statusdata);
 		g_free (str);
 	}
@@ -1044,6 +1045,7 @@ camel_filter_driver_log (CamelFilterDriver *driver, enum filter_log_t status, co
 
 			va_start (ap, desc);
 			str = g_strdup_vprintf (desc, ap);
+			va_end (ap);
 		}
 
 		switch (status) {
