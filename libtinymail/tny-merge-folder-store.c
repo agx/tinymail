@@ -146,7 +146,7 @@ tny_merge_folder_store_remove_folder_default (TnyFolderStore *self, TnyFolder *f
 	g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_UNSUPPORTED,
 			"You can't use the tny_folder_store_remove_folder API "
-			"on send queues. This problem indicates a bug in the "
+			"on merge folders. This problem indicates a bug in the "
 			"software.");
 
 	return;
@@ -164,11 +164,11 @@ tny_merge_folder_store_create_folder_default (TnyFolderStore *self, const gchar 
 {
 	g_set_error (err, TNY_ERROR_DOMAIN,
 			TNY_SERVICE_ERROR_UNSUPPORTED,
-			"You can't use the tny_folder_store_remove_folder API "
-			"on send queues. This problem indicates a bug in the "
+			"You can't use the tny_folder_store_create_folder API "
+			"on merge folders. This problem indicates a bug in the "
 			"software.");
 
-	return;
+	return NULL;
 
 
 	/* TODO: derive TnyMergeWritableFolderStore which does this:
