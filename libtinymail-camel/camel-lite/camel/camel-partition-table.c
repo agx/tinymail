@@ -766,7 +766,8 @@ camel_key_table_add(CamelKeyTable *ki, const char *key, camel_block_t data, unsi
 #else
 	if (kblast->used >=127) {
 		g_warning("Invalid value for used %d\n", kblast->used);
-		return 0;
+		keyid = 0;
+		goto fail;
 	}
 #endif
 
