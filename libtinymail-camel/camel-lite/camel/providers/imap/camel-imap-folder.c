@@ -1237,7 +1237,7 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 	CamelMessageInfo *info;
 	CamelImapMessageInfo *iinfo;
 	GArray *removed;
-	gboolean ok;
+	gboolean ok = FALSE;
 	CamelFolderChangeInfo *changes = NULL;
 
 	imap_folder->need_rescan = FALSE;
@@ -1253,10 +1253,12 @@ imap_rescan (CamelFolder *folder, int exists, CamelException *ex)
 	/* Check UIDs and flags of all messages we already know of. */
 	camel_operation_start (NULL, _("Scanning for changed messages in %s"), folder->name);
 	info = camel_folder_summary_index (folder->summary, summary_len - 1);
-	ok = camel_imap_command_start (store, folder, ex,
-				       "UID FETCH 1:%s (FLAGS)",
-				       camel_message_info_uid (info));
-	camel_message_info_free(info);
+	if (info) {
+		ok = camel_imap_command_start (store, folder, ex,
+					       "UID FETCH 1:%s (FLAGS)",
+					       camel_message_info_uid (info));
+		camel_message_info_free(info);
+	}
 	if (!ok) {
 		camel_operation_end (NULL);
 		return FALSE;
