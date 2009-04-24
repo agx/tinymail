@@ -685,7 +685,7 @@ camel_write_shared (int fd, const char *buf, size_t n, gboolean write_in_chunks)
 ssize_t
 camel_write (int fd, const char *buf, size_t n)
 {
-	camel_write_shared (fd, buf, n, FALSE);
+	return camel_write_shared (fd, buf, n, FALSE);
 }
 
 ssize_t
