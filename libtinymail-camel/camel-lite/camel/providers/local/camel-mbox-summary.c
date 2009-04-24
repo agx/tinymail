@@ -478,11 +478,13 @@ summary_update(CamelLocalSummary *cls, off_t offset, CamelFolderChangeInfo *chan
 	count = camel_folder_summary_count(s);
 	for (i=0;i<count;i++) {
 		mi = (CamelMboxMessageInfo *)camel_folder_summary_index(s, i);
-		if (offset == 0)
-			mi->info.info.flags |= CAMEL_MESSAGE_FOLDER_NOTSEEN;
-		else
-			mi->info.info.flags &= ~CAMEL_MESSAGE_FOLDER_NOTSEEN;
-		camel_message_info_free(mi);
+		if (mi) {
+			if (offset == 0)
+				mi->info.info.flags |= CAMEL_MESSAGE_FOLDER_NOTSEEN;
+			else
+				mi->info.info.flags &= ~CAMEL_MESSAGE_FOLDER_NOTSEEN;
+			camel_message_info_free(mi);
+		}
 	}
 	mbs->changes = changeinfo;
 
