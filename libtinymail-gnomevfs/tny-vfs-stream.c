@@ -102,6 +102,7 @@ tny_vfs_stream_set_errno (GnomeVFSResult res)
 		break;
 	case GNOME_VFS_ERROR_FILE_EXISTS:
 		errno = EEXIST;
+		break;
 	case GNOME_VFS_ERROR_LOOP:
 		errno = ELOOP;
 		break;
