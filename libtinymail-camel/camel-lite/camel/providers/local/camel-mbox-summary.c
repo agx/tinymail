@@ -513,7 +513,7 @@ summary_update(CamelLocalSummary *cls, off_t offset, CamelFolderChangeInfo *chan
 	for (i=0;i<count;i++) {
 		mi = (CamelMboxMessageInfo *)camel_folder_summary_index(s, i);
 		/* must've dissapeared from the file? */
-		if (mi->info.info.flags & CAMEL_MESSAGE_FOLDER_NOTSEEN) {
+		if (mi && mi->info.info.flags & CAMEL_MESSAGE_FOLDER_NOTSEEN) {
 			d(printf("uid '%s' vanished, removing", camel_message_info_uid(mi)));
 			if (changeinfo)
 				camel_folder_change_info_remove_uid(changeinfo, camel_message_info_uid(mi));
