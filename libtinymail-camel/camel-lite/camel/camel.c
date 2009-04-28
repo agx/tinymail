@@ -44,17 +44,22 @@
 #include "camel-provider.h"
 #include "camel-private.h"
 
-static int initialised = FALSE;
+/* To protect NSS initialization and shutdown */
+PRLock *nss_initlock = NULL;
+/* Whether or not Camel has initialized the NSS library */
+volatile gboolean nss_initialized = FALSE;
+
+static int initialized = FALSE;
 
 void
 camel_shutdown (void)
 {
 	CamelCertDB *certdb;
 
-	if (!initialised)
+	if (!initialized)
 		return;
 
-	initialised = FALSE;
+	initialized = FALSE;
 	certdb = camel_certdb_get_default ();
 	if (certdb) {
 		camel_certdb_save (certdb);
@@ -62,7 +67,10 @@ camel_shutdown (void)
 	}
 
 #if defined (HAVE_NSS)
-	NSS_Shutdown ();
+	PR_Lock(nss_initlock);
+	if (nss_initialized)
+		NSS_Shutdown ();
+	PR_Unlock(nss_initlock);
 #endif /* HAVE_NSS */
 
 }
@@ -73,7 +81,7 @@ camel_init (const char *configdir, gboolean nss_init)
 	CamelCertDB *certdb;
 	char *path;
 
-	if (initialised)
+	if (initialized)
 		return 0;
 
 	bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
@@ -89,7 +97,11 @@ camel_init (const char *configdir, gboolean nss_init)
 		char *nss_configdir;
 		PRUint16 indx;
 
-		PR_Init (PR_SYSTEM_THREAD, PR_PRIORITY_NORMAL, 10);
+		if (nss_initlock == NULL) {
+			PR_Init(PR_SYSTEM_THREAD, PR_PRIORITY_NORMAL, 10);
+			nss_initlock = PR_NewLock();
+		}
+		PR_Lock (nss_initlock);
 
 #ifndef G_OS_WIN32
 		nss_configdir = g_strdup (configdir);
@@ -97,16 +109,25 @@ camel_init (const char *configdir, gboolean nss_init)
 		nss_configdir = g_win32_locale_filename_from_utf8 (configdir);
 #endif
 
-		if (NSS_InitReadWrite (nss_configdir) == SECFailure) {
-			/* fall back on using volatile dbs? */
-			if (NSS_NoDB_Init (nss_configdir) == SECFailure) {
-				g_free (nss_configdir);
-				g_warning ("Failed to initialize NSS");
-				return -1;
+		if (!NSS_IsInitialized()) {
+			nss_initialized = 1;
+
+			if (NSS_InitReadWrite (nss_configdir) == SECFailure) {
+				/* fall back on using volatile dbs? */
+				if (NSS_NoDB_Init (nss_configdir) == SECFailure) {
+					g_free (nss_configdir);
+					g_warning ("Failed to initialize NSS");
+					nss_initialized = 0;
+					PR_Unlock(nss_initlock);
+					return -1;
+				}
 			}
 		}
 
 		NSS_SetDomesticPolicy ();
+
+		PR_Unlock(nss_initlock);
+
 		/* we must enable all ciphersuites */
 		for (indx = 0; indx < SSL_NumImplementedCiphers; indx++) {
 			if (!SSL_IS_SSL2_CIPHER(SSL_ImplementedCiphers[indx]))
@@ -137,7 +158,7 @@ camel_init (const char *configdir, gboolean nss_init)
 
 	g_atexit (camel_shutdown);
 
-	initialised = TRUE;
+	initialized = TRUE;
 
 	return 0;
 }
