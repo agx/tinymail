@@ -1,3 +1,7 @@
+2009-04-29  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Avoid assert if content location is an empty string.
+
 2009-04-23  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c:

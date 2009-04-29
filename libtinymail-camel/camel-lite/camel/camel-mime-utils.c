@@ -3914,7 +3914,12 @@ camel_header_location_decode(const char *in)
 			g_string_append_c(out, c);
 	}
 
-	res = g_strdup(out->str);
+	/* We don't allow empty string as content location, prefer NULL */
+	if (out->str != NULL && out->str[0] == '\0')
+		res = NULL;
+	else
+		res = g_strdup(out->str);
+
 	g_string_free(out, TRUE);
 
 	return res;
