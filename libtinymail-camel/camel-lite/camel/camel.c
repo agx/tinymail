@@ -44,10 +44,12 @@
 #include "camel-provider.h"
 #include "camel-private.h"
 
+#ifdef HAVE_NSS
 /* To protect NSS initialization and shutdown */
 PRLock *nss_initlock = NULL;
 /* Whether or not Camel has initialized the NSS library */
 volatile gboolean nss_initialized = FALSE;
+#endif
 
 static int initialized = FALSE;
 
