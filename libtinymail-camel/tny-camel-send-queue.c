@@ -842,8 +842,8 @@ thread_main (gpointer data)
 
 	}
 
-	tny_folder_sync_async (info->sentbox, TRUE, NULL, NULL, NULL);
-	tny_folder_sync_async (info->outbox, TRUE, NULL, NULL, NULL);
+	sync_sync (info->sentbox, TRUE, NULL);
+	sync_sync (info->outbox, TRUE, NULL);
 
 errorhandler:
 
