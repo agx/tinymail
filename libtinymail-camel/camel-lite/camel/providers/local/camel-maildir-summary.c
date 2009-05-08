@@ -633,13 +633,13 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 
 	total = 0;
 	count = 0;
-	while ( (d = readdir(dir)) )
+	while (readdir(dir))
 		total++;
 	rewinddir(dir);
 
 	camel_folder_summary_prepare_hash ((CamelFolderSummary *)cls);
 
-	while ( (d = readdir(dir)) ) {
+	while (d = readdir(dir)) {
 		gboolean mfree = FALSE;
 
 		camel_operation_progress(NULL, count, total);
@@ -694,11 +694,11 @@ maildir_summary_check(CamelLocalSummary *cls, CamelFolderChangeInfo *changes, Ca
 	if (dir != NULL) {
 		total = 0;
 		count = 0;
-		while ( (d = readdir(dir)) )
+		while (readdir(dir))
 			total++;
 		rewinddir(dir);
 
-		while ( (d = readdir(dir)) ) {
+		while (d = readdir(dir)) {
 			char *name, *newname, *destname, *destfilename;
 			char *src, *dest;
 

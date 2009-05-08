@@ -561,7 +561,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 			if (header)
 			{
 				GError *err = NULL;
-				TnyMsg *msg;
+				TnyMsg *msg = NULL;
 				TnyFolder *folder;
 
 				GtkWidget *entry1, *entry2;

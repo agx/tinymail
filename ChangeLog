@@ -1,3 +1,21 @@
+2009-05-08  Sergio Villar Senin  <svillar@igalia.com>
+
+	** Original patch by Dmitry Kazachkov with some slight modifications
+
+	* tests/c-demo/tny-demoui-summary-view.c
+	(on_header_view_key_press_event): added a proper initialization
+	* libtinymail-camel/tny-camel-bs-msg-receive-strategy.c
+	(tny_camel_bs_msg_receive_strategy_start_receiving_part): removed
+	unneeded check
+	* libtinymail-camel/camel/camel-gpg-context.c (gpg_verify): added
+	an extra check to detect gpg errors
+	* libtinymail-camel/camel/providers/local/camel-local-store.c (rename_folder):
+	commented some unreachable code
+	* libtinymail-camel/camel/providers/local/camel-maildir-summary.c
+	(maildir_summary_check): removed a couple of useless assignations
+	* libtinymail-camel/camel/providers/pop3/camel-pop3-folder.c (camel_pop3_folder_new)
+	(pop3_sync): removed unused variables
+
 2009-05-04  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-send-queue.c (thread_main): sync

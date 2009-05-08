@@ -412,10 +412,8 @@ rename_folder(CamelStore *store, const char *old, const char *new, CamelExceptio
 	return;
 
 	/* The (f)utility of this camel_recovery effort is quesitonable */
-
-	xrename(new, old, path, ".cmeta", TRUE, ex);
-	xrename(new, old, path, ".ev-summary.mmap", TRUE, ex);
-
+/* 	xrename(new, old, path, ".cmeta", TRUE, ex); */
+/* 	xrename(new, old, path, ".ev-summary.mmap", TRUE, ex); */
 
 #if 0
 	if (folder) {
@@ -434,11 +432,9 @@ ibex_failed:
 		camel_object_unref(folder);
 #endif
 
-
-	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE,
-			      _("Could not rename '%s': %s"),
-			      old, g_strerror (errno));
-
+/* 	camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE, */
+/* 			      _("Could not rename '%s': %s"), */
+/* 			      old, g_strerror (errno)); */
 }
 
 /* default implementation, only delete metadata */

@@ -83,7 +83,7 @@ tny_camel_bs_msg_receive_strategy_start_receiving_part (TnyCamelBsMsgReceiveStra
 
 		/* TODO: play with IMAP's CONVERT here ... */
 
-		filename = camel_folder_fetch (cfolder, uid, part_spec?part_spec:"1", binary, &ex);
+		filename = camel_folder_fetch (cfolder, uid, part_spec, binary, &ex);
 
 		if (camel_exception_is_set (&ex)) {
 			_tny_camel_exception_to_tny_error (&ex, err);

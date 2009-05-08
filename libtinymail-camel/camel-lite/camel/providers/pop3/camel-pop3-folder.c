@@ -121,12 +121,10 @@ camel_pop3_folder_new (CamelStore *parent, CamelException *ex)
 	CamelFolder *folder;
 	CamelPOP3Store *p3store = (CamelPOP3Store*) parent;
 	gchar *summary_file;
-	CamelPOP3Folder *pop3_folder;
 
 	d(printf("opening pop3 INBOX folder\n"));
 
 	folder = CAMEL_FOLDER (camel_object_new (CAMEL_POP3_FOLDER_TYPE));
-	pop3_folder = CAMEL_POP3_FOLDER (folder);
 
 	camel_folder_construct (folder, parent, "inbox", "inbox");
 
@@ -570,7 +568,6 @@ mfail:
 static void
 pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 {
-	CamelPOP3Folder *pop3_folder;
 	CamelPOP3Store *pop3_store;
 	CamelPOP3Command *pcl, *pcu = NULL;
 	int i, max;
@@ -578,7 +575,6 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	GList *deleted = NULL;
 	CamelFolderChangeInfo *changes = NULL;
 
-	pop3_folder = CAMEL_POP3_FOLDER (folder);
 	pop3_store = CAMEL_POP3_STORE (folder->parent_store);
 
 	check_dir (pop3_store, NULL);
