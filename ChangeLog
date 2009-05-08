@@ -2,6 +2,14 @@
 
 	** Original patch by Dmitry Kazachkov with some slight modifications
 
+	* libtinymail-camel/camel/camel-store-summary.c (store_info_load,
+	store_info_save): added several extra checks to summary load/store
+	processes
+
+2009-05-08  Sergio Villar Senin  <svillar@igalia.com>
+
+	** Original patch by Dmitry Kazachkov with some slight modifications
+
 	* tests/c-demo/tny-demoui-summary-view.c
 	(on_header_view_key_press_event): added a proper initialization
 	* libtinymail-camel/tny-camel-bs-msg-receive-strategy.c

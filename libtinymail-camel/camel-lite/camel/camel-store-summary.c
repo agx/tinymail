@@ -934,10 +934,14 @@ store_info_load(CamelStoreSummary *s, FILE *in)
 
 	io(printf("Loading folder info\n"));
 
-	camel_file_util_decode_string(in, &info->path);
-	camel_file_util_decode_uint32(in, &info->flags);
-	camel_file_util_decode_uint32(in, &info->unread);
-	camel_file_util_decode_uint32(in, &info->total);
+	if (camel_file_util_decode_string(in, &info->path) == -1)
+		goto error;
+	if (camel_file_util_decode_uint32(in, &info->flags) == -1)
+		goto error;
+	if (camel_file_util_decode_uint32(in, &info->unread) == -1)
+		goto error;
+	if (camel_file_util_decode_uint32(in, &info->total) == -1)
+		goto error;
 
 	/* Ok, brown paper bag bug - prior to version 2 of the file, flags are
 	   stored using the bit number, not the bit. Try to camel_recover as best we can */
@@ -958,7 +962,7 @@ store_info_load(CamelStoreSummary *s, FILE *in)
 
 	if (!ferror(in))
 		return info;
-
+error:
 	camel_store_summary_info_free(s, info);
 
 	return NULL;
@@ -969,10 +973,14 @@ store_info_save(CamelStoreSummary *s, FILE *out, CamelStoreInfo *info)
 {
 	io(printf("Saving folder info\n"));
 
-	camel_file_util_encode_string(out, camel_store_info_path(s, info));
-	camel_file_util_encode_uint32(out, info->flags);
-	camel_file_util_encode_uint32(out, info->unread);
-	camel_file_util_encode_uint32(out, info->total);
+	if( camel_file_util_encode_string(out, camel_store_info_path(s, info)) == -1)
+		return -1;
+	if( camel_file_util_encode_uint32(out, info->flags) == -1)
+		return -1;
+	if( camel_file_util_encode_uint32(out, info->unread) == -1)
+		return -1;
+	if( camel_file_util_encode_uint32(out, info->total) == -1)
+		return -1;
 
 	return ferror(out);
 }
