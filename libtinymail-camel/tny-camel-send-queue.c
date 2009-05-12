@@ -940,14 +940,11 @@ create_worker (TnySendQueue *self, GError **err)
 			priv->thread = g_thread_create (thread_main, info, FALSE, NULL);
 
 			if (priv->thread == NULL) {
-				GError *error;
-
 				priv->is_running = FALSE;
 
 				g_set_error (err, TNY_ERROR_DOMAIN, 
 					     TNY_SYSTEM_ERROR_UNKNOWN,
 					     "Couldn't start thread for send queue");
-				emit_error (self, NULL, NULL, error, 0, 0);
 
 			        if (TNY_IS_CAMEL_FOLDER (info->outbox)) {
 		        	        TnyCamelFolderPriv *opriv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->outbox);
