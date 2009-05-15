@@ -466,8 +466,10 @@ tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account, TnyConnecti
 	if (self->progress_count == 1) {
 		g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
 	}
-	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account), 
-		list, self->query, TRUE, get_folders_cb, NULL, g_object_ref (self));
+	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
+					    list, self->query,
+					    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
+					    get_folders_cb, NULL, g_object_ref (self));
 
 	return;
 }
