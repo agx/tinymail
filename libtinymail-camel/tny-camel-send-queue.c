@@ -1032,7 +1032,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 	g_object_unref (iter);
 	g_object_unref (headers);
 
-	tny_folder_sync (outbox, TRUE, err);
+	sync_sync (outbox, TRUE, err);
 	g_object_unref (outbox);
 
 	g_static_rec_mutex_unlock (priv->sending_lock);
