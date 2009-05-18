@@ -1015,7 +1015,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 			tny_folder_remove_msg (outbox, header, err);
 		else if (cancel_action == TNY_SEND_QUEUE_CANCEL_ACTION_SUSPEND)
 			tny_header_set_flag (header, TNY_HEADER_FLAG_SUSPENDED);
-		
+
 		if (err != NULL && *err != NULL)
 		{
 			g_object_unref (header);
@@ -1032,7 +1032,7 @@ tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelActio
 	g_object_unref (iter);
 	g_object_unref (headers);
 
-	sync_sync (outbox, TRUE, err);
+	tny_folder_sync_async (outbox, TRUE, NULL, NULL, NULL);
 	g_object_unref (outbox);
 
 	g_static_rec_mutex_unlock (priv->sending_lock);
