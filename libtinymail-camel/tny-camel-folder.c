@@ -3945,6 +3945,7 @@ static void
 tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyCamelFolderPriv *dest_priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CopyFolderInfo *info;
 
 	/* Idle info for the callbacks */
@@ -4624,8 +4625,11 @@ tny_camel_folder_transfer_msgs_shared (TnyFolder *self, TnyList *headers, TnyFol
 			on_err = TRUE;
 		}
 
-	if (!on_err)
+	if (!on_err) {
+		_tny_camel_folder_reason (priv_dst);
 		transfer_msgs_thread_clean (self, headers, new_headers, folder_dst, delete_originals, err);
+		_tny_camel_folder_unreason (priv_dst);
+	}
 
 	return;
 }
