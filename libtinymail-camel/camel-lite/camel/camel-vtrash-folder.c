@@ -51,6 +51,8 @@ static struct {
 } vdata[] = {
 	{ CAMEL_VTRASH_NAME, N_("Trash"), "(match-all (system-flag \"Deleted\"))", CAMEL_MESSAGE_DELETED, CAMEL_FOLDER_IS_TRASH,
 	  N_("Cannot copy messages to the Trash folder") },
+	{ CAMEL_VJUNK_NAME, N_("Junk"), "(match-all (system-flag \"Junk\"))", CAMEL_MESSAGE_JUNK, CAMEL_FOLDER_IS_JUNK,
+	  N_("Cannot copy messages to the Junk folder"), "junk" },
 };
 
 static CamelVeeFolderClass *camel_vtrash_folder_parent;

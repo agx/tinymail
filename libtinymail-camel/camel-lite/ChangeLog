@@ -1,6 +1,13 @@
 Note: Please use this ChangeLog file only for merge changes (from upstream to
 this version, and the other way around). Changes to camel-lite that are
 related to Tinymail go into ../../ChangeLog
+2009-05-19  Sergio Villar Senin  <svillar@igalia.com>
+
+	* camel/camel-folder-summary.h (_CamelMessageFlags):
+	* camel/camel-vtrash-folder.c (vdata): added a missing element to the
+	vdata array to prevent invalid dereferences caused by the type
+	argument in camel_vtrash_folder_new
+
 2008-08-21  Sergio Villar Senin  <svillar@igalia.com>
 
 	* camel/camel.c (camel_init): merged a fix from upstream for a
