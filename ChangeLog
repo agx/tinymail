@@ -1,5 +1,9 @@
 2009-05-21  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail-camel/tny-camel-folder.c
+	(tny_camel_folder_poke_status_default): don't set the poke_status
+	operation as auto-cancellable
+
 	* libtinymail-camel/tny-camel-send-queue.c (check_cancel): don't
 	cancel always after sending the first email of the send queue. It
 	was the consequence of a typo

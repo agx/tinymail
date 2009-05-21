@@ -6035,7 +6035,6 @@ tny_camel_folder_poke_status_default (TnyFolder *self)
 		tny_camel_folder_poke_status_destroyer, 
 		&info->cancelled,
 		info, sizeof (PokeStatusInfo),
-		TNY_CAMEL_QUEUE_AUTO_CANCELLABLE_ITEM|
 		TNY_CAMEL_QUEUE_CANCELLABLE_ITEM,
 		__FUNCTION__);
 
