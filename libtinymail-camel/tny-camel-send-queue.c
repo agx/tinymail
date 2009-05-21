@@ -611,6 +611,7 @@ check_cancel (TnySendQueue *self, gboolean new_is_running, gboolean *cancel_requ
 {
 	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	TnySendQueueCancelAction cancel_action;
+	gboolean do_cancel;
 
 	g_static_mutex_lock (priv->running_lock);
 
@@ -618,11 +619,12 @@ check_cancel (TnySendQueue *self, gboolean new_is_running, gboolean *cancel_requ
 		*cancel_requested = priv->cancel_requested;
 
 	cancel_action = priv->cancel_action;
+	do_cancel = priv->cancel_requested;
 	priv->cancel_requested = FALSE;
 	priv->is_running = new_is_running;
 	g_static_mutex_unlock (priv->running_lock);
 
-	if (cancel_requested)
+	if (do_cancel)
 		tny_send_queue_cancel (self, cancel_action, NULL);
 
 }

@@ -1,3 +1,9 @@
+2009-05-21  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-send-queue.c (check_cancel): don't
+	cancel always after sending the first email of the send queue. It
+	was the consequence of a typo
+
 2009-05-19  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c: reason/unreason the
