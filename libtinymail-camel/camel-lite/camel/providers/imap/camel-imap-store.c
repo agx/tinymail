@@ -4121,13 +4121,16 @@ get_folders_sync_ns_only_lsub (CamelImapStore *imap_store, struct _namespace *na
 		fi = parse_list_response_as_folder_info (imap_store, list, 
 				namespace->delim?namespace->delim:0);
 
-		hfi = g_hash_table_lookup(present, fi->full_name);
+		if (fi) {
+			hfi = g_hash_table_lookup(present, fi->full_name);
 
-		if (hfi == NULL) {
-			fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
-			g_hash_table_insert(present, fi->full_name, fi);
-		} else 
-			camel_folder_info_free(fi);
+			if (hfi == NULL) {
+				fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
+				g_hash_table_insert(present, fi->full_name, fi);
+			} else {
+				camel_folder_info_free(fi);
+			}
+		}
 	}
 
 	camel_imap_response_free (imap_store, response);

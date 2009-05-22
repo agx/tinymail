@@ -1,3 +1,9 @@
+2009-05-22  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/camel/providers/imap/camel-imap-store.c
+	(get_folders_sync_ns_only_lsub): handle the case of
+	parse_list_response_as_folder_info returning NULL
+
 2009-05-21  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c
