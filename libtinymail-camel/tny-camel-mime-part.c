@@ -247,7 +247,7 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 				}
 			}
 
-			tny_list_prepend (list, G_OBJECT (newpart));
+			tny_list_append (list, G_OBJECT (newpart));
 			g_object_unref (G_OBJECT (newpart));
 		}
 	}
