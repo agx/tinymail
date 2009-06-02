@@ -1458,9 +1458,8 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 	priv->iter = iter;
 	priv->cant_reuse_iter = FALSE;
 
-	if (priv->iter_store) {
-		camel_object_unref (CAMEL_OBJECT (store));
-	}
+	if (priv->iter_store)
+		camel_object_unref (CAMEL_OBJECT (priv->iter_store));
 
 	camel_object_ref (CAMEL_OBJECT (store));
 	priv->iter_store = store;

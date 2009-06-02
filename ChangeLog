@@ -1,3 +1,9 @@
+2009-06-02  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-store-account.c
+	(tny_camel_store_account_get_folders_default): unref the right
+	instance of CamelStore
+
 2009-05-22  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-mime-part.c 
