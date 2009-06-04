@@ -723,7 +723,7 @@ on_account_connect_done (TnyCamelAccount *account, gboolean canceled, GError *er
 
 	apriv->is_ready = TRUE;
 
-	if (!canceled && err) {
+	if (canceled && err) {
 
 		/* It seems err is forgotten here ... if the disk is full ! */
 		if( self->priv->account_store ){
