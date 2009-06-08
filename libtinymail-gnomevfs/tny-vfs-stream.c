@@ -178,7 +178,7 @@ tny_vfs_stream_read  (TnyStream *self, char *buffer, gsize n)
 
 	if (nread > 0 && result == GNOME_VFS_OK)
 		priv->position += nread;
-	else { 
+	else {
 		if ((result != GNOME_VFS_OK) && (result != GNOME_VFS_ERROR_EOF))
 			nread = -1;
 		else if (nread == 0)
@@ -201,10 +201,15 @@ tny_vfs_stream_write (TnyStream *self, const char *buffer, gsize n)
 
 	result = gnome_vfs_write (priv->handle, buffer, n, &nwritten);
 
-	if (nwritten > 0 && result == GNOME_VFS_OK)
+	if (nwritten > 0 && result == GNOME_VFS_OK) {
 		priv->position += nwritten;
-	else 
+	} else {
+		if ((result != GNOME_VFS_OK) && (result != GNOME_VFS_ERROR_EOF))
+			nwritten = -1;
+		else if (nwritten == 0)
+			priv->eos = TRUE;
 		tny_vfs_stream_set_errno (result);
+	}
 
 	return nwritten;
 }

@@ -1,3 +1,9 @@
+2009-06-08  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-gnomevfs/tny-vfs-stream.c (tny_vfs_stream_write):
+	return -1 in case of error which is the value that CamelStream
+	understands as error.
+
 2009-06-04  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-session-camel.c (on_account_connect_done):
