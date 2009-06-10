@@ -6302,7 +6302,7 @@ _tny_camel_folder_freeup_observers (TnyCamelFolder *self, TnyCamelFolderPriv *pr
 	   times they're causing locking problems. TODO: review the
 	   source of this behaviour */
 
-	/* g_static_rec_mutex_lock (priv->obs_lock); */
+	g_static_rec_mutex_lock (priv->obs_lock);
 	if (priv->obs) {
 		GList *copy = priv->obs;
 		while (copy) {
@@ -6322,7 +6322,7 @@ _tny_camel_folder_freeup_observers (TnyCamelFolder *self, TnyCamelFolderPriv *pr
 		g_list_free (priv->sobs);
 		priv->sobs = NULL;
 	}
-	/* g_static_rec_mutex_unlock (priv->obs_lock); */
+	g_static_rec_mutex_unlock (priv->obs_lock);
 }
 
 static void
