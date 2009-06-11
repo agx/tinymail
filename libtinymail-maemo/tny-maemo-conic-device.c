@@ -47,7 +47,8 @@ typedef struct {
 	gboolean is_online;
 	gchar *iap;
 	gboolean forced; /* Whether the is_online value is forced rather than real. */
-	ConnectInfo *connect_slot;
+	GList *connect_slots;
+	GStaticMutex connect_slots_lock;
 	/* When non-NULL, we are waiting for the success or failure signal. */
 	GMainLoop *loop;
 	gint signal1;
@@ -166,18 +167,26 @@ static void
 handle_connect (TnyMaemoConicDevice *self, int con_err, int con_state)
 {
 	TnyMaemoConicDevicePriv *priv;
+	GList *copy, *iter;
 
 	g_return_if_fail (TNY_IS_MAEMO_CONIC_DEVICE (self));
-	
+
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
-	if (priv->connect_slot) {
+	if (!priv->connect_slots)
+		return;
+
+	/* Use a copy in order not to lock too much */
+	g_static_mutex_lock (&priv->connect_slots_lock);
+	copy = priv->connect_slots;
+	priv->connect_slots = NULL;
+	g_static_mutex_unlock (&priv->connect_slots_lock);
+
+	iter = copy;
+	while (iter) {
 		GError *err = NULL;
 		gboolean canceled = FALSE;
-		ConnectInfo *info = priv->connect_slot;
-
-		/* Mark it as handled (TODO, this needs a small lock) */
-		priv->connect_slot = NULL;
+		ConnectInfo *info = (ConnectInfo *) iter->data;
 
 		switch (con_err) {
 			case CON_IC_CONNECTION_ERROR_NONE:
@@ -206,17 +215,21 @@ handle_connect (TnyMaemoConicDevice *self, int con_err, int con_state)
 			gdk_threads_leave ();
 		}
 
+		/* Frees */
 		if (err)
 			g_error_free (err);
-
-		if (G_IS_OBJECT(info->self)) {
+		if (info->self)
 			g_object_unref (info->self);
-			g_free (info->iap_id);
-			info->iap_id = NULL;
-			g_slice_free (ConnectInfo, info);
-		} else
-			g_warning ("%s: BUG: info seems b0rked", __FUNCTION__);
+		g_free (info->iap_id);
+		info->iap_id = NULL;
+		g_slice_free (ConnectInfo, info);
+
+		/* Go to next */
+		iter = g_list_next (iter);
 	}
+
+	/* Free the list */
+	g_list_free (copy);
 }
 
 typedef struct {
@@ -331,7 +344,7 @@ on_connection_event (ConIcConnection *cnx, ConIcConnectionEvent *event, gpointer
 
 	priv->is_online = is_online;
 
-	if (priv->connect_slot)	{
+	if (priv->connect_slots) {
 
 		iinfo = g_slice_new (HandleConnInfo);
 		iinfo->self = (TnyMaemoConicDevice *) g_object_ref (device);
@@ -386,7 +399,9 @@ tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self,
 	info->user_data = user_data;
 	info->iap_id = iap_id ? g_strdup (iap_id) : NULL; /* iap_id can be NULL */
 
-	priv->connect_slot = info;
+	g_static_mutex_lock (&priv->connect_slots_lock);
+	priv->connect_slots = g_list_append (priv->connect_slots, info);
+	g_static_mutex_unlock (&priv->connect_slots_lock);
 
 	/* Set the flags */
 	if (user_requested)
@@ -409,17 +424,19 @@ tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self,
 	}
 
 	if (request_failed) {
-		priv->connect_slot = NULL;
-		if (G_IS_OBJECT(info->self)) {
-			if (info->callback)
-				info->callback (info->self, iap_id, FALSE, err, info->user_data);
-			g_free (info->iap_id);
-			info->iap_id = NULL;
-			g_object_unref (info->self);
-			info->self = NULL;
-			g_slice_free (ConnectInfo, info);
-		} else 
-			g_warning ("%s: BUG: info seems b0rked", __FUNCTION__);
+		/* Remove info from connect slots */
+		g_static_mutex_lock (&priv->connect_slots_lock);
+		priv->connect_slots = g_list_remove (priv->connect_slots, info);
+		g_static_mutex_unlock (&priv->connect_slots_lock);
+
+		/* Callback */
+		if (info->callback)
+			info->callback (info->self, iap_id, FALSE, err, info->user_data);
+
+		/* Frees */
+		g_object_unref (info->self);
+		g_free (info->iap_id);
+		g_slice_free (ConnectInfo, info);
 	}
 }
 
@@ -632,10 +649,10 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->forced       = FALSE;
 	priv->iap          = NULL;
 	priv->is_online    = FALSE;
-	priv->connect_slot = NULL;
+	priv->connect_slots = NULL;
 	priv->loop         = NULL;
-
 	priv->cnx = con_ic_connection_new ();
+	g_static_mutex_init (&priv->connect_slots_lock);
 
 	if (!priv->cnx) {	
 		g_warning ("%s: con_ic_connection_new failed.", __FUNCTION__);
@@ -679,7 +696,7 @@ tny_maemo_conic_device_finalize (GObject *obj)
 	g_return_if_fail (TNY_IS_MAEMO_CONIC_DEVICE(obj));
 
 	g_debug ("%s: shutting the device down...", __FUNCTION__);
-	
+
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
 
 	if (g_signal_handler_is_connected (priv->cnx, priv->signal1))
@@ -693,9 +710,10 @@ tny_maemo_conic_device_finalize (GObject *obj)
 	} else
 		g_warning ("%s: BUG: priv->cnx is not a valid connection",
 			   __FUNCTION__);
-	
+
 	g_free (priv->iap);
 	priv->iap = NULL;
+	g_static_mutex_free (&priv->connect_slots_lock);
 
 	(*parent_class->finalize) (obj);
 }
