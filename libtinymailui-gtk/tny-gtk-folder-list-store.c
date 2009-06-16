@@ -81,6 +81,31 @@ guint tny_gtk_folder_list_store_signals [LAST_SIGNAL];
 
 typedef void (*listaddfunc) (GtkListStore *list_store, GtkTreeIter *iter);
 
+static void tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account, 
+							    TnyConnectionStatus status, 
+							    TnyGtkFolderListStore *self);
+
+
+static gboolean
+delayed_refresh_timeout_handler (TnyGtkFolderListStore *self)
+{
+	GList *node;
+	self->delayed_refresh_timeout_id = 0;
+
+	g_mutex_lock (self->iterator_lock);
+	for (node = self->first; node != NULL; node = g_list_next (node)) {
+		if (TNY_IS_ACCOUNT (node->data)) {
+			tny_gtk_folder_list_store_on_constatus_changed (
+				TNY_ACCOUNT (node->data),
+				tny_account_get_connection_status (TNY_ACCOUNT (node->data)),
+				self);
+		}
+	}
+	g_mutex_unlock (self->iterator_lock);
+
+	return FALSE;
+}
+
 
 static void 
 add_folder_observer_weak (TnyGtkFolderListStore *self, TnyFolder *folder)
@@ -342,6 +367,18 @@ recurse_folders_async_cb (TnyFolderStore *store,
 			if (mark_for_removal) {
 				g_object_unref (mark_for_removal);
 				mark_for_removal = NULL;
+			} else if (folder_store) {
+				/* We still keep recursing already fetch folders, to know if there are new child
+				   folders */
+				TnyList *folders = tny_simple_list_new ();
+
+				self->progress_count++;
+				tny_folder_store_get_folders_async (folder_store,
+								    folders, NULL, 
+								    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
+								    recurse_folders_async_cb,
+								    NULL, g_object_ref (self));
+				g_object_unref (folders);
 			}
 		}
 
@@ -466,6 +503,12 @@ tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account, TnyConnecti
 	if (self->progress_count == 1) {
 		g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
 	}
+
+	if (self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH) {
+		self->flags &= (~TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH);
+		self->flags &= (~TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH);
+	}
+
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
 					    list, self->query,
 					    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
@@ -651,6 +694,18 @@ tny_gtk_folder_list_store_add_i (TnyGtkFolderListStore *self, TnyFolderStore *fo
 	if (self->progress_count == 1) {
 		g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
 	}
+
+	if (self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH) {
+		if (self->delayed_refresh_timeout_id > 0) {
+			g_source_remove (self->delayed_refresh_timeout_id);
+		}
+		self->delayed_refresh_timeout_id = g_timeout_add_seconds_full (G_PRIORITY_DEFAULT,
+									       1,
+									       (GSourceFunc) delayed_refresh_timeout_handler,
+									       g_object_ref (self),
+									       g_object_unref);
+	}
+
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (folder_store), 
 					    folders, self->query, 
 					    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),  
@@ -703,6 +758,10 @@ tny_gtk_folder_list_store_new_with_flags (TnyFolderStoreQuery *query,
 	if (query) 
 		self->query = g_object_ref (query);
 
+	/* DELAYED_REFRESH implies NO_REFRESH */
+	if (flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH)
+		flags |= TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH;
+
 	self->flags = flags;
 
 	return GTK_TREE_MODEL (self);
@@ -715,6 +774,11 @@ tny_gtk_folder_list_store_finalize (GObject *object)
 {
 	TnyGtkFolderListStore *me = (TnyGtkFolderListStore*) object;
 	int i = 0;
+
+	if (me->delayed_refresh_timeout_id > 0) {
+		g_source_remove (me->delayed_refresh_timeout_id);
+		me->delayed_refresh_timeout_id = 0;
+	}
 
 	for (i = 0; i < me->signals->len; i++) {
 		SignalSlot *slot = (SignalSlot *) me->signals->pdata [i];
@@ -796,6 +860,7 @@ tny_gtk_folder_list_store_instance_init (GTypeInstance *instance, gpointer g_cla
 	me->path_separator = g_strdup (DEFAULT_PATH_SEPARATOR);
 
 	me->progress_count = 0;
+	me->delayed_refresh_timeout_id = 0;
 
 	gtk_list_store_set_column_types (store, 
 		TNY_GTK_FOLDER_LIST_STORE_N_COLUMNS, types);

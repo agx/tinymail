@@ -58,6 +58,7 @@ enum _TnyGtkFolderListStoreFlags
 {
 	TNY_GTK_FOLDER_LIST_STORE_FLAG_SHOW_PATH = 1<<0,
 	TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH = 1<<2,
+	TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH = 1<<3,
 };
 
 typedef enum _TnyGtkFolderListStoreFlags TnyGtkFolderListStoreFlags;
@@ -74,6 +75,7 @@ struct _TnyGtkFolderListStore
 	TnyGtkFolderListStoreFlags flags;
 	gchar *path_separator;
 	gint progress_count;
+	guint delayed_refresh_timeout_id;
 };
 
 struct _TnyGtkFolderListStoreClass
