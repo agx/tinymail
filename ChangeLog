@@ -1,3 +1,10 @@
+2009-06-15  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-send-queue.c (check_cancel): call
+	tny_camel_send_queue_cancel_default instead of the interface
+	function in order to prevent call loops when applications want to
+	subclass TnyCamelSendQueue
+
 2009-06-12  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-store-account.c. New method

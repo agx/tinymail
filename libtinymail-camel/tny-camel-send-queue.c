@@ -75,6 +75,7 @@ typedef struct {
 
 
 static void emit_queue_control_signals (TnySendQueue *self, guint signal_id);
+static void tny_camel_send_queue_cancel_default (TnySendQueue *self, TnySendQueueCancelAction cancel_action, GError **err);
 
 static TnyFolder*
 get_sentbox (TnySendQueue *self)
@@ -625,7 +626,7 @@ check_cancel (TnySendQueue *self, gboolean new_is_running, gboolean *cancel_requ
 	g_static_mutex_unlock (priv->running_lock);
 
 	if (do_cancel)
-		tny_send_queue_cancel (self, cancel_action, NULL);
+		tny_camel_send_queue_cancel_default ((TnySendQueue *) self, cancel_action, NULL);
 
 }
 
