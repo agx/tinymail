@@ -1385,6 +1385,52 @@ tny_camel_store_account_factor_folder_default (TnyCamelStoreAccount *self, const
 	return (TnyFolder *) folder;
 }
 
+static void
+_tny_camel_store_account_refresh_children (TnyFolderStore *self, TnyFolder *folder, CamelFolderInfo *iter)
+{
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+	CamelFolderInfo *child;
+
+	child = iter->child;
+	for (child = iter->child; child != NULL; child = child->next) {
+		GList *managed_folders;
+		TnyFolder *found = NULL;
+
+		g_static_rec_mutex_lock (priv->factory_lock);
+		for (managed_folders = priv->managed_folders; 
+		     managed_folders != NULL; 
+		     managed_folders = g_list_next (managed_folders)) {
+
+			TnyFolder *fnd = (TnyFolder*) managed_folders->data;
+			const gchar *name = tny_folder_get_id (fnd);
+
+			if (name && child->full_name && !strcmp (name, child->full_name))
+			{
+				found = g_object_ref (fnd);
+				break;
+			}
+		}
+		g_static_rec_mutex_unlock (priv->factory_lock);
+
+		if (!found) {
+			TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (folder);
+			if (fpriv->iter) {
+				CamelFolderInfo *copy;
+
+				copy = camel_folder_info_clone (child);
+				copy->next = fpriv->iter->child;
+				copy->parent = iter;
+				fpriv->iter->child = copy;
+			}
+		} else {
+			_tny_camel_store_account_refresh_children (self, found, child);
+			g_object_unref (found);
+		}
+
+	}
+}
+
+
 static void 
 tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFolderStoreQuery *query, gboolean refresh, GError **err)
 {
@@ -1477,11 +1523,13 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 				TNY_CAMEL_STORE_ACCOUNT (self), 
 				iter->full_name, &was_new);
 
-			if (was_new && folder != NULL)
-				_tny_camel_folder_set_folder_info (self, folder, iter);
-
 			if (folder != NULL)
 			{
+				if (was_new)
+					_tny_camel_folder_set_folder_info (self, folder, iter);
+				else
+					_tny_camel_store_account_refresh_children (self, folder, iter);
+			
 				const gchar *name = tny_folder_get_name (TNY_FOLDER(folder));
 				/* TNY TODO: Temporary fix for empty root folders */
 				if (name && strlen(name) > 0)
