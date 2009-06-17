@@ -31,6 +31,7 @@ libtinymail_camel_1_0_headers =	\
 	tny-camel-transport-account.h \
 	tny-camel-stream.h \
 	tny-stream-camel.h \
+	tny-camel-html-to-text-stream.h \
 	tny-camel-shared.h \
 	tny-camel-send-queue.h \
 	tny-camel-mem-stream.h \
@@ -89,6 +90,7 @@ libtinymail_camel_1_0_la_SOURCES = \
 	tny-stream-camel.c \
 	tny-camel-send-queue.c \
 	tny-camel-mem-stream.c \
+	tny-camel-html-to-text-stream.c \
 	tny-session-camel.c \
 	tny-camel-queue.c \
 	tny-camel-bs-msg.c \
