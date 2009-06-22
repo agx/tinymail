@@ -108,6 +108,9 @@ delayed_refresh_timeout_handler (TnyGtkFolderListStore *self)
 	GList *node;
 	self->delayed_refresh_timeout_id = 0;
 
+	self->flags &= (~TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH);
+	self->flags &= (~TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH);
+
 	g_mutex_lock (self->iterator_lock);
 	for (node = self->first; node != NULL; node = g_list_next (node)) {
 		if (TNY_IS_ACCOUNT (node->data)) {
