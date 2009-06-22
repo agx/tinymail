@@ -2436,9 +2436,17 @@ tny_camel_folder_get_headers_default (TnyFolder *self, TnyList *headers, gboolea
 
 	}
 
-	if (priv->folder && CAMEL_IS_FOLDER (priv->folder))
-		g_ptr_array_foreach (priv->folder->summary->messages, 
-			add_message_with_uid, ptr);
+	if (priv->folder && CAMEL_IS_FOLDER (priv->folder)) {
+		GPtrArray *array;;
+
+		array = priv->folder->summary->messages;
+		if (array->len > 0) {
+			guint i;
+			for (i = array->len - 1; i < array->len ; i--) {
+				add_message_with_uid (array->pdata[i], ptr);
+			}
+		}
+	}
 
 	g_slice_free (FldAndPriv, ptr);
 

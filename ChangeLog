@@ -1,5 +1,11 @@
 2009-06-22  Jose Dapena Paz  <jdapena@igalia.com>
 
+	* libtinymail-camel/tny-camel-folder.c
+	(tny_camel_folder_get_headers_default): get headers now
+	returns the headers in the reverse order (first we return
+	latest messages). This makes tinymail behave better in the
+	usual context (reading the newest messages).
+
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c: stop delayed
 	refresh once timeout is gone (avoiding continuous retrieval
 	issue with delayed refresh).
