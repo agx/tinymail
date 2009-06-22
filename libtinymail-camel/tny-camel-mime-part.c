@@ -186,8 +186,8 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 
 	content_type = camel_mime_part_get_content_type (priv->part);
 	if (content_type != NULL) {
-		if ((strcmp (content_type->type, "multipart")==0) &&
-		    (strcmp (content_type->subtype, "related") == 0)) {
+		if ((content_type->type && strcmp (content_type->type, "multipart")==0) &&
+		    (content_type->subtype && strcmp (content_type->subtype, "related") == 0)) {
 			is_related = TRUE;
 		}
 	}
