@@ -6,6 +6,10 @@
 	is now disabled, as we usually get hte connection event too 
 	soon.
 
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c: cancel account
+	operations on removing them from store (to allow stopping get
+	folders operation).
+
 2009-06-16  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* New libtinymail-camel/tny-camel-html-to-text-stream.[ch]:

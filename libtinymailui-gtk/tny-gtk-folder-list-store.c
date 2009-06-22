@@ -1028,6 +1028,8 @@ tny_gtk_folder_list_store_remove (TnyList *self, GObject* item)
 					if ((GObject *) account == item) {
 						more_items = gtk_list_store_remove (GTK_LIST_STORE (me), &iter);
 						deleted = TRUE;
+						if (TNY_GTK_FOLDER_LIST_STORE (self)->progress_count > 0)
+							tny_account_cancel (TNY_ACCOUNT (account));
 					}
 					g_object_unref (account);
 				}
