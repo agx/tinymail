@@ -85,6 +85,22 @@ static void tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account,
 							    TnyConnectionStatus status, 
 							    TnyGtkFolderListStore *self);
 
+static gboolean delayed_refresh_timeout_handler (TnyGtkFolderListStore *self);
+
+static void
+update_delayed_refresh (TnyGtkFolderListStore *self)
+{
+	if (self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH) {
+		if (self->delayed_refresh_timeout_id > 0) {
+			g_source_remove (self->delayed_refresh_timeout_id);
+		}
+		self->delayed_refresh_timeout_id = g_timeout_add_seconds_full (G_PRIORITY_DEFAULT,
+									       2,
+									       (GSourceFunc) delayed_refresh_timeout_handler,
+									       g_object_ref (self),
+									       g_object_unref);
+	}
+}
 
 static gboolean
 delayed_refresh_timeout_handler (TnyGtkFolderListStore *self)
@@ -333,6 +349,7 @@ recurse_folders_async_cb (TnyFolderStore *store,
 
 				add_folder_store_observer_weak (self, folder_store);
 				self->progress_count++;
+				update_delayed_refresh (self);
 				tny_folder_store_get_folders_async (folder_store,
 								    folders, NULL, 
 								    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
@@ -355,7 +372,7 @@ recurse_folders_async_cb (TnyFolderStore *store,
 			 * memory peak will happen, few data must be transmitted
 			 * in case we're online. Which is perfect! */
 
-			if (folder)
+			if (folder && !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH))
 				tny_folder_poke_status (TNY_FOLDER (folder));
 
 			if (mark_for_removal) {
@@ -373,6 +390,7 @@ recurse_folders_async_cb (TnyFolderStore *store,
 				TnyList *folders = tny_simple_list_new ();
 
 				self->progress_count++;
+				update_delayed_refresh (self);
 				tny_folder_store_get_folders_async (folder_store,
 								    folders, NULL, 
 								    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
@@ -460,9 +478,11 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 	if (found) {
 		TnyList *folders = tny_simple_list_new ();
 		self->progress_count++;
+		update_delayed_refresh (self);
 		if (self->progress_count == 1) {
 			g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
 		}
+		update_delayed_refresh (self);
 		tny_folder_store_get_folders_async (fstore,
 						    folders, NULL, 
 						    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
@@ -494,7 +514,7 @@ tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account, TnyConnecti
 	 * we got connected, we can expect that, at least sometimes, new folders
 	 * might have arrived. We'll need to scan for those, so we'll recursively
 	 * start asking the account about its folders. */
-
+	
 	if (status == TNY_CONNECTION_STATUS_RECONNECTING || status == TNY_CONNECTION_STATUS_DISCONNECTED)
 		return;
 
@@ -502,11 +522,6 @@ tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account, TnyConnecti
 	self->progress_count++;
 	if (self->progress_count == 1) {
 		g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
-	}
-
-	if (self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH) {
-		self->flags &= (~TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH);
-		self->flags &= (~TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH);
 	}
 
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
@@ -695,16 +710,7 @@ tny_gtk_folder_list_store_add_i (TnyGtkFolderListStore *self, TnyFolderStore *fo
 		g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
 	}
 
-	if (self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH) {
-		if (self->delayed_refresh_timeout_id > 0) {
-			g_source_remove (self->delayed_refresh_timeout_id);
-		}
-		self->delayed_refresh_timeout_id = g_timeout_add_seconds_full (G_PRIORITY_DEFAULT,
-									       1,
-									       (GSourceFunc) delayed_refresh_timeout_handler,
-									       g_object_ref (self),
-									       g_object_unref);
-	}
+	update_delayed_refresh (self);
 
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (folder_store), 
 					    folders, self->query, 
