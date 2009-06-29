@@ -85,7 +85,17 @@ static void tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account,
 							    TnyConnectionStatus status, 
 							    TnyGtkFolderListStore *self);
 
+static void constatus_do_refresh (TnyAccount *account, 
+				  TnyConnectionStatus status, 
+				  TnyGtkFolderListStore *self,
+				  gboolean force_poke_status);
+
 static gboolean delayed_refresh_timeout_handler (TnyGtkFolderListStore *self);
+
+typedef struct {
+	TnyGtkFolderListStore *self;
+	gboolean do_poke_status;
+} _RefreshInfo;
 
 static void
 update_delayed_refresh (TnyGtkFolderListStore *self)
@@ -114,10 +124,11 @@ delayed_refresh_timeout_handler (TnyGtkFolderListStore *self)
 	g_mutex_lock (self->iterator_lock);
 	for (node = self->first; node != NULL; node = g_list_next (node)) {
 		if (TNY_IS_ACCOUNT (node->data)) {
-			tny_gtk_folder_list_store_on_constatus_changed (
+			constatus_do_refresh (
 				TNY_ACCOUNT (node->data),
 				tny_account_get_connection_status (TNY_ACCOUNT (node->data)),
-				self);
+				self,
+				TRUE);
 		}
 	}
 	g_mutex_unlock (self->iterator_lock);
@@ -218,8 +229,14 @@ recurse_folders_async_cb (TnyFolderStore *store,
 	TnyIterator *iter;
 	TnyGtkFolderListStore *self;
 	gchar *parent_name;
+	gboolean do_poke_status;
+	_RefreshInfo *info;
+		
 
-	self = TNY_GTK_FOLDER_LIST_STORE (user_data);
+	info = (_RefreshInfo *) user_data;
+	self = info->self;
+	do_poke_status = info->do_poke_status;
+	g_slice_free (_RefreshInfo, info);
 
 	if (cancelled || err) {
 		g_warning ("%s Error getting the folders", __FUNCTION__);
@@ -349,15 +366,18 @@ recurse_folders_async_cb (TnyFolderStore *store,
 			/* it's a store by itself, so keep on recursing */
 			if (folder_store) {
 				TnyList *folders = tny_simple_list_new ();
+				_RefreshInfo *new_info = g_slice_new (_RefreshInfo);
 
 				add_folder_store_observer_weak (self, folder_store);
 				self->progress_count++;
 				update_delayed_refresh (self);
+				new_info->self = g_object_ref (self);
+				new_info->do_poke_status = do_poke_status;
 				tny_folder_store_get_folders_async (folder_store,
 								    folders, NULL, 
 								    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
 								    recurse_folders_async_cb,
-								    NULL, g_object_ref (self));
+								    NULL, new_info);
 				g_object_unref (folders);
 			}
 
@@ -375,7 +395,9 @@ recurse_folders_async_cb (TnyFolderStore *store,
 			 * memory peak will happen, few data must be transmitted
 			 * in case we're online. Which is perfect! */
 
-			if (folder && !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH))
+			if (folder && 
+			    (!(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH)||
+			     do_poke_status))
 				tny_folder_poke_status (TNY_FOLDER (folder));
 
 			if (mark_for_removal) {
@@ -384,21 +406,26 @@ recurse_folders_async_cb (TnyFolderStore *store,
 			}
 
 		} else {
+			if (folder && do_poke_status)
+				tny_folder_poke_status (TNY_FOLDER (folder));
 			if (mark_for_removal) {
 				g_object_unref (mark_for_removal);
 				mark_for_removal = NULL;
 			} else if (folder_store) {
+				_RefreshInfo *new_info = g_slice_new (_RefreshInfo);
 				/* We still keep recursing already fetch folders, to know if there are new child
 				   folders */
 				TnyList *folders = tny_simple_list_new ();
 
 				self->progress_count++;
 				update_delayed_refresh (self);
+				new_info->self = g_object_ref (self);
+				new_info->do_poke_status = do_poke_status;
 				tny_folder_store_get_folders_async (folder_store,
 								    folders, NULL, 
 								    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
 								    recurse_folders_async_cb,
-								    NULL, g_object_ref (self));
+								    NULL, new_info);
 				g_object_unref (folders);
 			}
 		}
@@ -436,11 +463,15 @@ get_root_name (TnyFolderStore *folder_store)
 static void
 get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GError *err, gpointer user_data)
 {
-	TnyGtkFolderListStore *self = (TnyGtkFolderListStore *) user_data;
+	_RefreshInfo *info = (_RefreshInfo *) user_data;
+	TnyGtkFolderListStore *self = (TnyGtkFolderListStore *) info->self;
+	gboolean do_poke_status = info->do_poke_status;
 	GtkTreeModel *model = GTK_TREE_MODEL (self);
 	GtkTreeIter iter;
 	GtkTreeIter name_iter;
 	gboolean found = FALSE;
+
+	g_slice_free (_RefreshInfo, info);
 
 	g_object_unref (list);
 
@@ -479,6 +510,7 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 	 * folders that already exist (it wont add them a second time). */
 
 	if (found) {
+		_RefreshInfo *new_info = g_slice_new (_RefreshInfo);
 		TnyList *folders = tny_simple_list_new ();
 		self->progress_count++;
 		update_delayed_refresh (self);
@@ -486,11 +518,13 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 			g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
 		}
 		update_delayed_refresh (self);
+		new_info->self = g_object_ref (self);
+		new_info->do_poke_status = do_poke_status;
 		tny_folder_store_get_folders_async (fstore,
 						    folders, NULL, 
 						    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
 						    recurse_folders_async_cb,
-						    NULL, g_object_ref (self));
+						    NULL, new_info);
 		g_object_unref (folders);
 	}
 	if (self->progress_count > 0) {
@@ -508,7 +542,13 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 static void 
 tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account, TnyConnectionStatus status, TnyGtkFolderListStore *self)
 {
+	constatus_do_refresh (account, status, self, FALSE);
+}
+static void 
+constatus_do_refresh (TnyAccount *account, TnyConnectionStatus status, TnyGtkFolderListStore *self, gboolean do_poke_status)
+{
 	TnyList *list = NULL;
+	_RefreshInfo *info = NULL;
 
 	if (!self || !TNY_IS_GTK_FOLDER_LIST_STORE (self))
 		return;
@@ -527,10 +567,14 @@ tny_gtk_folder_list_store_on_constatus_changed (TnyAccount *account, TnyConnecti
 		g_signal_emit (self, tny_gtk_folder_list_store_signals[ACTIVITY_CHANGED_SIGNAL], 0, TRUE);
 	}
 
+	info = g_slice_new (_RefreshInfo);
+	info->self = g_object_ref (self);
+	info->do_poke_status = do_poke_status;
+
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (account),
 					    list, self->query,
 					    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
-					    get_folders_cb, NULL, g_object_ref (self));
+					    get_folders_cb, NULL, info);
 
 	return;
 }
@@ -654,6 +698,7 @@ tny_gtk_folder_list_store_add_i (TnyGtkFolderListStore *self, TnyFolderStore *fo
 	GtkListStore *model = GTK_LIST_STORE (self);
 	TnyList *folders = tny_simple_list_new ();
 	GtkTreeIter name_iter;
+	_RefreshInfo *info = NULL;
 
 	func (model, &name_iter);
 
@@ -715,10 +760,13 @@ tny_gtk_folder_list_store_add_i (TnyGtkFolderListStore *self, TnyFolderStore *fo
 
 	update_delayed_refresh (self);
 
+	info = g_slice_new (_RefreshInfo);
+	info->self = g_object_ref (self);
+	info->do_poke_status = FALSE;
 	tny_folder_store_get_folders_async (TNY_FOLDER_STORE (folder_store), 
 					    folders, self->query, 
 					    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),  
-					    get_folders_cb, NULL, g_object_ref (self));
+					    get_folders_cb, NULL, info);
 
 	/* Add an observer for the root folder store, so that we can observe 
 	 * the actual account too. */
