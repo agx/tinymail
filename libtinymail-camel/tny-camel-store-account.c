@@ -75,6 +75,28 @@ typedef struct {
 } NotFolObInIdleInfo;
 
 static void 
+folder_opened (CamelStore *camel_store, CamelFolder *camel_folder, TnyCamelStoreAccount *self)
+{
+	GList *node;
+	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	if (camel_folder == NULL)
+		return;
+
+	for (node = priv->managed_folders; node != NULL; node = g_list_next (node)) {
+		TnyCamelFolder *folder = (TnyCamelFolder *) node->data;
+
+		if (TNY_IS_CAMEL_FOLDER (folder)) {
+			if (g_strcmp0 (tny_folder_get_id (TNY_FOLDER (folder)), camel_folder_get_name (camel_folder))==0) {
+				_tny_camel_folder_track_folder_changed (folder, camel_folder);
+				break;
+			}
+		}
+	}
+	
+}
+
+static void 
 do_notify_in_idle_destroy (gpointer user_data)
 {
 	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) user_data;
@@ -489,6 +511,7 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 
 		if (apriv->service && CAMEL_IS_SERVICE (apriv->service) && 
 		  new_service && !camel_exception_is_set (apriv->ex)) {
+			camel_object_unhook_event (apriv->service, "folder_opened", folder_opened, self);
 			camel_object_unref (apriv->service);
 			apriv->service = NULL;
 		}
@@ -521,8 +544,10 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 				g_free (str);
 			}
 
-			if (apriv->service && CAMEL_IS_SERVICE (apriv->service))
+			if (apriv->service && CAMEL_IS_SERVICE (apriv->service)) {
+				camel_object_unhook_event (new_service, "folder_opened", folder_opened, self);
 				camel_object_unref (apriv->service);
+			}
 
 			apriv->service = new_service;
 			apriv->service->data = self;
@@ -531,9 +556,14 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 			apriv->service->reconnecter = (con_op) reconnecting;
 			apriv->service->reconnection = (con_op) reconnection;
 
+			if (new_service)
+				camel_object_hook_event (new_service, "folder_opened", folder_opened, self);
+
 		} else if (camel_exception_is_set (apriv->ex) && new_service) {
-			if (CAMEL_IS_OBJECT (new_service))
+			if (CAMEL_IS_OBJECT (new_service)) {
+				camel_object_unhook_event (new_service, "folder_opened", folder_opened, self);
 				camel_object_unref (new_service);
+			}
 		}
 	  }
 	} else {
@@ -898,6 +928,12 @@ tny_camel_store_account_finalize (GObject *object)
 {
 	TnyCamelStoreAccount *self = (TnyCamelStoreAccount *)object;
 	TnyCamelStoreAccountPriv *priv = TNY_CAMEL_STORE_ACCOUNT_GET_PRIVATE (self);
+
+	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
+
+	if (apriv->service) {
+		camel_object_unhook_event (apriv->service, "folder_opened", folder_opened, self);
+	}
 
 	/* g_static_rec_mutex_free (priv->factory_lock); */
 	g_free (priv->factory_lock);

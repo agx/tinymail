@@ -326,6 +326,42 @@ _tny_camel_folder_check_unread_count (TnyCamelFolder *self)
 }
 
 static void 
+folder_tracking_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer user_data)
+{
+	TnyCamelFolder *self = user_data;
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	TnyFolderChange *change = NULL;
+	CamelFolderSummary *summary;
+	gboolean old = priv->dont_fkill;
+	gint i = 0; gboolean urcnted = FALSE;
+
+	if (!priv->handle_changes)
+		return;
+
+	if (!change && info->uid_changed != NULL && info->uid_changed->len > 0) {
+		priv->cached_length = (guint) camel_folder_get_message_count (camel_folder);
+		priv->unread_length = (guint) camel_folder_get_unread_message_count (camel_folder);
+		urcnted = TRUE;
+		change = tny_folder_change_new (TNY_FOLDER (self));
+	}
+
+	update_iter_counts (priv);
+
+	if (change)
+	{
+		tny_folder_change_set_new_unread_count (change, priv->unread_length);
+		tny_folder_change_set_new_all_count (change, priv->cached_length);
+		priv->dont_fkill = TRUE;
+		notify_folder_observers_about_in_idle (TNY_FOLDER (self), change,
+			TNY_FOLDER_PRIV_GET_SESSION (priv));
+		g_object_unref (change);
+		priv->dont_fkill = old;
+	}
+
+	return;
+}
+
+static void 
 folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer user_data)
 {
 	TnyCamelFolderPriv *priv = (TnyCamelFolderPriv *) user_data;
@@ -1559,11 +1595,13 @@ _tny_camel_folder_set_account (TnyCamelFolder *self, TnyAccount *account)
 	priv->account = TNY_ACCOUNT (g_object_ref (account));
 #endif
 
-	if (priv->store)
+	if (priv->store) {
 		camel_object_unref (priv->store);
+	}
 	priv->store = (CamelStore*) _tny_camel_account_get_service (TNY_CAMEL_ACCOUNT (priv->account));
-	if (priv->store)
+	if (priv->store) {
 		camel_object_ref (priv->store);
+	}
 
 	return;
 }
@@ -4728,6 +4766,39 @@ tny_camel_folder_uncache_nl (TnyCamelFolder *self)
 	return;
 }
 
+static void 
+folder_tracking_finalize (CamelObject *folder, gpointer event_data, gpointer user_data)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (user_data);
+	if (priv->folder_tracking_id)
+		priv->folder_tracking_id = 0;
+
+	if (priv->folder_tracking)
+		priv->folder_tracking = NULL;
+}
+
+void
+_tny_camel_folder_track_folder_changed (TnyCamelFolder *self, 
+					CamelFolder *folder)
+{
+	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+
+	if (priv->folder_tracking == folder)
+		return;
+
+	if (priv->folder_tracking) {
+		camel_object_remove_event (priv->folder_tracking, priv->folder_tracking_id);
+		camel_object_unhook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, self);
+	}
+	priv->folder_tracking = folder;
+	if  (priv->folder_tracking != NULL) {
+		priv->folder_tracking_id = camel_object_hook_event (priv->folder_tracking, "folder_changed", folder_tracking_changed, self);
+		camel_object_hook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, self);
+	}
+
+}
+
+
 
 void 
 _tny_camel_folder_unreason (TnyCamelFolderPriv *priv)
@@ -6339,8 +6410,9 @@ tny_camel_folder_dispose (GObject *object)
 	TnyCamelFolder *self = (TnyCamelFolder*) object;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
-	if (priv->store)
+	if (priv->store) {
 		camel_object_unref (priv->store);
+	}
 
 	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account)) {
 		_tny_camel_store_account_remove_from_managed_folders (TNY_CAMEL_STORE_ACCOUNT (priv->account), 
@@ -6400,6 +6472,10 @@ tny_camel_folder_finalize (GObject *object)
 	TnyCamelFolder *self = (TnyCamelFolder*) object;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
+	if (priv->folder_tracking) {
+		camel_object_remove_event (priv->folder_tracking, priv->folder_tracking_id);
+		camel_object_unhook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, self);
+	}
 
 #ifdef DEBUG
 	g_print ("Finalizing TnyCamelFolder: %s\n", 
@@ -6626,6 +6702,8 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->loaded = FALSE;
 	priv->folder_changed_id = 0;
 	priv->folder = NULL;
+	priv->folder_tracking = NULL;
+	priv->folder_tracking_id = 0;
 	priv->cached_name = NULL;
 	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;
 	priv->remove_strat = tny_camel_msg_remove_strategy_new ();

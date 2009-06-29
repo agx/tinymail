@@ -36,6 +36,8 @@ struct _TnyCamelFolderPriv
 	GStaticRecMutex *reason_lock;
 	GStaticRecMutex *folder_lock, *obs_lock;
 	CamelFolder *folder;
+	CamelFolder *folder_tracking;
+	guint folder_tracking_id;
 	gchar *folder_name;
 	TnyAccount *account; CamelStore *store;
 	guint cached_length, unread_length, unread_sync, local_size;
@@ -84,6 +86,7 @@ void _tny_camel_folder_set_allow_external_images (TnyCamelFolder *self, const gc
 void _tny_camel_folder_remove_folder_actual (TnyFolderStore *self, TnyFolder *folder, TnyFolderStoreChange *change, GError **err);
 
 void _tny_camel_folder_freeup_observers (TnyCamelFolder *self, TnyCamelFolderPriv *priv);
+void _tny_camel_folder_track_folder_changed (TnyCamelFolder *self, CamelFolder *folder);
 
 CamelFolder* _tny_camel_folder_get_folder (TnyCamelFolder *self);
 

@@ -3,6 +3,18 @@
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c:
 	reenable poke_status calls in delayed refresh mode.
 
+	* libtinymail-camel/tny-camel-folder.[ch], 
+	libtinymail-camel/tny-camel-folder-priv.h
+	(tny_camel_folder_track_folder_changed): added a method to add 
+	a CamelFolder instance to track folder_changed event until it's
+	finalized. This is useful to track only the number of messages 
+	available.
+  
+	* libtinymail-camel/tny-camel-store-account.c: added handling of 
+	folder_opened signal. When a folder is opened, we register it for
+	tracking the number of messages. THis allows us to track the
+	number of messages without opening the folder summary.
+
 2009-06-22  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c
