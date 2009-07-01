@@ -1,3 +1,9 @@
+2009-06-30  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c: remove
+	mark_for_removal handling as this is breaking delayed refresh
+	mode, and also detecting new folders in some cases.
+
 2009-06-29  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c:

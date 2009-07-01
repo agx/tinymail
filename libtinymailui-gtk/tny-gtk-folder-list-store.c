@@ -264,7 +264,6 @@ recurse_folders_async_cb (TnyFolderStore *store,
 		TnyFolderStore *folder_store = NULL;
 		GtkTreeIter miter;
 		gboolean found = FALSE;
-		GObject *mark_for_removal = NULL;
 
 		if (instance && (TNY_IS_FOLDER (instance) || TNY_IS_MERGE_FOLDER (instance)))
 			folder = TNY_FOLDER (instance);
@@ -289,25 +288,6 @@ recurse_folders_async_cb (TnyFolderStore *store,
 					g_object_unref (citem);
 				break;
 			}
-
-			/* We search whether this folder that we have in the
-			 * model, still exists in the actual list. Because if
-			 * not, it probably got removed remotely (and we need
-			 * to get rid of it in the model now) */
-
-			niter = tny_list_create_iterator (folders);
-			while (!tny_iterator_is_done (niter))
-			{
-				TnyFolder *ifound = TNY_FOLDER (tny_iterator_get_current (niter));
-				if (citem == (GObject *) ifound) {
-					if (mark_for_removal)
-						g_object_unref (mark_for_removal);
-					mark_for_removal = g_object_ref (ifound);
-				}
-				g_object_unref (ifound);
-				tny_iterator_next (niter);
-			}
-			g_object_unref (niter);
 
 			if (citem)
 				g_object_unref (citem);
@@ -400,18 +380,11 @@ recurse_folders_async_cb (TnyFolderStore *store,
 			     do_poke_status))
 				tny_folder_poke_status (TNY_FOLDER (folder));
 
-			if (mark_for_removal) {
-				g_object_unref (mark_for_removal);
-				mark_for_removal = NULL;
-			}
 
 		} else {
 			if (folder && do_poke_status)
 				tny_folder_poke_status (TNY_FOLDER (folder));
-			if (mark_for_removal) {
-				g_object_unref (mark_for_removal);
-				mark_for_removal = NULL;
-			} else if (folder_store) {
+			if (folder_store) {
 				_RefreshInfo *new_info = g_slice_new (_RefreshInfo);
 				/* We still keep recursing already fetch folders, to know if there are new child
 				   folders */
