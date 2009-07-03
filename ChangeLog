@@ -1,3 +1,8 @@
+2009-07-03  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-header-list-model.c
+	(notify_views_add): speed up the first views update.
+
 2009-06-30  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c: remove

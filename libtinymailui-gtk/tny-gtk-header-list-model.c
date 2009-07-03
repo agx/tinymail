@@ -661,10 +661,11 @@ notify_views_add (gpointer data)
 {
 	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (data);
 	gint already_registered, going_tb_registered, i;
- 
+
 	gboolean needmore = FALSE;
 	GtkTreePath *path;
 	GtkTreeIter iter;
+	int mails_load_count;
 
 	g_static_rec_mutex_lock (priv->iterator_lock);
 
@@ -677,13 +678,17 @@ notify_views_add (gpointer data)
 	}
 
 	already_registered = priv->registered;
+	if ( already_registered == 0)
+		mails_load_count = 100;
+	else
+		mails_load_count = 3000;
 
-	if (priv->items->len - already_registered > 3000) 
-	{
-		going_tb_registered = already_registered + 3000;
+	if (priv->items->len - already_registered > mails_load_count) {
+		going_tb_registered = already_registered + mails_load_count;
 		needmore = TRUE;
-	} else
+	} else {
 		going_tb_registered = priv->items->len;
+	}
 
 	priv->registered = going_tb_registered;
 
