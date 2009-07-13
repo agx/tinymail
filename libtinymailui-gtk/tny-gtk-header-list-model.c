@@ -766,14 +766,11 @@ tny_gtk_header_list_model_prepend (TnyList *self, GObject* item)
 		priv->updating_views = 0;
 		g_object_ref (self);
 
-		if (priv->add_timeout > 0) {
-			g_source_remove (priv->add_timeout);
-			priv->add_timeout = 0;
+		if (priv->add_timeout == 0) {
+			priv->add_timeout = g_timeout_add_full (G_PRIORITY_DEFAULT_IDLE, 
+								priv->timeout_span, notify_views_add, self, 
+								notify_views_add_destroy);
 		}
-
-		priv->add_timeout = g_timeout_add_full (G_PRIORITY_DEFAULT_IDLE, 
-			priv->timeout_span, notify_views_add, self, 
-			notify_views_add_destroy);
 	}
 
 	g_mutex_unlock (priv->ra_lock);
@@ -1196,7 +1193,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	g_static_rec_mutex_init (priv->iterator_lock);
 	priv->cur_len = 0;
 
-	priv->timeout_span = 100;
+	priv->timeout_span = 1;
 	priv->del_timeouts = NULL;
 	priv->add_timeout = 0;
 	priv->items = g_ptr_array_sized_new (1000);
@@ -1278,7 +1275,7 @@ tny_gtk_header_list_model_set_folder (TnyGtkHeaderListModel *self, TnyFolder *fo
 
 	g_static_rec_mutex_lock (priv->iterator_lock);
 
-	priv->timeout_span = 100;
+	priv->timeout_span = 1;
 	if (priv->add_timeout > 0) {
 		g_source_remove (priv->add_timeout);
 		priv->add_timeout = 0;
