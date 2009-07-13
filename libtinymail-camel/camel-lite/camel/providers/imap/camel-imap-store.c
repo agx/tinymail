@@ -2402,10 +2402,19 @@ imap_disconnect_offline (CamelService *service, gboolean clean, CamelException *
 
 	imap_debug ("imap_disconnect_offline\n");
 
-	let_idle_die (store, TRUE);
-	CAMEL_SERVICE_REC_LOCK (service, connect_lock);
-	camel_imap_store_stop_idle (store);
-	CAMEL_SERVICE_REC_UNLOCK (service, connect_lock);
+	if (store->in_idle && store->idle_thread && store->idle_thread == g_thread_self ()) {
+		if (store->idle_prefix) {
+			g_free (store->idle_prefix);
+			store->idle_prefix = NULL;
+		}
+		store->idle_kill  = TRUE;
+		store->idle_cont = FALSE;
+	} else {
+
+		CAMEL_SERVICE_REC_LOCK (service, connect_lock);
+		camel_imap_store_stop_idle (store);
+		CAMEL_SERVICE_REC_UNLOCK (service, connect_lock);
+	}
 
 	if (store->istream) {
 		camel_stream_close(store->istream);
@@ -2451,17 +2460,34 @@ imap_disconnect_online (CamelService *service, gboolean clean, CamelException *e
 {
 	CamelImapStore *store = CAMEL_IMAP_STORE (service);
 	CamelImapResponse *response;
+	gboolean do_disconnect = TRUE;
 
 	imap_debug ("imap_disconnect_online\n");
 
-	if (clean)
-		let_idle_die (store, TRUE);
+	if (!g_static_rec_mutex_trylock (store->idle_lock)) {
+		if (store->in_idle && store->idle_thread && store->idle_thread == g_thread_self ()) {
+			if (store->idle_prefix) {
+				g_free (store->idle_prefix);
+				store->idle_prefix = NULL;
+			}
+			store->idle_kill  = TRUE;
+			store->idle_cont = FALSE;
+			do_disconnect = FALSE;
+		}
+	} else {
+		g_static_rec_mutex_unlock (store->idle_lock);
+	}
 
-	camel_imap_store_stop_idle_connect_lock (store);
+	if (do_disconnect) {
+		if (clean)
+			let_idle_die (store, TRUE);
 
-	if (store->connected && clean) {
-		response = camel_imap_command (store, NULL, NULL, "LOGOUT");
-		camel_imap_response_free (store, response);
+		camel_imap_store_stop_idle_connect_lock (store);
+
+		if (store->connected && clean) {
+			response = camel_imap_command (store, NULL, NULL, "LOGOUT");
+			camel_imap_response_free (store, response);
+		}
 	}
 
 	imap_disconnect_offline (service, clean, ex);

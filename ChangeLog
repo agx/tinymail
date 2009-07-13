@@ -1,3 +1,10 @@
+2009-07-10  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
+	on disconnecting from network, avoid any network communication if we're
+	in idle loop and we don't have the idle lock. This avoids some crashes
+	on starting idle if connection is shutdown.
+
 2009-07-03  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-header-list-model.c
