@@ -2631,8 +2631,7 @@ tny_camel_folder_get_msg_async_thread (gpointer thr_user_data)
 
 	camel_operation_unregister (cancel);
 	camel_operation_end (cancel);
-	if (CAMEL_IS_OBJECT (cancel))
-		camel_operation_unref (cancel);
+	camel_operation_unref (cancel);
 
 	if (priv->account && TNY_IS_CAMEL_ACCOUNT (priv->account)) {
 		TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (priv->account);
