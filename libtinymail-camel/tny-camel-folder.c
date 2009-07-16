@@ -334,6 +334,13 @@ folder_tracking_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info,
 	CamelFolderSummary *summary;
 	gboolean old = priv->dont_fkill;
 
+	/* Ignore this callback if the folder is already loaded as
+	   this notification will be received by folder_changed as
+	   well. Checks for folder_changed_id and loaded are harmless
+	   and unlikely needed */
+	if (priv->folder && priv->folder_changed_id && priv->loaded)
+		return;
+
 	if (!priv->handle_changes)
 		return;
 
