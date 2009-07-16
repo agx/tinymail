@@ -3,6 +3,9 @@
 	* libtinymail-camel/tny-camel-folder.c (folder_tracking_changed):
 	always update the folder counts not only if we receive changed
 	uids but when we get added uids and removed uids
+	(folder_tracking_finalize)
+	(_tny_camel_folder_track_folder_changed)
+	(tny_camel_folder_finalize): user_data is now priv instead of self
 
 2009-07-14  Sergio Villar Senin  <svillar@igalia.com>
 

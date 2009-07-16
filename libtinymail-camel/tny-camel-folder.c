@@ -4769,7 +4769,7 @@ tny_camel_folder_uncache_nl (TnyCamelFolder *self)
 static void 
 folder_tracking_finalize (CamelObject *folder, gpointer event_data, gpointer user_data)
 {
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (user_data);
+	TnyCamelFolderPriv *priv =  (TnyCamelFolderPriv *) user_data;
 	if (priv->folder_tracking_id)
 		priv->folder_tracking_id = 0;
 
@@ -4788,12 +4788,13 @@ _tny_camel_folder_track_folder_changed (TnyCamelFolder *self,
 
 	if (priv->folder_tracking) {
 		camel_object_remove_event (priv->folder_tracking, priv->folder_tracking_id);
-		camel_object_unhook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, self);
+		camel_object_unhook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, priv);
+		priv->folder_tracking_id = 0;
 	}
 	priv->folder_tracking = folder;
 	if  (priv->folder_tracking != NULL) {
 		priv->folder_tracking_id = camel_object_hook_event (priv->folder_tracking, "folder_changed", folder_tracking_changed, self);
-		camel_object_hook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, self);
+		camel_object_hook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, priv);
 	}
 
 }
@@ -6474,7 +6475,8 @@ tny_camel_folder_finalize (GObject *object)
 
 	if (priv->folder_tracking) {
 		camel_object_remove_event (priv->folder_tracking, priv->folder_tracking_id);
-		camel_object_unhook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, self);
+		camel_object_unhook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, priv);
+		priv->folder_tracking_id = 0;
 	}
 
 #ifdef DEBUG
