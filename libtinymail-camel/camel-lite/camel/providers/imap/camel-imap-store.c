@@ -2153,9 +2153,11 @@ imap_auth_loop (CamelService *service, CamelException *ex, gboolean *auth)
 					enable_line = g_string_append (enable_line, "CONDSTORE");
 				}
 
-				response = camel_imap_command (store, NULL, ex, "ENABLE %s", enable_line->str);
-				if (response)
-					camel_imap_response_free_without_processing (store, response);
+				if (enable_line->len) {
+					response = camel_imap_command (store, NULL, ex, "ENABLE %s", enable_line->str);
+					if (response)
+						camel_imap_response_free_without_processing (store, response);
+				}
 				g_string_free (enable_line, TRUE);
 			}
 		}
