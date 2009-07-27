@@ -3563,7 +3563,7 @@ imap_update_summary (CamelFolder *folder, int exists,
 				  	int r;
 				  	if (curlen > sequence)
 				  	{
-				  		for (r = curlen-1; r >= sequence -1; r--)
+				  		for (r = curlen-1; r > sequence; r--)
 				  		{
 				  			CamelMessageInfo *ri;
 				  			g_warning ("Problem with your local summary store (too much), correcting: curlen=%d, r=%d, seq=%d\n", curlen, r, sequence);
