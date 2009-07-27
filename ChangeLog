@@ -1,3 +1,12 @@
+2009-07-27  Jose Dapena Paz  <jdapena@igalia.com>
+
+	Avoid a crash iterating in imap summary if it's corrupted.
+    
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c
+	(imap_update_summary): if summary is bigger than the sequence number
+	coming from server, summary is corrupt. We were iterating wrongly to
+	remove the extra elements, and could cause a crash.
+
 2009-07-27  Lucas Maneos <tinymail@subs.maneos.org>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
