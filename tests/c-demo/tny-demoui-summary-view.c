@@ -1697,7 +1697,7 @@ recursive_all_folders (GtkWidget *my_widget, GtkTreeModel *model, GtkTreeIter *i
 					G_CALLBACK (on_move_to_folder_activate), info);
 
 				gtk_widget_show (menuitem);
-				gtk_menu_prepend (menu, menuitem);
+				gtk_menu_shell_prepend (GTK_MENU_SHELL (menu), menuitem);
 			}
 		}
 
@@ -1800,11 +1800,11 @@ mailbox_view_do_popup_menu (GtkWidget *my_widget, GdkEventButton *event, gpointe
 	g_signal_connect (G_OBJECT (mmerge), "activate",
 		G_CALLBACK (on_merge_view_activate), user_data);
 
-	gtk_menu_prepend (menu, mrename);
-	gtk_menu_prepend (menu, mcreate);
-	gtk_menu_prepend (menu, mdelete);
-	gtk_menu_prepend (menu, muncache);
-	gtk_menu_prepend (menu, mmerge);
+	gtk_menu_shell_prepend (GTK_MENU_SHELL (menu), mrename);
+	gtk_menu_shell_prepend (GTK_MENU_SHELL (menu), mcreate);
+	gtk_menu_shell_prepend (GTK_MENU_SHELL (menu), mdelete);
+	gtk_menu_shell_prepend (GTK_MENU_SHELL (menu), muncache);
+	gtk_menu_shell_prepend (GTK_MENU_SHELL (menu), mmerge);
 	gtk_widget_show (mrename);
 	gtk_widget_show (mcreate);
 	gtk_widget_show (mdelete);
