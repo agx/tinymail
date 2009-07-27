@@ -89,6 +89,8 @@ static GObjectClass *parent_class = NULL;
 
 
 static void tny_camel_folder_transfer_msgs_shared (TnyFolder *self, TnyList *headers, TnyFolder *folder_dst, gboolean delete_originals, TnyList *new_headers, GError **err);
+static gboolean load_folder_no_lock (TnyCamelFolderPriv *priv);
+static void folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer user_data);
 
 
 
@@ -338,33 +340,22 @@ folder_tracking_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info,
 	   this notification will be received by folder_changed as
 	   well. Checks for folder_changed_id and loaded are harmless
 	   and unlikely needed */
-	if (priv->folder && priv->folder_changed_id && priv->loaded)
-		return;
-
-	if (!priv->handle_changes)
-		return;
-
-	if (!g_static_rec_mutex_trylock (priv->folder_lock)) {
+	g_static_rec_mutex_lock (priv->folder_lock);
+	if (priv->folder && priv->folder_changed_id && priv->loaded) {
 		g_static_rec_mutex_unlock (priv->folder_lock);
 		return;
 	}
 
-	/* Update message counts */
-	priv->cached_length = (guint) camel_folder_get_message_count (camel_folder);
-	priv->unread_length = (guint) camel_folder_get_unread_message_count (camel_folder);
-	change = tny_folder_change_new (TNY_FOLDER (self));
+	_tny_camel_folder_reason (priv);
+	if (!load_folder_no_lock (priv)) {
+		_tny_camel_folder_unreason (priv);
+		g_static_rec_mutex_unlock (priv->folder_lock);
+		return;
+	}
 
-	/* Update iter */
-	update_iter_counts (priv);
+	folder_changed (camel_folder, info, priv);
+	_tny_camel_folder_unreason (priv);
 	g_static_rec_mutex_unlock (priv->folder_lock);
-
-	tny_folder_change_set_new_unread_count (change, priv->unread_length);
-	tny_folder_change_set_new_all_count (change, priv->cached_length);
-	priv->dont_fkill = TRUE;
-	notify_folder_observers_about_in_idle (TNY_FOLDER (self), change,
-					       TNY_FOLDER_PRIV_GET_SESSION (priv));
-	g_object_unref (change);
-	priv->dont_fkill = old;
 
 	return;
 }

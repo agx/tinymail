@@ -7,6 +7,12 @@
 	coming from server, summary is corrupt. We were iterating wrongly to
 	remove the extra elements, and could cause a crash.
 
+	* libtinymail-camel/tny-camel-folder.c (folder_tracking_changed):
+	reimplemented to load the summary when we get a folder changed
+	event from camel, and use the standard folder_changed handler.
+	Avoids crashes if the camel folder is freed earlier than
+	folder changed handling finishes.
+
 2009-07-27  Lucas Maneos <tinymail@subs.maneos.org>
 
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
