@@ -4099,6 +4099,9 @@ idle_thread (gpointer data)
 	}
 
 
+	while (store->idle_thread != g_thread_self ())
+		usleep (100);
+
 	/* We add our own reference because the calling thread will immediately
 	 * after the GCond broadcast free the info (and its references). We add
 	 * this reference 'before' we broadcast! Of course. */

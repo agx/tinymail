@@ -1,3 +1,10 @@
+2009-07-30  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c
+	(idle_thread): loop while the store->idle_thread is not assigned, to
+	avoid unexpected behavior for not being able to detect if we're
+	starting or stopping idle from idle thread.
+
 2009-07-27  Javier Jardon  <javierjc11982@gmail.com>
 
 	* tests/c-demo/tny-demoui-summary-view.c (recursive_all_folders):
