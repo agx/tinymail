@@ -4429,9 +4429,6 @@ err_goto_lbl:
 	{
 		/* if (delete_originals) 
 			camel_folder_sync (cfol_src, TRUE, &ex); */
-
-		if (camel_exception_is_set (&ex))
-			_tny_camel_exception_to_tny_error (&ex, err);
 	}
 
 	priv_src->handle_changes = TRUE;
