@@ -3967,11 +3967,12 @@ process_idle_untagged_response (CamelImapStore *store, CamelFolder *folder, Idle
 				*idle_response = idle_response_new (folder);
 			consume_idle_line (store, folder, resp, *idle_response);
 		}
-		
 		if (resp)
 			g_free (resp);
 		resp = NULL;
 	}
+	if (resp)
+		g_free (resp);
 }
 
 static void
