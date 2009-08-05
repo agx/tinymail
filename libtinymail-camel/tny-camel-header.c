@@ -40,36 +40,37 @@
 
 static GObjectClass *parent_class = NULL;
 
-
-void 
-_tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit)
+static void
+summary_finalized (CamelObject *summary, gpointer event_data, gpointer user_data)
 {
-	if (!knowit && G_UNLIKELY (self->info))
-		g_warning ("Strange behaviour: Overwriting existing message info");
+	CamelMessageInfo *info = (CamelMessageInfo *) user_data;
 
-	if (self->info)
-		camel_message_info_free (self->info);
-
-	camel_message_info_ref (camel_message_info);
-	self->info = camel_message_info;
-
-	return;
+	info->summary = NULL;
 }
 
-void 
-_tny_camel_header_set_as_memory (TnyCamelHeader *self, CamelMessageInfo *info)
+void
+_tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo *camel_message_info)
 {
 	if (G_UNLIKELY (self->info))
 		g_warning ("Strange behaviour: Overwriting existing message info");
 
-	if (self->info)
+	if (self->info) {
+		if (self->info->summary)
+			camel_object_unhook_event (self->info->summary, "finalize", summary_finalized, self->info);
 		camel_message_info_free (self->info);
+	}
 
-	self->info = info;
+	camel_message_info_ref (camel_message_info);
+	self->info = camel_message_info;
+
+	/* Check that summary is not freed. If the summary is
+	   destroyed before this instance is freed then we must not
+	   try to free it again */
+	if (self->info->summary)
+		camel_object_hook_event (self->info->summary, "finalize", summary_finalized, self->info);
 
 	return;
 }
-
 
 static gchar*
 tny_camel_header_dup_replyto (TnyHeader *self)
@@ -308,8 +309,11 @@ tny_camel_header_finalize (GObject *object)
 {
 	TnyCamelHeader *self = (TnyCamelHeader*) object;
 
-	if (self->info)
+	if (self->info) {
+		if (self->info->summary)
+			camel_object_unhook_event (self->info->summary, "finalize", summary_finalized, self->info);
 		camel_message_info_free (self->info);
+	}
 
 	if (self->folder) {
 		TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (self->folder);

@@ -1,5 +1,12 @@
 2009-08-05  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail-camel/tny-camel-folder.c (folder_changed): replaced
+	_tny_camel_header_set_as_memory calls by _tny_camel_header_set_camel_message_info
+
+	* libtinymail-camel/tny-camel-header.c
+	(_tny_camel_header_set_camel_message_info): add a hook to finalize
+	of summary object. This will prevent double frees of the folder summary.
+
 	* libtinymail-camel/tny-camel-folder.c (notify_folder_store_observers_about_in_idle)
 	(notify_folder_observers_about_in_idle): check that session is not
 	NULL before adding a reference to it as it could cause an invalid dereference

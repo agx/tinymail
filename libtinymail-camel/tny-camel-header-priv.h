@@ -60,9 +60,8 @@ struct _TnyCamelHeaderClass
 GType tny_camel_header_get_type (void);
 TnyHeader* _tny_camel_header_new (void);
 
-void _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo *camel_message_info, gboolean knowit);
+void _tny_camel_header_set_camel_message_info (TnyCamelHeader *self, CamelMessageInfo *camel_message_info);
 void _tny_camel_header_set_folder (TnyCamelHeader *self, TnyCamelFolder *folder, TnyCamelFolderPriv *tpriv);
-void _tny_camel_header_set_as_memory (TnyCamelHeader *self, CamelMessageInfo *camel_message_info);
 
 G_END_DECLS
 

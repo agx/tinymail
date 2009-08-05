@@ -440,7 +440,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 						TNY_CAMEL_FOLDER (self), priv);
 					/* hdr will take care of the freeup*/
-					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
+					_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (hdr), minfo);
 					tny_folder_change_add_added_header (change, hdr);
 					g_object_unref (hdr);
 				}
@@ -469,7 +469,7 @@ folder_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info, gpointer
 					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 						TNY_CAMEL_FOLDER (self), priv);
 					/* hdr will take care of the freeup */
-					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
+					_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (hdr), minfo);
 					tny_folder_change_add_expunged_header (change, hdr);
 					g_object_unref (hdr);
 				}
@@ -840,7 +840,7 @@ tny_camel_folder_add_msg_shared (TnyFolder *self, TnyMsg *msg, TnyFolderChange *
 					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 						TNY_CAMEL_FOLDER (self), priv);
 					/* hdr will take care of the freeup */
-					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), om);
+					_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (hdr), om);
 					if (change)
 						tny_folder_change_add_added_header (change, hdr);
 					g_object_unref (hdr);
@@ -2241,7 +2241,7 @@ add_message_with_uid (gpointer data, gpointer user_data)
 
 	header = _tny_camel_header_new ();
 	_tny_camel_header_set_folder ((TnyCamelHeader *) header, (TnyCamelFolder *) self, priv);
-	_tny_camel_header_set_camel_message_info ((TnyCamelHeader *) header, mi, FALSE);
+	_tny_camel_header_set_camel_message_info ((TnyCamelHeader *) header, mi);
 	tny_list_prepend (headers, (GObject*) header);
 	g_object_unref (header);
 
@@ -3109,7 +3109,7 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 		} else {
 			hdr = _tny_camel_header_new ();
 			_tny_camel_header_set_folder ((TnyCamelHeader *) hdr, (TnyCamelFolder *) self, priv);
-			_tny_camel_header_set_camel_message_info ((TnyCamelHeader *) hdr, info, FALSE);
+			_tny_camel_header_set_camel_message_info ((TnyCamelHeader *) hdr, info);
 			
 			retval = tny_msg_receive_strategy_perform_get_msg (priv->receive_strat, self, hdr, err);
 			if (retval) {
@@ -4362,7 +4362,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 				_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 					TNY_CAMEL_FOLDER (folder_dst), priv_dst);
 				/* hdr will take care of the freeup */
-				_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), minfo);
+				_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (hdr), minfo);
 				succeeded_news = g_list_prepend (succeeded_news, hdr);
 			} else {
 				/* Fallback to the less efficient way */
@@ -4430,7 +4430,7 @@ transfer_msgs_thread_clean (TnyFolder *self, TnyList *headers, TnyList *new_head
 					_tny_camel_header_set_folder (TNY_CAMEL_HEADER (hdr), 
 						TNY_CAMEL_FOLDER (folder_dst), priv_dst);
 					/* hdr will take care of the freeup */
-					_tny_camel_header_set_as_memory (TNY_CAMEL_HEADER (hdr), om);
+					_tny_camel_header_set_camel_message_info (TNY_CAMEL_HEADER (hdr), om);
 					tny_list_prepend (new_headers, (GObject *) hdr);
 					g_object_unref (hdr);
 				} else /* Not-new message, freeup */
@@ -5415,7 +5415,7 @@ _tny_camel_folder_guess_folder_type (TnyCamelFolder *folder, CamelFolderInfo *fo
 		if (!g_ascii_strcasecmp (folder_info->name, "inbox")) {
 			/* Needed as some dovecot servers report the inbox as
 			 * normal */
-			TnyFolderStore *store = tny_folder_get_folder_store (folder);
+			TnyFolderStore *store = tny_folder_get_folder_store (TNY_FOLDER (folder));
 			if (store) {
 				if (TNY_IS_ACCOUNT (store))
 					priv->cached_folder_type = TNY_FOLDER_TYPE_INBOX;
