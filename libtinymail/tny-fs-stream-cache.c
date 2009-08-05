@@ -271,10 +271,11 @@ fill_from_cache (TnyFsStreamCache *self)
 			priv->current_size += tny_cached_file_get_expected_size (cached_file);
 			g_hash_table_insert (priv->cached_files, g_strdup (filename), cached_file);
 		}
+		g_free (fullname);
 	}
 
 	g_dir_close (dir);
-}				
+}
 
 /**
  * tny_fs_stream_cache_new:

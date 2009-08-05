@@ -4425,8 +4425,8 @@ err_goto_lbl:
 	if (camel_exception_is_set (&ex)) 
 	{
 		_tny_camel_exception_to_tny_error (&ex, err);
-	} else 
-	{
+		camel_exception_clear (&ex);
+	} else {
 		/* if (delete_originals) 
 			camel_folder_sync (cfol_src, TRUE, &ex); */
 	}
