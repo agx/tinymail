@@ -168,8 +168,19 @@ notify_folder_store_observers_about_idle (gpointer user_data)
 static void
 notify_folder_store_observers_about_in_idle (TnyFolderStore *self, TnyFolderStoreChange *change, TnySessionCamel *session)
 {
-	NotFolObInIdleInfo *info = g_slice_new (NotFolObInIdleInfo);
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	NotFolObInIdleInfo *info;
+	TnyCamelFolderPriv *priv;
+
+	/* This could happen as the session argument is sometimes
+	   obtained from TNY_FOLDER_PRIV_GET_SESSION that could return
+	   NULL */
+	if (!session) {
+		g_warning ("%s: session destroyed before notifying observers. Notification will be lost", __FUNCTION__);
+		return;
+	}
+
+	info = g_slice_new (NotFolObInIdleInfo);
+	priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	_tny_camel_folder_reason (priv);
 	info->self = g_object_ref (self);
@@ -225,8 +236,19 @@ notify_folder_observers_about_idle (gpointer user_data)
 static void
 notify_folder_observers_about_in_idle (TnyFolder *self, TnyFolderChange *change, TnySessionCamel *session)
 {
-	NotFolObInIdleInfo *info = g_slice_new (NotFolObInIdleInfo);
-	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
+	NotFolObInIdleInfo *info;
+	TnyCamelFolderPriv *priv;
+
+	/* This could happen as the session argument is sometimes
+	   obtained from TNY_FOLDER_PRIV_GET_SESSION that could return
+	   NULL */
+	if (!session) {
+		g_warning ("%s: session destroyed before notifying observers. Notification will be lost", __FUNCTION__);
+		return;
+	}
+
+	info = g_slice_new (NotFolObInIdleInfo);
+	priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 
 	_tny_camel_folder_reason (priv);
 	info->self = g_object_ref (self);
