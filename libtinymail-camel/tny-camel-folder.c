@@ -5521,6 +5521,9 @@ tny_camel_folder_get_folders_default (TnyFolderStore *self, TnyList *list, TnyFo
 	if (!cant_reuse_iter)
 		cant_reuse_iter = priv->cant_reuse_iter;
 
+	if (!cant_reuse_iter)
+		cant_reuse_iter = refresh;
+
 	if ((!priv->iter && priv->iter_parented) || cant_reuse_iter)
 	{
 		CamelStore *store = priv->store;
