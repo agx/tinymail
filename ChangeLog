@@ -1,5 +1,9 @@
 2009-08-07  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c
+	(recurse_folders_async_cb): remove the folders already present on
+	model that are not listed by provider
+
 	* libtinymail-camel/tny-camel-folder.c
 	(tny_camel_folder_get_folders_default): do not reuse iter when
 	getting the folders and refresh=TRUE

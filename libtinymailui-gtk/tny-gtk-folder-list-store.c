@@ -233,7 +233,6 @@ recurse_folders_async_cb (TnyFolderStore *store,
 	gchar *parent_name;
 	gboolean do_poke_status;
 	_RefreshInfo *info;
-		
 
 	info = (_RefreshInfo *) user_data;
 	self = info->self;
@@ -412,6 +411,64 @@ recurse_folders_async_cb (TnyFolderStore *store,
 	g_object_unref (iter);
 
 	g_free (parent_name);
+
+	/* Remove objects present in the model that are not in the
+	   list returned by the folder store */
+	GtkTreeIter model_iter;
+	GtkTreeModel *mmodel = (GtkTreeModel *) self;
+	if (gtk_tree_model_get_iter_first (mmodel, &model_iter)) {
+		do {
+			GObject *citem = NULL;
+			gboolean found;
+			gboolean process;
+
+			found = FALSE;
+			process = FALSE;
+
+			gtk_tree_model_get (mmodel, &model_iter,
+					    TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN,
+					    &citem, -1);
+
+			/* Only process the model item if its parent
+			   is the store passed as parametter */
+			if (TNY_IS_FOLDER (citem) && !TNY_IS_MERGE_FOLDER (citem)) {
+				TnyFolderStore *f_store = tny_folder_get_folder_store (TNY_FOLDER (citem));
+				if (f_store) {
+					if (f_store == store)
+						process = TRUE;
+					g_object_unref (f_store);
+				}
+			}
+
+			/* The list of folders is not supposed to be large so this should be really fast */
+			if (process) {
+				TnyIterator *niter = NULL;
+
+				niter = tny_list_create_iterator (folders);
+				while (!found && !tny_iterator_is_done (niter)) {
+					TnyFolderStore *store = (TnyFolderStore *) tny_iterator_get_current (niter);
+					if (store) {
+						if ((GObject *) store == citem)
+							found = TRUE;
+						g_object_unref (store);
+					}
+					tny_iterator_next (niter);
+				}
+				g_object_unref (niter);
+
+				/* Remove from model if it's not present in the list returned by provider */
+				if (!found)
+					gtk_list_store_remove ((GtkListStore *) mmodel, &model_iter);
+			}
+
+			if (citem)
+				g_object_unref (citem);
+
+			if (!process || found)
+				gtk_tree_model_iter_next (mmodel, &model_iter);
+
+		} while (gtk_list_store_iter_is_valid ((GtkListStore*) mmodel, &model_iter));
+	}
 
 	if (self->progress_count > 0) {
 		self->progress_count--;
