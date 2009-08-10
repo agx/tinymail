@@ -1,3 +1,9 @@
+2009-08-10  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/camel-lite/camel/ (cmd_tocache): protect a
+	buffer passed to strlen with the null character '\0' in order to
+	fix a conditional jump reported by valgrind
+
 2009-08-07  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c
