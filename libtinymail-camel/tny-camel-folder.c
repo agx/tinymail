@@ -362,7 +362,9 @@ folder_tracking_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info,
 	   this notification will be received by folder_changed as
 	   well. Checks for folder_changed_id and loaded are harmless
 	   and unlikely needed */
-	g_static_rec_mutex_lock (priv->folder_lock);
+	if (!g_static_rec_mutex_trylock (priv->folder_lock))
+		return;
+
 	if (priv->folder && priv->folder_changed_id && priv->loaded) {
 		g_static_rec_mutex_unlock (priv->folder_lock);
 		return;
