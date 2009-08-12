@@ -46,6 +46,7 @@ struct _TnyFsStreamCachePriv
 	gint64 max_size;
 	gint64 current_size;
 	GHashTable *cached_files;
+	GStaticMutex *cache_lock;
 };
 
 #define TNY_FS_STREAM_CACHE_GET_PRIVATE(o)	\
@@ -71,7 +72,9 @@ get_available_size (TnyFsStreamCache *self)
 	guint64 active_files_size = 0;
 	priv = TNY_FS_STREAM_CACHE_GET_PRIVATE (self);
 
+	g_static_mutex_lock (priv->cache_lock);
 	g_hash_table_foreach (priv->cached_files, (GHFunc) count_active_files_size, &active_files_size);
+	g_static_mutex_unlock (priv->cache_lock);
 
 	/* if available size < 0 it means we shrinked cache and we need to drop files */
 	return priv->max_size - active_files_size;
@@ -84,7 +87,9 @@ get_free_space (TnyFsStreamCache *self)
 	guint64 files_size = 0;
 	priv = TNY_FS_STREAM_CACHE_GET_PRIVATE (self);
 
+	g_static_mutex_lock (priv->cache_lock);
 	g_hash_table_foreach (priv->cached_files, (GHFunc) count_files_size, &files_size);
+	g_static_mutex_unlock (priv->cache_lock);
 
 	/* if available size < 0 it means we shrinked cache and we need to drop files */
 	return priv->max_size - files_size;
@@ -130,7 +135,9 @@ remove_old_files (TnyFsStreamCache *self, gint64 required_size)
 
 	/* 1. we obtain a list of non active files */
 	cached_files_list = NULL;
+	g_static_mutex_lock (priv->cache_lock);
 	g_hash_table_foreach (priv->cached_files, (GHFunc) get_inactive_files_list, &cached_files_list);
+	g_static_mutex_unlock (priv->cache_lock);
 
 	/* 2. we sort the list (first uncomplete, then old) */
 	cached_files_list = g_list_sort (cached_files_list, (GCompareFunc) remove_priority);
@@ -140,7 +147,9 @@ remove_old_files (TnyFsStreamCache *self, gint64 required_size)
 	while (available_size < required_size) {
 		TnyCachedFile *cached_file = (TnyCachedFile *) cached_files_list->data;
 		available_size += tny_cached_file_get_expected_size (cached_file);
+		g_static_mutex_lock (priv->cache_lock);
 		g_hash_table_remove (priv->cached_files, tny_cached_file_get_id (cached_file));
+		g_static_mutex_unlock (priv->cache_lock);
 		tny_cached_file_remove (cached_file);
 		cached_files_list = g_list_delete_link (cached_files_list, cached_files_list);
 		g_object_unref (cached_file);
@@ -163,7 +172,9 @@ tny_fs_stream_cache_get_stream (TnyStreamCache *self, const gchar *id,
 	g_return_val_if_fail (id, NULL);
 	priv = TNY_FS_STREAM_CACHE_GET_PRIVATE (self);
 
+	g_static_mutex_lock (priv->cache_lock);
 	cached_file = g_hash_table_lookup (priv->cached_files, id);
+	g_static_mutex_unlock (priv->cache_lock);
 	if (cached_file) {
 		result = tny_cached_file_get_stream (cached_file);
 	} else {
@@ -178,7 +189,9 @@ tny_fs_stream_cache_get_stream (TnyStreamCache *self, const gchar *id,
 		if (expected_size <= get_available_size (TNY_FS_STREAM_CACHE (self))) {
 			remove_old_files (TNY_FS_STREAM_CACHE (self), expected_size);
 			cached_file = tny_cached_file_new (TNY_FS_STREAM_CACHE (self), id, expected_size, input_stream);
+			g_static_mutex_lock (priv->cache_lock);
 			g_hash_table_insert (priv->cached_files, g_strdup (id), cached_file);
+			g_static_mutex_unlock (priv->cache_lock);
 			result = tny_cached_file_get_stream (cached_file);
 		}
 	}
@@ -243,7 +256,9 @@ tny_fs_stream_cache_remove (TnyStreamCache *self, TnyStreamCacheRemoveFilter fil
 	remove_filter_data->filter = filter;
 	remove_filter_data->userdata = userdata;
 
+	g_static_mutex_lock (priv->cache_lock);
 	g_hash_table_foreach_remove (priv->cached_files, (GHRFunc) remove_filter, (gpointer) remove_filter_data);
+	g_static_mutex_unlock (priv->cache_lock);
 
 	g_slice_free (RemoveFilterData, remove_filter_data);
 }
@@ -269,7 +284,9 @@ fill_from_cache (TnyFsStreamCache *self)
 
 			cached_file = tny_cached_file_new (self, filename, 0, NULL);
 			priv->current_size += tny_cached_file_get_expected_size (cached_file);
+			g_static_mutex_lock (priv->cache_lock);
 			g_hash_table_insert (priv->cached_files, g_strdup (filename), cached_file);
+			g_static_mutex_unlock (priv->cache_lock);
 		}
 		g_free (fullname);
 	}
@@ -328,6 +345,7 @@ tny_fs_stream_cache_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->path = NULL;
 	priv->max_size = 0;
 	priv->cached_files = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+	priv->cache_lock = g_new0 (GStaticMutex, 1);
 
 	return;
 }
@@ -338,13 +356,25 @@ tny_fs_stream_cache_finalize (GObject *object)
 	TnyFsStreamCache *self = (TnyFsStreamCache *)object;
 	TnyFsStreamCachePriv *priv = TNY_FS_STREAM_CACHE_GET_PRIVATE (self);
 
-	if (priv->cached_files)
+	if (priv->cached_files) {
+		if (priv->cache_lock)
+			g_static_mutex_lock (priv->cache_lock);
 		g_hash_table_unref (priv->cached_files);
+		priv->cached_files = NULL;
+		if (priv->cache_lock)
+			g_static_mutex_unlock (priv->cache_lock);
+	}
+
+	if (priv->cache_lock) {
+		g_free (priv->cache_lock);
+		priv->cache_lock = NULL;
+	}
 
 	if (priv->path) {
 		g_free (priv->path);
 		priv->path = NULL;
 	}
+
 	(*parent_class->finalize) (object);
 	return;
 }
