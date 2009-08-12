@@ -364,10 +364,17 @@ const char *e_iconv_charset_name(const char *charset)
 	if (charset == NULL)
 		return NULL;
 
+	/* The current longest charsetname in
+	   http://www.iana.org/assignments/character-sets is 45, so 80
+	   should be more than enough to avoid SIGSEVS caused by
+	   specially huge malformed charset names */
+	if (strlen (charset) > 80)
+		return NULL;
+
 	name = g_alloca (strlen (charset) + 1);
 	strcpy (name, charset);
 	e_strdown (name);
-	
+
 	e_iconv_init(TRUE);
 	ret = g_hash_table_lookup(iconv_charsets, name);
 	if (ret != NULL) {
