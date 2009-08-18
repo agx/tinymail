@@ -143,16 +143,17 @@ tny_maemo_conic_device_reset (TnyDevice *device)
 	gboolean status_before = FALSE;
 
 	g_return_if_fail (TNY_IS_DEVICE(device));
+
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
-	status_before = tny_maemo_conic_device_is_online (device);
 	priv->forced = FALSE;
 
-	if (status_before != tny_maemo_conic_device_is_online (device))
-		conic_emit_status (device, !status_before);
-
-	return;
+	/* The only way to get the connection status is by issuing a
+	   connection request with the AUTOMATICALLY_TRIGGERED
+	   flag. Yes it's really sad, but there is no other way to do
+	   that */
+	tny_maemo_conic_device_connect_async ((TnyMaemoConicDevice *) device, NULL, FALSE, NULL, NULL);
 }
 
 
@@ -187,9 +188,10 @@ dummy_con_ic_connection_connect_by_id_async_cb (GtkWidget *dialog,
 				__FUNCTION__, error->message);
 		}
 		g_free (filename);
-	}
-	else
+	} else {
 		canceled = TRUE;
+		on_dummy_connection_check (info->self);
+	}
 
 	/* No need to gdk_threads_enter/leave here. We are in Gtk+'s context
 	 * already (being a signal handler for a Gtk+ component) */
@@ -201,7 +203,8 @@ dummy_con_ic_connection_connect_by_id_async_cb (GtkWidget *dialog,
 		g_error_free (error);
 	error = NULL;
 
-	gtk_widget_destroy (dialog);
+	if (dialog)
+		gtk_widget_destroy (dialog);
 
 	g_free (info->iap_id);
 	g_object_unref (info->self);
@@ -213,6 +216,7 @@ dummy_con_ic_connection_connect_by_id_async_cb (GtkWidget *dialog,
 static void 
 dummy_con_ic_connection_connect_by_id_async (TnyMaemoConicDevice *self, 
 					     const gchar* iap_id, 
+					     gboolean user_requested,
 					     TnyMaemoConicDeviceConnectCallback callback, 
 					     gpointer user_data)
 {
@@ -228,16 +232,19 @@ dummy_con_ic_connection_connect_by_id_async (TnyMaemoConicDevice *self,
 	 * and give the user a chance to refuse a new connection, because libconic would allow that too.
 	 * This allows us to see roughly similar behaviour in scratchbox as on the device. */
 
-	dialog = GTK_DIALOG (gtk_message_dialog_new( NULL, GTK_DIALOG_MODAL,
-			GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL, 
-			"TnyMaemoConicDevice fake scratchbox implementation:\nThe application requested a connection. Make a fake connection?"));
+	if (user_requested) {
+		dialog = GTK_DIALOG (gtk_message_dialog_new( NULL, GTK_DIALOG_MODAL,
+							     GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL,
+							     "TnyMaemoConicDevice fake scratchbox implementation:\nThe application requested a connection. Make a fake connection?"));
 
-	g_signal_connect (dialog, "response",
-			  G_CALLBACK (dummy_con_ic_connection_connect_by_id_async_cb),
-			  info);
+		g_signal_connect (dialog, "response",
+				  G_CALLBACK (dummy_con_ic_connection_connect_by_id_async_cb),
+				  info);
 
-	gtk_widget_show (GTK_WIDGET (dialog));
-
+		gtk_widget_show (GTK_WIDGET (dialog));
+	} else {
+		dummy_con_ic_connection_connect_by_id_async_cb (NULL, GTK_RESPONSE_CANCEL, info);
+	}
 }
 
 
@@ -254,14 +261,14 @@ dummy_con_ic_connection_connect_by_id_async (TnyMaemoConicDevice *self,
  * This may show a dialog to allow the user to select a connection, or 
  * may otherwise take a significant amount of time. 
  **/
-void  
+void
 tny_maemo_conic_device_connect_async (TnyMaemoConicDevice *self, 
 				      const gchar* iap_id, 
 				      gboolean user_requested,
 				      TnyMaemoConicDeviceConnectCallback callback, 
 				      gpointer user_data)
 {
-	dummy_con_ic_connection_connect_by_id_async (self, iap_id, callback, user_data);
+	dummy_con_ic_connection_connect_by_id_async (self, iap_id, user_requested, callback, user_data);
 	return;
 }
 
@@ -301,7 +308,10 @@ on_dummy_connection_check (gpointer user_data)
 	self = TNY_MAEMO_CONIC_DEVICE (user_data);
 
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
-	
+
+	if (priv->forced)
+		return TRUE;
+
 	/* Check whether the enviroment variable has changed, 
 	 * so we can fake a connection change: */
 	filename = get_dummy_filename ();
@@ -487,6 +497,11 @@ tny_maemo_conic_device_force_online (TnyDevice *device)
 	priv->forced = TRUE;
 	priv->is_online = TRUE;
 
+	if (priv->iap) {
+		g_free (priv->iap);
+		priv->iap = NULL;
+	}
+
 	/* Signal if it changed: */
 	if (!already_online)
 		g_signal_emit (device, tny_device_signals [TNY_DEVICE_CONNECTION_CHANGED], 0, TRUE);
@@ -509,6 +524,11 @@ tny_maemo_conic_device_force_offline (TnyDevice *device)
 	already_offline = !tny_maemo_conic_device_is_online (device);
 	priv->forced = TRUE;
 	priv->is_online = FALSE;
+
+	if (priv->iap) {
+		g_free (priv->iap);
+		priv->iap = NULL;
+	}
 
 	/* Signal if it changed: */
 	if (!already_offline)

@@ -144,23 +144,24 @@ conic_emit_status (TnyDevice *self, gboolean status)
 		info, conic_emit_status_destroy);
 }
 
-static void 
+static void
 tny_maemo_conic_device_reset (TnyDevice *device)
 {
 	TnyMaemoConicDevice *self;
 	TnyMaemoConicDevicePriv *priv;
-	gboolean status_before = FALSE;
 
 	g_return_if_fail (TNY_IS_DEVICE(device));
-	
+
 	self = TNY_MAEMO_CONIC_DEVICE (device);
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
-	status_before = tny_maemo_conic_device_is_online (device);
 	priv->forced = FALSE;
 
-	if (status_before != tny_maemo_conic_device_is_online (device))
-		conic_emit_status (device, !status_before);
+	/* The only way to get the connection status is by issuing a
+	   connection request with the AUTOMATICALLY_TRIGGERED
+	   flag. Yes it's really sad, but there is no other way to do
+	   that */
+	tny_maemo_conic_device_connect_async (device, priv->iap, FALSE, NULL, NULL);
 }
 
 static void
@@ -654,26 +655,19 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->cnx = con_ic_connection_new ();
 	g_static_mutex_init (&priv->connect_slots_lock);
 
-	if (!priv->cnx) {	
+	if (!priv->cnx) {
 		g_warning ("%s: con_ic_connection_new failed.", __FUNCTION__);
 		return;
 	}
 
-	/* This might be necessary to make the connection object actually emit 
-	 * the signal, though the documentation says that they should be sent 
-	 * even when this is not set, when we explicitly try to connect. The 
+	/* This might be necessary to make the connection object actually emit
+	 * the signal, though the documentation says that they should be sent
+	 * even when this is not set, when we explicitly try to connect. The
 	 * signal still does not seem to be emitted. */
 	g_object_set (priv->cnx, "automatic-connection-events", TRUE, NULL);
 
 	priv->signal1 = (gint) g_signal_connect (priv->cnx, "connection-event",
-			  G_CALLBACK(on_connection_event), self);
-
-	/* This will get us in connected state only if there is already a connection.
-	 * thus, this will setup our state correctly when we receive the signals. */
-	if (!con_ic_connection_connect (priv->cnx, 
-					CON_IC_CONNECT_FLAG_AUTOMATICALLY_TRIGGERED))
-		g_warning ("%s: could not send connect dbus message",
-			__FUNCTION__);	
+						 G_CALLBACK(on_connection_event), self);
 }
 
 
