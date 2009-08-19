@@ -935,7 +935,7 @@ cmd_totop(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 {
 	CamelPOP3Store *tstore = (CamelPOP3Store *) pe->store;
 	CamelPOP3FolderInfo *fi = data;
-	char buffer[2048];
+	char buffer[2049];
 	int w = 0, n;
 	int retval = 1;
 
@@ -946,11 +946,12 @@ cmd_totop(CamelPOP3Engine *pe, CamelPOP3Stream *stream, void *data)
 	if ((n = camel_stream_write(fi->stream, "*", 1)) == -1)
 		goto done;
 
-	while ((n = camel_stream_read((CamelStream *)stream, buffer, sizeof(buffer))) > 0) {
+	while ((n = camel_stream_read((CamelStream *)stream, buffer, sizeof(buffer) - 1)) > 0) {
 		n = camel_stream_write(fi->stream, buffer, n);
 		if (n == -1)
 			break;
 
+		buffer[n] = '\0';
 		/* heuristics */
 		if (camel_strstrcase (buffer, "Content-Disposition: attachment") != NULL)
 			fi->has_attachments = TRUE;
