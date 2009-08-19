@@ -517,6 +517,7 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 #else
 			errno = EIO;
 #endif
+			goto failed;
 		} else {
 			 do {
 				nread = -1;
@@ -532,7 +533,7 @@ stream_read_nb (CamelTcpStream *stream, char *buffer, size_t n)
 	} while (0 && (nread == -1 && (PR_GetError () == PR_PENDING_INTERRUPT_ERROR ||
 				 PR_GetError () == PR_IO_PENDING_ERROR ||
 				 PR_GetError () == PR_WOULD_BLOCK_ERROR)));
-
+ failed:
 	/* restore O_NONBLOCK options */
 	sockopts.option = PR_SockOpt_Nonblocking;
 	sockopts.value.non_blocking = nonblock;
@@ -587,6 +588,7 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 #else
 				errno = EIO;
 #endif
+				goto failed1;
 			} else {
 				do {
 					nread = -1;
@@ -602,6 +604,7 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 					 PR_GetError () == PR_IO_PENDING_ERROR ||
 					 PR_GetError () == PR_WOULD_BLOCK_ERROR));
 
+	failed1:
 		/* restore O_NONBLOCK options */
 		error = errno;
 		sockopts.option = PR_SockOpt_Nonblocking;
@@ -645,10 +648,10 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 #else
 				errno = EIO;
 #endif
-				goto failed;
+				goto failed2;
 			} else if (pollfds[1].out_flags == PR_POLL_READ) {
 				errno = EINTR;
-				goto failed;
+				goto failed2;
 			} else {
 				do {
 					nread = -1;
@@ -665,7 +668,7 @@ stream_read (CamelStream *stream, char *buffer, size_t n)
 					 PR_GetError () == PR_WOULD_BLOCK_ERROR));
 
 		/* restore O_NONBLOCK options */
-	failed:
+	failed2:
 		error = errno;
 		sockopts.option = PR_SockOpt_Nonblocking;
 		sockopts.value.non_blocking = nonblock;
