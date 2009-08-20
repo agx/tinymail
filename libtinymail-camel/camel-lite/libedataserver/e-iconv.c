@@ -470,13 +470,16 @@ iconv_t e_iconv_open(const char *oto, const char *ofrom)
 	int errnosav;
 	iconv_t ip;
 
-	if (oto == NULL || ofrom == NULL) {
+	to = e_iconv_charset_name (oto);
+	from = e_iconv_charset_name (ofrom);
+
+	/* e_iconv_charset_name() could return NULL in case of invalid charset.
+	   So, we need to check them here. */
+	if (to == NULL || from == NULL) {
 		errno = EINVAL;
 		return (iconv_t) -1;
 	}
-	
-	to = e_iconv_charset_name (oto);
-	from = e_iconv_charset_name (ofrom);
+
 	tofrom = g_alloca (strlen (to) + strlen (from) + 2);
 	sprintf(tofrom, "%s%%%s", to, from);
 
@@ -630,10 +633,11 @@ e_iconv_charset_language (const char *charset)
 {
 	int i;
 	
+	charset = e_iconv_charset_name (charset);
+
 	if (!charset)
 		return NULL;
 	
-	charset = e_iconv_charset_name (charset);
 	for (i = 0; i < NUM_CJKR_LANGS; i++) {
 		if (!g_ascii_strcasecmp (cjkr_lang_map[i].charset, charset))
 			return cjkr_lang_map[i].lang;
