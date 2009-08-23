@@ -1,5 +1,10 @@
 2009-08-20  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail-camel/tny-camel-folder.c (do_notify_in_idle_destroy)
+	(notify_folder_observers_about_in_idle): add a reference to the
+	folder summary before notifying the observers in order to keep
+	alive the summary instance the TnyCamelHeaders point to.
+
 	* libedataserver/e-iconv.c (e_iconv_open)
 	(e_iconv_charset_language): added a couple of extra checks to
 	prevent crashes with malformed emails with large amounts of data

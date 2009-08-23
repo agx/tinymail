@@ -106,6 +106,17 @@ do_notify_in_idle_destroy (gpointer user_data)
 	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) user_data;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
 
+	if (TNY_IS_FOLDER_CHANGE (info->change)) {
+		TnyFolderChangeChanged changed = tny_folder_change_get_changed  ((TnyFolderChange *) info->change);
+
+		/* Remove the extra reference to the summary if the change
+		   contains headers */
+		if (changed & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS ||
+		    changed & TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS) {
+			camel_object_unref (priv->folder->summary);
+		}
+	}
+
 	g_object_unref (info->change);
 	_tny_camel_folder_unreason (priv);
 	g_object_unref (info->self);
@@ -238,6 +249,7 @@ notify_folder_observers_about_in_idle (TnyFolder *self, TnyFolderChange *change,
 {
 	NotFolObInIdleInfo *info;
 	TnyCamelFolderPriv *priv;
+	TnyFolderChangeChanged changed;
 
 	/* This could happen as the session argument is sometimes
 	   obtained from TNY_FOLDER_PRIV_GET_SESSION that could return
@@ -255,6 +267,19 @@ notify_folder_observers_about_in_idle (TnyFolder *self, TnyFolderChange *change,
 	info->change = g_object_ref (change);
 	info->session = session;
 	camel_object_ref (info->session);
+
+	if (TNY_IS_FOLDER_CHANGE (change)) {
+		/* Increase the summary references, we have to do it, because
+		   TnyFolderChange contains TnyCamelHeader instances and those
+		   instances hold a pointer to the summary, and the summary
+		   could be freed (if the folder is unloaded for example),
+		   before the idle handler is run */
+		changed = tny_folder_change_get_changed  (change);
+		if (changed & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS ||
+		    changed & TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS) {
+			camel_object_ref (priv->folder->summary);
+		}
+	}
 
 	g_idle_add_full (G_PRIORITY_HIGH, notify_folder_observers_about_idle,
 		info, do_notify_in_idle_destroy);
