@@ -156,6 +156,10 @@ tny_maemo_conic_device_reset (TnyDevice *device)
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
 
 	priv->forced = FALSE;
+	if (priv->iap) {
+		g_free (priv->iap);
+		priv->iap = NULL;
+	}
 
 	/* The only way to get the connection status is by issuing a
 	   connection request with the AUTOMATICALLY_TRIGGERED
