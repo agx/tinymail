@@ -4,6 +4,10 @@
 	(tny_maemo_conic_device_reset): clear the priv->iap when reseting
 	the device as it will be no longer valid.
 
+	* camel/camel-mime-part.c (camel_mime_part_set_filename): if the
+	mime-type does not have mime-type then set it as
+	octet-stream. Merged from Camel upstream
+
 2009-08-20  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-folder.c (do_notify_in_idle_destroy)
