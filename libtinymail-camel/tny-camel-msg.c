@@ -511,3 +511,21 @@ tny_camel_msg_get_type (void)
 	return GPOINTER_TO_UINT (once.retval);
 }
 
+void
+tny_camel_msg_parse (TnyMsg *self, TnyStream *stream)
+{
+	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
+	CamelMimeParser *parser;
+	CamelStream *cstream;
+
+	cstream = tny_stream_camel_new (stream);
+
+	parser = camel_mime_parser_new ();
+	camel_mime_parser_init_with_stream (parser, cstream);
+
+	camel_mime_part_construct_from_parser (ppriv->part, parser);
+
+	camel_object_unref (cstream);
+	camel_object_unref (parser);
+}
+

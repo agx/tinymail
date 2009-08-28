@@ -64,6 +64,7 @@ GType tny_camel_msg_get_type (void);
 
 TnyMsg* tny_camel_msg_new (void);
 TnyMsg* tny_camel_msg_new_with_part (CamelMimePart *part);
+void tny_camel_msg_parse (TnyMsg *self, TnyStream *stream);
 
 
 G_END_DECLS

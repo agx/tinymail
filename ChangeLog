@@ -1,3 +1,9 @@
+2009-08-28  Jürg Billeter  <j@bitron.ch>
+
+	* libtinymail-camel/tny-camel-msg.c: (tny_camel_msg_parse):
+	* libtinymail-camel/tny-camel-msg.h: add function to parse message
+	from stream
+
 2009-08-27  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-maemo/tny-maemo-conic-device.c
