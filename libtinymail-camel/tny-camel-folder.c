@@ -98,6 +98,7 @@ typedef struct {
 	GObject *self;
 	GObject *change; 
 	TnySessionCamel *session;
+	CamelFolderSummary *summary;
 } NotFolObInIdleInfo;
 
 static void 
@@ -113,7 +114,8 @@ do_notify_in_idle_destroy (gpointer user_data)
 		   contains headers */
 		if (changed & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS ||
 		    changed & TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS) {
-			camel_object_unref (priv->folder->summary);
+			if (info->summary)
+				camel_object_unref (info->summary);
 		}
 	}
 
@@ -198,6 +200,7 @@ notify_folder_store_observers_about_in_idle (TnyFolderStore *self, TnyFolderStor
 	info->change = g_object_ref (change);
 	info->session = session;
 	camel_object_ref (info->session);
+	info->summary = NULL;
 
 	g_idle_add_full (G_PRIORITY_HIGH, notify_folder_store_observers_about_idle,
 		info, do_notify_in_idle_destroy);
@@ -267,6 +270,7 @@ notify_folder_observers_about_in_idle (TnyFolder *self, TnyFolderChange *change,
 	info->change = g_object_ref (change);
 	info->session = session;
 	camel_object_ref (info->session);
+	info->summary = NULL;
 
 	if (TNY_IS_FOLDER_CHANGE (change)) {
 		/* Increase the summary references, we have to do it, because
@@ -277,7 +281,10 @@ notify_folder_observers_about_in_idle (TnyFolder *self, TnyFolderChange *change,
 		changed = tny_folder_change_get_changed  (change);
 		if (changed & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS ||
 		    changed & TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS) {
-			camel_object_ref (priv->folder->summary);
+			if (priv->folder) {
+				info->summary = priv->folder->summary;
+				camel_object_ref (info->summary);
+			}
 		}
 	}
 
@@ -333,6 +340,7 @@ notify_folder_store_observers_about_for_store_acc_in_idle (TnyFolderStore *self,
 	info->change = g_object_ref (change);
 	info->session = session;
 	camel_object_ref (info->session);
+	info->summary = NULL;
 
 	g_idle_add_full (G_PRIORITY_HIGH, notify_folder_store_observers_about_for_store_acc_idle,
 		info, do_notify_in_idle_destroy_for_acc);

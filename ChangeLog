@@ -1,3 +1,9 @@
+2009-08-31  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c
+	(do_notify_in_idle_destroy): fixes a crash when the TnyFolder does
+	not have a CamfelFolder loaded
+
 2009-08-28  Jürg Billeter  <j@bitron.ch>
 
 	* libtinymail-camel/tny-camel-msg.c: (tny_camel_msg_parse):
