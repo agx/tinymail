@@ -889,7 +889,7 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 		if (errno == EINTR) {
 			camel_exception_set (ex, CAMEL_EXCEPTION_USER_CANCEL, _("Canceled"));
 		} else {
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE,
+			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 					      _("Unable to connect to POP server %s.\n"
 						"Error sending password: %s"),
 					      CAMEL_SERVICE (store)->url->host,
