@@ -106,20 +106,27 @@ do_notify_in_idle_destroy (gpointer user_data)
 {
 	NotFolObInIdleInfo *info = (NotFolObInIdleInfo *) user_data;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (info->self);
+	gboolean remove_reference = FALSE;
 
 	if (TNY_IS_FOLDER_CHANGE (info->change)) {
 		TnyFolderChangeChanged changed = tny_folder_change_get_changed  ((TnyFolderChange *) info->change);
 
-		/* Remove the extra reference to the summary if the change
-		   contains headers */
+		/* Check if we have to remove the extra reference to
+		   the summary if the change contains headers */
 		if (changed & TNY_FOLDER_CHANGE_CHANGED_ADDED_HEADERS ||
 		    changed & TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS) {
-			if (info->summary)
-				camel_object_unref (info->summary);
+			remove_reference = TRUE;
 		}
 	}
-
 	g_object_unref (info->change);
+
+	/* Remove the reference *after* deleting the
+	   TnyFolderChange. Otherwise the unref of the TnyCamelHeaders
+	   could cause a crash as there is no summary */
+	if (remove_reference)
+		if (info->summary)
+			camel_object_unref (info->summary);
+
 	_tny_camel_folder_unreason (priv);
 	g_object_unref (info->self);
 	camel_object_unref (info->session);
@@ -387,9 +394,6 @@ folder_tracking_changed (CamelFolder *camel_folder, CamelFolderChangeInfo *info,
 {
 	TnyCamelFolder *self = user_data;
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyFolderChange *change = NULL;
-	CamelFolderSummary *summary;
-	gboolean old = priv->dont_fkill;
 
 	/* Ignore this callback if the folder is already loaded as
 	   this notification will be received by folder_changed as
