@@ -1,6 +1,13 @@
+2009-09-08  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/camel-list/camel/providers/pop3/camel-pop3-store.c (wait_for_login_delay):
+	replaced a g_static_rec_mutex_lock by a g_static_rec_mutex_trylock
+	to avoid deadlocks when a POP3 account is executing a disconnect
+	caused by pop3_try_authenticate and wait_for_login_delay
+
 2009-09-07  Sergio Villar Senin  <svillar@igalia.com>
 
-	* camel/providers/pop3/camel-pop3-store.c (pop3_try_authenticate):
+	* libtinymail-camel/camel-list/camel/providers/pop3/camel-pop3-store.c (pop3_try_authenticate):
 	do not report connection problems as authentication errors
 
 2009-08-31  Sergio Villar Senin  <svillar@igalia.com>
