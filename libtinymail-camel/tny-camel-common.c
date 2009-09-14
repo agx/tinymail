@@ -214,8 +214,18 @@ split_recipients (gchar *buffer)
 	}
 
 	while (*tmp != '\0') {
-		if (*tmp == '\"')
-			is_quoted = !is_quoted;
+		if (*tmp == '\"') {
+			if (is_quoted) {
+				gchar *next_at = strchr (tmp, '@');
+				if (next_at) {
+					gchar *next_quote = strchr (tmp+1, '"');
+					if (!next_quote || (next_quote > next_at))
+						is_quoted = !is_quoted;
+				}
+			} else {
+				is_quoted = !is_quoted;
+			}
+		}
 		if (*tmp == '\\')
 			tmp++;
 		if ((!is_quoted) && ((*tmp == ',') || (*tmp == ';'))) {
@@ -225,13 +235,13 @@ split_recipients (gchar *buffer)
 			g_ptr_array_add (array, part);
 			start = tmp+1;
 		}
-		
+
 		tmp++;
 	}
 
 	if (start != tmp)
 		g_ptr_array_add (array, g_strstrip (g_strdup (start)));
-	
+
 	g_ptr_array_add (array, NULL);
 	return (gchar **) g_ptr_array_free (array, FALSE);
 }
