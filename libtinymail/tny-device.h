@@ -51,6 +51,7 @@ struct _TnyDeviceIface
 	GTypeInterface parent;
 
 	gboolean (*is_online) (TnyDevice *self);
+	gboolean (*is_forced) (TnyDevice *self);
 
 	void (*force_online) (TnyDevice *self);
 	void (*force_offline) (TnyDevice *self);
@@ -66,6 +67,7 @@ GType tny_device_get_type (void);
 gboolean tny_device_is_online (TnyDevice *self);
 void tny_device_force_online (TnyDevice *self);
 void tny_device_force_offline (TnyDevice *self);
+gboolean tny_device_is_forced (TnyDevice *self);
 void tny_device_reset (TnyDevice *self);
 
 G_END_DECLS

@@ -30,7 +30,7 @@ static GObjectClass *parent_class = NULL;
 static void tny_olpc_device_on_online (TnyDevice *self);
 static void tny_olpc_device_on_offline (TnyDevice *self);
 static gboolean tny_olpc_device_is_online (TnyDevice *self);
-
+static gboolean tny_olpc_device_is_forced (TnyDevice *self);
 
 static gboolean
 emit_status (TnyDevice *self)
@@ -135,6 +135,14 @@ tny_olpc_device_is_online (TnyDevice *self)
 	return retval;
 }
 
+static gboolean
+tny_olpc_device_is_forced (TnyDevice *self)
+{
+	TnyOlpcDevicePriv *priv = TNY_OLPC_DEVICE_GET_PRIVATE (self);
+
+	return priv->fset;
+}
+
 static void
 tny_olpc_device_instance_init (GTypeInstance *instance, gpointer g_class)
 {
@@ -177,6 +185,7 @@ tny_device_init (gpointer g, gpointer iface_data)
 	TnyDeviceIface *klass = (TnyDeviceIface *)g;
 
 	klass->is_online= tny_olpc_device_is_online;
+	klass->is_forced= tny_olpc_device_is_forced
 	klass->reset= tny_olpc_device_reset;
 	klass->force_offline= tny_olpc_device_force_offline;
 	klass->force_online= tny_olpc_device_force_online;

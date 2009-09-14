@@ -41,6 +41,7 @@ static GObjectClass *parent_class = NULL;
 static void tny_gnome_device_on_online (TnyDevice *self);
 static void tny_gnome_device_on_offline (TnyDevice *self);
 static gboolean tny_gnome_device_is_online (TnyDevice *self);
+static gboolean tny_gnome_device_is_forced (TnyDevice *self);
 
 static gboolean
 emit_status (TnyDevice *self)
@@ -195,6 +196,15 @@ tny_gnome_device_is_online (TnyDevice *self)
 	return retval;
 }
 
+static gboolean
+tny_gnome_device_is_forced (TnyDevice *self)
+{
+	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
+
+	return priv->fset;
+}
+
+
 /* #define IMMEDIATE_ONLINE_TEST */
 
 static void
@@ -272,6 +282,7 @@ tny_device_init (gpointer g, gpointer iface_data)
 	TnyDeviceIface *klass = (TnyDeviceIface *)g;
 
 	klass->is_online= tny_gnome_device_is_online;
+	klass->is_forced= tny_gnome_device_is_forced;
 	klass->reset= tny_gnome_device_reset;
 	klass->force_offline= tny_gnome_device_force_offline;
 	klass->force_online= tny_gnome_device_force_online;

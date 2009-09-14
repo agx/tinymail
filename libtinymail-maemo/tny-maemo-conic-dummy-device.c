@@ -31,6 +31,7 @@
 
 static gboolean on_dummy_connection_check (gpointer user_data);
 static gboolean tny_maemo_conic_device_is_online (TnyDevice *self);
+static gboolean tny_maemo_conic_device_is_forced (TnyDevice *self);
 
 typedef struct {
 	TnyMaemoConicDevice *self;
@@ -547,6 +548,17 @@ tny_maemo_conic_device_is_online (TnyDevice *self)
 	return TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self)->is_online;
 }
 
+static gboolean
+tny_maemo_conic_device_is_forced (TnyDevice *self)
+{
+	TnyMaemoConicDevicePriv *priv;
+
+	g_return_val_if_fail (TNY_IS_DEVICE(self), FALSE);
+
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+
+	return priv->forced;
+}
 
 static void
 tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -610,6 +622,7 @@ tny_device_init (gpointer g, gpointer iface_data)
 	TnyDeviceIface *klass = (TnyDeviceIface *)g;
 
 	klass->is_online     = tny_maemo_conic_device_is_online;
+	klass->is_forced     = tny_maemo_conic_device_is_forced;
 	klass->reset         = tny_maemo_conic_device_reset;
 	klass->force_offline = tny_maemo_conic_device_force_offline;
 	klass->force_online  = tny_maemo_conic_device_force_online;

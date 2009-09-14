@@ -287,3 +287,43 @@ tny_device_signal_get_type (void)
   g_once (&once, tny_device_signal_register_type, NULL);
   return GPOINTER_TO_UINT (once.retval);
 }
+
+/**
+ * tny_device_is_forced:
+ * @self: a #TnyDevice
+ *
+ * Request the current state of @self. In case of forced online or
+ * forced offline this function returns TRUE. Otherwise this function
+ * returns FALSE
+ *
+ * Example:
+ * <informalexample><programlisting>
+ * TnyDevice *device = ...
+ * tny_device_force_online (device);
+ * if (tny_device_is_forced (device))
+ *      tny_device_reset (device);
+ * else
+ *      g_print ("Something went wrong\n");
+ * </programlisting></informalexample>
+ *
+ * returns: TRUE if forced online/offline, FALSE otherwise
+ * since: 1.0
+ * audience: platform-developer, type-implementer
+ **/
+gboolean
+tny_device_is_forced (TnyDevice *self)
+{
+	gboolean retval;
+
+#ifdef DBC /* require */
+	g_assert (TNY_IS_DEVICE (self));
+	g_assert (TNY_DEVICE_GET_IFACE (self)->is_forced!= NULL);
+#endif
+
+	retval = TNY_DEVICE_GET_IFACE (self)->is_forced(self);
+
+#ifdef DBC /* ensure */
+#endif
+
+	return retval;
+}

@@ -25,6 +25,7 @@
 #include <tny-error.h>
 
 static gboolean tny_maemo_conic_device_is_online (TnyDevice *self);
+static gboolean tny_maemo_conic_device_is_forced (TnyDevice *self);
 
 static GObjectClass *parent_class = NULL;
 
@@ -107,6 +108,11 @@ tny_maemo_conic_device_is_online (TnyDevice *self)
 	return TRUE;
 }
 
+static gboolean
+tny_maemo_conic_device_is_forced (TnyDevice *self)
+{
+	return FALSE;
+}
 
 static void
 tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
@@ -139,6 +145,7 @@ tny_device_init (gpointer g, gpointer iface_data)
 	TnyDeviceIface *klass = (TnyDeviceIface *)g;
 
 	klass->is_online     = tny_maemo_conic_device_is_online;
+	klass->is_forced     = tny_maemo_conic_device_is_forced;
 	klass->reset         = tny_maemo_conic_device_reset;
 	klass->force_offline = tny_maemo_conic_device_force_offline;
 	klass->force_online  = tny_maemo_conic_device_force_online;
