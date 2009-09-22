@@ -213,6 +213,18 @@ else
 fi
 AM_CONDITIONAL(ENABLE_IMAPP, test x$enable_imapp = xyes)
 
+dnl **************************************************
+dnl IMAP IDLE support.
+dnl **************************************************
+AC_ARG_ENABLE(idle, 
+[  --disable-idle      Disable IMAP IDLE support],
+[ case "$enableval" in
+  no)
+    AC_DEFINE(DISABLE_IDLE,1,[do not use IMAP IDLE]);;
+  *)
+    ;;
+  esac ], )
+
 
 AC_TNY_FILELOCK_CHECK
 AC_TNY_BRKSPOOL_CHECK
