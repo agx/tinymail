@@ -42,13 +42,11 @@ typedef struct _TnyFolderStoreChangeClass TnyFolderStoreChangeClass;
 
 #define TNY_TYPE_FOLDER_STORE_CHANGE_CHANGED (tny_folder_store_change_changed_get_type())
 
-enum _TnyFolderStoreChangeChanged
+typedef enum
 {
 	TNY_FOLDER_STORE_CHANGE_CHANGED_CREATED_FOLDERS = 1<<0,
 	TNY_FOLDER_STORE_CHANGE_CHANGED_REMOVED_FOLDERS = 1<<1
-};
-
-typedef enum _TnyFolderStoreChangeChanged TnyFolderStoreChangeChanged;
+} TnyFolderStoreChangeChanged;
 
 
 struct _TnyFolderStoreChange

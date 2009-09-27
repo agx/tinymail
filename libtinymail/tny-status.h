@@ -32,18 +32,16 @@ typedef struct _TnyStatus TnyStatus;
 
 #define TNY_TYPE_STATUS_DOMAIN (tny_status_domain_get_type())
 
-enum _TnyStatusDomain
+typedef enum
 {
 	TNY_FOLDER_STATUS = 1,
 	TNY_GET_MSG_QUEUE_STATUS = 2,
 	TNY_GET_SUPPORTED_SECURE_AUTH_STATUS = 3
-};
-
-typedef enum _TnyStatusDomain TnyStatusDomain;
+} TnyStatusDomain;
 
 #define TNY_TYPE_STATUS_CODE (tny_status_code_get_type())
 
-enum _TnyStatusCode 
+typedef enum
 {
 	TNY_FOLDER_STATUS_CODE_REFRESH = 1,
 	TNY_FOLDER_STATUS_CODE_GET_MSG = 2,
@@ -52,9 +50,7 @@ enum _TnyStatusCode
 	TNY_FOLDER_STATUS_CODE_COPY_FOLDER = 5,
 	TNY_GET_SUPPORTED_SECURE_AUTH_STATUS_GET_SECURE_AUTH = 6,
 	TNY_FOLDER_STATUS_CODE_SYNC = 7
-};
-
-typedef enum _TnyStatusCode TnyStatusCode;
+} TnyStatusCode;
 
 struct _TnyStatus 
 {

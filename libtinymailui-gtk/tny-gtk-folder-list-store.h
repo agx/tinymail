@@ -42,7 +42,7 @@ typedef struct _TnyGtkFolderListStoreClass TnyGtkFolderListStoreClass;
 
 #define TNY_TYPE_GTK_FOLDER_LIST_STORE_COLUMN (tny_gtk_folder_list_store_column_get_type())
 
-enum _TnyGtkFolderListStoreColumn
+typedef enum
 {
 	TNY_GTK_FOLDER_LIST_STORE_NAME_COLUMN,
 	TNY_GTK_FOLDER_LIST_STORE_UNREAD_COLUMN,
@@ -50,18 +50,14 @@ enum _TnyGtkFolderListStoreColumn
 	TNY_GTK_FOLDER_LIST_STORE_TYPE_COLUMN,
 	TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN,
 	TNY_GTK_FOLDER_LIST_STORE_N_COLUMNS
-};
+} TnyGtkFolderListStoreColumn;
 
-typedef enum _TnyGtkFolderListStoreColumn TnyGtkFolderListStoreColumn;
-
-enum _TnyGtkFolderListStoreFlags
+typedef enum
 {
 	TNY_GTK_FOLDER_LIST_STORE_FLAG_SHOW_PATH = 1<<0,
 	TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH = 1<<2,
 	TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH = 1<<3,
-};
-
-typedef enum _TnyGtkFolderListStoreFlags TnyGtkFolderListStoreFlags;
+} TnyGtkFolderListStoreFlags;
 
 struct _TnyGtkFolderListStore
 {

@@ -40,15 +40,13 @@ typedef struct _TnyGtkAttachListModelClass TnyGtkAttachListModelClass;
 #define TNY_TYPE_GTK_ATTACH_LIST_MODEL_COLUMN (tny_gtk_attach_list_model_column_get_type())
 
 
-enum _TnyGtkAttachListModelColumn
+typedef enum
 {
 	TNY_GTK_ATTACH_LIST_MODEL_PIXBUF_COLUMN,
 	TNY_GTK_ATTACH_LIST_MODEL_FILENAME_COLUMN,
 	TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN,
 	TNY_GTK_ATTACH_LIST_MODEL_N_COLUMNS
-};
-
-typedef enum _TnyGtkAttachListModelColumn TnyGtkAttachListModelColumn;
+} TnyGtkAttachListModelColumn;
 
 struct _TnyGtkAttachListModel
 {

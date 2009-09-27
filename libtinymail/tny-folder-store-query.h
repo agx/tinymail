@@ -44,7 +44,7 @@ G_BEGIN_DECLS
 
 #define TNY_TYPE_FOLDER_STORE_QUERY_OPTION (tny_folder_store_query_option_get_type())
 
-enum _TnyFolderStoreQueryOption
+typedef enum
 {
 	TNY_FOLDER_STORE_QUERY_OPTION_SUBSCRIBED = 1<<1,
 	TNY_FOLDER_STORE_QUERY_OPTION_UNSUBSCRIBED = 1<<2,
@@ -52,7 +52,7 @@ enum _TnyFolderStoreQueryOption
 	TNY_FOLDER_STORE_QUERY_OPTION_MATCH_ON_ID = 1<<4,
 	TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE = 1<<5,
 	TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_REGEX = 1<<6
-};
+} TnyFolderStoreQueryOption;
 
 #ifndef TNY_SHARED_H
 typedef struct _TnyFolderStoreQuery TnyFolderStoreQuery;
@@ -60,8 +60,6 @@ typedef struct _TnyFolderStoreQueryClass TnyFolderStoreQueryClass;
 typedef struct _TnyFolderStoreQueryItem TnyFolderStoreQueryItem;
 typedef struct _TnyFolderStoreQueryItemClass TnyFolderStoreQueryItemClass;
 #endif
-
-typedef enum _TnyFolderStoreQueryOption TnyFolderStoreQueryOption;
 
 struct _TnyFolderStoreQueryItem 
 {

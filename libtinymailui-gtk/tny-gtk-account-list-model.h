@@ -38,14 +38,12 @@ typedef struct _TnyGtkAccountListModelClass TnyGtkAccountListModelClass;
 
 #define TNY_TYPE_GTK_ACCOUNT_LIST_MODEL_COLUMN (tny_gtk_account_list_model_column_get_type())
 
-enum _TnyGtkAccountListModelColumn
+typedef enum
 {
 	TNY_GTK_ACCOUNT_LIST_MODEL_NAME_COLUMN,
 	TNY_GTK_ACCOUNT_LIST_MODEL_INSTANCE_COLUMN,
 	TNY_GTK_ACCOUNT_LIST_MODEL_N_COLUMNS
-};
-
-typedef enum _TnyGtkAccountListModelColumn TnyGtkAccountListModelColumn;
+} TnyGtkAccountListModelColumn;
 
 struct _TnyGtkAccountListModel
 {

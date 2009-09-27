@@ -33,7 +33,7 @@ G_BEGIN_DECLS
  *
  * A GError error code.
  */
-enum _TnyError 
+typedef enum
 {
 	TNY_NO_ERROR,
 
@@ -72,11 +72,9 @@ enum _TnyError
 
 	TNY_MIME_ERROR_STATE,
 	TNY_MIME_ERROR_MALFORMED,
-};
+} TnyError;
 
 typedef GError TError;
-
-typedef enum _TnyError TnyError;
 
 const gchar* tny_error_get_message (GError *err);
 gint tny_error_get_code (GError *err);

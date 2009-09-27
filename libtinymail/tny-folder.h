@@ -44,14 +44,12 @@ typedef struct _TnyFolderIface TnyFolderIface;
 
 #define TNY_TYPE_FOLDER_SIGNAL (tny_folder_signal_get_type())
 
-enum _TnyFolderSignal
+typedef enum
 {
 	TNY_FOLDER_FOLDER_INSERTED,
 	TNY_FOLDER_FOLDERS_RELOADED,
 	TNY_FOLDER_LAST_SIGNAL
-};
-
-typedef enum _TnyFolderSignal TnyFolderSignal;
+} TnyFolderSignal;
 
 
 extern guint tny_folder_signals[TNY_FOLDER_LAST_SIGNAL];
@@ -60,17 +58,15 @@ extern guint tny_folder_signals[TNY_FOLDER_LAST_SIGNAL];
 
 #define TNY_TYPE_FOLDER_CAPS (tny_folder_caps_get_type())
 
-enum _TnyFolderCaps
+typedef enum
 {
 	TNY_FOLDER_CAPS_WRITABLE = 1<<0,
 	TNY_FOLDER_CAPS_PUSHEMAIL = 1<<1,
 	TNY_FOLDER_CAPS_NOSELECT = 1<<2,
 	TNY_FOLDER_CAPS_NOCHILDREN = 1<<3
-};
+} TnyFolderCaps;
 
-typedef enum _TnyFolderCaps TnyFolderCaps;
-
-enum _TnyFolderType
+typedef enum
 {
 	TNY_FOLDER_TYPE_UNKNOWN,
 	TNY_FOLDER_TYPE_NORMAL,
@@ -87,9 +83,7 @@ enum _TnyFolderType
 	TNY_FOLDER_TYPE_ARCHIVE,
 	TNY_FOLDER_TYPE_MERGE,
 	TNY_FOLDER_TYPE_NUM
-};
-
-typedef enum _TnyFolderType TnyFolderType;
+} TnyFolderType;
 
 struct _TnyFolderIface
 {

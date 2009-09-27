@@ -41,7 +41,7 @@ typedef struct _TnyGtkHeaderListModelClass TnyGtkHeaderListModelClass;
 
 #define TNY_TYPE_GTK_HEADER_LIST_MODEL_COLUMN (tny_gtk_header_list_model_column_get_type())
 
-enum _TnyGtkHeaderListModelColumn
+typedef enum
 {
 	TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN,
 	TNY_GTK_HEADER_LIST_MODEL_TO_COLUMN,
@@ -55,9 +55,7 @@ enum _TnyGtkHeaderListModelColumn
 	TNY_GTK_HEADER_LIST_MODEL_INSTANCE_COLUMN,
 	TNY_GTK_HEADER_LIST_MODEL_FLAGS_COLUMN,
 	TNY_GTK_HEADER_LIST_MODEL_N_COLUMNS
-};
-
-typedef enum _TnyGtkHeaderListModelColumn TnyGtkHeaderListModelColumn;
+} TnyGtkHeaderListModelColumn;
 
 struct _TnyGtkHeaderListModel 
 {

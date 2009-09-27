@@ -42,7 +42,7 @@ typedef struct _TnyGtkFolderStoreTreeModelClass TnyGtkFolderStoreTreeModelClass;
 
 #define TNY_TYPE_GTK_FOLDER_STORE_TREE_MODEL_COLUMN (tny_gtk_folder_store_tree_model_column_get_type())
 
-enum _TnyGtkFolderStoreTreeModelColumn
+typedef enum
 {
 	TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN,
 	TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN,
@@ -50,16 +50,12 @@ enum _TnyGtkFolderStoreTreeModelColumn
 	TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN,
 	TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN,
 	TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS
-};
+} TnyGtkFolderStoreTreeModelColumn;
 
-typedef enum _TnyGtkFolderStoreTreeModelColumn TnyGtkFolderStoreTreeModelColumn;
-
-enum _TnyGtkFolderStoreTreeModelFlags
+typedef enum
 {
 	TNY_GTK_FOLDER_STORE_TREE_MODEL_FLAG_SHOW_PATH = 1<<0,
-};
-
-typedef enum _TnyGtkFolderStoreTreeModelFlags TnyGtkFolderStoreTreeModelFlags;
+} TnyGtkFolderStoreTreeModelFlags;
 
 struct _TnyGtkFolderStoreTreeModel
 {

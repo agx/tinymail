@@ -1,5 +1,19 @@
 2009-09-25  Carl Simonson <simonsonc@gmail.com>
 
+	The *mm helper helper scripts expect enums to be of the following form:
+
+	typedef enum {
+	    ...
+	} Foo;
+
+	This changeset makes the enums all follow this pattern so that the
+	enum.pl script from glibmm can generate defs files properly.
+
+	Note from Philip: please fix the enum.pl script from glibmm, if it
+	doesn't support Tinymail's original notation, then it's simply wrong.
+
+2009-09-25  Carl Simonson <simonsonc@gmail.com>
+
 	tny-camel-folder.h includes camel-folder.h when it does not need to.
 	Including it causes a problem when it is included in a C++ program.
 	camel-folder. This fixes the problem for C++ programs that include

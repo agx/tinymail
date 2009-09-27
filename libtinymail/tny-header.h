@@ -51,7 +51,7 @@ typedef struct _TnyHeaderIface TnyHeaderIface;
 #endif
 
 
-enum _TnyHeaderFlags 
+typedef enum
 {
 	TNY_HEADER_FLAG_ANSWERED = 1<<0,
 	TNY_HEADER_FLAG_DELETED = 1<<1,
@@ -66,11 +66,9 @@ enum _TnyHeaderFlags
 	TNY_HEADER_FLAG_NORMAL_PRIORITY = 0<<9|0<<10,
 	TNY_HEADER_FLAG_LOW_PRIORITY = 1<<9|0<<10,
 	TNY_HEADER_FLAG_SUSPENDED = 1<<11
-};
+} TnyHeaderFlags;
 
 #define TNY_HEADER_FLAG_PRIORITY_MASK (1<<9|1<<10)
-
-typedef enum _TnyHeaderFlags TnyHeaderFlags;
 
 
 struct _TnyHeaderIface

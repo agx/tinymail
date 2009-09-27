@@ -43,7 +43,7 @@ typedef struct _TnyFolderChangeClass TnyFolderChangeClass;
 
 #define TNY_TYPE_FOLDER_CHANGE_CHANGED (tny_folder_change_changed_get_type())
 
-enum _TnyFolderChangeChanged
+typedef enum
 {
 	TNY_FOLDER_CHANGE_CHANGED_ALL_COUNT = 1<<0,
 	TNY_FOLDER_CHANGE_CHANGED_UNREAD_COUNT = 1<<1,
@@ -51,9 +51,7 @@ enum _TnyFolderChangeChanged
 	TNY_FOLDER_CHANGE_CHANGED_EXPUNGED_HEADERS = 1<<3,
 	TNY_FOLDER_CHANGE_CHANGED_FOLDER_RENAME = 1<<4,
 	TNY_FOLDER_CHANGE_CHANGED_MSG_RECEIVED = 1<<5
-};
-
-typedef enum _TnyFolderChangeChanged TnyFolderChangeChanged;
+} TnyFolderChangeChanged;
 
 
 struct _TnyFolderChange

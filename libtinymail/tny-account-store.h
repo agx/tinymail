@@ -33,34 +33,30 @@ G_BEGIN_DECLS
 
 #define TNY_TYPE_ACCOUNT_STORE_SIGNAL (tny_account_store_signal_get_type())
 
-enum _TnyAccountStoreSignal
+typedef enum
 {
 	TNY_ACCOUNT_STORE_CONNECTING_STARTED,
 	TNY_ACCOUNT_STORE_LAST_SIGNAL
-};
+} TnyAccountStoreSignal;
 
 #define TNY_TYPE_ALERT_TYPE (tny_alert_type_get_type())
 
-enum _TnyAlertType
+typedef enum
 {
 	TNY_ALERT_TYPE_INFO,
 	TNY_ALERT_TYPE_WARNING,
 	TNY_ALERT_TYPE_ERROR
-};
-
-typedef enum _TnyAlertType TnyAlertType;
+} TnyAlertType;
 
 
 #define TNY_TYPE_GET_ACCOUNTS_REQUEST_TYPE (tny_get_accounts_request_type_get_type())
 
-enum _TnyGetAccountsRequestType
+typedef enum
 {
 	TNY_ACCOUNT_STORE_TRANSPORT_ACCOUNTS,
 	TNY_ACCOUNT_STORE_STORE_ACCOUNTS,
 	TNY_ACCOUNT_STORE_BOTH
-};
-
-typedef enum _TnyGetAccountsRequestType TnyGetAccountsRequestType;
+} TnyGetAccountsRequestType;
 
 
 extern guint tny_account_store_signals [TNY_ACCOUNT_STORE_LAST_SIGNAL];
