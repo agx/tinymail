@@ -1,5 +1,14 @@
 2009-09-25  Carl Simonson <simonsonc@gmail.com>
 
+	tny-camel-folder.h includes camel-folder.h when it does not need to.
+	Including it causes a problem when it is included in a C++ program.
+	camel-folder. This fixes the problem for C++ programs that include
+	tny-camel-folder.h. However, renaming variables in camel-folder.h may
+	be a good thing to implement, which should be done in the upstream
+	camel library.
+
+2009-09-25  Carl Simonson <simonsonc@gmail.com>
+
 	Some public header files are missing G_{BEGIN,END}_DECLS macros which
 	are helpful for C++ as they are 'extern "C"' wrappers.
 

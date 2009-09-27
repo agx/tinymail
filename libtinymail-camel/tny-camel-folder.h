@@ -30,8 +30,6 @@
 #include <tny-msg-remove-strategy.h>
 #include <tny-msg-receive-strategy.h>
 
-#include <camel/camel-folder.h>
-
 G_BEGIN_DECLS
 
 #define TNY_TYPE_CAMEL_FOLDER             (tny_camel_folder_get_type ())
