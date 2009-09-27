@@ -1,3 +1,10 @@
+2009-09-25  Carl Simonson <simonsonc@gmail.com>
+
+	Running autoreconf by itself does not work because some things are
+	 missing in the build files. This changeset fixes them up. Also 
+	this changeset also makes sure that configure does not look for 
+	more packages if --disable-uigtk or --disable-demoui are passed.
+
 2009-09-22  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/configure.ac: add new configure option

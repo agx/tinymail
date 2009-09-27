@@ -1,5 +1,7 @@
 SUBDIRS = m4 
 
+ACLOCAL_AMFLAGS = -I m4
+
 SUBDIRS += libtinymail 
 SUBDIRS += libtinymailui 
 

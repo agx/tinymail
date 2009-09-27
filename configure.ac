@@ -56,6 +56,8 @@ AC_PROG_LIBTOOL
 AC_PATH_PROG(VALAC, valac, valac)
 AC_SUBST(VALAC)
 
+AM_PATH_PYTHON
+
 dnl ### default values (will get overwritten)
 build_acap=false
 build_gnome=true
@@ -418,7 +420,12 @@ AC_SUBST(LIBTINYMAIL_GNOMEVFS_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GNOMEVFS_LIBS)
 
 dnl ### libtinymailui-gtk, a gtk+ implementation of libtinymail-ui ##
-PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 $extragtkpkgs gtk+-2.0)
+if test x$build_uigtk = xtrue; then
+  PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 $extragtkpkgs gtk+-2.0)
+else
+  LIBTINYMAILUI_GTK_CFLAGS=
+  LIBTINYMAILUI_GTK_LIBS=
+fi
 AC_SUBST(LIBTINYMAILUI_GTK_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
 
@@ -532,7 +539,12 @@ if test x$build_unittests = xtrue; then
 fi
 
 dnl ### tinymail, the demo-ui ##
-PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extratnypkgs)
+if test x$build_demoui = xtrue; then
+  PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extratnypkgs)
+else
+  TINYMAIL_CFLAGS=
+  TINYMAIL_LIBS=
+fi
 AC_SUBST(TINYMAIL_CFLAGS)
 AC_SUBST(TINYMAIL_LIBS)
 
