@@ -22,11 +22,15 @@
 
 #include <tny-shared.h>
 
+G_BEGIN_DECLS
+
 extern gboolean _camel_type_init_done;
 
 typedef struct _TnySessionCamel TnySessionCamel;
 typedef struct _TnySessionCamelClass TnySessionCamelClass;
 
 TnySessionCamel*  tny_session_camel_new  (TnyAccountStore *account_store);
+
+G_END_DECLS
 
 #endif

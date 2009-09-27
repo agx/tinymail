@@ -24,6 +24,8 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
+G_BEGIN_DECLS
+
 #ifndef TNY_SHARED_H
 typedef struct _TnyStatus TnyStatus;
 #endif
@@ -76,5 +78,7 @@ void tny_clear_status (TnyStatus **status);
 
 void tny_status_set_fraction (TnyStatus *status, gdouble fraction);
 gdouble tny_status_get_fraction (TnyStatus *status);
+
+G_END_DECLS
 
 #endif

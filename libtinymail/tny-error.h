@@ -24,6 +24,8 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 
+G_BEGIN_DECLS
+
 #define TNY_ERROR_DOMAIN (tny_get_error_quark())
 
 /**
@@ -81,5 +83,6 @@ gint tny_error_get_code (GError *err);
 
 GQuark tny_get_error_quark (void);
 
+G_END_DECLS
 
 #endif

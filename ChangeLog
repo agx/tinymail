@@ -1,5 +1,10 @@
 2009-09-25  Carl Simonson <simonsonc@gmail.com>
 
+	Some public header files are missing G_{BEGIN,END}_DECLS macros which
+	are helpful for C++ as they are 'extern "C"' wrappers.
+
+2009-09-25  Carl Simonson <simonsonc@gmail.com>
+
 	Running autoreconf by itself does not work because some things are
 	 missing in the build files. This changeset fixes them up. Also 
 	this changeset also makes sure that configure does not look for 
