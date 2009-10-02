@@ -505,6 +505,7 @@ smtp_connect (CamelService *service, CamelException *ex)
 	if (service->url->authmech && (transport->flags & CAMEL_SMTP_TRANSPORT_IS_ESMTP) && has_authtypes) {
 		CamelSession *session = camel_service_get_session (service);
 		CamelServiceAuthType *authtype;
+		guint32 password_flags;
 		char *errbuf = NULL;
 
 		if (!g_hash_table_lookup (transport->authtypes, service->url->authmech)) {
@@ -538,6 +539,8 @@ smtp_connect (CamelService *service, CamelException *ex)
 				return FALSE;
 			}
 		}
+
+		password_flags = CAMEL_SESSION_PASSWORD_SECRET;
 
 		/* keep trying to login until either we succeed or the user cancels */
 		while (!authenticated && mtry < 3) {
@@ -579,14 +582,25 @@ smtp_connect (CamelService *service, CamelException *ex)
 
 			authenticated = smtp_auth (transport, authtype->authproto, ex);
 			if (!authenticated) {
-				if (camel_exception_is_set (ex)) {
-					errbuf = g_markup_printf_escaped (
-									  _("Unable to authenticate "
-									    "to SMTP server.\n%s\n\n"),
-									  camel_exception_get_description (ex));
-					camel_exception_clear (ex);
-				}
+				if (camel_exception_get_id (ex) == CAMEL_EXCEPTION_USER_CANCEL ||
+				    camel_exception_get_id (ex) == CAMEL_EXCEPTION_SERVICE_UNAVAILABLE)
+					return FALSE;
+
+				errbuf = g_markup_printf_escaped (
+					_("Unable to authenticate "
+					  "to SMTP server.\n%s\n\n"),
+					camel_exception_get_description (ex));
+				camel_exception_clear (ex);
+
+				g_free (service->url->passwd);
+				service->url->passwd = NULL;
 			}
+
+			/* Force a password prompt on the next pass, in
+			 * case we have an invalid password cached.  This
+			 * avoids repeated authentication attempts using
+			 * the same invalid password. */
+			password_flags |= CAMEL_SESSION_PASSWORD_REPROMPT;
 		}
 	} else 
 		authenticated = TRUE;

@@ -1,3 +1,9 @@
+2009-10-01  Sergio Villar Senin  <svillar@igalia.com>
+
+	* camel/providers/smtp/camel-smtp-transport.c (smtp_connect): set
+	the reprompt flag when trying to reconnect after an invalid
+	authentication attempt. Merged from Camel upstream
+
 2009-09-25  Carl Simonson <simonsonc@gmail.com>
 
 	The *mm helper helper scripts expect enums to be of the following form:
