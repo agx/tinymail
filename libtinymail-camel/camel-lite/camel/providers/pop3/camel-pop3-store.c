@@ -409,7 +409,8 @@ wait_for_login_delay (gpointer user_data)
 		sleep (login_delay);
 
 
-		if (!store->is_refreshing) {
+		if (!store->is_refreshing &&
+		    (CAMEL_SERVICE (store)->status != CAMEL_SERVICE_CONNECTING)) {
 			CamelException dex = CAMEL_EXCEPTION_INITIALISER;
 			g_static_rec_mutex_lock (store->uidl_lock);
 			if (g_static_rec_mutex_trylock (store->eng_lock)) {
