@@ -40,6 +40,15 @@
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-store.c:
 	if IDLE is disabled, don't parse IDLE capability.
 
+2009-09-18  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c (tny_camel_folder_dispose):
+	set private fields to NULL in dispose
+
+	* libtinymail-camel/tny-camel-common.c
+	(_tny_camel_exception_to_tny_error): set the proper error in
+	tinymail when CAMEL_EXCEPTION_SYSTEM_MEMORY comes from Camel
+
 2009-09-14  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-common.c (split_recipients):

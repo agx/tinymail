@@ -6472,6 +6472,7 @@ tny_camel_folder_dispose (GObject *object)
 
 	if (priv->store) {
 		camel_object_unref (priv->store);
+		priv->store = NULL;
 	}
 
 	if (priv->account && TNY_IS_CAMEL_STORE_ACCOUNT (priv->account)) {
@@ -6480,17 +6481,16 @@ tny_camel_folder_dispose (GObject *object)
 	}
 
 #ifdef ACCOUNT_WEAK_REF
-	if (priv->account)
+	if (priv->account) {
 		g_object_weak_unref (G_OBJECT (priv->account), notify_account_del, self);
+		priv->account = NULL;
+	}
 #else
 	if (priv->account) {
 		g_object_unref (priv->account);
 		priv->account = NULL;
 	}
 #endif
-
-	if (priv->parent)
-		g_object_weak_unref (G_OBJECT (priv->parent), notify_parent_del, self);
 
 	_tny_camel_folder_freeup_observers (self, priv);
 
@@ -6504,21 +6504,25 @@ tny_camel_folder_dispose (GObject *object)
 
 	unload_folder_no_lock (priv, TRUE);
 
-	if (G_LIKELY (priv->folder))
-	{
+	if (priv->folder) {
 		camel_object_unref (priv->folder);
 		priv->folder = NULL;
 	}
 
-	if (G_LIKELY (priv->remove_strat))
+	if (priv->remove_strat) {
 		g_object_unref (G_OBJECT (priv->remove_strat));
-	priv->remove_strat = NULL;
+		priv->remove_strat = NULL;
+	}
 
-	if (G_LIKELY (priv->receive_strat))
+	if (priv->receive_strat) {
 		g_object_unref (G_OBJECT (priv->receive_strat));
-	priv->receive_strat = NULL;
+		priv->receive_strat = NULL;
+	}
 
-	priv->parent = NULL;
+	if (priv->parent) {
+		g_object_weak_unref (G_OBJECT (priv->parent), notify_parent_del, self);
+		priv->parent = NULL;
+	}
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 

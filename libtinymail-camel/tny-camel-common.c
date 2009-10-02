@@ -367,7 +367,7 @@ _tny_camel_exception_to_tny_error (CamelException *ex, GError **err)
 
 	case CAMEL_EXCEPTION_SYSTEM_MEMORY:
 		g_set_error (err, TNY_ERROR_DOMAIN,
-			TNY_IO_ERROR_WRITE,
+			TNY_SYSTEM_ERROR_MEMORY,
 			camel_exception_get_description (ex));
 	break;
 
