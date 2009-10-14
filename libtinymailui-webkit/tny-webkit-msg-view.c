@@ -80,8 +80,9 @@ tny_webkit_msg_view_create_mime_part_view_for_default (TnyMsgView *self, TnyMime
 
 		retval = tny_webkit_html_mime_part_view_new ();
 
-		gtk_widget_set_usize (GTK_WIDGET (retval), 
-			widget->allocation.width>11?widget->allocation.width-10:1, 2500);
+		gtk_widget_set_size_request (GTK_WIDGET (retval),
+					     widget->allocation.width>11?widget->allocation.width-10:1,
+					     2500);
 
 	} else
 		retval = TNY_GTK_MSG_VIEW_CLASS (parent_class)->create_mime_part_view_for(self, part);

@@ -5,6 +5,8 @@
 	* Default behaviour is "automatic", so the NetworkManager is
 	compiled only if you have the NetworkManager libraries
 	(libnm-glib) in you system.
+	* libtinymailui-webkit/tny-webkit-msg-view.c: more gtk
+	deprecated symbols removed.
 
 2009-10-14  Sergio Villar Senin  <svillar@igalia.com>
 
