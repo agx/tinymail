@@ -4038,6 +4038,7 @@ send_done_in_stop_idle (CamelImapStore *store, CamelFolder *folder)
 
 	/* Step C) (see idle_thread). We're assuming idle_cont == FALSE, send_done == TRUE*/
 	do_send_done (store, folder, &idle_resp, &ex);
+	camel_exception_clear (&ex);
 	return idle_resp;
 }
 
