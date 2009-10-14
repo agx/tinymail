@@ -1,3 +1,11 @@
+2009-10-14  Carl Simonson <simonsonc@gmail.com>
+
+	Reviewed by: Sergio Villar Senin <svillar@igalia.com>
+
+	* libtinymail/tny-account.c (tny_account_base_init):
+	"connection-status-changed" second argument must be of
+	TnyConnectionStatus enum type.
+
 2009-10-14  Javier Jardon  <javierjc1982@gmail.com>
 
 	Reviewed by: Jose Dapena Paz  <jdapena@igalia.com>

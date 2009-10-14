@@ -1061,8 +1061,8 @@ tny_account_base_init (gpointer g_class)
 			G_SIGNAL_RUN_FIRST,
 			G_STRUCT_OFFSET (TnyAccountIface, connection_status_changed),
 			NULL, NULL,
-			g_cclosure_marshal_VOID__INT, 
-			G_TYPE_NONE, 1, G_TYPE_INT);
+			g_cclosure_marshal_VOID__ENUM,
+			G_TYPE_NONE, 1, TNY_TYPE_CONNECTION_STATUS);
 
 
 
