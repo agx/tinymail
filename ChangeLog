@@ -1,5 +1,7 @@
 2009-10-14  Sergio Villar Senin  <svillar@igalia.com>
 
+	* camel/camel-folder-summary.c (message_info_load): added proper
+	error checking for summary mmap'ed file
 	* camel/providers/imap/camel-imap-folder.c
 	(send_done_in_stop_idle): fixes a memory leak in a CamelException
 

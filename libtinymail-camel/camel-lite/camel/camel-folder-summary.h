@@ -216,6 +216,7 @@ struct _CamelFolderSummary {
 	struct _CamelFolderMetaSummary *meta_summary; /* Meta summary */
 
 	GMappedFile *file;
+	unsigned char *eof;
 	unsigned char *filepos;
 	GMutex *hash_lock;
 	GStaticRecMutex *dump_lock;

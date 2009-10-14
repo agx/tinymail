@@ -327,6 +327,7 @@ camel_folder_summary_unload_mmap (CamelFolderSummary *s)
 	if (s->file)
 		g_mapped_file_free (s->file);
 	s->file = NULL;
+	s->eof = NULL;
 
 	return;
 }
@@ -695,6 +696,11 @@ perform_content_info_load(CamelFolderSummary *s)
 		return NULL;
 
 	ptrchr = s->filepos;
+	if (s->eof < (ptrchr + sizeof (guint32))) {
+		d(fprintf (stderr, "Summary file format messed up?"));
+		camel_folder_summary_content_info_free (s, ci);
+		return NULL;
+	}
 	ptrchr = camel_file_util_mmap_decode_uint32 ((unsigned char*)ptrchr, &count, FALSE);
 	s->filepos = ptrchr;
 
@@ -755,6 +761,7 @@ camel_folder_summary_load(CamelFolderSummary *s)
 	}
 
 	s->filepos = (unsigned char*) g_mapped_file_get_contents (s->file);
+	s->eof = s->filepos + g_mapped_file_get_length (s->file);
 
 	if ( ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_load(s) == -1)
 		goto error;
@@ -814,6 +821,7 @@ printf ("Removes %s\n", ri->uid);
 	if (s->saved_count <= 0) {
 		g_mapped_file_free (s->file);
 		s->file = NULL;
+		s->eof = NULL;
 	}
 
 	camel_operation_end (NULL);
@@ -1239,6 +1247,7 @@ camel_folder_summary_header_load(CamelFolderSummary *s)
 	}
 
 	s->filepos = (unsigned char*) g_mapped_file_get_contents (s->file);
+	s->eof = s->filepos + g_mapped_file_get_length (s->file);
 
 	ret = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->summary_header_load(s);
 
@@ -1977,7 +1986,18 @@ camel_folder_summary_decode_token(CamelFolderSummary *s, char **str)
 
 	io(printf("Decode token ...\n"));
 
+	if (s->eof < ptrchr + sizeof (guint32)) {
+		io(printf ("Got premature EOF"));
+		*str = NULL;
+		return -1;
+	}
 	ptrchr = camel_file_util_mmap_decode_uint32 ((unsigned char*)ptrchr, &len, FALSE);
+
+	if (s->eof < ptrchr + len) {
+		io(printf ("Got premature EOF"));
+		*str = NULL;
+		return -1;
+	}
 
 	if (len<32) {
 
@@ -2363,6 +2383,20 @@ message_info_new_from_header(CamelFolderSummary *s, struct _camel_header_raw *h)
 	return (CamelMessageInfo *)mi;
 }
 
+/* Just for optimization reasons */
+#define GUINT32_SIZE sizeof(guint32)
+#define TIME_T_SIZE sizeof(time_t)
+
+/* If the access is outside the boundaries of the mmaped file, then
+   show an error and return NULL */
+#define CHECK_MMAP_ACCESS(eof,current,length,mi)			\
+	if (eof < (current + length)) {					\
+		d(printf("%s Premature EOF. Summary file corrupted?\n", __FUNCTION__)); \
+		if (mi)							\
+			camel_message_info_free ((void *) mi);		\
+		return NULL;						\
+	}								\
+
 static CamelMessageInfo *
 message_info_load(CamelFolderSummary *s, gboolean *must_add)
 {
@@ -2376,9 +2410,13 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	/* Try to find the original instance in case we are in reloading */
 
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
-	if (len)
+
+	if (len) {
+		CHECK_MMAP_ACCESS (s->eof, ptrchr, len, mi);
 		theuid = (char*)ptrchr;
+	}
 	ptrchr += len;
 
 	if (!s->in_reload)
@@ -2430,8 +2468,10 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	}
 
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->size, FALSE);
 
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &mi->flags, FALSE);
 
 	mi->flags &= ~CAMEL_MESSAGE_INFO_NEEDS_FREE;
@@ -2439,46 +2479,66 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	s->set_extra_flags_func (s->folder, mi);
 
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, TIME_T_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_sent);
+
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, TIME_T_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_time_t (ptrchr, &mi->date_received);
 
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
 
-	if (len)
+	if (len) {
+		CHECK_MMAP_ACCESS (s->eof, ptrchr, len, mi);
 		mi->subject = (const char*)ptrchr;
-
+	}
 	ptrchr += len;
+
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
 
-	if (len)
+	if (len) {
+		CHECK_MMAP_ACCESS (s->eof, ptrchr, len, mi);
 		mi->from = (const char*)ptrchr;
-
+	}
 	ptrchr += len;
 
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
 
-	if (len)
+	if (len) {
+		CHECK_MMAP_ACCESS (s->eof, ptrchr, len, mi);
 		mi->to = (const char*)ptrchr;
+	}
 	ptrchr += len;
 
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
 
-	if (len)
+	if (len) {
+		CHECK_MMAP_ACCESS (s->eof, ptrchr, len, mi);
 		mi->cc = (const char*)ptrchr;
+	}
 	ptrchr += len;
 
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
 
-
+	if (len) {
+		CHECK_MMAP_ACCESS (s->eof, ptrchr, len, mi);
+	}
 	ptrchr += len;
+
 	s->filepos = ptrchr;
 
+	CHECK_MMAP_ACCESS (s->eof, s->filepos, 8, mi);
 	mi->message_id.id.part.hi = g_ntohl(get_unaligned_u32(s->filepos));
 	s->filepos += 4;
 	mi->message_id.id.part.lo = g_ntohl(get_unaligned_u32(s->filepos));
 	s->filepos += 4;
 
 	ptrchr = (unsigned char*) s->filepos;
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
 
 #ifdef NON_TINYMAIL_FEATURES
@@ -2490,6 +2550,7 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 
 	s->filepos = ptrchr;
 
+	CHECK_MMAP_ACCESS (s->eof, s->filepos, count * 8, mi);
 #ifdef NON_TINYMAIL_FEATURES
 	for (i=0;i<count;i++) {
 		mi->references->references[i].id.part.hi = g_ntohl(get_unaligned_u32(s->filepos));
@@ -2502,30 +2563,43 @@ message_info_load(CamelFolderSummary *s, gboolean *must_add)
 #endif
 
 	ptrchr = s->filepos;
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
 
 	for (i=0;i<count;i++)
 	{
 		char *name = NULL;
+		CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 		ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
-		if (len)
+		if (len) {
+			CHECK_MMAP_ACCESS (s->eof, ptrchr, len, mi);
 			name = (char*) ptrchr;
+		}
 		ptrchr += len;
 	}
 
+	CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 	ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &count, FALSE);
+	/* Sergio, how ptrchr could be 0 ? */
 	if (!ptrchr) return NULL;
 
 	for (i=0;i<count;i++)
 	{
 		char *name = NULL, *value = NULL;
+		CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 		ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
-		if (len)
+		if (len) {
+			CHECK_MMAP_ACCESS (s->eof, ptrchr, len, mi);
 			name = (char*)ptrchr;
+		}
 		ptrchr += len;
+
+		CHECK_MMAP_ACCESS (s->eof, ptrchr, GUINT32_SIZE, mi);
 		ptrchr = camel_file_util_mmap_decode_uint32 (ptrchr, &len, TRUE);
-		if (len)
+		if (len) {
+			CHECK_MMAP_ACCESS (s->eof, ptrchr, len, mi);
 			value =(char*) ptrchr;
+		}
 		ptrchr += len;
 	}
 
@@ -2730,6 +2804,12 @@ content_info_load(CamelFolderSummary *s)
 	ct = camel_content_type_new(type, subtype);
 
 	ptrchr = s->filepos;
+	if (s->eof < ptrchr + sizeof(guint32)) {
+		d(printf("%s Premature EOF. Summary file corrupted?\n", __FUNCTION__));
+		camel_content_type_unref (ct);
+		camel_folder_summary_content_info_free (s, ci);
+		return NULL;
+	}
 	ptrchr = camel_file_util_mmap_decode_uint32 ((unsigned char*)ptrchr, &count, FALSE);
 	s->filepos = ptrchr;
 
@@ -2748,6 +2828,11 @@ content_info_load(CamelFolderSummary *s)
 	camel_folder_summary_decode_token(s, &ci->encoding);
 
 	ptrchr = s->filepos;
+	if (s->eof < ptrchr + sizeof(guint32)) {
+		d(printf("%s Premature EOF. Summary file corrupted?\n", __FUNCTION__));
+		camel_folder_summary_content_info_free (s, ci);
+		return NULL;
+	}
 	ptrchr = camel_file_util_mmap_decode_uint32 ((unsigned char*)ptrchr, &ci->size, FALSE);
 	s->filepos = ptrchr;
 
