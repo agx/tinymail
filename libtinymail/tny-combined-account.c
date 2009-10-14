@@ -559,6 +559,7 @@ tny_combined_account_class_init (TnyCombinedAccountClass *klass)
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 	object_class->finalize = tny_combined_account_finalize;
+	g_type_class_add_private (object_class, sizeof (TnyCombinedAccountPriv));
 }
 
 static gpointer

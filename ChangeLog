@@ -5,6 +5,9 @@
 	* libtinymail/tny-account.c (tny_account_base_init):
 	"connection-status-changed" second argument must be of
 	TnyConnectionStatus enum type.
+	* libtinymail/tny-combined-account.c
+	(tny_combined_account_class_init): register the private in the
+	class
 
 2009-10-14  Javier Jardon  <javierjc1982@gmail.com>
 
