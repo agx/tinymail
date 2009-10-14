@@ -141,7 +141,7 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
 				{
 					if (options & TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE)
 					{
-						if (g_strcasecmp (finfo->name, pattern) == 0)
+						if (g_ascii_strcasecmp (finfo->name, pattern) == 0)
 							retval = TRUE;
 					} else {
 						if (strcmp (finfo->name, pattern) == 0)
@@ -153,7 +153,7 @@ _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolderInfo *fin
 				{
 					if (options & TNY_FOLDER_STORE_QUERY_OPTION_PATTERN_IS_CASE_INSENSITIVE)
 					{
-						if (g_strcasecmp (finfo->full_name, pattern) == 0)
+						if (g_ascii_strcasecmp (finfo->full_name, pattern) == 0)
 							retval = TRUE;
 					} else {
 						if (strcmp (finfo->full_name, pattern) == 0)
