@@ -4,11 +4,14 @@
 
 	* Default behaviour is "automatic", so the NetworkManager is
 	compiled only if you have the NetworkManager libraries
-	(libnm-glib) in you system.
+	(libnm-glib) in you system
 	* libtinymailui-webkit/tny-webkit-msg-view.c: more gtk
-	deprecated symbols removed.
+	deprecated symbols removed
 	* libtinymail-camel/tny-camel-common.c: remove glib
 	deprecated symbols (fixes #589996).
+	* libtinymail-camel/camel-lite/libedataserver/e-memory.c:
+	removes dead code containing glib deprecated symbols
+	(fix 2/2 #589996).
 
 2009-10-14  Sergio Villar Senin  <svillar@igalia.com>
 
