@@ -25,12 +25,12 @@
 #include <tny-gnome-device.h>
 
 /*
-#ifdef GNOME
-#undef GNOME
+#ifdef NM_SUPPORT
+#undef NM_SUPPORT
 #endif
 */
 
-#ifdef GNOME
+#ifdef NM_SUPPORT
 #include <libnm_glib.h>
 #endif
 
@@ -55,7 +55,7 @@ emit_status (TnyDevice *self)
 }
 
 
-#ifdef GNOME
+#ifdef NM_SUPPORT
 static void 
 nm_callback (libnm_glib_ctx *nm_ctx, gpointer user_data)
 {
@@ -164,7 +164,7 @@ tny_gnome_device_is_online (TnyDevice *self)
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 	gboolean retval = priv->forced;
 
-#ifdef GNOME
+#ifdef NM_SUPPORT
 	if (!priv->fset && !priv->invnm)
 	{
 		libnm_glib_state state = libnm_glib_get_network_state (priv->nm_ctx);
@@ -224,7 +224,7 @@ tny_gnome_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->current_state = FALSE;
 #endif
 
-#ifdef GNOME
+#ifdef NM_SUPPORT
 	priv->invnm = FALSE;
 	priv->nm_ctx = libnm_glib_init ();
 #ifndef IMMEDIATE_ONLINE_TEST
@@ -263,7 +263,7 @@ tny_gnome_device_finalize (GObject *object)
 	TnyGnomeDevice *self = (TnyGnomeDevice *)object;
 	TnyGnomeDevicePriv *priv = TNY_GNOME_DEVICE_GET_PRIVATE (self);
 
-#ifdef GNOME
+#ifdef NM_SUPPORT
 	if (!priv->invnm) {
 		libnm_glib_unregister_callback (priv->nm_ctx, priv->callback_id);
 		libnm_glib_shutdown (priv->nm_ctx);

@@ -1,3 +1,11 @@
+2009-10-14  Javier Jardon  <javierjc1982@gmail.com>
+
+	Reviewed by: Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Default behaviour is "automatic", so the NetworkManager is
+	compiled only if you have the NetworkManager libraries
+	(libnm-glib) in you system.
+
 2009-10-14  Sergio Villar Senin  <svillar@igalia.com>
 
 	* camel/camel-folder-summary.c (message_info_load): added proper

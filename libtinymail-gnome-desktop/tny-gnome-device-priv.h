@@ -26,7 +26,7 @@ struct _TnyGnomeDevicePriv
 {
 	gboolean forced, fset, current_state;
 
-#ifdef GNOME
+#ifdef NM_SUPPORT
 	gboolean invnm;
 	guint callback_id;
 	libnm_glib_ctx *nm_ctx;

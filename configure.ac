@@ -59,6 +59,7 @@ AC_SUBST(VALAC)
 AM_PATH_PYTHON
 
 dnl ### default values (will get overwritten)
+build_nm=false
 build_acap=false
 build_gnome=true
 build_uigtk=true
@@ -79,6 +80,19 @@ PLATFORM=1
 PLATFORM_LIBS='$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la'
 PLATFORM_CFLAGS='-I$(top_srcdir)/$(PLATFORM)'
 have_platform=yes
+
+dnl ### Enable NetworkManager ##
+PKG_CHECK_MODULES(libnm_glib, libnm_glib, [have_libnm_glib="true"],
+                  [have_libnm_glib="false"])
+AC_ARG_ENABLE(nm,
+AC_HELP_STRING([--enable-nm],
+  [Build using NetworkManager support (yes, no)]),
+[case "${enableval}" in
+  yes)  enable_nm=true  ;;
+  no)   enable_nm=false ;;
+  auto) enable_nm=auto  ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-nm) ;;
+esac],[enable_nm=$enable_nm])
 
 dnl ### Debugging ###
 AC_ARG_ENABLE(debug,
@@ -467,8 +481,20 @@ else
 fi
 
 dnl ### libtinymail-gnome-desktop, a GNOME platform library implementation ##
+if test x$have_libnm_glib = xtrue || test x$enable_nm = xtrue; then
+build_nm="true"
+fi
+if test x$enable_nm = xfalse; then
+build_nm="false"
+fi
+
+if test x$build_nm = xtrue; then
+extranmpkgs="libnm_glib"
+AC_DEFINE_UNQUOTED(NM_SUPPORT, 1, ["NetworkManager support."])
+fi
+
 if test x$PLATFORMDIR = xlibtinymail-gnome-desktop; then
-  PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, gconf-2.0 $extraplatpkgs libnm_glib glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
+  PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, gconf-2.0 $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs $extranmpkgs)
 else
   LIBTINYMAIL_GNOME_DESKTOP_CFLAGS=
   LIBTINYMAIL_GNOME_DESKTOP_LIBS=
@@ -651,6 +677,7 @@ echo ""
 echo "The following options are selected:"
 echo ""
 echo "  Enable GNOME features:       $build_gnome"
+echo "  Enable NetworkManager:       $build_nm"
 echo "  Enable ACAP features:        $build_acap"
 echo "  Enable Telepathy features:   $build_tp"
 echo "  HTML component:              ${with_html_component}"
