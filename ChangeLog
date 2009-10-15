@@ -13,7 +13,12 @@
 	* libtinymailui-gnome-keyring/tny-gnome-keyring-password-getter.c:
 	don't access directly content area if we use G_SEAL enabled gtk
 
+	* libtinymail-camel/camel-lite/configure.ac: add also support
+	for silent rules in automake 1.11
+
 2009-10-15 Javier Jardón Cabezas <javierjc1982@gmail.com>
+
+	Reviewed by: Jose Dapena Paz  <jdapena@igalia.com>
 
 	* configure.ac: Support silent build rules, requires at least automake-1.11.
 	Disable by either passing --disable-silent-rules to configure or
