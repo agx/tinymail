@@ -1,3 +1,10 @@
+2009-10-15  Carl Simonson <simonsonc@gmail.com>
+
+	Committed by: Sergio Villar Senin <svillar@igalia.com>
+
+	* libtinymail/tny-send-queue.h (_TnySendQueueIface): removed
+	superfluous user_data argument in signal definitions
+
 2009-10-14  Carl Simonson <simonsonc@gmail.com>
 
 	Reviewed by: Sergio Villar Senin <svillar@igalia.com>

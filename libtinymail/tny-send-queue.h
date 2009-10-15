@@ -66,9 +66,9 @@ struct _TnySendQueueIface
 	/* Signals */
 	void (*msg_sending) (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint nth, guint total);
 	void (*msg_sent) (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, guint nth, guint total);
-	void (*error_happened) (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *err, gpointer user_data);
-	void (*queue_start) (TnySendQueue *self, gpointer user_data);
-	void (*queue_stop) (TnySendQueue *self, gpointer user_data);
+	void (*error_happened) (TnySendQueue *self, TnyHeader *header, TnyMsg *msg, GError *err);
+	void (*queue_start) (TnySendQueue *self);
+	void (*queue_stop) (TnySendQueue *self);
 
 	/* methods */
 	void (*add) (TnySendQueue *self, TnyMsg *msg, GError **err);
