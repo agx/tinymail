@@ -37,7 +37,6 @@ Requires:	firefox
 Requires:	libcamel1.2-8
 Requires:	libgnome-vfs0
 Requires:	python-gtk2
-Requires:	libgnomeui-0
 
 BuildRequires:  make
 BuildRequires:  gcc
@@ -47,7 +46,6 @@ BuildRequires:	firefox-dev
 BuildRequires:	libglib2.0-0-dev
 BuildRequires:	libgnome-vfs-dev
 BuildRequires:	python-gtk2-dev
-BuildRequires:	libgnomeui-dev
 %endif
 
 %description

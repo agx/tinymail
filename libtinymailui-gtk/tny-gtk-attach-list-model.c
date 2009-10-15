@@ -37,10 +37,6 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#ifdef GNOME
-#include <libgnomeui/libgnomeui.h>
-#endif
-
 #include <tny-gtk-attach-list-model.h>
 #include <tny-mime-part.h>
 #include <tny-iterator.h>
@@ -67,7 +63,8 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, l
 	TnyGtkAttachListModelPriv *priv = TNY_GTK_ATTACH_LIST_MODEL_GET_PRIVATE (self);
 	static GdkPixbuf *stock_file_pixbuf = NULL;
 	GdkPixbuf *pixbuf;
-	gchar *icon;
+	gchar *icon_name;
+	GIcon *icon;
 
 	if (tny_mime_part_get_content_type (part) &&
 			tny_mime_part_is_attachment (part))
@@ -79,24 +76,20 @@ tny_gtk_attach_list_model_add (TnyGtkAttachListModel *self, TnyMimePart *part, l
 			g_object_ref (priv->theme);
 		}
 
-#ifdef GNOME
 		if (priv->theme && GTK_IS_ICON_THEME (priv->theme))
 		{
-			icon = gnome_icon_lookup (priv->theme, NULL, 
-				tny_mime_part_get_filename (part), NULL, NULL,
-				tny_mime_part_get_content_type (part), 0, NULL);
+			icon = g_content_type_get_icon (tny_mime_part_get_content_type (part));
+			g_object_get (icon, "name", &icon_name, NULL);
+			g_object_unref (icon);
 		}
-#else
-		icon = GTK_STOCK_FILE;
-#endif
 
 		if (G_LIKELY (icon) && priv->theme && GTK_IS_ICON_THEME (priv->theme))
 		{
-			pixbuf = gtk_icon_theme_load_icon (priv->theme, icon, 
+			pixbuf = gtk_icon_theme_load_icon (priv->theme, icon_name,
 				GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
-#ifdef GNOME
-			g_free (icon);
-#endif
+
+			g_free (icon_name);
+
 		} else {
 			if (G_UNLIKELY (!stock_file_pixbuf) && priv->theme && GTK_IS_ICON_THEME (priv->theme))
 				stock_file_pixbuf = gtk_icon_theme_load_icon (priv->theme, 

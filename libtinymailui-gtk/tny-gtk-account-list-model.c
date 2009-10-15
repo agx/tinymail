@@ -37,10 +37,6 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#ifdef GNOME
-#include <libgnomeui/libgnomeui.h>
-#endif
-
 #include <tny-gtk-account-list-model.h>
 #include <tny-mime-part.h>
 #include <tny-iterator.h>
