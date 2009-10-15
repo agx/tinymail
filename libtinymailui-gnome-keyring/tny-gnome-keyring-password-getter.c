@@ -45,6 +45,7 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 	{
 		gint response;
 
+		GtkWidget *content_area;
 		GtkWidget *dialog;
 		GtkWidget *in_vbox;
 		GtkWidget *in_label;
@@ -65,7 +66,12 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 						      GTK_RESPONSE_ACCEPT,
 						      NULL);
 		gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
-		gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 12);
+#if GTK_CHECK_VERSION (2,14,0)
+		content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+#else
+		content_area = GTK_DIALOG (dialog)->vbox;
+#endif
+		gtk_box_set_spacing (GTK_BOX (content_area), 12);
 		gtk_container_set_border_width (GTK_CONTAINER (dialog), 12);
 
 		in_hbox = gtk_hbox_new (FALSE, 12);
@@ -95,9 +101,9 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 		gtk_box_pack_start (GTK_BOX (password_hbox), password_entry, TRUE, TRUE, 0);
 		gtk_box_pack_start (GTK_BOX (in_hbox), in_icon, FALSE, FALSE, 0);
 		gtk_box_pack_start (GTK_BOX (in_hbox), in_label, TRUE, TRUE, 0);
-		gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), in_hbox, FALSE, FALSE, 0);
-		gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), password_hbox, FALSE, FALSE, 0);
-		gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), remember_check_button, FALSE, FALSE, 0);
+		gtk_box_pack_start (GTK_BOX (content_area), in_hbox, FALSE, FALSE, 0);
+		gtk_box_pack_start (GTK_BOX (content_area), password_hbox, FALSE, FALSE, 0);
+		gtk_box_pack_start (GTK_BOX (content_area), remember_check_button, FALSE, FALSE, 0);
 		
 		gtk_size_group_add_widget (sizegroup, password_label);
 		g_object_unref (sizegroup);
@@ -109,7 +115,7 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 		gtk_widget_show (password_entry);
 		gtk_widget_show (password_label);
 		gtk_widget_show (remember_check_button);
-		gtk_widget_show (GTK_DIALOG(dialog)->vbox);
+		gtk_widget_show (content_area);
 
 		response = gtk_dialog_run (GTK_DIALOG (dialog));
 		

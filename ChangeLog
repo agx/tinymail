@@ -8,6 +8,8 @@
 	which is deprecated (fix #590753).
 	* Removed pending includes and dependencies on
 	libgnomeui (in configure.ac too) (fix #590753).
+	* libtinymailui-gnome-keyring/tny-gnome-keyring-password-getter.c:
+	don't access directly content area if we use G_SEAL enabled gtk
 
 2009-10-15  Carl Simonson <simonsonc@gmail.com>
 
