@@ -1,3 +1,8 @@
+2009-10-15  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Drop from repository generated files config.h.in,
+	libtinymail-camel/camel-lite/config.h.in and po/Makefile.in.in
+
 2009-10-15  Carl Simonson <simonsonc@gmail.com>
 
 	Committed by: Sergio Villar Senin <svillar@igalia.com>
