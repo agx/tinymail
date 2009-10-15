@@ -43,42 +43,88 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 
 	if ((keyringret != GNOME_KEYRING_RESULT_OK) || (list == NULL))
 	{
-		gboolean canc = FALSE;
+		gint response;
 
-		GnomePasswordDialog *dialog = GNOME_PASSWORD_DIALOG 
-				(gnome_password_dialog_new
-					(_("Enter password"), prompt,
-					NULL, 
-					NULL, TRUE));
+		GtkWidget *dialog;
+		GtkWidget *in_vbox;
+		GtkWidget *in_label;
+		GtkWidget *in_hbox;
+		GtkWidget *in_icon;
+		GtkWidget *password_hbox;
+		GtkWidget *password_label;
+		GtkWidget *password_entry;
+		GtkWidget *remember_check_button;
+		GtkSizeGroup *sizegroup;
 
-		gnome_password_dialog_set_domain (dialog, "Mail");
-		gnome_password_dialog_set_remember (dialog, 
-			GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER);
+		dialog = gtk_dialog_new_with_buttons (_("Enter password"),
+						      NULL,
+						      GTK_DIALOG_MODAL,
+						      GTK_STOCK_CANCEL,
+						      GTK_RESPONSE_REJECT,
+						      GTK_STOCK_OK,
+						      GTK_RESPONSE_ACCEPT,
+						      NULL);
+		gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
+		gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 12);
+		gtk_container_set_border_width (GTK_CONTAINER (dialog), 12);
 
-		gnome_password_dialog_set_readonly_username (dialog, TRUE);
-		/* gnome_password_dialog_set_username (dialog, 
-			tny_account_get_user (account)); */
+		in_hbox = gtk_hbox_new (FALSE, 12);
+		password_hbox = gtk_hbox_new (FALSE, 12);
+		sizegroup = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
 
-		gnome_password_dialog_set_show_username (dialog, FALSE);
-		gnome_password_dialog_set_show_remember (dialog, 
-			gnome_keyring_is_available ());
-		gnome_password_dialog_set_show_domain (dialog, FALSE);
-		gnome_password_dialog_set_show_userpass_buttons (dialog, FALSE);
+		in_icon = gtk_image_new_from_stock (GTK_STOCK_DIALOG_AUTHENTICATION,
+						    GTK_ICON_SIZE_DIALOG);
+		gtk_misc_set_alignment (GTK_MISC (in_icon), 1.0, 0.5);
 
-		canc = gnome_password_dialog_run_and_block (dialog);
+		in_label = gtk_label_new (NULL);
+		gtk_label_set_line_wrap (GTK_LABEL (in_label), TRUE);
+		gtk_label_set_line_wrap_mode (GTK_LABEL (in_label), PANGO_WRAP_WORD_CHAR);
+		gtk_label_set_markup (GTK_LABEL (in_label), prompt);
+		gtk_misc_set_alignment (GTK_MISC (in_label), 0.0, 1.0);
 
-		if (canc)
+		password_entry = gtk_entry_new ();
+		gtk_entry_set_visibility (GTK_ENTRY (password_entry), FALSE);
+
+		password_label = gtk_label_new (_("Password:"));
+		gtk_misc_set_alignment (GTK_MISC (password_label), 0.0, 0.5);
+
+		remember_check_button = gtk_check_button_new_with_label (_("Remember password"));
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (remember_check_button), FALSE);
+
+		gtk_box_pack_start (GTK_BOX (password_hbox), password_label, FALSE, FALSE, 0);
+		gtk_box_pack_start (GTK_BOX (password_hbox), password_entry, TRUE, TRUE, 0);
+		gtk_box_pack_start (GTK_BOX (in_hbox), in_icon, FALSE, FALSE, 0);
+		gtk_box_pack_start (GTK_BOX (in_hbox), in_label, TRUE, TRUE, 0);
+		gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), in_hbox, FALSE, FALSE, 0);
+		gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), password_hbox, FALSE, FALSE, 0);
+		gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), remember_check_button, FALSE, FALSE, 0);
+		
+		gtk_size_group_add_widget (sizegroup, password_label);
+		g_object_unref (sizegroup);
+
+		gtk_widget_show (in_hbox);
+		gtk_widget_show (in_icon);
+		gtk_widget_show (password_hbox);
+		gtk_widget_show (in_label);
+		gtk_widget_show (password_entry);
+		gtk_widget_show (password_label);
+		gtk_widget_show (remember_check_button);
+		gtk_widget_show (GTK_DIALOG(dialog)->vbox);
+
+		response = gtk_dialog_run (GTK_DIALOG (dialog));
+		
+		if (response == GTK_RESPONSE_ACCEPT)
 		{
 			guint32 item_id;
-			GnomePasswordDialogRemember r;
+			gboolean remember;
 
-			retval = gnome_password_dialog_get_password (dialog);
+			retval = g_strdup (gtk_entry_get_text (GTK_ENTRY (password_entry)));
 
 			mlock (retval, strlen (retval));
 
-			r = gnome_password_dialog_get_remember (dialog);
+			remember = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (remember_check_button));
 
-			if (r == GNOME_PASSWORD_DIALOG_REMEMBER_FOREVER)
+			if (remember)
 			{
 				gnome_keyring_set_network_password_sync (keyring,
 					aid /* user */,
@@ -88,10 +134,10 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 			}
 		} else retval = NULL;
 
-		*cancel = (!canc);
+		*cancel = (response != GTK_RESPONSE_ACCEPT);
 
 		/* this causes warnings, but should be done afaik */
-		gtk_object_destroy (GTK_OBJECT (dialog));
+		gtk_widget_destroy (dialog);
 
 		while (gtk_events_pending ())
 			gtk_main_iteration ();
