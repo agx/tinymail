@@ -416,7 +416,7 @@ AC_SUBST(LIBTINYMAIL_TP_LIBS)
 
 dnl ### libtinymail-gnomevfs, a tnystreamiface for gnome-vfs ##
 if test x$build_gnome = xtrue; then
-extragtkpkgs="libgnomeui-2.0 gnome-keyring-1"
+extragtkpkgs="gnome-vfs-2.0 gnome-keyring-1"
 extratnypkgs="gnome-vfs-2.0"
   PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.8 gobject-2.0 gnome-vfs-2.0)
 elif test x$build_maemo = xtrue; then

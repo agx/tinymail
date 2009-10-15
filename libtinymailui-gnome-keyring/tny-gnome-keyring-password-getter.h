@@ -24,7 +24,6 @@
 #include <glib-object.h>
 #include <tny-shared.h>
 #include <tny-password-getter.h>
-#include <libgnomeui/gnome-password-dialog.h>
 #include <gnome-keyring.h>
 
 G_BEGIN_DECLS

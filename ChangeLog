@@ -6,6 +6,8 @@
 	* Reimplemented gnome keyring password dialog to use
 	just plain gtk and drop usage of GnomePasswordDialog
 	which is deprecated (fix #590753).
+	* Removed pending includes and dependencies on
+	libgnomeui (in configure.ac too) (fix #590753).
 
 2009-10-15  Carl Simonson <simonsonc@gmail.com>
 
