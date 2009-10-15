@@ -6,10 +6,18 @@
 	* Reimplemented gnome keyring password dialog to use
 	just plain gtk and drop usage of GnomePasswordDialog
 	which is deprecated (fix #590753).
+
 	* Removed pending includes and dependencies on
 	libgnomeui (in configure.ac too) (fix #590753).
+
 	* libtinymailui-gnome-keyring/tny-gnome-keyring-password-getter.c:
 	don't access directly content area if we use G_SEAL enabled gtk
+
+2009-10-15 Javier Jardón Cabezas <javierjc1982@gmail.com>
+
+	* configure.ac: Support silent build rules, requires at least automake-1.11.
+	Disable by either passing --disable-silent-rules to configure or
+	passing V=1 to make.
 
 2009-10-15  Carl Simonson <simonsonc@gmail.com>
 
