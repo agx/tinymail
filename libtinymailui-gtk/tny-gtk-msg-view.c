@@ -56,14 +56,6 @@
 #include <tny-gtk-expander-mime-part-view.h>
 #include <tny-mime-part-saver.h>
 
-#ifdef GNOME
-#include <tny-vfs-stream.h>
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-utils.h>
-#else
-#include <tny-fs-stream.h>
-#endif
-
 #include "tny-gtk-attach-list-model-priv.h"
 
 static GObjectClass *parent_class = NULL;

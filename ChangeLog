@@ -24,6 +24,14 @@
 	Disable by either passing --disable-silent-rules to configure or
 	passing V=1 to make.
 
+	* Implementation of TnyStream based in GIO
+
+	* Use GIO based streams instead of vfs based streams
+	in tinymail GTK.
+
+	* Remove includes requiring vfs streams wherever they
+	were not needed.
+
 2009-10-15  Carl Simonson <simonsonc@gmail.com>
 
 	Committed by: Sergio Villar Senin <svillar@igalia.com>

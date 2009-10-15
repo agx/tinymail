@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libtinymail-gio
+Description: TinyMail generic library implemented for gio
+Version: 1.0.0
+Requires: libtinymail-1.0 gio-2.0
+Libs: -L${libdir} -ltinymail-gio-1.0
+Cflags: -I${includedir}/libtinymail-gio-1.0

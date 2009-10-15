@@ -3,11 +3,17 @@ SUBDIRS = m4
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS += libtinymail 
-SUBDIRS += libtinymailui 
+SUBDIRS += libtinymailui
+
+if BUILD_GIO
+SUBDIRS += libtinymail-gio
+endif
 
 if BUILD_GNOME
 SUBDIRS += libtinymailui-gnome-keyring
-SUBDIRS += libtinymail-gnomevfs 
+if !BUILD_GIO
+SUBDIRS += libtinymail-gnomevfs
+endif
 endif
 
 if BUILD_UIGTK
@@ -27,7 +33,9 @@ SUBDIRS += libtinymailui-gtkhtml
 endif
 
 if BUILD_MAEMO
+if !BUILD_GIO
 SUBDIRS += libtinymail-gnomevfs
+endif
 endif
 
 SUBDIRS += libtinymail-camel $(PLATFORMDIR) 
@@ -72,6 +80,7 @@ DIST_SUBDIRS = \
 	libtinymail \
 	libtinymailui \
 	libtinymail-gnomevfs \
+	libtinymail-gio \
 	libtinymailui-gtk \
 	libtinymail-camel \
 	docs \

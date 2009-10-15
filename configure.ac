@@ -419,24 +419,75 @@ fi
 AC_SUBST(LIBTINYMAIL_TP_CFLAGS)
 AC_SUBST(LIBTINYMAIL_TP_LIBS)
 
-dnl ### libtinymail-gnomevfs, a tnystreamiface for gnome-vfs ##
-if test x$build_gnome = xtrue; then
-extragtkpkgs="gnome-vfs-2.0 gnome-keyring-1"
-extratnypkgs="gnome-vfs-2.0"
-  PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.8 gobject-2.0 gnome-vfs-2.0)
-elif test x$build_maemo = xtrue; then
 extragtkpkgs=
-extratnypkgs="gnome-vfs-2.0"
-  PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.8 gobject-2.0 gnome-vfs-2.0)
-else
-  LIBTINYMAIL_GNOMEVFS_CFLAGS=
-  LIBTINYMAIL_GNOMEVFS_LIBS=
-  extragtkpkgs=
-  extratnypkgs=
-fi
+extratnypkgs=
 
+dnl ### libtinymail-gio, a tnystreamiface for gio ##
+build_gio="false"
+PKG_CHECK_MODULES(LIBTINYMAIL_GIO, gio-2.0, [have_gio="true"],
+					    [have_gio="false"])
+AC_ARG_ENABLE(gio,
+AC_HELP_STRING([--enable-gio],
+	       [Build using Gio support (yes, no, auto)]),
+	       [case "${enableval}" in
+		  yes)  enable_gio=true  ;;
+		  no)   enable_gio=false ;;
+		  auto) enable_gio=auto  ;;
+		  *) AC_MSG_ERROR(bad value ${enableval} for --enable-gio) ;;
+	       esac],
+	       [enable_gio=$enable_gio])
+if test x$have_gio = xtrue || test x$enable_gio = xtrue; then
+build_gio="true"
+fi
+if test x$enable_gio = xfalse; then
+build_gio="false"
+fi
+if test x$enable_gio = xtrue && test x$have_gio = xfalse; then
+AC_MSG_ERROR(GIO requested but not available)
+fi
+if test x$build_gnome = xtrue && test x$build_gio = xfalse; then
+AC_MSG_ERROR(GIO is required for Gnome port)
+fi
+if test x$build_gio = xtrue; then
+extratnypkgs="$extratnypkgs gio-2.0"
+fi
+AM_CONDITIONAL(BUILD_GIO, test x$build_gio = xtrue)
+AC_SUBST(LIBTINYMAIL_GIO_CFLAGS)
+AC_SUBST(LIBTINYMAIL_GIO_LIBS)
+
+dnl ### libtinymail-gnomevfs, a tnystreamiface for gio ##
+build_gnomevfs="false"
+PKG_CHECK_MODULES(LIBTINYMAIL_GNOMEVFS, glib-2.0 >= 2.8 gobject-2.0 gnome-vfs-2.0, [have_gnomevfs="true"],
+     					    	     	    			   [have_gnomevfs="false"])
+AC_ARG_ENABLE(gnomevfs,
+AC_HELP_STRING([--enable-gnomevfs],
+	       [Build using GnomeVFS support (yes, no, auto)]),
+	       [case "${enableval}" in
+		  yes)  enable_gnomevfs=true  ;;
+		  no)   enable_gnomevfs=false ;;
+		  auto) enable_gnomevfs=auto  ;;
+		  *) AC_MSG_ERROR(bad value ${enableval} for --enable-gnomevfs) ;;
+	       esac],
+	       [enable_gnomevfs=$enable_gnomevfs])
+if test x$have_gnomevfs = xtrue || test x$enable_gnomevfs = xtrue; then
+build_gnomevfs="true"
+fi
+if test x$enable_gnomevfs = xfalse; then
+build_gnomevfs="false"
+fi
+if test x$enable_gnomevfs = xtrue && test x$have_gnomevfs = xfalse; then
+AC_MSG_ERROR(GnomeVFS requested but not available)
+fi
+if test x$build_gnomevfs = xtrue; then
+extratnypkgs="$extratnypkgs gnome-vfs-2.0"
+fi
+AM_CONDITIONAL(BUILD_GNOMEVFS, test x$build_gnomevfs = xtrue)
 AC_SUBST(LIBTINYMAIL_GNOMEVFS_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GNOMEVFS_LIBS)
+
+if test x$build_gnome = xtrue; then
+   extragtkpkgs="gnome-keyring-1 gio-2.0"
+fi
 
 dnl ### libtinymailui-gtk, a gtk+ implementation of libtinymail-ui ##
 if test x$build_uigtk = xtrue; then
@@ -656,6 +707,8 @@ libtinymailui-mozembed/libtinymailui-mozembed.pc
 libtinymailui-gnome-keyring/Makefile
 libtinymail-gnomevfs/Makefile
 libtinymail-gnomevfs/libtinymail-gnomevfs.pc
+libtinymail-gio/Makefile
+libtinymail-gio/libtinymail-gio.pc
 libtinymail-gnome-desktop/Makefile
 libtinymail-gnome-desktop/libtinymail-gnome-desktop.pc
 libtinymail-olpc/Makefile
@@ -681,6 +734,8 @@ m4/Makefile
 echo ""
 echo "The following options are selected:"
 echo ""
+echo "  Enable Gio support:          $build_gio"
+echo "  Enable GnomeVFS support:     $build_gnomevfs"
 echo "  Enable GNOME features:       $build_gnome"
 echo "  Enable NetworkManager:       $build_nm"
 echo "  Enable ACAP features:        $build_acap"

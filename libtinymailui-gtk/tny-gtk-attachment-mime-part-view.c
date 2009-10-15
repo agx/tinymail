@@ -40,16 +40,7 @@
 #include <gtk/gtk.h>
 #include <tny-list.h>
 
-#ifdef GNOME
-#include <tny-vfs-stream.h>
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-utils.h>
-#else
-#include <tny-fs-stream.h>
-#endif
-
 #include <tny-gtk-attachment-mime-part-view.h>
-
 
 static GObjectClass *parent_class = NULL;
 

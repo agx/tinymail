@@ -43,15 +43,6 @@
 #include <tny-gtk-image-mime-part-view.h>
 #include <tny-gtk-pixbuf-stream.h>
 
-#ifdef GNOME
-#include <tny-vfs-stream.h>
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-utils.h>
-#else
-#include <tny-fs-stream.h>
-#endif
-
-
 static GObjectClass *parent_class = NULL;
 
 typedef struct _TnyGtkImageMimePartViewPriv TnyGtkImageMimePartViewPriv;

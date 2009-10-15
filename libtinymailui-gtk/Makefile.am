@@ -4,7 +4,7 @@ INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 	-I$(top_srcdir)/libtinymailui 
 
 if BUILD_GNOME
-INCLUDES += -I$(top_srcdir)/libtinymail-gnomevfs -DGNOME
+INCLUDES += -I$(top_srcdir)/libtinymail-gio -DGNOME
 endif
 
 lib_LTLIBRARIES = libtinymailui-gtk-1.0.la
@@ -68,7 +68,7 @@ libtinymailui_gtk_1_0_la_LDFLAGS = -export-dynamic \
 	-version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
 
 if BUILD_GNOME
-libtinymailui_gtk_1_0_la_LIBADD += $(top_builddir)/libtinymail-gnomevfs/libtinymail-gnomevfs-$(API_VERSION).la
+libtinymailui_gtk_1_0_la_LIBADD += $(top_builddir)/libtinymail-gio/libtinymail-gio-$(API_VERSION).la
 endif
 
 libtinymailuigtkincludedir = $(includedir)/libtinymailui-gtk-$(API_VERSION)

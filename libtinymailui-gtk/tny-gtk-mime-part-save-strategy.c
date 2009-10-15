@@ -21,7 +21,7 @@
  * TnyGtkMimePartSaveStrategy:
  *
  * a #TnyMimePartSaveStrategy that saves a #TnyMimePart using a file dialog
- * in Gtk+ and GnomeVFS if available.
+ * in Gtk+ and GIO if available.
  *
  * free-function: g_object_unref
  **/
@@ -46,9 +46,8 @@
 #include <tny-mime-part.h>
 
 #ifdef GNOME
-#include <tny-vfs-stream.h>
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-utils.h>
+#include <tny-gio-output-stream.h>
+#include <gio/gio.h>
 #else
 #include <tny-fs-stream.h>
 #endif
@@ -73,17 +72,21 @@ static gboolean
 gtk_save_to_file (const gchar *uri, TnyMimePart *part, TnyMimePartSaveStrategy *self)
 {
 	TnyGtkMimePartSaveStrategyPriv *priv = TNY_GTK_MIME_PART_SAVE_STRATEGY_GET_PRIVATE (self);
-	GnomeVFSResult result;
-	GnomeVFSHandle *handle;
 	TnyStream *stream = NULL;
+	GFile *file;
+	GOutputStream *gio_stream;
 
-	result = gnome_vfs_create (&handle, uri, 
-		GNOME_VFS_OPEN_WRITE, FALSE, 0777);
+	file = g_file_new_for_uri (uri);
 
-	if (G_UNLIKELY (result != GNOME_VFS_OK))
+	gio_stream = (GOutputStream *) g_file_replace (file, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL);
+	g_object_unref (file);
+
+	if (gio_stream == NULL)
 		return FALSE;
 
-	stream = tny_vfs_stream_new (handle);
+	stream = tny_gio_output_stream_new (gio_stream);
+	g_object_unref (gio_stream);
+
 	tny_mime_part_decode_to_stream_async (part, stream, NULL, 
 		priv->status_callback, priv->status_user_data);
 
@@ -194,7 +197,7 @@ tny_gtk_mime_part_save_strategy_perform_save_default (TnyMimePartSaveStrategy *s
  * @status_user_data: (null-ok): user data for @status_callback
  *
  * Create a new #TnyMimePartSaveStrategy It will use the #GtkFileChooserDialog type and if
- * available consume its support for GnomeVFS.
+ * available consume its support for GIO.
  *
  * Whenever data must be retrieved or takes long to load, @status_callback will
  * be called to let the outside world know about what this compenent is doing.
