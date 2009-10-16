@@ -603,11 +603,11 @@ notify_views_add_destroy (gpointer data)
 
 	g_mutex_lock (priv->ra_lock);
 	priv->updating_views = -1;
-	g_mutex_unlock (priv->ra_lock);
 
 	if (priv->timeout_span < 5000)
 		priv->timeout_span += 500;
 	priv->add_timeout = 0;
+	g_mutex_unlock (priv->ra_lock);
 	g_object_unref (data);
 
 	return;
