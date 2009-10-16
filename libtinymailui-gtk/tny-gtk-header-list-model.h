@@ -20,7 +20,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <gtk/gtktreemodel.h>
+#include <gtk/gtk.h>
 #include <tny-header.h>
 #include <tny-folder.h>
 #include <tny-list.h>

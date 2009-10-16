@@ -21,8 +21,6 @@
 
 #include <gtk/gtk.h>
 
-#include <gtk/gtkwindow.h>
-#include <gtk/gtkprogressbar.h>
 #include <tny-iterator.h>
 #include <tny-simple-list.h>
 #include <tny-account-store.h>

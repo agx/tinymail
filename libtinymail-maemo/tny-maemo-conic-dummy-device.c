@@ -27,7 +27,7 @@
 #include <conicconnectionevent.h>
 #include <string.h>
 #include <tny-error.h>
-#include <gtk/gtkmessagedialog.h>
+#include <gtk/gtk.h>
 
 static gboolean on_dummy_connection_check (gpointer user_data);
 static gboolean tny_maemo_conic_device_is_online (TnyDevice *self);
