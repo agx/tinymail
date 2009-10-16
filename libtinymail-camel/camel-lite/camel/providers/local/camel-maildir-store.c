@@ -270,7 +270,9 @@ static int rem_dir (const gchar *tmp)
 	if (rmdir(tmp) == -1)
 		err = errno;
 
-	chdir ("/");
+	if (chdir ("/") == -1) {
+		d(fprintf(stderr, "couldn't chdir to /"));
+	}
 
 	return err;
 }
@@ -549,7 +551,9 @@ fail:
 	g_hash_table_foreach(visited, scan_free, NULL);
 	g_hash_table_destroy(visited);
 
-	chdir ("/");
+	if (chdir ("/") == -1) {
+		d(fprintf(stderr, "couldn't chdir to /"));
+	}
 
 	return res;
 }

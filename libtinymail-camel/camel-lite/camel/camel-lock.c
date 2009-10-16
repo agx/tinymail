@@ -107,7 +107,8 @@ camel_lock_dot(const char *path, CamelException *ex)
 		close(fdtmp);
 
 		/* apparently return code from link can be unreliable for nfs (see link(2)), so we ignore it */
-		link(locktmp, lock);
+		if (link(locktmp, lock) == -1)
+			d(printf("linking locktmp to lock failed", g_strerror (errno)));
 
 		/* but we check stat instead (again, see link(2)) */
 		if (stat(locktmp, &st) == -1) {

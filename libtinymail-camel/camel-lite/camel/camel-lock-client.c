@@ -128,9 +128,13 @@ static int camel_lock_helper_init(CamelException *ex)
 		return -1;
 	case 0:
 		close(STDIN_FILENO);
-		dup(lock_stdin_pipe[0]);
+		if (dup(lock_stdin_pipe[0]) == -1) {
+			d(fprintf(stderr, "%s: error duping file: %s", __FUNCTION__, g_strerror (errno)));
+		}
 		close(STDOUT_FILENO);
-		dup(lock_stdout_pipe[1]);
+		if (dup(lock_stdout_pipe[1]) == -1) {
+			d(fprintf(stderr, "%s: error duping file: %s", __FUNCTION__, g_strerror (errno)));
+		}
 		close(lock_stdin_pipe[0]);
 		close(lock_stdin_pipe[1]);
 		close(lock_stdout_pipe[0]);

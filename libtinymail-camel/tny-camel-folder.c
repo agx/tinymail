@@ -4849,7 +4849,7 @@ _tny_camel_folder_track_folder_changed (TnyCamelFolder *self,
 	}
 	priv->folder_tracking = folder;
 	if  (priv->folder_tracking != NULL) {
-		priv->folder_tracking_id = camel_object_hook_event (priv->folder_tracking, "folder_changed", folder_tracking_changed, self);
+	  priv->folder_tracking_id = camel_object_hook_event (priv->folder_tracking, "folder_changed", (CamelObjectEventHookFunc)folder_tracking_changed, self);
 		camel_object_hook_event (priv->folder_tracking, "finalize", folder_tracking_finalize, priv);
 	}
 
@@ -5454,7 +5454,7 @@ _tny_camel_folder_guess_folder_type (TnyCamelFolder *folder, CamelFolderInfo *fo
 		if (!g_ascii_strcasecmp (folder_info->name, "inbox")) {
 			/* Needed as some dovecot servers report the inbox as
 			 * normal */
-			TnyFolderStore *store = tny_folder_get_folder_store (folder);
+			TnyFolderStore *store = tny_folder_get_folder_store (TNY_FOLDER (folder));
 			if (store) {
 				if (TNY_IS_ACCOUNT (store))
 					priv->cached_folder_type = TNY_FOLDER_TYPE_INBOX;

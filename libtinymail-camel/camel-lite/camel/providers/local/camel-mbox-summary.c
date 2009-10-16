@@ -1003,7 +1003,9 @@ camel_mbox_summary_sync_mbox(CamelMboxSummary *cls, guint32 flags, CamelFolderCh
 #endif
 			info->frompos = lseek(fdout, 0, SEEK_CUR);
 			fromline = camel_mime_parser_from_line(mp);
-			write(fdout, fromline, strlen(fromline));
+			if (write(fdout, fromline, strlen(fromline)) == -1) {
+				d(printf("%s: failed to write: %s\n", __FUNCTION__, strerror (errno)));
+			}
 		}
 
 		if (info && info->info.info.flags & (CAMEL_MESSAGE_FOLDER_NOXEV | CAMEL_MESSAGE_FOLDER_FLAGGED)) {

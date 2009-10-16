@@ -511,7 +511,7 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 
 		if (apriv->service && CAMEL_IS_SERVICE (apriv->service) && 
 		  new_service && !camel_exception_is_set (apriv->ex)) {
-			camel_object_unhook_event (apriv->service, "folder_opened", folder_opened, self);
+		  camel_object_unhook_event (apriv->service, "folder_opened", (CamelObjectEventHookFunc) folder_opened, self);
 			camel_object_unref (apriv->service);
 			apriv->service = NULL;
 		}
@@ -545,7 +545,7 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 			}
 
 			if (apriv->service && CAMEL_IS_SERVICE (apriv->service)) {
-				camel_object_unhook_event (new_service, "folder_opened", folder_opened, self);
+				camel_object_unhook_event (new_service, "folder_opened", (CamelObjectEventHookFunc) folder_opened, self);
 				camel_object_unref (apriv->service);
 			}
 
@@ -557,11 +557,11 @@ tny_camel_store_account_prepare (TnyCamelAccount *self, gboolean recon_if, gbool
 			apriv->service->reconnection = (con_op) reconnection;
 
 			if (new_service)
-				camel_object_hook_event (new_service, "folder_opened", folder_opened, self);
+				camel_object_hook_event (new_service, "folder_opened", (CamelObjectEventHookFunc) folder_opened, self);
 
 		} else if (camel_exception_is_set (apriv->ex) && new_service) {
 			if (CAMEL_IS_OBJECT (new_service)) {
-				camel_object_unhook_event (new_service, "folder_opened", folder_opened, self);
+				camel_object_unhook_event (new_service, "folder_opened", (CamelObjectEventHookFunc) folder_opened, self);
 				camel_object_unref (new_service);
 			}
 		}
@@ -932,7 +932,7 @@ tny_camel_store_account_finalize (GObject *object)
 	TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	if (apriv->service) {
-		camel_object_unhook_event (apriv->service, "folder_opened", folder_opened, self);
+		camel_object_unhook_event (apriv->service, "folder_opened", (CamelObjectEventHookFunc) folder_opened, self);
 	}
 
 	/* g_static_rec_mutex_free (priv->factory_lock); */
@@ -1567,7 +1567,7 @@ tny_camel_store_account_get_folders_default (TnyFolderStore *self, TnyList *list
 				if (was_new)
 					_tny_camel_folder_set_folder_info (self, folder, iter);
 				else
-					_tny_camel_store_account_refresh_children (self, folder, iter);
+					_tny_camel_store_account_refresh_children (self, TNY_FOLDER (folder), iter);
 			
 				const gchar *name = tny_folder_get_name (TNY_FOLDER(folder));
 				/* TNY TODO: Temporary fix for empty root folders */

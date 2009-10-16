@@ -994,6 +994,7 @@ imap_body_decode (const char **in, CamelMessageContentInfo *ci, CamelFolder *fol
 
 
 		if (camel_content_type_is (ctype, "message", "rfc822")) {
+			unsigned long int strtoul_ret;
 			/* body_type_msg */
 			if (*inptr++ != ' ')
 				goto exception;
@@ -1013,14 +1014,15 @@ imap_body_decode (const char **in, CamelMessageContentInfo *ci, CamelFolder *fol
 				goto exception;
 
 			/* lines */
-			strtoul ((const char *) inptr, &p, 10);
+			strtoul_ret = strtoul ((const char *) inptr, &p, 10);
 			inptr = (const char *) p;
 		} else if (camel_content_type_is (ctype, "text", "*")) {
+			unsigned long int strtoul_ret;
 			if (*inptr++ != ' ')
 				goto exception;
 
 			/* lines */
-			strtoul ((const char *) inptr, &p, 10);
+			strtoul_ret = strtoul ((const char *) inptr, &p, 10);
 			inptr = (const char *) p;
 		} else {
 			/* body_type_basic */

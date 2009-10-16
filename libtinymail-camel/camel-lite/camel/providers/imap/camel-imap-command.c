@@ -1134,9 +1134,10 @@ camel_imap_response_extract (CamelImapStore *store,
 	len = strlen (type);
 
 	for (i = 0; i < response->untagged->len; i++) {
+		unsigned long int strtoul_res;
 		resp = response->untagged->pdata[i];
 		/* Skip "* ", and initial sequence number, if present */
-		strtoul (resp + 2, &resp, 10);
+		strtoul_res = strtoul (resp + 2, &resp, 10);
 		if (*resp == ' ')
 			resp = (char *) imap_next_word (resp);
 

@@ -308,7 +308,7 @@ decode_to_stream_async_thread (gpointer userdata)
 {
 	DecodeAsyncInfo *info = (DecodeAsyncInfo *) userdata;
 
-	tny_mime_part_decode_to_stream (info->self, info->stream, &(info->err));
+	tny_mime_part_decode_to_stream (TNY_MIME_PART (info->self), TNY_STREAM (info->stream), &(info->err));
 
 	g_idle_add_full (G_PRIORITY_HIGH, 
 			 decode_async_callback, 

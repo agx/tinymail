@@ -426,13 +426,14 @@ recursive_scan (CamelStore *store, CamelURL *url, CamelFolderInfo **fip, CamelFo
 
 		/* Look for subdirectories to add and scan. */
 		while ((d = readdir(dp)) != NULL) {
+			unsigned long int strtoul_ret;
 			/* Skip current and parent directory. */
 			if (strcmp(d->d_name, ".") == 0
 			    || strcmp(d->d_name, "..") == 0)
 				continue;
 
 			/* skip fully-numerical entries (i.e. mh messages) */
-			strtoul(d->d_name, &tmp, 10);
+			strtoul_ret = strtoul(d->d_name, &tmp, 10);
 			if (*tmp == 0)
 				continue;
 

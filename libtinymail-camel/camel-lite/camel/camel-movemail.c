@@ -150,7 +150,9 @@ camel_movemail(const char *source, const char *dest, CamelException *ex)
 	 */
 	if (res != -1) {
 		if (close (dfd) == 0) {
-			ftruncate (sfd, 0);
+			if (ftruncate (sfd, 0) == -1) {
+				d(printf("failed to truncate source fd: %s\n", gstrerror (errno)));
+			}
 		} else {
 			camel_exception_setv (ex, CAMEL_EXCEPTION_SYSTEM,
 					      _("Failed to store mail in temp file %s: %s"),

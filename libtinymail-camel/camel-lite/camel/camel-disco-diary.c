@@ -410,7 +410,8 @@ camel_disco_diary_replay (CamelDiscoDiary *diary, CamelException *ex)
 	diary->folders = g_hash_table_new (g_str_hash, g_str_equal);
 
 	/* Truncate the log */
-	ftruncate (fileno (diary->file), 0);
+	if (ftruncate (fileno (diary->file), 0) == -1)
+		d(printf("failed to truncate diary '%s'\n", g_strerror (errno)));
 }
 
 CamelDiscoDiary *

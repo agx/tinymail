@@ -2474,7 +2474,7 @@ fix_broken_rfc2047 (const char **in)
 	gboolean encoded = FALSE;
 	gboolean broken = TRUE;
 
-	p = *in;
+	p = (gchar *) *in;
 
 	while (*p != '\0') {
 		if (!encoded) {

@@ -29,6 +29,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include <tny-mime-part.h>
 #include <tny-camel-shared.h>
@@ -276,7 +277,8 @@ tny_camel_bs_mime_part_get_header_pairs_default (TnyMimePart *self, TnyList *lis
 					gchar buffer[1024];
 					gchar *ptr;
 					memset (buffer, 0, 1024);
-					fgets (buffer, 1024, f);
+					if (fgets (buffer, 1024, f) == NULL)
+					  g_warning ("%s: failed to read:", __FUNCTION__, g_strerror (errno));
 					ptr = strchr (buffer, ':');
 					if (ptr) {
 						TnyPair *pair;

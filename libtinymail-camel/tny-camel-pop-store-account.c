@@ -114,7 +114,7 @@ tny_camel_pop_store_account_factor_folder (TnyCamelStoreAccount *self, const gch
 	{
 		*was_new = TRUE;
 		ppriv->inbox = TNY_FOLDER (_tny_camel_pop_folder_new ());
-		_tny_camel_store_account_add_to_managed_folders (self, ppriv->inbox);
+		_tny_camel_store_account_add_to_managed_folders (self, TNY_CAMEL_FOLDER (ppriv->inbox));
 		g_object_weak_ref (G_OBJECT (ppriv->inbox), (GWeakNotify) notify_factory_del, self);
 	} else {
 		g_object_ref (ppriv->inbox);

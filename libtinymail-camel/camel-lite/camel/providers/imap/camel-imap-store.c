@@ -314,7 +314,7 @@ void
 _camel_imap_store_start_idle (CamelImapStore *store)
 {
 	/* We avoid to stop or start the idle thread from the msg gmsgstore */
-	if (store->current_folder && CAMEL_IS_IMAP_FOLDER (store->current_folder) && store->current_folder->parent_store != store)
+	if (store->current_folder && CAMEL_IS_IMAP_FOLDER (store->current_folder) && store->current_folder->parent_store != (CamelStore *) store)
 		return;
 	if (store->current_folder && CAMEL_IS_IMAP_FOLDER (store->current_folder))
 		camel_imap_folder_start_idle (store->current_folder);

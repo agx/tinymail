@@ -442,7 +442,10 @@ get_highestmodseq (CamelImapFolder *imap_folder)
 	if (file != NULL)
 	{
 		retval = g_malloc0 (25); /* a 64bit number must fit in it */
-		fscanf (file, "%s", retval);
+
+		if (fscanf (file, "%s", retval) == EOF)
+			d(fprintf(stderr, "%s: failed to read file: %s", __FUNCTION__, g_strerror (errno)));
+
 		fclose (file);
 	}
 
@@ -5528,7 +5531,9 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 		struct stat buf;
 		fstat (fileno (file), &buf);
 		retval = (char *) malloc (buf.st_size + 10);
-		fgets (retval, buf.st_size, file);
+		if (fgets (retval, buf.st_size, file) == NULL) {
+			d(fprintf (stderr, "%s: failed to read:", __FUNCTION__, g_strerror (errno)));
+		}
 		fclose (file);
 	} else {
 
