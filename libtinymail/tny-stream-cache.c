@@ -158,7 +158,7 @@ tny_stream_cache_register_type (gpointer notused)
 			NULL
 		};
 	type = g_type_register_static (G_TYPE_INTERFACE, 
-				       "TnyCacheStream", &info, 0);
+				       "TnyStreamCache", &info, 0);
 	
 	return GUINT_TO_POINTER (type);
 }

@@ -1,3 +1,7 @@
+2009-10-16  Carl Simonson <simonsonc@gmail.com>
+
+	* libtinymail/tny-stream-cache.c: Fix TnyStreamCache class name
+
 2009-10-16  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Many build warning fixes.
