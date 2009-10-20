@@ -105,6 +105,11 @@
 	* Removed dependency on libgnomeui in many places of
 	tinymail (partial fix #590753).
 
+2009-10-14  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c: register folder
+	store observer for every instance.
+
 2009-10-14  Sergio Villar Senin  <svillar@igalia.com>
 
 	* camel/camel-folder-summary.c (message_info_load): added proper

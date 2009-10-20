@@ -314,6 +314,7 @@ recurse_folders_async_cb (TnyFolderStore *store,
 				   reference count is decreased automatically by the gtktreestore infra-
 				   structure. */
 
+				add_folder_store_observer_weak (self, TNY_FOLDER_STORE (folder));
 				add_folder_observer_weak (self, folder);
 
 				if (self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_SHOW_PATH) {
