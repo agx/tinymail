@@ -1,3 +1,9 @@
+2009-10-20  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c
+	(recurse_folders_async_cb): only add a folder store observer if
+	the folder is a TnyFolderStore
+
 2009-10-16  Carl Simonson <simonsonc@gmail.com>
 
 	* libtinymail/tny-stream-cache.c: Fix TnyStreamCache class name
