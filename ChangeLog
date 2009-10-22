@@ -1,3 +1,9 @@
+2009-10-22  Javier Jardón Cabezas <jjardon@gnome.org>
+
+	Reviewed by  Sergio Villar Senin  <svillar@igalia.com>
+
+	* tests/c-demo/tny-main.c: Remove gnome_vfs code
+
 2009-10-20  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c

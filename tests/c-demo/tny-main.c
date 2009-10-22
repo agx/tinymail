@@ -42,11 +42,6 @@
 
 #include <tny-demoui-summary-view.h>
 
-#ifdef GNOME
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-utils.h>
-#endif
-
 /**
  * main:
  * @argc: Amount of arguments
@@ -83,10 +78,6 @@ main (int argc, char **argv)
 	gdk_threads_enter ();
 
 	gtk_init (&argc, &argv);
-
-#ifdef GNOME
-	gnome_vfs_init ();
-#endif
 
 	bindtextdomain(GETTEXT_PACKAGE, TNY_LOCALE_DIR);
 
