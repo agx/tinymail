@@ -6,7 +6,7 @@ INCLUDES =								\
 	-DLOCALEDIR=\""$(localedir)"\"					\
 	-DE_DATA_SERVER_EXTENSIONDIR=\"$(extensiondir)\"		\
 	-DE_DATA_SERVER_IMAGESDIR=\"$(imagesdir)\"			\
-	-DE_DATA_SERVER_UI_GLADEDIR=\""$(gladedir)"\"			\
+	-DE_DATA_SERVER_UIDIR=\""$(uidir)"\"				\
 	$(E_DATA_SERVER_CFLAGS)
 
 noinst_LTLIBRARIES = libedataserver-1.2.la

@@ -1,6 +1,19 @@
 2009-10-22  Javier Jardón Cabezas <jjardon@gnome.org>
 
-	Reviewed by  Sergio Villar Senin  <svillar@igalia.com>
+	Reviewed by: Sergio Villar Senin  <svillar@igalia.com>
+
+	Use GtkBuilder instead libglade
+
+	* tests/python-demo/tinymail-python-test.glade: deleted
+	* tests/python-demo/tinymail-python-test.ui: new file
+	* libtinymail-camel/camel-lite/libedataserver/Makefile.am
+	* libtinymail-camel/camel-lite/libedataserver/e-data-server-util.c
+	* libtinymail-camel/camel-lite/libedataserver/libedataserver-private.h
+	* tests/python-demo/tinymail-python-test.py
+
+2009-10-22  Javier Jardón Cabezas <jjardon@gnome.org>
+
+	Reviewed by: Sergio Villar Senin  <svillar@igalia.com>
 
 	* tests/c-demo/tny-main.c: Remove gnome_vfs code
 

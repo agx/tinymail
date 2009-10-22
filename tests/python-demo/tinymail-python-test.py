@@ -1,5 +1,4 @@
 import gtk
-import gtk.glade
 import gnome
 import tinymail
 import tinymail.ui
@@ -43,13 +42,14 @@ def on_folderstree_selected (treeselection, headerstree) :
 
 props = { gnome.PARAM_APP_DATADIR : "/usr/share" }
 pr = gnome.program_init ("E-Mail", "1.0", properties=props)
-xml = gtk.glade.XML ("tinymail-python-test.glade", domain="email")
-widget = xml.get_widget ("window")
-progressbar = xml.get_widget ("progressbar")
+builder = gtk.Builder()
+builder.add_from_file("tinymail-python-test.ui")
+widget = builder.get_object("window")
+progressbar = builder.get_object ("progressbar")
 progressbar.hide ()
-folderstree = xml.get_widget ("folderstree")
-headerstree = xml.get_widget ("headerstree")
-vpaned = xml.get_widget ("vpaned")
+folderstree = builder.get_object ("folderstree")
+headerstree = builder.get_object ("headerstree")
+vpaned = builder.get_object ("vpaned")
 renderer = gtk.CellRendererText ();
 column = gtk.TreeViewColumn ("Folder", renderer, text=0)
 column.set_fixed_width (100)
@@ -84,5 +84,5 @@ account_store.get_accounts (accounts, tinymail.ACCOUNT_STORE_STORE_ACCOUNTS)
 folderstree.set_model (accounts)
 folderstree.get_selection().connect("changed", on_folderstree_selected, headerstree)
 headerstree.get_selection().connect("changed", on_headerstree_selected, msgview)
-xml.signal_connect("on_window_delete_event", gtk.main_quit)
+builder.connect_signals(self)
 gtk.main()
