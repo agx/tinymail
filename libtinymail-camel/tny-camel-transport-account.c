@@ -180,6 +180,8 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 
 	if (apriv->service == NULL || !CAMEL_IS_SERVICE (apriv->service)) {
 		_tny_camel_exception_to_tny_error (apriv->ex, err);
+		camel_exception_clear (apriv->ex);
+
 		return;
 	}
 
@@ -197,6 +199,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
 	{
 		if (camel_exception_is_set (&ex)) {
 			_tny_camel_exception_to_tny_error (&ex, err);
+			camel_exception_clear (&ex);
 		} else {
 			g_set_error (err, TNY_ERROR_DOMAIN,
 				TNY_SERVICE_ERROR_AUTHENTICATE,

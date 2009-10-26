@@ -1,5 +1,29 @@
-2009-10-22  Javier Jardón Cabezas <jjardon@gnome.org>
+2009-10-26  Sergio Villar Senin  <svillar@igalia.com>
 
+	Fixed a lot of memory leaks in CamelException's
+
+	* libtinymail-camel/tny-camel-transport-account.c
+	(tny_camel_transport_account_send_default): added missing camel_exception_clear
+
+	* libtinymail-camel/tny-camel-partial-msg-receive-strategy.c (tny_camel_partial_msg_receive_strategy_perform_get_msg_default): added missing camel_exception_clear
+
+	* libtinymail-camel/tny-camel-full-msg-receive-strategy.c (tny_camel_full_msg_receive_strategy_perform_get_msg_default): added missing camel_exception_clear
+
+	* libtinymail-camel/tny-camel-folder.c (tny_camel_folder_add_msg_shared)
+	(tny_camel_folder_add_msg_default)
+	(tny_camel_folder_sync_default)
+	(tny_camel_folder_refresh_async_thread)
+	(tny_camel_folder_refresh_default)
+	(tny_camel_folder_get_headers_default)
+	(tny_camel_folder_get_msg_default)
+	(tny_camel_folder_find_msg_default)
+	(tny_camel_folder_copy_shared, transfer_msgs_thread_clean)
+	(tny_camel_folder_transfer_msgs_async_thread): added missing camel_exception_clear
+
+	* libtinymail-camel/tny-camel-account.c (_tny_camel_account_try_connect)
+	(tny_camel_account_get_supported_secure_authentication_async_thread): added missing camel_exceptio
+
+2009-10-22  Javier Jardón Cabezas <jjardon@gnome.org>
 	Reviewed by: Sergio Villar Senin  <svillar@igalia.com>
 
 	Use GtkBuilder instead libglade

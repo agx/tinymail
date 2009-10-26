@@ -84,6 +84,7 @@ tny_camel_partial_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStr
 	if (camel_exception_is_set (&ex))
 	{
 		_tny_camel_exception_to_tny_error (&ex, err);
+		camel_exception_clear (&ex);
 	} else 
 	{
 		if (camel_message && CAMEL_IS_OBJECT (camel_message))

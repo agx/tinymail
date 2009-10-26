@@ -624,8 +624,10 @@ _tny_camel_account_try_connect (TnyCamelAccount *self, gboolean for_online, GErr
 	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
 
 	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->prepare(TNY_CAMEL_ACCOUNT (self), for_online, TRUE);
-	if (camel_exception_is_set (priv->ex))
+	if (camel_exception_is_set (priv->ex)) {
 		_tny_camel_exception_to_tny_error (priv->ex, err);
+		camel_exception_clear (priv->ex);
+	}
 	return;
 }
 
@@ -2026,8 +2028,10 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 	info->result = result;
 
 	info->err = NULL;
-	if (camel_exception_is_set (&ex))
+	if (camel_exception_is_set (&ex)) {
 		_tny_camel_exception_to_tny_error (&ex, &info->err);
+		camel_exception_clear (&ex);
+	}
 
 	g_static_rec_mutex_unlock (priv->service_lock);
 
