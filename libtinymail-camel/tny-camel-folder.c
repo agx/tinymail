@@ -3172,7 +3172,9 @@ tny_camel_folder_find_msg_default (TnyFolder *self, const gchar *url_string, GEr
 			if (retval) {
 				nhdr = tny_msg_get_header (retval);
 				/* This trick is for forcing owning a TnyCamelHeader reference */
-				_tny_camel_msg_header_set_decorated ((TnyCamelMsgHeader *) nhdr, hdr, TRUE);
+				if (hdr != nhdr && TNY_IS_CAMEL_MSG_HEADER (nhdr)) {
+					_tny_camel_msg_header_set_decorated ((TnyCamelMsgHeader *) nhdr, hdr, TRUE);
+				}
 				g_object_unref (nhdr);
 			}
 			g_object_unref (hdr);

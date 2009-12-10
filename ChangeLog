@@ -15,6 +15,8 @@
 	don't wipe the bs cached parts accidentally.
 	* Better setup of using bodystruct for IMAP. Also, set as default bodystruct
 	based implementation.
+	* Avoid a crash on getting the header of a BS message, and this won't be
+	decorated (not needed in bs).
 
 2009-10-26  Sergio Villar Senin  <svillar@igalia.com>
 
