@@ -239,6 +239,7 @@ esac],[build_demoui=$build_demoui])
 AM_CONDITIONAL(BUILD_DEMOUI, test x$build_demoui = xtrue)
 
 dnl ### Enable IMAP part-fetch feature ##
+build_imapp=true
 AC_ARG_ENABLE(imap-part-fetch,
 AC_HELP_STRING([--enable-imap-part-fetch],
   [Build using imap part fetch]),
@@ -741,6 +742,7 @@ echo "  Enable NetworkManager:       $build_nm"
 echo "  Enable ACAP features:        $build_acap"
 echo "  Enable Telepathy features:   $build_tp"
 echo "  HTML component:              ${with_html_component}"
+echo "  Enable Bodystruct support:   ${build_imapp}"
 echo "  Python language bindings:    $build_pytinymail"
 echo "  API tests:                   $build_apitests"
 echo "  Unit tests:                  $build_unittests"

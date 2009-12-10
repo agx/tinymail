@@ -13,6 +13,8 @@
 	on fetching the bodystructure.
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-message-cache.c:
 	don't wipe the bs cached parts accidentally.
+	* Better setup of using bodystruct for IMAP. Also, set as default bodystruct
+	based implementation.
 
 2009-10-26  Sergio Villar Senin  <svillar@igalia.com>
 

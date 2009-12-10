@@ -6797,7 +6797,7 @@ tny_camel_folder_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->cached_name = NULL;
 	priv->cached_folder_type = TNY_FOLDER_TYPE_UNKNOWN;
 	priv->remove_strat = tny_camel_msg_remove_strategy_new ();
-	priv->receive_strat = tny_camel_bs_msg_receive_strategy_new ();
+	priv->receive_strat = tny_camel_full_msg_receive_strategy_new ();
 	priv->reason_lock = g_new0 (GStaticRecMutex, 1);
 	g_static_rec_mutex_init (priv->reason_lock);
 
