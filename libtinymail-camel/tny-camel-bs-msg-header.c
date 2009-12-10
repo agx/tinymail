@@ -105,7 +105,7 @@ tny_camel_bs_msg_header_dup_bcc (TnyHeader *self)
 static TnyHeaderFlags
 tny_camel_bs_msg_header_get_flags (TnyHeader *self)
 {
-	return 0;
+	return TNY_HEADER_FLAG_CACHED;
 }
 
 static void

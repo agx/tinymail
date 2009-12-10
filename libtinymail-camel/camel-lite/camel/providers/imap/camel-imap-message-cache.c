@@ -351,14 +351,19 @@ cachefile_get(const char *path, const char *uid, const char *part_spec)
 	} else {
 		char tmp [512];
 
-		snprintf(tmp, 512, "%s.~", uid);
-		file = g_build_filename(path, tmp, NULL);
-		if (!g_file_test(tmp, G_FILE_TEST_IS_REGULAR)) {
-			/*  Test if old cache file exists (like "uid."*/
-			int len = strlen(file);
-			file [len -1] = '\0';
+		snprintf(tmp, 512, "%s_bodystructure", uid);
+		file = g_build_filename (path, tmp, NULL);
+		if (!g_file_test (file, G_FILE_TEST_IS_REGULAR)) {
+			g_free (file);
+			snprintf(tmp, 512, "%s.~", uid);
+			file = g_build_filename(path, tmp, NULL);
 			if (!g_file_test(file, G_FILE_TEST_IS_REGULAR)) {
-				file [len -1] = '~';
+				/*  Test if old cache file exists (like "uid."*/
+				int len = strlen(file);
+				file [len -1] = '\0';
+				if (!g_file_test(file, G_FILE_TEST_IS_REGULAR)) {
+					file [len -1] = '~';
+				}
 			}
 		}
 	}
