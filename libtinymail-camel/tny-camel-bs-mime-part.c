@@ -179,7 +179,9 @@ decode_from_stream_to (TnyMimePart *self, TnyStream *from_stream, TnyStream *str
 	gssize bytes_written = -1;
 	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
 
-	if (decode_text && camel_strcase_equal (priv->bodystructure->content.type, "TEXT")) 
+	if (decode_text &&
+	    camel_strcase_equal (priv->bodystructure->content.type, "TEXT") &&
+	    camel_strcase_equal (priv->bodystructure->content.subtype, "PLAIN")) 
 	{
 		gchar *encoding = NULL;
 		gchar *charset = (gchar *) mimeparam_get_value_for (priv->bodystructure->content.params, "CHARSET");

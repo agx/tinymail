@@ -5,6 +5,8 @@
 	* Offer header pairs available in body struct if body itself is not
 	fetched.
 	* Bodystruct parts are not purged.
+	* libtinymail-camel/tny-camel-bs-mime-part.c: only use format_text with
+	text/plain mime parts.
 
 2009-10-26  Sergio Villar Senin  <svillar@igalia.com>
 
