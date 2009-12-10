@@ -184,10 +184,10 @@ camel_imap_message_cache_new (const char *path, CamelFolderSummary *summary,
 	while ((dname = g_dir_read_name (dir))) {
 		if (!isdigit (dname[0]))
 			continue;
-		p = strchr (dname, '.');
+		p = strchr (dname, '_');
 		if (p)
 			uid = g_strndup (dname, p - dname);
-		else if ((p = strchr (dname, '_')))
+		else if ((p = strchr (dname, '.')))
 			uid = g_strndup (dname, p - dname);
 		else {
 			g_warning("Cache file name Invalid\n");

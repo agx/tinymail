@@ -11,6 +11,8 @@
 	know if a specific mime part is already fetched to cache.
 	* libtinymail-camel/tny-camel-bs-msg-receive-strategy.c: retrieve bodies
 	on fetching the bodystructure.
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-message-cache.c:
+	don't wipe the bs cached parts accidentally.
 
 2009-10-26  Sergio Villar Senin  <svillar@igalia.com>
 
