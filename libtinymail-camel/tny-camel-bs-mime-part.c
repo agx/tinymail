@@ -1082,6 +1082,24 @@ _tny_camel_bs_mime_part_set_strat (TnyCamelBsMimePart *self, TnyCamelBsMsgReceiv
 	return;
 }
 
+gboolean
+tny_camel_bs_mime_part_is_fetched (TnyCamelBsMimePart *part)
+{
+	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
+	CamelFolderPartState state;
+	CamelFolder *cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (priv->folder));
+	gchar *pos_filename = camel_folder_get_cache_filename (cfolder, 
+		priv->uid, priv->bodystructure->part_spec, &state);
+
+	if (pos_filename) {
+		g_free (pos_filename);
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+
 static void
 tny_camel_bs_mime_part_finalize (GObject *object)
 {

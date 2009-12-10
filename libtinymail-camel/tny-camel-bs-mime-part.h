@@ -79,6 +79,8 @@ struct _TnyCamelBsMimePartClass
 
 GType tny_camel_bs_mime_part_get_type (void);
 
+gboolean tny_camel_bs_mime_part_is_fetched (TnyCamelBsMimePart *part);
+
 
 G_END_DECLS
 
