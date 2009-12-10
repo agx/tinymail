@@ -1,3 +1,11 @@
+2009-12-10  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Enable bodystruct parsing for partial retrieval.
+	* Improvement in content type recoginition in bodystruct mime part.
+	* Offer header pairs available in body struct if body itself is not
+	fetched.
+	* Bodystruct parts are not purged.
+
 2009-10-26  Sergio Villar Senin  <svillar@igalia.com>
 
 	Fixed a lot of memory leaks in CamelException's

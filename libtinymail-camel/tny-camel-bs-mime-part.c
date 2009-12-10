@@ -260,40 +260,120 @@ tny_camel_bs_mime_part_get_header_pairs (TnyMimePart *self, TnyList *list)
 	return;
 }
 
+static gchar *
+create_content_type_string (bodystruct_t *bs)
+{
+	GString *buffer;
+	mimeparam_t *current;
+	
+	buffer = g_string_new ("");
+	g_string_append_printf (buffer, "%s/%s", 
+				bs->content.type,
+				bs->content.subtype);
+	buffer = g_string_ascii_down (buffer);
+
+	for (current = bs->content.params; current != NULL; current = current->next) {
+		gchar *down;
+		buffer = g_string_append (buffer, "; ");
+		down = g_ascii_strdown (current->name, -1);
+		buffer = g_string_append (buffer, down);
+		g_free (down);
+		buffer = g_string_append (buffer, "=");
+		buffer = g_string_append (buffer, current->value);
+	}
+ 
+	if (bs->content.cid != NULL ) {
+		g_string_append_printf (buffer, "; cid=%s", bs->content.cid);
+	}
+	if (bs->content.md5 != NULL ) {
+		g_string_append_printf (buffer, "; md5=%s", bs->content.md5);
+	}
+ 
+	return g_string_free (buffer, FALSE);
+}
+ 
+static gchar *
+create_disposition_string (bodystruct_t *bs)
+{
+	GString *buffer;
+	mimeparam_t *current;
+ 
+	buffer = g_string_new (bs->disposition.type);
+ 
+	for (current = bs->disposition.params; current != NULL; current = current->next) {
+		gchar *down;
+		buffer = g_string_append (buffer, "; ");
+		down = g_ascii_strdown (current->name, -1);
+		buffer = g_string_append (buffer, down);
+		g_free (down);
+		buffer = g_string_append (buffer, "=");
+		buffer = g_string_append (buffer, current->value);
+	}
+ 
+	if (bs->octets > 0) {
+		g_string_append_printf (buffer, "; size=%d", bs->octets);
+	}
+ 
+	return g_string_free (buffer, FALSE);
+}
+
 static void 
 tny_camel_bs_mime_part_get_header_pairs_default (TnyMimePart *self, TnyList *list)
 {
 	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
-	if (!priv->parent && TNY_IS_MSG (self)) {
-		CamelFolderPartState state;
-		CamelFolder *cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (priv->folder));
-		gchar *pos_filename = camel_folder_get_cache_filename (cfolder, 
-			priv->uid, "HEADER", &state);
-
-		if (pos_filename) {
-			FILE *f = fopen (pos_filename, "r");
-			if (f) {
-				while (!feof (f)) {
-					gchar buffer[1024];
-					gchar *ptr;
-					memset (buffer, 0, 1024);
-					if (fgets (buffer, 1024, f) == NULL)
-					  g_warning ("%s: failed to read:", __FUNCTION__, g_strerror (errno));
-					ptr = strchr (buffer, ':');
-					if (ptr) {
-						TnyPair *pair;
-						*ptr='\0';
-						ptr++;
-						pair = tny_pair_new (buffer, ptr);
-						tny_list_append (list, (GObject *) pair);
-						g_object_unref (pair);
-					}
-				}
-
-				fclose (f);
-			}
-			g_free (pos_filename);
+	CamelFolderPartState state;
+	CamelFolder *cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (priv->folder));
+	gchar *pos_filename = camel_folder_get_cache_filename (cfolder, 
+							       priv->uid, "HEADER", &state);
+ 
+	if (pos_filename && !priv->parent && TNY_IS_MSG (self)) {
+		FILE *f = fopen (pos_filename, "r");
+		if (f) {
+			while (!feof (f)) {
+				gchar buffer[1024];
+				gchar *ptr;
+				memset (buffer, 0, 1024);
+				fgets (buffer, 1024, f);
+				ptr = strchr (buffer, ':');
+				if (ptr) {
+					TnyPair *pair;
+					*ptr='\0';
+					ptr++;
+					pair = tny_pair_new (buffer, ptr);
+					tny_list_append (list, (GObject *) pair);
+					g_object_unref (pair);
+                                }
+                        }
+                       
+			fclose (f);
 		}
+		g_free (pos_filename);
+	} else {
+		/* extract from bodystructure the retrieved headers */
+		TnyPair *pair;
+		gchar *disposition_string;
+		gchar *content_type_string;
+		
+		if (priv->bodystructure->description) {
+			pair = tny_pair_new ("Description", priv->bodystructure->description);
+			tny_list_append (list, (GObject *) pair);
+			g_object_unref (pair);
+		}
+		disposition_string = create_disposition_string (priv->bodystructure);
+		if (disposition_string) {
+			pair = tny_pair_new ("Content-Disposition", disposition_string);
+			tny_list_append (list, (GObject *) pair);
+			g_object_unref (pair);
+			g_free (disposition_string);
+		}
+		content_type_string = create_content_type_string (priv->bodystructure);
+		if (content_type_string) {
+			pair = tny_pair_new ("Content-Type", content_type_string);
+			tny_list_append (list, (GObject *) pair);
+			g_object_unref (pair);
+			g_free (content_type_string);
+		}
+		
 	}
 
 	return;
@@ -759,7 +839,7 @@ tny_camel_bs_mime_part_is_purged_default (TnyMimePart *self)
 	gboolean retval = FALSE;
 
 	if (pos_filename) {
-		retval = TRUE;
+		retval = FALSE;
 		g_free (pos_filename);
 	}
 
