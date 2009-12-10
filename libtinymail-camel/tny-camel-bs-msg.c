@@ -108,31 +108,39 @@ tny_camel_bs_msg_get_url_string_default (TnyMsg *self)
 {
 	TnyCamelBsMsgPriv *priv = TNY_CAMEL_BS_MSG_GET_PRIVATE (self);
 	gchar *retval = NULL;
+	TnyFolder *folder;
+
+	TnyHeader *header = tny_msg_get_header (self);
+	gchar *uid = tny_header_dup_uid (header);
 
 	if (priv->folder) {
-		TnyHeader *header = tny_msg_get_header (self);
-		gchar *uid = tny_header_dup_uid (header);
-
-		if (uid) {
-			TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->folder);
-			if (fpriv->iter && fpriv->iter->uri) {
-				retval = g_strdup_printf ("%s/%s", fpriv->iter->uri, uid);
-
-			} else if (fpriv->account) {
-				TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (fpriv->account);
-				if (apriv->service) {
-					char *urls = camel_service_get_url (apriv->service);
-					CamelFolder *cfol = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (priv->folder));
-					const char *foln = camel_folder_get_full_name (cfol);
-					retval = g_strdup_printf ("%s/%s/%s", urls, foln, uid);
-					g_free (urls);
-				}
-			}
-			g_free (uid);
-		}
-
-		g_object_unref (header);
+		folder = g_object_ref (priv->folder);
+	} else if (header) {
+		folder = tny_header_get_folder (header);
+	} else {
+		folder = NULL;
 	}
+
+	if (uid && folder) {
+		TnyCamelFolderPriv *fpriv = TNY_CAMEL_FOLDER_GET_PRIVATE (priv->folder);
+		if (fpriv->iter && fpriv->iter->uri) {
+			retval = g_strdup_printf ("%s/%s", fpriv->iter->uri, uid);
+			
+		} else if (fpriv->account) {
+			TnyCamelAccountPriv *apriv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (fpriv->account);
+			if (apriv->service) {
+				char *urls = camel_service_get_url (apriv->service);
+				CamelFolder *cfol = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (priv->folder));
+				const char *foln = camel_folder_get_full_name (cfol);
+				retval = g_strdup_printf ("%s/%s/%s", urls, foln, uid);
+				g_free (urls);
+			}
+		}
+		g_free (uid);
+	}
+	
+	g_object_unref (header);
+	if (folder) g_object_unref (folder);
 
 	return retval;
 }
@@ -157,11 +165,20 @@ tny_camel_bs_msg_get_allow_external_images_default (TnyMsg *self)
 	TnyCamelBsMsgPriv *priv = TNY_CAMEL_BS_MSG_GET_PRIVATE (self);
 	gboolean allow = FALSE;
 	
-	if (priv->folder && priv->header) {
+	if (priv->header) {
 		gchar *uid;
+		TnyFolder *folder;
 		uid = tny_header_dup_uid (priv->header);
-		allow = _tny_camel_folder_get_allow_external_images (TNY_CAMEL_FOLDER(priv->folder),
-								     uid);
+		if (priv->folder) {
+			folder = g_object_ref (priv->folder);
+		} else {
+			folder = tny_header_get_folder (priv->header);
+		}
+		if (folder) {
+			allow = _tny_camel_folder_get_allow_external_images (TNY_CAMEL_FOLDER(folder),
+									     uid);
+			g_object_unref (folder);
+		}
 		g_free (uid);
 	}
 	return allow;
@@ -178,11 +195,20 @@ tny_camel_bs_msg_set_allow_external_images_default (TnyMsg *self, gboolean allow
 {
 	TnyCamelBsMsgPriv *priv = TNY_CAMEL_BS_MSG_GET_PRIVATE (self);
 
-	if (priv->folder && priv->header) {
+	if (priv->header) {
 		gchar *uid;
+		TnyFolder *folder;
 		uid = tny_header_dup_uid (priv->header);
-		_tny_camel_folder_set_allow_external_images (TNY_CAMEL_FOLDER(priv->folder),
-							     uid, allow);
+		if (priv->folder) {
+			folder = g_object_ref (priv->folder);
+		} else {
+			folder = tny_header_get_folder (priv->header);
+		}
+		if (folder) {
+			_tny_camel_folder_set_allow_external_images (TNY_CAMEL_FOLDER(folder),
+								     uid, allow);
+			g_object_unref (folder);
+		}
 		g_free (uid);
 	}
 	return;
