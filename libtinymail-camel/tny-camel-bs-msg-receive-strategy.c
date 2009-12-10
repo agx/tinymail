@@ -183,6 +183,7 @@ tny_camel_bs_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrategy
 				return NULL;
 			}
 		}
+		tny_header_set_flag (TNY_HEADER (header), TNY_HEADER_FLAG_CACHED);
 	} else
 		message = NULL;
 
