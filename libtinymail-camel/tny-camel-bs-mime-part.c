@@ -1085,7 +1085,7 @@ _tny_camel_bs_mime_part_set_strat (TnyCamelBsMimePart *self, TnyCamelBsMsgReceiv
 gboolean
 tny_camel_bs_mime_part_is_fetched (TnyCamelBsMimePart *part)
 {
-	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
+	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (part);
 	CamelFolderPartState state;
 	CamelFolder *cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (priv->folder));
 	gchar *pos_filename = camel_folder_get_cache_filename (cfolder, 

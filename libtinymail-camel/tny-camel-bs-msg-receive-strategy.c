@@ -50,12 +50,16 @@
 #include <tny-camel-bs-mime-part.h>
 
 #include <tny-fs-stream.h>
+#include <tny-simple-list.h>
+#include <tny-camel-stream.h>
 
 #include "tny-camel-account-priv.h"
 #include "tny-camel-folder-priv.h"
 #include "tny-camel-msg-header-priv.h"
 #include "tny-camel-bs-msg-priv.h"
 #include "tny-camel-bs-mime-part-priv.h"
+
+static TnyCamelBsMsgReceiveStrategyBodiesFilter _bodies_filter = NULL;
 
 static GObjectClass *parent_class = NULL;
 
@@ -149,6 +153,36 @@ tny_camel_bs_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrategy
 		_tny_camel_bs_mime_part_set_strat (TNY_CAMEL_BS_MIME_PART (message), 
 			TNY_CAMEL_BS_MSG_RECEIVE_STRATEGY (self));
 
+		/* If there are bodies to fetch, fetch them */
+		if (_bodies_filter) {
+			TnyList *bodies;
+			TnyIterator *iterator;
+
+			bodies = TNY_LIST (tny_simple_list_new ());
+			_bodies_filter (message, bodies);
+			for (iterator = tny_list_create_iterator (bodies);
+			     !tny_iterator_is_done (iterator) && (err && !*err);
+			     tny_iterator_next (iterator)) {
+				TnyMimePart *body;
+				CamelStream *null_stream;
+				TnyStream *tny_null_stream;
+
+				body = TNY_MIME_PART (tny_iterator_get_current (iterator));
+				null_stream = camel_stream_null_new ();
+				tny_null_stream = tny_camel_stream_new (null_stream);
+				tny_mime_part_write_to_stream (body, tny_null_stream, err);
+				g_object_unref (tny_null_stream);
+				
+				g_object_unref (body);
+			}
+			g_object_unref (iterator);
+			g_object_unref (bodies);
+
+			if (err && *err != NULL) {
+				g_object_unref (message);
+				return NULL;
+			}
+		}
 	} else
 		message = NULL;
 
@@ -185,7 +219,6 @@ tny_camel_bs_msg_receive_strategy_new (void)
 	return TNY_MSG_RECEIVE_STRATEGY (self);
 }
 
-
 static void
 tny_camel_bs_msg_receive_strategy_class_init (TnyCamelBsMsgReceiveStrategyClass *klass)
 {
@@ -197,6 +230,7 @@ tny_camel_bs_msg_receive_strategy_class_init (TnyCamelBsMsgReceiveStrategyClass 
 	klass->perform_get_msg= tny_camel_bs_msg_receive_strategy_perform_get_msg_default;
 
 	object_class->finalize = tny_camel_bs_msg_receive_strategy_finalize;
+
 }
 
 static void 
@@ -248,4 +282,10 @@ tny_camel_bs_msg_receive_strategy_get_type (void)
 	static GOnce once = G_ONCE_INIT;
 	g_once (&once, tny_camel_bs_msg_receive_strategy_register_type, NULL);
 	return GPOINTER_TO_UINT (once.retval);
+}
+
+void
+tny_camel_bs_msg_receive_strategy_set_global_bodies_filter (TnyCamelBsMsgReceiveStrategyBodiesFilter filter)
+{
+	_bodies_filter = filter;
 }

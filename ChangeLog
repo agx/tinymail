@@ -9,6 +9,8 @@
 	text/plain mime parts.
 	* libtinymail-camel/tny-camel-bs-mime-part.c: new methods is_fetched, to
 	know if a specific mime part is already fetched to cache.
+	* libtinymail-camel/tny-camel-bs-msg-receive-strategy.c: retrieve bodies
+	on fetching the bodystructure.
 
 2009-10-26  Sergio Villar Senin  <svillar@igalia.com>
 
