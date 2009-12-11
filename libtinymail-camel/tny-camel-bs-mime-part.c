@@ -799,6 +799,7 @@ tny_camel_bs_mime_part_get_decoded_stream_default (TnyMimePart *self)
 {
 	TnyStream *retval = tny_camel_mem_stream_new ();
 	fetch_part (self, retval, FALSE);
+	tny_stream_reset (retval);
 	return retval;
 }
 
