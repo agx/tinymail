@@ -5379,7 +5379,13 @@ fetch_berrorhander:
 							}
 							linenum++;
 						} else {
-							imap_debug ("Unsolicited in FETCH: %s\n", line);
+							pos = g_strstr_len (line, -1, "NIL");
+							if (pos) {
+								exread = 0;
+								linenum++;
+							} else {
+								imap_debug ("Unsolicited in FETCH: %s\n", line);
+							}
 						}
 						continue;
 					}
@@ -6035,7 +6041,13 @@ Received: from nic.funet.fi
 						}
 						linenum++;
 					} else {
-						imap_debug ("Unsolicited in FETCH: %s\n", line);
+						pos = g_strstr_len (line, -1, "NIL");
+						if (pos) {
+							exread = 0;
+							linenum++;
+						} else {
+							imap_debug ("Unsolicited in FETCH: %s\n", line);
+						}
 					}
 					memset (line, 0, MAX_LINE_LEN);
 					continue;

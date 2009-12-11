@@ -6,6 +6,7 @@
 	* Add the bodystruct of the child to the embedded message created
 	in tny_camel_bs_mime_part_get_parts, as this is the expected
 	structure in tinymail.
+	* Handle better in IMAP "NIL" parameter in fetch response.
 
 2009-12-12  Carl Simonson <simonsonc@gmail.com>
 
