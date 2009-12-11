@@ -512,7 +512,7 @@ tny_camel_msg_get_type (void)
 }
 
 void
-tny_camel_msg_parse (TnyMsg *self, TnyStream *stream)
+tny_camel_msg_parse (TnyCamelMsg *self, TnyStream *stream)
 {
 	TnyCamelMimePartPriv *ppriv = TNY_CAMEL_MIME_PART_GET_PRIVATE (self);
 	CamelMimeParser *parser;
