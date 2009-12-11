@@ -20,6 +20,7 @@
 #include <config.h>
 #include <glib/gi18n-lib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <tny-camel-account.h>
 #include <tny-session-camel.h>

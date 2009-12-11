@@ -402,7 +402,8 @@ tny_camel_bs_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 			TnyMimePart *mpart;
 
 			if (!strcasecmp (part->content.type, "message") && !strcasecmp (part->content.subtype, "rfc822")) {
-				TnyHeader *header = _tny_camel_bs_msg_header_new (part->envelope, part->octets);
+				TnyHeader *header = _tny_camel_bs_msg_header_new (part->envelope, part->octets, 
+										  mimeparam_get_value_for (part->content.params, "CHARSET"));
 				mpart = (TnyMimePart *) _tny_camel_bs_msg_new (part->subparts,
 					priv->uid, TNY_CAMEL_BS_MIME_PART (self));
 				_tny_camel_bs_msg_set_header (TNY_CAMEL_BS_MSG (mpart), header);

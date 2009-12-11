@@ -23,6 +23,7 @@
 
 #include <glib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <tny-header.h>
 
@@ -32,15 +33,38 @@
 #include <tny-camel-shared.h>
 
 #include <camel/camel-mime-utils.h>
+#include <libedataserver/e-iconv.h>
 
 static GObjectClass *parent_class = NULL;
+
+char *
+_tny_camel_bs_decode_raw_header (TnyCamelBsMsgHeader *me, const char *str)
+{
+	const gchar *charset;
+
+	if (!str)
+		return NULL;
+
+	charset = me->charset;
+	
+	if (charset && (g_ascii_strcasecmp(charset, "us-ascii") == 0))
+		charset = NULL;
+
+	charset = charset ? e_iconv_charset_name (charset) : NULL;
+
+	while (isspace ((unsigned) *str))
+		str++;
+
+	return camel_header_decode_string (str, charset);
+}
+
 
 
 static gchar*
 tny_camel_bs_msg_header_dup_replyto (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return g_strdup (me->envelope->reply_to);
+	return _tny_camel_bs_decode_raw_header (me, me->envelope->reply_to);
 }
 
 
@@ -92,14 +116,14 @@ static gchar*
 tny_camel_bs_msg_header_dup_cc (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return g_strdup (me->envelope->cc);
+	return _tny_camel_bs_decode_raw_header (me, me->envelope->cc);
 }
 
 static gchar*
 tny_camel_bs_msg_header_dup_bcc (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return g_strdup (me->envelope->bcc);
+	return _tny_camel_bs_decode_raw_header (me, me->envelope->bcc);
 }
 
 static TnyHeaderFlags
@@ -140,14 +164,14 @@ static gchar*
 tny_camel_bs_msg_header_dup_from (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return g_strdup (me->envelope->from);
+	return _tny_camel_bs_decode_raw_header (me, me->envelope->from);
 }
 
 static gchar*
 tny_camel_bs_msg_header_dup_subject (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return g_strdup (me->envelope->subject);
+	return _tny_camel_bs_decode_raw_header (me, me->envelope->subject);
 }
 
 
@@ -155,7 +179,7 @@ static gchar*
 tny_camel_bs_msg_header_dup_to (TnyHeader *self)
 {
 	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (self);
-	return g_strdup (me->envelope->to);
+	return _tny_camel_bs_decode_raw_header (me, me->envelope->to);
 }
 
 static gchar*
@@ -188,6 +212,10 @@ tny_camel_bs_msg_header_dup_uid (TnyHeader *self)
 static void
 tny_camel_bs_msg_header_finalize (GObject *object)
 {
+	TnyCamelBsMsgHeader *me = TNY_CAMEL_BS_MSG_HEADER (object);
+
+	g_free (me->charset);
+
 	(*parent_class->finalize) (object);
 	return;
 }
@@ -199,12 +227,14 @@ tny_camel_bs_msg_header_get_folder (TnyHeader *self)
 }
 
 TnyHeader*
-_tny_camel_bs_msg_header_new (envelope_t *envelope, gint msg_size)
+_tny_camel_bs_msg_header_new (envelope_t *envelope, gint msg_size,
+			      const gchar *charset)
 {
 	TnyCamelBsMsgHeader *self = g_object_new (TNY_TYPE_CAMEL_BS_MSG_HEADER, NULL);
 
 	self->envelope = envelope; 
 	self->msg_size = msg_size;
+	self->charset = g_strdup (charset);
 
 	return (TnyHeader*) self;
 }

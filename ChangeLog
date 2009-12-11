@@ -10,6 +10,8 @@
 	* Fix part specs of direct child of attached messages in
 	bodystruct parser.
 	* Refactor decode_it and decode_it_2 in _tny_camel_decode_raw_header
+	* Decode properly headers in TnyCamelBsMsgHeader, to return utf8
+	strings.
 
 2009-12-12  Carl Simonson <simonsonc@gmail.com>
 

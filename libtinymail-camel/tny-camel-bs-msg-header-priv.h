@@ -44,6 +44,9 @@ struct _TnyCamelBsMsgHeader
 	GObject parent;
 	envelope_t *envelope;
 	gint msg_size;
+	gchar *content_type;
+	gchar *content_subtype;
+	gchar *charset;
 };
 
 struct _TnyCamelBsMsgHeaderClass 
@@ -53,7 +56,7 @@ struct _TnyCamelBsMsgHeaderClass
 
 GType tny_camel_bs_msg_header_get_type (void);
 
-TnyHeader* _tny_camel_bs_msg_header_new (envelope_t *envelope, gint msg_size);
+TnyHeader* _tny_camel_bs_msg_header_new (envelope_t *envelope, gint msg_size, const gchar *charset);
 
 G_END_DECLS
 
