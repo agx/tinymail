@@ -661,10 +661,15 @@ bodystruct_part_decode (unsigned char **in, unsigned char *inend, bodystruct_t *
 	part->parent = parent;
 
 	if (parent) {
-		if (parent->part_spec)
-			part->part_spec = g_strdup_printf ("%s.%d", parent->part_spec, num);
-		else
+		if (parent->part_spec) {
+			if (!strcasecmp (parent->content.type, "message") && !strcasecmp (parent->content.subtype, "rfc822")) {
+				part->part_spec = g_strdup (parent->part_spec);
+			} else {
+				part->part_spec = g_strdup_printf ("%s.%d", parent->part_spec, num);
+			}
+		} else {
 			part->part_spec = g_strdup_printf ("%d", num);
+		}
 	}
 
 	if (*inptr == '(') {
