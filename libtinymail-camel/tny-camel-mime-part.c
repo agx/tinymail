@@ -68,50 +68,6 @@ static ssize_t camel_stream_format_text (CamelDataWrapper *dw, CamelStream *stre
 
 
 
-static char*
-decode_it_2 (CamelMimePart *part, const char *str, gboolean is_addr)
-{
-	struct _camel_header_raw *h = part->headers;
-	const char *content, *charset = NULL;
-	CamelContentType *ct = NULL;
-
-	if (!str)
-		return NULL;
-	
-	if ((content = camel_header_raw_find(&h, "Content-Type", NULL))
-	     && (ct = camel_content_type_decode(content))
-	     && (charset = camel_content_type_param(ct, "charset"))
-	     && (g_ascii_strcasecmp(charset, "us-ascii") == 0))
-		charset = NULL;
-
-	charset = charset ? e_iconv_charset_name (charset) : NULL;
-
-	while (isspace ((unsigned) *str))
-		str++;
-
-	if (is_addr) {
-		char *ret;
-		struct _camel_header_address *addr;
-		addr = camel_header_address_decode (str, charset);
-		if (addr) {
-			ret = camel_header_address_list_format (addr);
-			camel_header_address_list_clear (&addr);
-		} else {
-			ret = g_strdup (str);
-		}
-
-		if (ct)
-			camel_content_type_unref (ct);
-
-		return ret;
-	}
-
-	if (ct)
-		camel_content_type_unref (ct);
-
-	return camel_header_decode_string (str, charset);
-}
-
 
 static void 
 tny_camel_mime_part_set_header_pair (TnyMimePart *self, const gchar *name, const gchar *value)
@@ -1115,7 +1071,7 @@ tny_camel_mime_part_get_filename_default (TnyMimePart *self)
 
 		if (str) {
 			if (!g_utf8_validate (str, -1, NULL))
-				priv->cached_filename = decode_it_2 (priv->part, str, FALSE);
+				priv->cached_filename = _tny_camel_decode_raw_header (priv->part, str, FALSE);
 			else
 				priv->cached_filename = g_strdup (str);
 		}

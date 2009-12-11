@@ -494,3 +494,47 @@ _tny_camel_exception_to_tny_error (CamelException *ex, GError **err)
 
 	return;
 }
+
+char *
+_tny_camel_decode_raw_header (CamelMimePart *part, const char *str, gboolean is_addr)
+{
+	struct _camel_header_raw *h = part->headers;
+	const char *content, *charset = NULL;
+	CamelContentType *ct = NULL;
+
+	if (!str)
+		return NULL;
+	
+	if ((content = camel_header_raw_find(&h, "Content-Type", NULL))
+	     && (ct = camel_content_type_decode(content))
+	     && (charset = camel_content_type_param(ct, "charset"))
+	     && (g_ascii_strcasecmp(charset, "us-ascii") == 0))
+		charset = NULL;
+
+	charset = charset ? e_iconv_charset_name (charset) : NULL;
+
+	while (isspace ((unsigned) *str))
+		str++;
+
+	if (is_addr) {
+		char *ret;
+		struct _camel_header_address *addr;
+		addr = camel_header_address_decode (str, charset);
+		if (addr) {
+			ret = camel_header_address_list_format (addr);
+			camel_header_address_list_clear (&addr);
+		} else {
+			ret = g_strdup (str);
+		}
+
+		if (ct)
+			camel_content_type_unref (ct);
+
+		return ret;
+	}
+
+	if (ct)
+		camel_content_type_unref (ct);
+
+	return camel_header_decode_string (str, charset);
+}

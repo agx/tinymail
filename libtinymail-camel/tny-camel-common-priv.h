@@ -37,5 +37,8 @@ gboolean _tny_folder_store_query_passes (TnyFolderStoreQuery *query, CamelFolder
 gboolean _tny_session_check_operation (TnySessionCamel *session, TnyAccount *account, GError **err, GQuark domain, gint code);
 void _tny_session_stop_operation (TnySessionCamel *session);
 void _tny_camel_exception_to_tny_error (CamelException *ex, GError **err);
+char *_tny_camel_decode_raw_header (CamelMimePart *part, const char *str, gboolean is_addr);
+
+
 
 #endif
