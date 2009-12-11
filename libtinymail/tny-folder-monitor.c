@@ -146,13 +146,6 @@ tny_folder_monitor_poke_status_default (TnyFolderMonitor *self)
 }
 
 
-static void
-tny_folder_monitor_update (TnyFolderObserver *self, TnyFolderChange *change)
-{
-	TNY_FOLDER_MONITOR_GET_CLASS (self)->update(self, change);
-	return;
-}
-
 static gboolean 
 uid_matcher (TnyList *list, GObject *item, gpointer match_data)
 {
@@ -226,7 +219,7 @@ cmpstringp(const void *p1, const void *p2)
 
 
 static void
-tny_folder_monitor_update_default (TnyFolderObserver *self, TnyFolderChange *change)
+tny_folder_monitor_update (TnyFolderObserver *self, TnyFolderChange *change)
 {
 	TnyFolderMonitorPriv *priv = TNY_FOLDER_MONITOR_GET_PRIVATE (self);
 	TnyIterator *iter;
@@ -413,7 +406,6 @@ tny_folder_monitor_class_init (TnyFolderMonitorClass *klass)
 	parent_class = g_type_class_peek_parent (klass);
 	object_class = (GObjectClass*) klass;
 
-	klass->update= tny_folder_monitor_update_default;
 	klass->poke_status= tny_folder_monitor_poke_status_default;
 	klass->add_list= tny_folder_monitor_add_list_default;
 	klass->remove_list= tny_folder_monitor_remove_list_default;

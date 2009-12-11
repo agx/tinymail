@@ -2,6 +2,14 @@
 
 	Committed by Sergio Villar Senin <svillar@igalia.com>
 
+	* libtinymail/tny-folder-monitor.c, libtinymail/tny-folder-monitor.h:
+	Fix override of update method by removing the addition of the update
+	method on TnyFolderMonitor.
+
+2009-12-12  Carl Simonson <simonsonc@gmail.com>
+
+	Committed by Sergio Villar Senin <svillar@igalia.com>
+
 	* libtinymail-camel/tny-camel-msg.c, libtinymail-camel/tny-camel-msg.h
 	(tny_camel_msg_parse): Correct type of self parameter
 
