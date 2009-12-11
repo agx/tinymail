@@ -403,7 +403,7 @@ tny_camel_bs_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 
 			if (!strcasecmp (part->content.type, "message") && !strcasecmp (part->content.subtype, "rfc822")) {
 				TnyHeader *header = _tny_camel_bs_msg_header_new (part->envelope, part->octets);
-				mpart = (TnyMimePart *) _tny_camel_bs_msg_new (part,
+				mpart = (TnyMimePart *) _tny_camel_bs_msg_new (part->subparts,
 					priv->uid, TNY_CAMEL_BS_MIME_PART (self));
 				_tny_camel_bs_msg_set_header (TNY_CAMEL_BS_MSG (mpart), header);
 				g_object_unref (header);

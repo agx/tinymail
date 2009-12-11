@@ -3,6 +3,9 @@
 	* On getting the decoded stream from bs mime part, reset
 	to offer a stream started in 0 offset.
 	* Fix error detecting embedded message/rfc822 in bs.
+	* Add the bodystruct of the child to the embedded message created
+	in tny_camel_bs_mime_part_get_parts, as this is the expected
+	structure in tinymail.
 
 2009-12-12  Carl Simonson <simonsonc@gmail.com>
 
