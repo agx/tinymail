@@ -1,3 +1,9 @@
+2009-12-12  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* On getting the decoded stream from bs mime part, reset
+	to offer a stream started in 0 offset.
+	* Fix error detecting embedded message/rfc822 in bs.
+
 2009-12-12  Carl Simonson <simonsonc@gmail.com>
 
 	Committed by Sergio Villar Senin <svillar@igalia.com>

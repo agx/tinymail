@@ -401,7 +401,7 @@ tny_camel_bs_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 		while (part != NULL) {
 			TnyMimePart *mpart;
 
-			if (!strcasecmp (part->content.type, "message") && !strcasecmp (part->content.type, "rfc822")) {
+			if (!strcasecmp (part->content.type, "message") && !strcasecmp (part->content.subtype, "rfc822")) {
 				TnyHeader *header = _tny_camel_bs_msg_header_new (part->envelope, part->octets);
 				mpart = (TnyMimePart *) _tny_camel_bs_msg_new (part,
 					priv->uid, TNY_CAMEL_BS_MIME_PART (self));
