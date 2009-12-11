@@ -1,3 +1,9 @@
+2009-12-11  Sergio Villar Senin  <svillar@igalia.com>
+
+	* camel/providers/pop3/camel-pop3-folder.c (pop3_sync): do expunge
+	messages when users request it. An invalid message ID was passed
+	to the server and thus, no message was deleted.
+
 2009-12-10  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Enable bodystruct parsing for partial retrieval.

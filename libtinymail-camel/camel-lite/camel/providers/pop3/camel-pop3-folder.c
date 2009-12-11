@@ -579,9 +579,6 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	check_dir (pop3_store, NULL);
 
-	if (camel_disco_store_status (CAMEL_DISCO_STORE (pop3_store)) == CAMEL_DISCO_STORE_OFFLINE)
-		return;
-
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	pop3_store->is_refreshing = TRUE;
 	if (pop3_store->engine == NULL)
@@ -589,42 +586,6 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
 		if (camel_exception_is_set (ex)) {
 			pop3_store->is_refreshing = FALSE;
-			g_static_rec_mutex_unlock (pop3_store->eng_lock);
-			return;
-		}
-	}
-
-	camel_operation_start (NULL, _("Fetching summary information for new messages in folder"));
-
-	if (pop3_store->engine == NULL) {
-		pop3_store->is_refreshing = FALSE;
-		g_static_rec_mutex_unlock (pop3_store->eng_lock);
-		goto mfail;
-	}
-
-	pcl = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_list, folder, "LIST\r\n");
-	if (pop3_store->engine->capa & CAMEL_POP3_CAP_UIDL)
-		pcu = camel_pop3_engine_command_new(pop3_store->engine, CAMEL_POP3_COMMAND_MULTI, cmd_uidl, folder, "UIDL\r\n");
-	while ((i = camel_pop3_engine_iterate(pop3_store->engine, NULL)) > 0)
-		;
-
-	g_static_rec_mutex_unlock (pop3_store->eng_lock);
-	camel_operation_end (NULL);
-
-	if (i == -1) {
-		if (errno == EINTR)
-			camel_exception_setv(ex, CAMEL_EXCEPTION_USER_CANCEL, _("User canceled"));
-		else
-			camel_exception_setv (ex, CAMEL_EXCEPTION_SERVICE_PROTOCOL,
-					      _("Cannot get POP summary: %s"),
-					      g_strerror (errno));
-	}
-
-
-	g_static_rec_mutex_lock (pop3_store->eng_lock);
-	if (pop3_store->engine == NULL) {
-		camel_service_connect (CAMEL_SERVICE (pop3_store), ex);
-		if (camel_exception_is_set (ex)) {
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 			return;
 		}
@@ -638,6 +599,9 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	}
 
 	g_static_rec_mutex_unlock (pop3_store->eng_lock);
+
+	if (!expunge)
+		return;
 
 	camel_operation_start(NULL, _("Expunging deleted messages"));
 
@@ -659,16 +623,21 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 				camel_data_cache_remove(pop3_store->cache, "cache", info->uid, NULL);
 
 			if (expunge) {
+				CamelPOP3FolderInfo *fi = NULL;
+
 				if (pop3_store->engine == NULL) {
 					g_static_rec_mutex_unlock (pop3_store->eng_lock);
 					return;
 				}
 
-				cmd = camel_pop3_engine_command_new(pop3_store->engine, 
-								    0, NULL, NULL, "DELE %s\r\n", 
-								    info->uid);
-				while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
-				camel_pop3_engine_command_free(pop3_store->engine, cmd);
+				fi = g_hash_table_lookup (pop3_store->uids_uid, info->uid);
+				if (fi) {
+					cmd = camel_pop3_engine_command_new(pop3_store->engine,
+									    0, NULL, NULL, "DELE %u\r\n",
+									    fi->id);
+					while (camel_pop3_engine_iterate(pop3_store->engine, cmd) > 0);
+					camel_pop3_engine_command_free(pop3_store->engine, cmd);
+				}
 			}
 			g_static_rec_mutex_unlock (pop3_store->eng_lock);
 		}
@@ -700,8 +669,7 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 		camel_message_info_free((CamelMessageInfo *)info);
 	}
 
-	while (deleted)
-	{
+	while (deleted) {
 		CamelMessageInfo *info = deleted->data;
 
 		if (!changes)
@@ -714,13 +682,14 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	}
 
 
-	if (changes)
-	{
+	if (changes) {
 		camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", changes);
 		camel_folder_change_info_free (changes);
 	}
 
 	camel_operation_end(NULL);
+
+	camel_pop3_store_expunge (pop3_store, ex);
 
 	camel_folder_summary_save (folder->summary, ex);
 

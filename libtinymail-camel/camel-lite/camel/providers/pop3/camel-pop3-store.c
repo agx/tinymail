@@ -702,6 +702,27 @@ query_auth_types (CamelService *service, CamelException *ex)
 	return types;
 }
 
+/**
+ * camel_pop3_store_expunge:
+ * @store: the store
+ * @ex: a CamelException
+ *
+ * Expunge messages from the store. This will result in the connection
+ * being closed, which may cause later commands to fail if they can't
+ * reconnect.
+ **/
+void
+camel_pop3_store_expunge (CamelPOP3Store *store, CamelException *ex)
+{
+	CamelPOP3Command *pc;
+
+	pc = camel_pop3_engine_command_new(store->engine, 0, NULL, NULL, "QUIT\r\n");
+	while (camel_pop3_engine_iterate(store->engine, NULL) > 0)
+		;
+	camel_pop3_engine_command_free(store->engine, pc);
+
+	camel_service_disconnect (CAMEL_SERVICE (store), FALSE, ex);
+}
 
 static int
 try_sasl(CamelPOP3Store *store, const char *mech, CamelException *ex)
