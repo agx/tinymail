@@ -1104,15 +1104,18 @@ rfc2047_decode_word (const char *in, size_t inlen, const char *default_charset)
 
 	/* slight optimization? */
 	if (!g_ascii_strcasecmp (charset, "UTF-8")) {
-		p = (char *) decoded;
-		len = declen;
+		char *str_8bit;
+
+		str_8bit = decode_8bit ((char *) decoded, declen, default_charset);
+		p = (char *) str_8bit;
+		len = strlen (str_8bit);
 		
 		while (!g_utf8_validate (p, len, (const char **) &p)) {
 			len = declen - (p - (char *) decoded);
 			*p = '?';
 		}
 		
-		return g_strndup ((char *) decoded, declen);
+		return str_8bit;
 	}
 	
 	if (charset[0])
