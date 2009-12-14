@@ -1,3 +1,8 @@
+2009-12-14  Sergio Villar  <svillar@igalia.com>
+
+	* Removed libtinymail-gio/libtinymail-gio-1.0.pc incorrectly added
+	to repo
+
 2009-12-12  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* On getting the decoded stream from bs mime part, reset
