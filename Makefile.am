@@ -11,9 +11,10 @@ endif
 
 if BUILD_GNOME
 SUBDIRS += libtinymailui-gnome-keyring
-if !BUILD_GIO
-SUBDIRS += libtinymail-gnomevfs
 endif
+
+if BUILD_GNOMEVFS
+SUBDIRS += libtinymail-gnomevfs
 endif
 
 if BUILD_UIGTK
@@ -32,11 +33,6 @@ if BUILD_GTKHTML
 SUBDIRS += libtinymailui-gtkhtml
 endif
 
-if BUILD_MAEMO
-if !BUILD_GIO
-SUBDIRS += libtinymail-gnomevfs
-endif
-endif
 
 SUBDIRS += libtinymail-camel $(PLATFORMDIR) 
 
