@@ -179,7 +179,7 @@ tny_camel_mime_part_get_parts_default (TnyMimePart *self, TnyList *list)
 
 				g_object_unref (nheader);
 			}
-			else if (camel_content_type_is (type, "message", "rfc822"))
+			else if (type && camel_content_type_is (type, "message", "rfc822"))
 			{
 				CamelDataWrapper *c = camel_medium_get_content_object (CAMEL_MEDIUM (tpart));
 
@@ -467,7 +467,7 @@ tny_camel_mime_part_add_part_default (TnyMimePart *self, TnyMimePart *part)
 		curl = 0;
 		type = camel_mime_part_get_content_type (priv->part);
 
-		if (!g_ascii_strcasecmp (type->type, "multipart"))
+		if (type && !g_ascii_strcasecmp (type->type, "multipart"))
 			applied_type = g_strdup_printf ("%s/%s", type->type, type->subtype);
 		else
 			applied_type = g_strdup ("multipart/mixed");
@@ -946,7 +946,8 @@ tny_camel_mime_part_get_content_type_default (TnyMimePart *self)
 		CamelContentType *type;
 		g_mutex_lock (priv->part_lock);
 		type = camel_mime_part_get_content_type (priv->part);
-		priv->cached_content_type = g_strdup_printf ("%s/%s", type->type, type->subtype);
+		if (type)
+			priv->cached_content_type = g_strdup_printf ("%s/%s", type->type, type->subtype);
 		g_mutex_unlock (priv->part_lock);
 	}
 
@@ -984,6 +985,9 @@ tny_camel_mime_part_content_type_is_default (TnyMimePart *self, const gchar *typ
 	g_mutex_lock (priv->part_lock);
 	ctype = camel_mime_part_get_content_type (priv->part);
 	g_mutex_unlock (priv->part_lock);
+
+	if (!ctype)
+		return FALSE;
 
 	/* Whoooo, pointer hocus .. */
 

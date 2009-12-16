@@ -1,3 +1,11 @@
+2009-12-16  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-mime-part.c (tny_camel_mime_part_get_parts_default)
+	(tny_camel_mime_part_add_part_default)
+	(tny_camel_mime_part_content_type_is_default)
+	(tny_camel_mime_part_get_content_type_default): do not assume that
+	every mime part has content type
+
 2009-12-14  Sergio Villar  <svillar@igalia.com>
 
 	* Removed libtinymail-gio/libtinymail-gio-1.0.pc incorrectly added
