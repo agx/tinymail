@@ -5583,7 +5583,7 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 				}
 
 				camel_imap_response_free (store, response);
-			
+
 				retval = bodyst->str;
 				g_string_free (bodyst, FALSE);
 			} else {
@@ -5594,6 +5594,8 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 			}
 
 			stop_gmsgstore (imap_folder, ctchecker, FALSE);
+
+			camel_imap_message_cache_set_partial (imap_folder->cache, uid, TRUE);
 
 			camel_operation_end (NULL);
 		}
