@@ -1,3 +1,10 @@
+2009-12-18  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/tny-camel-mime-part.c: added include to
+	tny-camel-common-priv.h, as it was causing a build warning that
+	points to a problem that could cause crashes in 64 bit
+	architectures.
+
 2009-12-16  Sergio Villar Senin  <svillar@igalia.com>
 
 	* camel/providers/imap/camel-imap-folder.c (imap_fetch_structure):

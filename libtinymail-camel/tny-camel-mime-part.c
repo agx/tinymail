@@ -39,6 +39,7 @@
 #include <tny-simple-list.h>
 #include <tny-camel-msg.h>
 #include <tny-error.h>
+#include <tny-camel-common-priv.h>
 
 static GObjectClass *parent_class = NULL;
 
