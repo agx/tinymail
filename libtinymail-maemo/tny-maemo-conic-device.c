@@ -53,6 +53,7 @@ typedef struct {
 	/* When non-NULL, we are waiting for the success or failure signal. */
 	GMainLoop *loop;
 	gint signal1;
+	guint emit_status_id;
 } TnyMaemoConicDevicePriv;
 
 
@@ -63,20 +64,6 @@ typedef struct {
 	GObject *self;
 	gboolean status;
 } EmitStatusInfo;
-
-static gboolean
-dnsmasq_has_resolv (void)
-{
-	/* This is because silly Conic does not have a blocking API that tells
-	 * us immediately when the device is online. */
-
-	if (!g_file_test ("/var/run/resolv.conf", G_FILE_TEST_EXISTS))
-		if (!g_file_test ("/tmp/resolv.conf.wlan0", G_FILE_TEST_EXISTS))
-			if (!g_file_test ("/tmp/resolv.conf.ppp0", G_FILE_TEST_EXISTS))
-				return FALSE;
-
-	return TRUE;
-}
 
 static gboolean
 conic_emit_status_idle (gpointer user_data)
@@ -121,28 +108,34 @@ conic_emit_status_destroy (gpointer user_data)
 		g_warning ("%s: BUG: not a valid info", __FUNCTION__);
 }
 
-static void 
+static void
 conic_emit_status (TnyDevice *self, gboolean status)
 {
 	EmitStatusInfo *info;
-	guint time = 1000;
+	guint time = 2500;
+	TnyMaemoConicDevicePriv *priv;
 
 	g_return_if_fail (TNY_IS_DEVICE(self));
-	
+
+	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (self);
+
 	/* Emit it in an idle handler: */
 	info = g_slice_new (EmitStatusInfo);
-	
 	info->self = g_object_ref (self);
 	info->status = status;
 
-	if (!dnsmasq_has_resolv())
-		time = 5000;
+	if (priv->emit_status_id) {
+		g_debug ("%s: removing the previous emission", __FUNCTION__);
+		g_source_remove (priv->emit_status_id);
+		priv->emit_status_id = 0;
+	}
 
-	g_debug ("%s: emitting status (%p, %s) in %d ms", 
+	g_debug ("%s: emitting status (%p, %s) in %d ms",
 		   __FUNCTION__, info, status ? "true" : "false", time);
 
-	g_timeout_add_full (G_PRIORITY_DEFAULT, time, conic_emit_status_idle,
-		info, conic_emit_status_destroy);
+	priv->emit_status_id = g_timeout_add_full (G_PRIORITY_DEFAULT, time,
+						   conic_emit_status_idle,
+						   info, conic_emit_status_destroy);
 }
 
 static void
@@ -698,6 +691,7 @@ tny_maemo_conic_device_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->connect_slots = NULL;
 	priv->loop         = NULL;
 	priv->cnx = con_ic_connection_new ();
+	priv->emit_status_id = 0;
 	g_static_mutex_init (&priv->connect_slots_lock);
 
 	if (!priv->cnx) {
@@ -737,6 +731,11 @@ tny_maemo_conic_device_finalize (GObject *obj)
 	g_debug ("%s: shutting the device down...", __FUNCTION__);
 
 	priv = TNY_MAEMO_CONIC_DEVICE_GET_PRIVATE (obj);
+
+	if (priv->emit_status_id) {
+		g_source_remove (priv->emit_status_id);
+		priv->emit_status_id = 0;
+	}
 
 	if (g_signal_handler_is_connected (priv->cnx, priv->signal1))
 		g_signal_handler_disconnect (priv->cnx, priv->signal1);
