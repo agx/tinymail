@@ -689,7 +689,9 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 
 	camel_operation_end(NULL);
 
+	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	camel_pop3_store_expunge (pop3_store, ex);
+	g_static_rec_mutex_unlock (pop3_store->eng_lock);
 
 	camel_folder_summary_save (folder->summary, ex);
 

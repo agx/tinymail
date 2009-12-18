@@ -716,6 +716,9 @@ camel_pop3_store_expunge (CamelPOP3Store *store, CamelException *ex)
 {
 	CamelPOP3Command *pc;
 
+	if (!store->engine)
+		return;
+
 	pc = camel_pop3_engine_command_new(store->engine, 0, NULL, NULL, "QUIT\r\n");
 	while (camel_pop3_engine_iterate(store->engine, NULL) > 0)
 		;
