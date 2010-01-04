@@ -1,5 +1,8 @@
 2009-12-22  Jose Dapena Paz  <jdapena@igalia.com>
 
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
+	detect properly also TEXT stored mime parts in bodystruct.
+
 	* libtinymail-camel/camel-lite/bs/bodystruct.c: also
 	consider VIDEO mime types with file/attachment format.
 
