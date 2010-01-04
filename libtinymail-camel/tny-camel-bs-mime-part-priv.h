@@ -31,6 +31,7 @@ struct _TnyCamelBsMimePartPriv
 	GMutex *part_lock;
 	bodystruct_t *bodystructure;
 	gchar *cached_content_type;
+	gchar *cached_filename;
 	gchar *uid;
 	TnyCamelBsMimePart *parent;
 	TnyFolder *folder;

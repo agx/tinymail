@@ -898,13 +898,33 @@ static const gchar*
 tny_camel_bs_mime_part_get_filename_default (TnyMimePart *self)
 {
 	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
-	const gchar *retval;
 
-	g_mutex_lock (priv->part_lock);
-	retval = mimeparam_get_value_for (priv->bodystructure->disposition.params, "FILENAME");
-	g_mutex_unlock (priv->part_lock);
+	if (!priv->cached_filename) {
+		const gchar *raw_value;
+		const gchar *charset;
 
-	return retval;
+		g_mutex_lock (priv->part_lock);
+		raw_value = mimeparam_get_value_for (priv->bodystructure->disposition.params, "FILENAME");
+		charset = mimeparam_get_value_for (priv->bodystructure->content.params, "CHARSET");
+
+		if (!raw_value) {
+			priv->cached_filename = NULL;
+		} else {
+	
+			if (charset && (g_ascii_strcasecmp(charset, "us-ascii") == 0))
+				charset = NULL;
+
+			charset = charset ? e_iconv_charset_name (charset) : NULL;
+
+			while (isspace ((unsigned) *raw_value))
+				raw_value++;
+
+			priv->cached_filename = camel_header_decode_string (raw_value, charset);
+		}
+		g_mutex_unlock (priv->part_lock);
+	}
+
+	return priv->cached_filename;
 }
 
 static const gchar*
@@ -1112,6 +1132,9 @@ tny_camel_bs_mime_part_finalize (GObject *object)
 	if (priv->cached_content_type)
 		g_free (priv->cached_content_type);
 	priv->cached_content_type = NULL;
+	if (priv->cached_filename)
+		g_free (priv->cached_filename);
+	priv->cached_filename = NULL;
 	g_mutex_unlock (priv->part_lock);
 
 	g_mutex_free (priv->part_lock);
@@ -1237,6 +1260,7 @@ tny_camel_bs_mime_part_instance_init (GTypeInstance *instance, gpointer g_class)
 	priv->folder = NULL;
 	priv->uid = NULL;
 	priv->cached_content_type = NULL;
+	priv->cached_filename = NULL;
 	priv->parent = NULL;
 	priv->bodystructure = NULL;
 
