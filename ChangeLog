@@ -1,3 +1,9 @@
+2010-01-04  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-bs-mime-part.c
+	(tny_camel_bs_mime_part_get_content_type_default): content type is
+	no longer cached in capital letters
+
 2009-12-22  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/bs/bodystruct.c: set proper part_spec

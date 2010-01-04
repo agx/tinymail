@@ -825,10 +825,13 @@ tny_camel_bs_mime_part_get_content_type_default (TnyMimePart *self)
 	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
 
 	if (!priv->cached_content_type) {
+		gchar *tmp;
 		g_mutex_lock (priv->part_lock);
-		priv->cached_content_type = g_strdup_printf ("%s/%s", 
-			priv->bodystructure->content.type, 
-			priv->bodystructure->content.subtype);
+		tmp = g_strdup_printf ("%s/%s",
+				       priv->bodystructure->content.type,
+				       priv->bodystructure->content.subtype);
+		priv->cached_content_type = g_ascii_strdown (tmp, -1);
+		g_free (tmp);
 		g_mutex_unlock (priv->part_lock);
 	}
 
