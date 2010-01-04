@@ -1,5 +1,12 @@
 2009-12-22  Jose Dapena Paz  <jdapena@igalia.com>
 
+	* libtinymail-camel/camel-lite/bs/bodystruct.c: set proper part_spec
+	of root part (it's empty, not "1").
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c,
+	libtinymail-camel/tny-camel-bs-msg-receive-strategy.c:
+	properly handle stored parts with part_spec == "" (as root part spec)
+
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c:
 	detect properly also TEXT stored mime parts in bodystruct.
 

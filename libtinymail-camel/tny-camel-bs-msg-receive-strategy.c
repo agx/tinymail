@@ -87,7 +87,11 @@ tny_camel_bs_msg_receive_strategy_start_receiving_part (TnyCamelBsMsgReceiveStra
 		CamelFolder *cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (folder));
 
 		if (TNY_IS_CAMEL_BS_MSG (part)) {
-			text_part_spec = g_strconcat (part_spec, ".TEXT", NULL);
+			if (part_spec && *part_spec) {
+				text_part_spec = g_strconcat (part_spec, ".TEXT", NULL);
+			} else {
+				text_part_spec = g_strdup ("TEXT");
+			}
 		} else {
 			text_part_spec = g_strdup (part_spec);
 		}

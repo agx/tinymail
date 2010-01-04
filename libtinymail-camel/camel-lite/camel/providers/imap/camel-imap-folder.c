@@ -4801,28 +4801,40 @@ imap_get_cache_filename (CamelFolder *folder, const char *uid, const char *spec,
 
 	*state = CAMEL_FOLDER_PART_STATE_NOT_CACHED;
 
-	check = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+	if (spec && *spec)
+		check = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+	else
+		check = g_strdup_printf ("%s/%s", imap_folder->cache->path, uid);
 	if (g_file_test (check, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR)) {
 		*state = CAMEL_FOLDER_PART_STATE_CACHED_BINARY;
 		return check;
 	}
 
 	g_free (check);
-	check = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
+	if (spec && *spec)
+		check = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
+	else
+		check = g_strdup_printf ("%s/%s_ENCODED", imap_folder->cache->path, uid);
 	if (g_file_test (check, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR)) {
 		*state = CAMEL_FOLDER_PART_STATE_CACHED_ENCODED;
 		return check;
 	}
 
 	g_free (check);
-	check = g_strdup_printf ("%s/%s_%s.TEXT_ENCODED", imap_folder->cache->path, uid, spec);
+	if (spec && *spec)
+		check = g_strdup_printf ("%s/%s_%s_TEXT_ENCODED", imap_folder->cache->path, uid, spec);
+	else
+		check = g_strdup_printf ("%s/%s_TEXT_ENCODED", imap_folder->cache->path, uid);
 	if (g_file_test (check, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR)) {
 		*state = CAMEL_FOLDER_PART_STATE_CACHED_ENCODED;
 		return check;
 	}
 
 	g_free (check);
-	check = g_strdup_printf ("%s/%s_%s_CONVERTED", imap_folder->cache->path, uid, spec);
+	if (spec && *spec)
+		check = g_strdup_printf ("%s/%s_%s_CONVERTED", imap_folder->cache->path, uid, spec);
+	else
+		check = g_strdup_printf ("%s/%s_CONVERTED", imap_folder->cache->path, uid);
 	if (g_file_test (check, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR)) {
 		*state = CAMEL_FOLDER_PART_STATE_CACHED_CONVERTED;
 		return check;
@@ -5091,33 +5103,48 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 
   if (binary && *binary) {
 	g_free (path);
-	path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+	if (spec && *spec)
+		path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+	else
+		path = g_strdup_printf ("%s/%s", imap_folder->cache->path, uid);
 	found = g_file_test (path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR);
   }
 
   if (!found) {
 	g_free (path);
-	path = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
+	if (spec  && *spec)
+		path = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
+	else
+		path = g_strdup_printf ("%s/%s_ENCODED", imap_folder->cache->path, uid);
 	found = g_file_test (path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR);
 	if (found) {
 		if (binary)
 			*binary = FALSE;
 	} else if (binary && *binary) {
 		g_free (path);
-		path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+		if (spec && *spec)
+			path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+		else
+			path = g_strdup_printf ("%s/%s", imap_folder->cache->path, uid);
 	}
   }
 
   if (!found) {
 	g_free (path);
-	path = g_strdup_printf ("%s/%s_%s.TEXT_ENCODED", imap_folder->cache->path, uid, spec);
+	if (spec && *spec)
+		path = g_strdup_printf ("%s/%s_%s.TEXT_ENCODED", imap_folder->cache->path, uid, spec);
+	else
+		path = g_strdup_printf ("%s/%s.TEXT_ENCODED", imap_folder->cache->path, uid);
 	found = g_file_test (path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR);
 	if (found) {
 		if (binary)
 			*binary = FALSE;
 	} else if (binary && *binary) {
 		g_free (path);
-		path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+		if (spec && *spec)
+			path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+		else
+			path = g_strdup_printf ("%s/%s", imap_folder->cache->path, uid);
 	}
   }
 
@@ -5158,9 +5185,15 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 
 			if (binary && *binary && store->capabilities & IMAP_CAPABILITY_BINARY)
 			{
-				path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+				if (spec && *spec)
+					path = g_strdup_printf ("%s/%s_%s", imap_folder->cache->path, uid, spec);
+				else
+					path = g_strdup_printf ("%s/%s", imap_folder->cache->path, uid);
 			} else {
-				path = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
+				if (spec && *spec)
+					path = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
+				else
+					path = g_strdup_printf ("%s/%s_ENCODED", imap_folder->cache->path, uid);
 			}
 			fil = fopen (path, "w");
 
@@ -5240,7 +5273,10 @@ imap_fetch (CamelFolder *folder, const char *uid, const char *spec, gboolean *bi
 						fil = NULL;
 						unlink (path);
 						g_free (path);
-						path = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
+						if (spec && *spec)
+							path = g_strdup_printf ("%s/%s_%s_ENCODED", imap_folder->cache->path, uid, spec);
+						else
+							path = g_strdup_printf ("%s/%s_ENCODED", imap_folder->cache->path, uid);
 						camel_imap_store_connect_unlock_start_idle (store);
 						goto fetch_retry;
 					}

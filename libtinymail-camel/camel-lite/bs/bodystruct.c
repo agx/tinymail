@@ -661,7 +661,7 @@ bodystruct_part_decode (unsigned char **in, unsigned char *inend, bodystruct_t *
 	part->parent = parent;
 
 	if (parent) {
-		if (parent->part_spec) {
+		if (parent->part_spec && *parent->part_spec) {
 			if (!strcasecmp (parent->content.type, "message") && !strcasecmp (parent->content.subtype, "rfc822")) {
 				part->part_spec = g_strdup (parent->part_spec);
 			} else {
@@ -670,6 +670,8 @@ bodystruct_part_decode (unsigned char **in, unsigned char *inend, bodystruct_t *
 		} else {
 			part->part_spec = g_strdup_printf ("%d", num);
 		}
+	} else {
+		part->part_spec = g_strdup ("");
 	}
 
 	if (*inptr == '(') {
@@ -1132,7 +1134,7 @@ bodystruct_parse (guchar *inbuf, guint inlen, GError **err)
 		r = bodystruct_part_decode (&start, (unsigned char *) ( start + (inlen - lendif) ), NULL, 1, err);
 	}
 	if (!r->part_spec)
-		r->part_spec = g_strdup ("1");
+		r->part_spec = g_strdup ("");
 	return r;
 }
 
