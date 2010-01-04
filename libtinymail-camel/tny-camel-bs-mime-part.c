@@ -220,11 +220,11 @@ fetch_part (TnyMimePart *self, TnyStream *stream, gboolean decode_text)
 {
 	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
 	GError *err = NULL;
-	gboolean binary = TRUE;
+	gboolean binary = FALSE;
 	TnyStream *from_stream;
 	gssize return_value = 0;
 
-	/* binary = !camel_strcase_equal (priv->bodystructure->content.type, "TEXT"); */
+	binary = !camel_strcase_equal (priv->bodystructure->content.type, "TEXT");
 	from_stream = tny_camel_bs_msg_receive_strategy_start_receiving_part (
 		priv->strat, priv->folder, TNY_CAMEL_BS_MIME_PART (self), &binary, &err);
 
@@ -658,8 +658,7 @@ decode_async_thread (gpointer user_data)
 	camel_operation_register (cancel);
 	camel_operation_start (cancel, (char *) "Getting message part");
 
-	/* binary = !camel_strcase_equal (priv->bodystructure->content.type, "TEXT"); */
-	info->binary = TRUE;
+	info->binary = !camel_strcase_equal (priv->bodystructure->content.type, "TEXT");
 	info->from_stream = tny_camel_bs_msg_receive_strategy_start_receiving_part (
 		priv->strat, priv->folder, TNY_CAMEL_BS_MIME_PART (info->self), 
 		&info->binary, &info->err);
