@@ -7,6 +7,9 @@
 	(fetch_part): if the content type is text then do not use
 	BINARY
 
+	* camel/providers/imap/camel-imap-folder.c (imap_fetch): unlink
+	the newly created cache file when the fetch of the MIME part fails
+
 2009-12-22  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/camel-lite/bs/bodystruct.c: set proper part_spec

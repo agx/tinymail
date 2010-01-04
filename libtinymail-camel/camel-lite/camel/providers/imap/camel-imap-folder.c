@@ -5534,6 +5534,9 @@ fetch_errorhandler:
 	if (fil)
 		fclose (fil);
 
+	if (path)
+		unlink (path);
+
 	if (!err_message)
 		camel_exception_setv (ex, ex_id, _("Could not find message body in response"));
 	else {
