@@ -1,3 +1,8 @@
+2009-12-22  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* libtinymail-camel/camel-lite/bs/bodystruct.c: also
+	consider VIDEO mime types with file/attachment format.
+
 2009-12-21  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail-camel/tny-camel-bs-mime-part.c: fix

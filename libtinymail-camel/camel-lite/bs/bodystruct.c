@@ -848,6 +848,7 @@ bodystruct_part_decode (unsigned char **in, unsigned char *inend, bodystruct_t *
 
 		} else if (!strcasecmp (part->content.type, "APPLICATION")||
 				!strcasecmp (part->content.type, "IMAGE") ||
+				!strcasecmp (part->content.type, "VIDEO") ||
 				!strcasecmp (part->content.type, "AUDIO"))
 		{
 
