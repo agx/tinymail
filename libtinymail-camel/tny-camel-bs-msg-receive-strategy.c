@@ -83,11 +83,19 @@ tny_camel_bs_msg_receive_strategy_start_receiving_part (TnyCamelBsMsgReceiveStra
 
 	if (part_spec) 
 	{
+		char *text_part_spec;
 		CamelFolder *cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (folder));
+
+		if (TNY_IS_CAMEL_BS_MSG (part)) {
+			text_part_spec = g_strconcat (part_spec, ".TEXT", NULL);
+		} else {
+			text_part_spec = g_strdup (part_spec);
+		}
 
 		/* TODO: play with IMAP's CONVERT here ... */
 
-		filename = camel_folder_fetch (cfolder, uid, part_spec, binary, &ex);
+		filename = camel_folder_fetch (cfolder, uid, text_part_spec, binary, &ex);
+		g_free (text_part_spec);
 
 		if (camel_exception_is_set (&ex)) {
 			_tny_camel_exception_to_tny_error (&ex, err);
