@@ -325,8 +325,17 @@ tny_camel_bs_mime_part_get_header_pairs_default (TnyMimePart *self, TnyList *lis
 	TnyCamelBsMimePartPriv *priv = TNY_CAMEL_BS_MIME_PART_GET_PRIVATE (self);
 	CamelFolderPartState state;
 	CamelFolder *cfolder = _tny_camel_folder_get_camel_folder (TNY_CAMEL_FOLDER (priv->folder));
+	gchar *part_uid;
+
+	if (priv->bodystructure && priv->bodystructure->parent) {
+		/* this means we have to read the cached header of a subpart */
+		part_uid = g_strconcat (priv->uid, "_", priv->bodystructure->part_spec, NULL);
+	} else {
+		part_uid = g_strdup (priv->uid);
+	}
 	gchar *pos_filename = camel_folder_get_cache_filename (cfolder, 
-							       priv->uid, "HEADER", &state);
+							       part_uid, "HEADER", &state);
+	g_free (part_uid);
  
 	if (pos_filename && !priv->parent && TNY_IS_MSG (self)) {
 		FILE *f = fopen (pos_filename, "r");
@@ -914,7 +923,7 @@ tny_camel_bs_mime_part_get_filename_default (TnyMimePart *self)
 			if (charset && (g_ascii_strcasecmp(charset, "us-ascii") == 0))
 				charset = NULL;
 
-			charset = charset ? e_iconv_charset_name (charset) : NULL;
+			charset = charset ? (const gchar *) e_iconv_charset_name (charset) : NULL;
 
 			while (isspace ((unsigned) *raw_value))
 				raw_value++;

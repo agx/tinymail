@@ -1,5 +1,12 @@
 2009-12-21  Jose Dapena Paz  <jdapena@igalia.com>
 
+	* libtinymail-camel/tny-camel-bs-mime-part.c: fix
+	fetching properly the headers of message/rfc822 attachments
+	on fetching the bodystructure.
+
+	* libtinymail-camel/tny-camel-mime-part.c: properly fetch the
+	children messages when the message comes from IMAP bodystructure.
+
 	* libtinymail-camel/tny-camel-bs-msg-receive-strategy.c:
 	fetch the message/rfc822 contents using part.TEXT in
 	IMAP request.

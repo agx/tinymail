@@ -355,7 +355,8 @@ recreate_part (TnyMimePart *orig)
 		g_object_unref (dest_header);
 		piece = tny_camel_mime_part_new ();
 		piece_needs_unref = TRUE;
-		type = NULL;
+		if (!g_ascii_strcasecmp (type, "message/rfc822"))
+			type = NULL;
 	} else {
 		piece = tny_camel_mime_part_new ();
 		retval = piece;

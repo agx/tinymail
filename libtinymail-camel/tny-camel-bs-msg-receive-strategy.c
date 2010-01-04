@@ -120,6 +120,37 @@ tny_camel_bs_msg_receive_strategy_start_receiving_part (TnyCamelBsMsgReceiveStra
 	return retval;
 }
 
+static void
+retrieve_subparts_headers (CamelFolder *folder, const gchar *uid, bodystruct_t *bodystructure, CamelException *ex)
+{
+	bodystruct_t *children;
+
+	if (!strcasecmp (bodystructure->content.type, "message") && 
+	    !strcasecmp (bodystructure->content.subtype, "rfc822") && 
+	    bodystructure->parent != NULL) {
+		gchar *part_spec;
+		gboolean hdr_bin = FALSE;
+
+		part_spec = g_strconcat (bodystructure->part_spec, ".HEADER", NULL);
+		gchar *mpstr = camel_folder_fetch (folder, uid, part_spec, &hdr_bin, ex);
+		g_free (mpstr);
+		g_free (part_spec);
+
+		if (camel_exception_is_set (ex))
+			return;
+	}
+
+	children = bodystructure->subparts;
+	while (children != NULL) {
+
+		retrieve_subparts_headers (folder, uid, children, ex);
+		
+		if (camel_exception_is_set (ex))
+			return;
+		children = children->next;
+	}
+}
+
 static TnyMsg *
 tny_camel_bs_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrategy *self, TnyFolder *folder, TnyHeader *header, GError **err)
 {
@@ -151,6 +182,18 @@ tny_camel_bs_msg_receive_strategy_perform_get_msg_default (TnyMsgReceiveStrategy
 			bodystructure = NULL;
 		}
 		g_free (structure_str);
+	}
+
+	if (bodystructure) {
+		retrieve_subparts_headers (cfolder, uid, bodystructure, &ex);
+
+		if (camel_exception_is_set (&ex)) {
+			_tny_camel_exception_to_tny_error (&ex, err);
+			camel_exception_clear (&ex);
+			g_free (uid);
+			bodystruct_free (bodystructure);
+			return NULL;
+		}
 	}
 
 	if (bodystructure) {
