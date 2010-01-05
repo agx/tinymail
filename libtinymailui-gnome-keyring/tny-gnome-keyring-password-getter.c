@@ -21,7 +21,7 @@
 #include <glib.h>
 #include <glib/gi18n-lib.h>
 #include <string.h>
-
+#include <sys/mman.h>
 #include <tny-gnome-keyring-password-getter.h>
 
 static GObjectClass *parent_class = NULL;
@@ -47,7 +47,6 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 
 		GtkWidget *content_area;
 		GtkWidget *dialog;
-		GtkWidget *in_vbox;
 		GtkWidget *in_label;
 		GtkWidget *in_hbox;
 		GtkWidget *in_icon;

@@ -368,7 +368,6 @@ sync_async_thread (gpointer thr_user_data)
 	TnyFolder *self = info->self;
 	TnyMergeFolderPriv *priv = TNY_MERGE_FOLDER_GET_PRIVATE (self);
 	TnyIterator *iter;
-	GError *err = NULL;
 	TnyList *copy;
 
 	g_static_rec_mutex_lock (priv->lock);

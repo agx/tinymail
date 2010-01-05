@@ -30,6 +30,7 @@
 #include "tny-camel-account-priv.h"
 
 #include <tny-folder-store-query.h>
+#include <libedataserver/e-iconv.h>
 
 static void remove_quotes (gchar *buffer);
 static gchar **split_recipients (gchar *buffer);
@@ -512,7 +513,7 @@ _tny_camel_decode_raw_header (CamelMimePart *part, const char *str, gboolean is_
 	     && (g_ascii_strcasecmp(charset, "us-ascii") == 0))
 		charset = NULL;
 
-	charset = charset ? e_iconv_charset_name (charset) : NULL;
+	charset = (charset != NULL) ? e_iconv_charset_name (charset) : NULL;
 
 	while (isspace ((unsigned) *str))
 		str++;

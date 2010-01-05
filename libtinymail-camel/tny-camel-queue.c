@@ -33,6 +33,7 @@
 #include <tny-camel-shared.h>
 #include <tny-camel-account-priv.h>
 #include <tny-status.h>
+#include <camel/camel-service.h>
 
 static GObjectClass *parent_class = NULL;
 

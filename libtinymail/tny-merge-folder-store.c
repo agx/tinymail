@@ -39,6 +39,7 @@
 #include <tny-list.h>
 #include <tny-simple-list.h>
 #include <tny-error.h>
+#include <tny-lockable.h>
 #include "observer-mixin-priv.h"
 
 static GObjectClass *parent_class = NULL;

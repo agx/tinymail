@@ -223,7 +223,6 @@ static gint
 tny_gio_output_reset (TnyStream *self)
 {
 	TnyGioOutputStreamPriv *priv = TNY_GIO_OUTPUT_STREAM_GET_PRIVATE (self);
-	gint retval = 0;
 	GError *error;
 
 	if (priv->output_stream == NULL)

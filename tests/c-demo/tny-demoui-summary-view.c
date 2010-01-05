@@ -1249,7 +1249,6 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 				case GTK_RESPONSE_ACCEPT: 
 				{
 					gboolean move = (result == GTK_RESPONSE_ACCEPT);
-					GError *err = NULL;
 					gchar *entry_value = g_strdup (gtk_entry_get_text (GTK_ENTRY (entry)));
 					gchar *new_name;
 					TnyFolderStore *into;
@@ -1587,7 +1586,6 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 			{
 				case GTK_RESPONSE_ACCEPT: 
 				{
-					GError *err = NULL;
 					const gchar *newname = gtk_entry_get_text (GTK_ENTRY (entry));
 
 					tny_folder_store_create_folder_async (folderstore, newname, 

@@ -569,7 +569,6 @@ static void
 pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 {
 	CamelPOP3Store *pop3_store;
-	CamelPOP3Command *pcl, *pcu = NULL;
 	int i, max;
 	CamelMessageInfoBase *info;
 	GList *deleted = NULL;
@@ -696,16 +695,6 @@ pop3_sync (CamelFolder *folder, gboolean expunge, CamelException *ex)
 	camel_folder_summary_save (folder->summary, ex);
 
 	return;
-
-mfail:
-
-	pop3_store->is_refreshing = FALSE;
-
-	/* dont need this anymore */
-	camel_operation_end (NULL);
-
-	return;
-
 }
 
 
@@ -1093,7 +1082,6 @@ pop3_get_allow_external_images (CamelFolder *folder, const char *uid)
 static void
 pop3_set_allow_external_images (CamelFolder *folder, const char *uid, gboolean allow)
 {
-	gboolean retval;
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (folder->parent_store);
 	camel_data_cache_set_allow_external_images (pop3_store->cache, "cache", uid, allow);
 	return;

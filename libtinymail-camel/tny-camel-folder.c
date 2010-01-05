@@ -788,7 +788,6 @@ void
 _tny_camel_folder_set_allow_external_images (TnyCamelFolder *self, const gchar *uid, gboolean allow)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	gboolean retval;
 
 	g_static_rec_mutex_lock (priv->folder_lock);
 
@@ -4071,7 +4070,6 @@ static void
 tny_camel_folder_copy_async_default (TnyFolder *self, TnyFolderStore *into, const gchar *new_name, gboolean del, TnyCopyFolderCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
 	TnyCamelFolderPriv *priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
-	TnyCamelFolderPriv *dest_priv = TNY_CAMEL_FOLDER_GET_PRIVATE (self);
 	CopyFolderInfo *info;
 
 	/* Idle info for the callbacks */

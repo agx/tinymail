@@ -198,7 +198,6 @@ static gint
 tny_gio_input_reset (TnyStream *self)
 {
 	TnyGioInputStreamPriv *priv = TNY_GIO_INPUT_STREAM_GET_PRIVATE (self);
-	gint retval = 0;
 	GError *error;
 
 	if (priv->input_stream == NULL)

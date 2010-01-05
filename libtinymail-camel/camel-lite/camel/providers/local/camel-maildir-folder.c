@@ -114,8 +114,7 @@ static void camel_maildir_folder_class_init(CamelObjectClass * camel_maildir_fol
 	camel_folder_class->rewrite_cache = maildir_rewrite_cache;
 	camel_folder_class->get_allow_external_images = maildir_get_allow_external_images;
 	camel_folder_class->set_allow_external_images = maildir_set_allow_external_images;
-
-	//camel_folder_class->transfer_messages_to = maildir_transfer_messages_to;
+	camel_folder_class->transfer_messages_to = maildir_transfer_messages_to;
 
 	lclass->create_summary = maildir_create_summary;
 }
@@ -140,7 +139,7 @@ maildir_transfer_messages_to (CamelFolder *source, GPtrArray *uids, CamelFolder 
 			char *uid = (char *) uids->pdata[i];
 			char *s_filename, *d_filename, *tmp; 
 			CamelMaildirMessageInfo *mdi;
-			CamelMessageInfo *mi, *info;
+			CamelMessageInfo *info;
 
 			if ((info = camel_folder_summary_uid (source->summary, uid)) == NULL) {
 				camel_exception_setv(ex, CAMEL_EXCEPTION_FOLDER_INVALID_UID,

@@ -552,7 +552,6 @@ camel_data_cache_delete_attachments (CamelDataCache *cdc, const char *path, cons
 		if (boundary == NULL)
 		{
 			   /* CamelContentType *ct = NULL; */
-			   const char *bound=NULL;
 			   char *pstr = (char*)camel_strstrcase ((const char *) buffer, "boundary");
 
 			   if (pstr)

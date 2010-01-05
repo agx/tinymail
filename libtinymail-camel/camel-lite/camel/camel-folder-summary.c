@@ -131,9 +131,6 @@ static void		         content_info_free(CamelFolderSummary *, CamelMessageConten
 
 static char *next_uid_string(CamelFolderSummary *s);
 
-static CamelMessageContentInfo * summary_build_content_info(CamelFolderSummary *s, CamelMessageInfo *msginfo, CamelMimeParser *mp);
-static CamelMessageContentInfo * summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msginfo, CamelMimePart *object);
-
 static void camel_folder_summary_class_init (CamelFolderSummaryClass *klass);
 static void camel_folder_summary_init       (CamelFolderSummary *obj);
 static void camel_folder_summary_finalize   (CamelObject *obj);
@@ -877,17 +874,6 @@ perform_content_info_save(CamelFolderSummary *s, FILE *out, CamelMessageContentI
 	return 0;
 }
 
-static void 
-flush_for_reload (CamelFolderSummary *s, CamelMessageInfoBase *mi)
-{
-	if (!(mi->flags & CAMEL_MESSAGE_INFO_NEEDS_FREE)) {
-		mi->subject = "...";
-		mi->to = "...";
-		mi->from = "...";
-		mi->cc = "...";
-	}
-} 
-
 /**
  * camel_folder_summary_save:
  * @summary: a #CamelFolderSummary object
@@ -1548,17 +1534,6 @@ camel_folder_summary_info_new_from_message(CamelFolderSummary *s, CamelMimeMessa
 		info = message_info_new_from_message(s, msg);
 
 	((CamelMessageInfoBase *)info)->content = NULL;
-
-/*
-	if (s!=NULL)
-		CAMEL_SUMMARY_LOCK(s, filter_lock);
-
-	((CamelMessageInfoBase *)info)->content = summary_build_content_info_message(s, info, (CamelMimePart *)msg);
-
-
-	if (s!=NULL)
-		CAMEL_SUMMARY_UNLOCK(s, filter_lock);
-*/
 
 	return info;
 }
@@ -2908,195 +2883,6 @@ next_uid_string(CamelFolderSummary *s)
 	return g_strdup_printf("%u", camel_folder_summary_next_uid(s));
 }
 
-/*
-  OK
-  Now this is where all the "smarts" happen, where the content info is built,
-  and any indexing and what not is performed
-*/
-
-/* must have filter_lock before calling this function */
-static CamelMessageContentInfo *
-summary_build_content_info(CamelFolderSummary *s, CamelMessageInfo *msginfo, CamelMimeParser *mp)
-{
-	int state;
-	size_t len;
-	char *buffer;
-	CamelMessageContentInfo *info = NULL;
-	CamelContentType *ct;
-	int enc_id = -1, chr_id = -1, html_id = -1, idx_id = -1;
-	CamelMessageContentInfo *part;
-
-	d(printf("building content info\n"));
-
-	/* start of this part */
-	state = camel_mime_parser_step(mp, &buffer, &len);
-
-	if (s->build_content)
-		info = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_new_from_parser(s, mp);
-
-	switch(state) {
-	case CAMEL_MIME_PARSER_STATE_HEADER:
-		/* check content type for indexing, then read body */
-		ct = camel_mime_parser_content_type(mp);
-		/* update attachments flag as we go */
-
-/*
-		if (camel_content_type_is(ct, "application", "pgp-signature")
-#ifdef ENABLE_SMIME
-		    || camel_content_type_is(ct, "application", "x-pkcs7-signature")
-		    || camel_content_type_is(ct, "application", "pkcs7-signature")
-#endif
-			)
-			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE);
-
-*/
-
-		/* and scan/index everything */
-		while (camel_mime_parser_step(mp, &buffer, &len) != CAMEL_MIME_PARSER_STATE_BODY_END)
-			;
-		/* and remove the filters */
-		camel_mime_parser_filter_remove(mp, enc_id);
-		camel_mime_parser_filter_remove(mp, chr_id);
-		camel_mime_parser_filter_remove(mp, html_id);
-		camel_mime_parser_filter_remove(mp, idx_id);
-		break;
-	case CAMEL_MIME_PARSER_STATE_MULTIPART:
-		d(printf("Summarising multipart\n"));
-		/* update attachments flag as we go */
-		ct = camel_mime_parser_content_type(mp);
-		if (camel_content_type_is(ct, "multipart", "mixed"))
-			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_ATTACHMENTS, CAMEL_MESSAGE_ATTACHMENTS);
-		/*if (camel_content_type_is(ct, "multipart", "signed")
-		    || camel_content_type_is(ct, "multipart", "encrypted"))
-			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE);
-		*/
-		while (camel_mime_parser_step(mp, &buffer, &len) != CAMEL_MIME_PARSER_STATE_MULTIPART_END) {
-			camel_mime_parser_unstep(mp);
-			part = summary_build_content_info(s, msginfo, mp);
-			if (part) {
-				part->parent = info;
-				my_list_append((struct _node **)&info->childs, (struct _node *)part);
-			}
-		}
-		break;
-	case CAMEL_MIME_PARSER_STATE_MESSAGE:
-		d(printf("Summarising message\n"));
-		/* update attachments flag as we go */
-		camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_ATTACHMENTS, CAMEL_MESSAGE_ATTACHMENTS);
-
-		part = summary_build_content_info(s, msginfo, mp);
-		if (part) {
-			part->parent = info;
-			my_list_append((struct _node **)&info->childs, (struct _node *)part);
-		}
-		state = camel_mime_parser_step(mp, &buffer, &len);
-		if (state != CAMEL_MIME_PARSER_STATE_MESSAGE_END) {
-			g_error("Bad parser state: Expecing MESSAGE_END or MESSAGE_EOF, got: %d", state);
-			camel_mime_parser_unstep(mp);
-		}
-		break;
-	}
-
-	d(printf("finished building content info\n"));
-
-	return info;
-}
-
-/* build the content-info, from a message */
-/* this needs the filter lock since it uses filters to perform indexing */
-static CamelMessageContentInfo *
-summary_build_content_info_message(CamelFolderSummary *s, CamelMessageInfo *msginfo, CamelMimePart *object)
-{
-	CamelDataWrapper *containee;
-	int parts, i;
-	struct _CamelFolderSummaryPrivate *p = NULL;
-	CamelMessageContentInfo *info = NULL, *child;
-	CamelContentType *ct;
-
-	if (s != NULL && s->build_content)
-		info = ((CamelFolderSummaryClass *)(CAMEL_OBJECT_GET_CLASS(s)))->content_info_new_from_message(s, object);
-	else
-		info = content_info_new_from_message(NULL, object);
-
-	if (s != NULL)
-		p = _PRIVATE(s);
-
-	containee = camel_medium_get_content_object(CAMEL_MEDIUM(object));
-
-	if (containee == NULL)
-		return info;
-
-	camel_object_ref (containee);
-
-	/* TODO: I find it odd that get_part and get_content_object do not
-	   add a reference, probably need fixing for multithreading */
-
-	/* check for attachments */
-	ct = ((CamelDataWrapper *)containee)->mime_type;
-	if (camel_content_type_is(ct, "multipart", "*")) {
-		if (camel_content_type_is(ct, "multipart", "mixed"))
-			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_ATTACHMENTS, CAMEL_MESSAGE_ATTACHMENTS);
-/*
-		if (camel_content_type_is(ct, "multipart", "signed")
-		    || camel_content_type_is(ct, "multipart", "encrypted"))
-			camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE);
-*/
-	} else if (camel_content_type_is(ct, "application", "pgp-signature")
-#ifdef ENABLE_SMIME
-		    || camel_content_type_is(ct, "application", "x-pkcs7-signature")
-		    || camel_content_type_is(ct, "application", "pkcs7-signature")
-#endif
-		) {
-/*		camel_message_info_set_flags(msginfo, CAMEL_MESSAGE_SECURE, CAMEL_MESSAGE_SECURE); */
-	}
-
-	/* using the object types is more accurate than using the mime/types */
-	if (CAMEL_IS_MULTIPART(containee)) {
-		parts = camel_multipart_get_number(CAMEL_MULTIPART(containee));
-
-		for (i=0;i<parts;i++) {
-			CamelMimePart *part = camel_multipart_get_part_wref (CAMEL_MULTIPART(containee), i);
-			g_assert(part);
-			child = summary_build_content_info_message(s, msginfo, part);
-			if (child) {
-				child->parent = info;
-				my_list_append((struct _node **)&info->childs, (struct _node *)child);
-			}
-			camel_object_unref (part);
-		}
-
-	} else if (CAMEL_IS_MIME_MESSAGE(containee)) {
-		/* for messages we only look at its contents */
-		child = summary_build_content_info_message(s, msginfo, (CamelMimePart *)containee);
-		if (child) {
-			child->parent = info;
-			my_list_append((struct _node **)&info->childs, (struct _node *)child);
-		}
-	} else if (s != NULL && p && p->filter_stream
-		   && camel_content_type_is(ct, "text", "*")) {
-		int html_id = -1, idx_id = -1;
-
-		/* pre-attach html filter if required, otherwise just index filter */
-		if (camel_content_type_is(ct, "text", "html")) {
-			if (p->filter_html == NULL)
-				p->filter_html = camel_mime_filter_html_new();
-			else
-				camel_mime_filter_reset((CamelMimeFilter *)p->filter_html);
-			html_id = camel_stream_filter_add(p->filter_stream, (CamelMimeFilter *)p->filter_html);
-		}
-		idx_id = camel_stream_filter_add(p->filter_stream, (CamelMimeFilter *)p->filter_index);
-
-		camel_data_wrapper_decode_to_stream(containee, (CamelStream *)p->filter_stream);
-		camel_stream_flush((CamelStream *)p->filter_stream);
-
-		camel_stream_filter_remove(p->filter_stream, idx_id);
-		camel_stream_filter_remove(p->filter_stream, html_id);
-	}
-
-	camel_object_unref (containee);
-
-	return info;
-}
 
 /**
  * camel_flag_get:

@@ -138,14 +138,15 @@ tny_gtk_text_buffer_stream_write_default (TnyStream *self, const char *buffer, g
 	const gchar *end;
 	gint nb_written;
 
-	g_byte_array_append (priv->pending_bytes, buffer, n);
+	g_byte_array_append (priv->pending_bytes, (const guint8 *) buffer, n);
 
 	/* GtkTextBuffer only accepts full UTF-8 chars, but we might
 	 * receive a single UTF-8 char split into two different
 	 * buffers -see camel_stream_write_to_stream()- so we write
 	 * only the part of the buffer that is valid UTF-8 text and
 	 * leave the rest for later */
-	g_utf8_validate (priv->pending_bytes->data, priv->pending_bytes->len, &end);
+	g_utf8_validate ((const gchar *) priv->pending_bytes->data,
+			 priv->pending_bytes->len, &end);
 	nb_written = (gint) (end - ((char *) priv->pending_bytes->data));
 
 	/* However if the rest of the buffer is more than 4 bytes long
@@ -157,7 +158,8 @@ tny_gtk_text_buffer_stream_write_default (TnyStream *self, const char *buffer, g
 		nb_written = priv->pending_bytes->len;
 	}
 
-	gtk_text_buffer_insert (priv->buffer, &(priv->cur), priv->pending_bytes->data, nb_written);
+	gtk_text_buffer_insert (priv->buffer, &(priv->cur),
+				(const gchar *) priv->pending_bytes->data, nb_written);
 
 	/* Leave the unwritten chars in priv->pending_bytes for later */
 	g_byte_array_remove_range (priv->pending_bytes, 0, nb_written);
@@ -177,7 +179,8 @@ tny_gtk_text_buffer_stream_flush_default (TnyStream *self)
 	TnyGtkTextBufferStreamPriv *priv = TNY_GTK_TEXT_BUFFER_STREAM_GET_PRIVATE (self);
 	if (priv->pending_bytes->len > 0) {
 		gtk_text_buffer_insert (priv->buffer, &(priv->cur),
-					priv->pending_bytes->data, priv->pending_bytes->len);
+					(const gchar *) priv->pending_bytes->data,
+					priv->pending_bytes->len);
 		g_byte_array_set_size (priv->pending_bytes, 0);
 	}
 	return 0;

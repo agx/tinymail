@@ -1,3 +1,60 @@
+2010-01-05  Sergio Villar Senin  <svillar@igalia.com>
+
+	* tests/c-demo/tny-demoui-summary-view.c
+	(on_rename_folder_activate):
+	(on_create_folder_activate): removed unused variables
+
+	* libtinymail-camel/tny-camel-bs-mime-part.c: added two missing
+	includes
+
+	* libtinymail-camel/tny-camel-queue.c: added a missing include
+
+	* libtinymail-camel/tny-camel-send-queue.c
+	(tny_camel_send_queue_add_async_default): removed unused variable
+
+	* libtinymail-camel/tny-camel-folder.c
+	(_tny_camel_folder_set_allow_external_images):
+	(tny_camel_folder_copy_async_default): removed unused variable
+
+	* libtinymail-camel/tny-camel-common.c: added a missing include
+
+	* camel/providers/local/camel-maildir-folder.c
+	(maildir_transfer_messages_to): removed unused variable
+	(camel_maildir_folder_class_init): redefined a method
+
+	* camel/providers/pop3/camel-pop3-folder.c (pop3_sync): removed
+	unused code
+	(pop3_sync): removed unused variables
+	(pop3_set_allow_external_images): removed unused variable
+
+	* camel/camel-url.c: added missing include
+
+	* camel/camel-mime-utils.c (fix_broken_rfc2047): removed unused variable
+
+	* camel/camel-data-cache.c (camel_data_cache_delete_attachments):
+	removed unused variable
+
+	* camel/camel-folder-summary.c
+	(camel_folder_summary_info_new_from_message): removed unused code
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c
+	(recurse_folders_async_cb): removed unused variable
+
+	* libtinymailui-gnome-keyring/tny-gnome-keyring-password-getter.c
+	(tny_gnome_keyring_password_getter_get_password): removed unused variable.
+	Added a missing include.
+
+	* libtinymail-gio/tny-gio-output-stream.c (tny_gio_output_reset):
+	removed unused variable
+
+	* libtinymail-gio/tny-gio-input-stream.c (tny_gio_input_reset):
+	removed unused variable
+
+	* libtinymail/tny-merge-folder-store.c: added a missing include
+
+	* libtinymail/tny-merge-folder.c (sync_async_thread): removed
+	unused variable
+
 2010-01-04  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-camel-bs-mime-part.c

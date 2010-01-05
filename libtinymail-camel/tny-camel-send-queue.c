@@ -1166,7 +1166,6 @@ tny_camel_send_queue_add_async (TnySendQueue *self, TnyMsg *msg, TnySendQueueAdd
 static void
 tny_camel_send_queue_add_async_default (TnySendQueue *self, TnyMsg *msg, TnySendQueueAddCallback callback, TnyStatusCallback status_callback, gpointer user_data)
 {
-	TnyCamelSendQueuePriv *priv = TNY_CAMEL_SEND_QUEUE_GET_PRIVATE (self);
 	GError *err = NULL;
 	OnAddedInfo *info = NULL;
 	TnyFolder *outbox;

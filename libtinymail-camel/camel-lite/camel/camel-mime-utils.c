@@ -2473,7 +2473,7 @@ header_decode_addrspec(const char **in)
 static void
 fix_broken_rfc2047 (const char **in)
 {
-	gchar *p, *broken_start, *r;
+	gchar *p, *broken_start;
 	gboolean encoded = FALSE;
 	gboolean broken = TRUE;
 

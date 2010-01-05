@@ -276,7 +276,6 @@ recurse_folders_async_cb (TnyFolderStore *store,
 		  do
 		  {
 			GObject *citem = NULL;
-			TnyIterator *niter = NULL;
 
 			gtk_tree_model_get (mmodel, &miter,
 				TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN,
