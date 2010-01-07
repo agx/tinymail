@@ -44,6 +44,7 @@ G_BEGIN_DECLS
 #define TNY_HEADER_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), TNY_TYPE_HEADER, TnyHeaderIface))
 
 #define TNY_TYPE_HEADER_FLAGS (tny_header_flags_get_type())
+#define TNY_TYPE_HEADER_SUPPORT_FLAGS (tny_header_support_flags_get_type ())
 
 #ifndef TNY_SHARED_H
 typedef struct _TnyHeader TnyHeader;
@@ -70,6 +71,14 @@ typedef enum
 
 #define TNY_HEADER_FLAG_PRIORITY_MASK (1<<9|1<<10)
 
+typedef enum
+{
+	TNY_HEADER_SUPPORT_FLAGS_NONE = 0,
+	TNY_HEADER_SUPPORT_FLAGS_ANY = 1<<0,
+	TNY_HEADER_SUPPORT_FLAGS_SOME = 1<<1,
+	TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_ANY = 1<<2,
+	TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_SOME = 1<<3,
+} TnyHeaderSupportFlags;
 
 struct _TnyHeaderIface
 {
@@ -96,10 +105,15 @@ struct _TnyHeaderIface
 	TnyHeaderFlags (*get_flags) (TnyHeader *self);
 	void (*set_flag) (TnyHeader *self, TnyHeaderFlags mask);
 	void (*unset_flag) (TnyHeader *self, TnyHeaderFlags mask);
+	gboolean (*get_user_flag) (TnyHeader *self, const gchar *id);
+	void (*set_user_flag) (TnyHeader *self, const gchar *id);
+	void (*unset_user_flag) (TnyHeader *self, const gchar *id);
+	TnyHeaderSupportFlags (*support_user_flags) (TnyHeader *self);
 };
 
 GType tny_header_get_type (void);
 GType tny_header_flags_get_type (void);
+GType tny_header_support_flags_get_type (void);
 
 gchar* tny_header_dup_uid (TnyHeader *self);
 gchar* tny_header_dup_bcc (TnyHeader *self);
@@ -122,6 +136,10 @@ TnyFolder* tny_header_get_folder (TnyHeader *self);
 TnyHeaderFlags tny_header_get_flags (TnyHeader *self);
 void tny_header_set_flag (TnyHeader *self, TnyHeaderFlags mask);
 void tny_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask);
+void tny_header_set_user_flag (TnyHeader *self, const gchar *name);
+void tny_header_unset_user_flag (TnyHeader *self, const gchar *name);
+gboolean tny_header_get_user_flag (TnyHeader *self, const gchar *name);
+TnyHeaderSupportFlags tny_header_support_user_flags (TnyHeader *self);
 
 TnyHeaderFlags tny_header_get_priority (TnyHeader *self);
 void tny_header_set_priority (TnyHeader *self, TnyHeaderFlags priority);

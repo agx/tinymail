@@ -202,6 +202,51 @@ tny_camel_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
 	return;
 }
 
+static gboolean
+tny_camel_header_get_user_flag (TnyHeader *self, const gchar *id)
+{
+	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
+	gboolean retval;
+
+	retval = camel_message_info_user_flag (me->info, id);
+
+	return retval;
+}
+
+static void
+tny_camel_header_set_user_flag (TnyHeader *self, const gchar *id)
+{
+	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
+
+	camel_message_info_set_user_flag (me->info, id, TRUE);
+}
+
+static void
+tny_camel_header_unset_user_flag (TnyHeader *self, const gchar *id)
+{
+	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
+
+	camel_message_info_set_user_flag (me->info, id, FALSE);
+}
+
+static TnyHeaderSupportFlags
+tny_camel_header_support_user_flags (TnyHeader *self)
+{
+	TnyCamelHeader *me = TNY_CAMEL_HEADER (self);
+	TnyHeaderSupportFlags flags = TNY_HEADER_SUPPORT_FLAGS_NONE;
+
+	if (camel_message_info_user_flag (me->info, CAMEL_MESSAGE_INFO_SUPPORT_FLAGS_ANY_USER_FLAG))
+		flags |= TNY_HEADER_SUPPORT_FLAGS_ANY;
+	if (camel_message_info_user_flag (me->info, CAMEL_MESSAGE_INFO_SUPPORT_FLAGS_SOME_USER_FLAG))
+		flags |= TNY_HEADER_SUPPORT_FLAGS_SOME;
+	if (camel_message_info_user_flag (me->info, CAMEL_MESSAGE_INFO_SUPPORT_PERMANENT_FLAGS_ANY_USER_FLAG))
+		flags |= TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_ANY;
+	if (camel_message_info_user_flag (me->info, CAMEL_MESSAGE_INFO_SUPPORT_PERMANENT_FLAGS_SOME_USER_FLAG))
+		flags |= TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_SOME;
+
+	return flags;
+}
+
 static time_t
 tny_camel_header_get_date_received (TnyHeader *self)
 {
@@ -383,6 +428,10 @@ tny_header_init (gpointer g, gpointer iface_data)
 	klass->set_flag= tny_camel_header_set_flag;
 	klass->unset_flag= tny_camel_header_unset_flag;
 	klass->get_flags= tny_camel_header_get_flags;
+	klass->set_user_flag = tny_camel_header_set_user_flag;
+	klass->get_user_flag = tny_camel_header_get_user_flag;
+	klass->unset_user_flag = tny_camel_header_unset_user_flag;
+	klass->support_user_flags = tny_camel_header_support_user_flags;
 
 	return;
 }

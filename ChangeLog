@@ -1,3 +1,9 @@
+2010-01-07  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Added support for user flags in specific tinymail and camel
+	backends. Default implementation does not provide any support
+	but API allows to access user flags in specific backends.
+
 2010-01-05  Sergio Villar Senin  <svillar@igalia.com>
 
 	* tests/c-demo/tny-demoui-summary-view.c

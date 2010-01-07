@@ -298,6 +298,54 @@ tny_camel_msg_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
 	return;
 }
 
+static void
+tny_camel_msg_header_set_user_flag (TnyHeader *self, const gchar *id)
+{
+	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+
+	if (me->decorated) {
+		tny_header_set_user_flag (me->decorated, id);
+	}
+
+	return;
+}
+
+static void
+tny_camel_msg_header_unset_user_flag (TnyHeader *self, const gchar *id)
+{
+	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+
+	if (me->decorated) {
+		tny_header_unset_user_flag (me->decorated, id);
+	}
+
+	return;
+}
+
+static gboolean
+tny_camel_msg_header_get_user_flag (TnyHeader *self, const gchar *id)
+{
+	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+
+	if (me->decorated) {
+		return tny_header_get_user_flag (me->decorated, id);
+	} else {
+		return FALSE;
+	}
+}
+
+static TnyHeaderSupportFlags
+tny_camel_msg_header_support_user_flags (TnyHeader *self)
+{
+	TnyCamelMsgHeader *me = TNY_CAMEL_MSG_HEADER (self);
+
+	if (me->decorated) {
+		return tny_header_support_user_flags (me->decorated);
+	} else {
+		return TNY_HEADER_SUPPORT_FLAGS_NONE;
+	}
+}
+
 static time_t
 tny_camel_msg_header_get_date_received (TnyHeader *self)
 {
@@ -564,6 +612,10 @@ tny_header_init (gpointer g, gpointer iface_data)
 	klass->set_flag= tny_camel_msg_header_set_flag;
 	klass->unset_flag= tny_camel_msg_header_unset_flag;
 	klass->get_flags= tny_camel_msg_header_get_flags;
+	klass->set_user_flag= tny_camel_msg_header_set_user_flag;
+	klass->unset_user_flag= tny_camel_msg_header_unset_user_flag;
+	klass->get_user_flag= tny_camel_msg_header_get_user_flag;
+	klass->support_user_flags= tny_camel_msg_header_support_user_flags;
 
 	return;
 }

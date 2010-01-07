@@ -33,6 +33,11 @@
 #define CAMEL_FOLDER_SUMMARY_CLASS(klass) CAMEL_CHECK_CLASS_CAST (klass, camel_folder_summary_get_type (), CamelFolderSummaryClass)
 #define CAMEL_IS_FOLDER_SUMMARY(obj)      CAMEL_CHECK_TYPE (obj, camel_folder_summary_get_type ())
 
+#define CAMEL_MESSAGE_INFO_SUPPORT_FLAGS_ANY_USER_FLAG "__message_info_support_flags_any"
+#define CAMEL_MESSAGE_INFO_SUPPORT_FLAGS_SOME_USER_FLAG "__message_info_support_flags_some"
+#define CAMEL_MESSAGE_INFO_SUPPORT_PERMANENT_FLAGS_ANY_USER_FLAG "__message_info_support_permanent_flags_any"
+#define CAMEL_MESSAGE_INFO_SUPPORT_PERMANENT_FLAGS_SOME_USER_FLAG "__message_info_support_permanent_flags_some"
+
 G_BEGIN_DECLS
 
 struct _CamelFolder;
@@ -98,6 +103,7 @@ typedef enum _CamelMessageFlags {
 
 /* Changes to system flags will NOT trigger a folder changed event */
 #define CAMEL_MESSAGE_SYSTEM_MASK (0x1fff << 12)
+
 
 typedef struct _CamelFlag {
 	struct _CamelFlag *next;

@@ -145,6 +145,28 @@ tny_expunged_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
 {
 }
 
+static gboolean
+tny_expunged_header_get_user_flag (TnyHeader *self, const gchar *id)
+{
+	return FALSE;
+}
+
+static void
+tny_expunged_header_set_user_flag (TnyHeader *self, const gchar *id)
+{
+}
+
+static void
+tny_expunged_header_unset_user_flag (TnyHeader *self, const gchar *id)
+{
+}
+
+static TnyHeaderSupportFlags
+tny_expunged_header_support_user_flags (TnyHeader *self)
+{
+	return TNY_HEADER_SUPPORT_FLAGS_NONE;
+}
+
 static void
 tny_expunged_header_finalize (GObject *object)
 {
@@ -180,6 +202,10 @@ tny_header_init (TnyHeaderIface *klass)
 	klass->get_flags= tny_expunged_header_get_flags;
 	klass->set_flag= tny_expunged_header_set_flag;
 	klass->unset_flag= tny_expunged_header_unset_flag;
+	klass->get_user_flag= tny_expunged_header_get_user_flag;
+	klass->set_user_flag= tny_expunged_header_set_user_flag;
+	klass->unset_user_flag= tny_expunged_header_unset_user_flag;
+	klass->support_user_flags= tny_expunged_header_support_user_flags;
 }
 
 static void

@@ -532,6 +532,76 @@ tny_header_set_flag (TnyHeader *self, TnyHeaderFlags mask)
 }
 
 /**
+ * tny_header_set_user_flag:
+ * @self: a #TnyHeader
+ * @name: name of the flag to set
+ * 
+ * Set as %TRUE the user flag with name @name.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+void 
+tny_header_set_user_flag (TnyHeader *self, const gchar *name)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->set_user_flag!= NULL);
+#endif
+
+	TNY_HEADER_GET_IFACE (self)->set_user_flag(self, name);
+
+	return;
+}
+
+/**
+ * tny_header_unset_user_flag:
+ * @self: a #TnyHeader
+ * @name: name of the flag to unset
+ * 
+ * Set as %FALSE (not set) the user flag with name @name. This is
+ * the same as removing the flag.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+void 
+tny_header_unset_user_flag (TnyHeader *self, const gchar *name)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->unset_user_flag!= NULL);
+#endif
+
+	TNY_HEADER_GET_IFACE (self)->unset_user_flag(self, name);
+
+	return;
+}
+
+/**
+ * tny_header_get_user_flag:
+ * @self: a #TnyHeader
+ * @name: name of the flag
+ * 
+ * Get if a user flag with name @name is set.
+ *
+ * Returns: %TRUE if flag is set, %FALSE otherwise
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+gboolean 
+tny_header_get_user_flag (TnyHeader *self, const gchar *name)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->get_user_flag!= NULL);
+#endif
+
+	return TNY_HEADER_GET_IFACE (self)->get_user_flag(self, name);
+}
+
+/**
  * tny_header_get_priority:
  * @self: a #TnyHeader
  * 
@@ -610,6 +680,26 @@ tny_header_unset_flag (TnyHeader *self, TnyHeaderFlags mask)
 	return;
 }
 
+/**
+ * tny_header_support_user_flags:
+ * @self: a #TnyHeader
+ *
+ * Tells if user flags are supported in this header. It depends mostly on the
+ * provider implementation.
+ *
+ * since: 1.0
+ * audience: application-developer
+ **/
+TnyHeaderSupportFlags
+tny_header_support_user_flags (TnyHeader *self)
+{
+#ifdef DBC /* require */
+	g_assert (TNY_IS_HEADER (self));
+	g_assert (TNY_HEADER_GET_IFACE (self)->support_user_flags!= NULL);
+#endif
+
+	return TNY_HEADER_GET_IFACE (self)->support_user_flags (self);
+}
 
 static void
 tny_header_base_init (gpointer g_class)
@@ -692,5 +782,36 @@ tny_header_flags_get_type (void)
 {
 	static GOnce once = G_ONCE_INIT;
 	g_once (&once, tny_header_flags_register_type, NULL);
+	return GPOINTER_TO_UINT (once.retval);
+}
+
+static gpointer
+tny_header_support_flags_register_type (gpointer notused)
+{
+	GType etype = 0;
+	static const GFlagsValue values[] = {
+		{ TNY_HEADER_SUPPORT_FLAGS_NONE, "TNY_HEADER_SUPPORT_FLAGS_NONE", "none" },
+		{ TNY_HEADER_SUPPORT_FLAGS_ANY, "TNY_HEADER_SUPPORT_FLAGS_ANY", "any" },
+		{ TNY_HEADER_SUPPORT_FLAGS_SOME, "TNY_HEADER_SUPPORT_FLAGS_SOME", "some" },
+		{ TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_ANY, "TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_ANY", "persistent_any" },
+		{ TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_SOME, "TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_SOME", "persistent_some" },
+		{ 0, NULL, NULL }
+	};
+	etype = g_flags_register_static ("TnyHeaderSupportFlags", values);
+	return GUINT_TO_POINTER (etype);
+}
+
+/**
+ * tny_header_support_flags_get_type:
+ *
+ * GType system helper function
+ *
+ * returns: a #GType
+ **/
+GType
+tny_header_support_flags_get_type (void)
+{
+	static GOnce once = G_ONCE_INIT;
+	g_once (&once, tny_header_support_flags_register_type, NULL);
 	return GPOINTER_TO_UINT (once.retval);
 }
