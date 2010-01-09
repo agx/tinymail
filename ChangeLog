@@ -1,3 +1,8 @@
+2010-01-09  Sergio Villar Senin  <svillar@igalia.com>
+
+	* camel/providers/imap/camel-imap-store.h: do not enable IDLE
+	debug if IDLE was disabled in configure stage
+
 2010-01-07  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Added support for user flags in specific tinymail and camel

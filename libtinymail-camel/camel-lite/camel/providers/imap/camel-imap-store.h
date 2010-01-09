@@ -26,7 +26,9 @@
 #define CAMEL_IMAP_STORE_H 1
 
 #ifdef DEBUG
+#ifndef DISABLE_IDLE
 #define IDLE_DEBUG 1
+#endif
 #define IMAP_DEBUG 1
 #endif
 
