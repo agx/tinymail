@@ -2,29 +2,8 @@
 
 [CCode (cprefix = "Tny", lower_case_cprefix = "tny_")]
 namespace Tny {
-	[CCode (cheader_filename = "tny.h")]
-	public class SessionCamel {
-		public weak Tny.SessionCamelPriv priv;
-		public SessionCamel (Tny.AccountStore account_store);
-		public void set_account_store (Tny.AccountStore account_store);
-		public void set_device (Tny.Device device);
-		public void set_initialized ();
-		public void set_ui_locker (Tny.Lockable ui_lock);
-	}
-	[CCode (cheader_filename = "tny.h")]
-	public class SessionCamelPriv {
-	}
-	[CCode (cheader_filename = "tny.h")]
-	public class StreamCamel {
-		public weak Tny.Stream stream;
-		public StreamCamel (Tny.Stream stream);
-		public void set_stream (Tny.Stream stream);
-		public long write_to_stream (Tny.Stream output);
-	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-account.h")]
 	public class CamelAccount : GLib.Object, Tny.Account {
-		public void get_supported_secure_authentication (Tny.CamelGetSupportedSecureAuthCallback callback, Tny.StatusCallback status_callback);
-		public void set_session (Tny.SessionCamel session);
 		public virtual void add_option (Tny.Pair option);
 		[NoWrapper]
 		public virtual void cancel ();
@@ -34,26 +13,27 @@ namespace Tny {
 		[NoWrapper]
 		public virtual Tny.ConnectionStatus get_connection_status ();
 		[NoWrapper]
-		public virtual Tny.ForgetPassFunc get_forget_pass_func ();
+		public virtual unowned Tny.ForgetPassFunc get_forget_pass_func ();
 		[NoWrapper]
-		public virtual weak string get_hostname ();
+		public virtual unowned string get_hostname ();
 		[NoWrapper]
-		public virtual weak string get_id ();
+		public virtual unowned string get_id ();
 		[NoWrapper]
-		public virtual weak string get_name ();
+		public virtual unowned string get_name ();
 		public virtual void get_options (Tny.List options);
 		[NoWrapper]
-		public virtual Tny.GetPassFunc get_pass_func ();
+		public virtual unowned Tny.GetPassFunc get_pass_func ();
 		[NoWrapper]
 		public virtual uint get_port ();
 		[NoWrapper]
-		public virtual weak string get_proto ();
+		public virtual unowned string get_proto ();
 		[NoWrapper]
-		public virtual weak string get_secure_auth_mech ();
+		public virtual unowned string get_secure_auth_mech ();
+		public void get_supported_secure_authentication (Tny.CamelGetSupportedSecureAuthCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
-		public virtual weak string get_url_string ();
+		public virtual unowned string get_url_string ();
 		[NoWrapper]
-		public virtual weak string get_user ();
+		public virtual unowned string get_user ();
 		[NoWrapper]
 		public virtual bool matches_url_string (string url_string);
 		[NoWrapper]
@@ -75,6 +55,7 @@ namespace Tny {
 		public virtual void set_proto (string proto);
 		[NoWrapper]
 		public virtual void set_secure_auth_mech (string name);
+		public void set_session (Tny.SessionCamel session);
 		[NoWrapper]
 		public virtual void set_url_string (string url_string);
 		[NoWrapper]
@@ -85,9 +66,9 @@ namespace Tny {
 		public virtual void stop_operation (bool canceled);
 		[NoWrapper]
 		public virtual void try_connect () throws GLib.Error;
-		public signal void set_online_happened (bool online);
+		public virtual signal void set_online_happened (bool online);
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-bs-mime-part.h")]
 	public class CamelBsMimePart : GLib.Object, Tny.MimePart {
 		[NoWrapper]
 		public virtual int add_part (Tny.MimePart part);
@@ -96,33 +77,34 @@ namespace Tny {
 		[NoWrapper]
 		public virtual bool content_type_is (string content_type);
 		[NoWrapper]
-		public virtual long decode_to_stream (Tny.Stream stream) throws GLib.Error;
+		public virtual ssize_t decode_to_stream (Tny.Stream stream) throws GLib.Error;
 		[NoWrapper]
 		public virtual void decode_to_stream_async (Tny.Stream stream, Tny.MimePartCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
 		public virtual void del_part (Tny.MimePart part);
 		[NoWrapper]
-		public virtual weak string get_content_id ();
+		public virtual unowned string get_content_id ();
 		[NoWrapper]
-		public virtual weak string get_content_location ();
+		public virtual unowned string get_content_location ();
 		[NoWrapper]
-		public virtual weak string get_content_type ();
+		public virtual unowned string get_content_type ();
 		[NoWrapper]
-		public virtual weak Tny.Stream get_decoded_stream ();
+		public virtual unowned Tny.Stream get_decoded_stream ();
 		[NoWrapper]
-		public virtual weak string get_description ();
+		public virtual unowned string get_description ();
 		[NoWrapper]
-		public virtual weak string get_filename ();
+		public virtual unowned string get_filename ();
 		[NoWrapper]
 		public virtual void get_header_pairs (Tny.List list);
 		[NoWrapper]
 		public virtual void get_parts (Tny.List list);
 		[NoWrapper]
-		public virtual weak Tny.Stream get_stream ();
+		public virtual unowned Tny.Stream get_stream ();
 		[NoWrapper]
-		public virtual weak string get_transfer_encoding ();
+		public virtual unowned string get_transfer_encoding ();
 		[NoWrapper]
 		public virtual bool is_attachment ();
+		public bool is_fetched ();
 		[NoWrapper]
 		public virtual bool is_purged ();
 		[NoWrapper]
@@ -142,35 +124,41 @@ namespace Tny {
 		[NoWrapper]
 		public virtual void set_transfer_encoding (string transfer_encoding);
 		[NoWrapper]
-		public virtual long write_to_stream (Tny.Stream stream) throws GLib.Error;
+		public virtual ssize_t write_to_stream (Tny.Stream stream) throws GLib.Error;
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-bs-msg.h")]
 	public class CamelBsMsg : Tny.CamelBsMimePart, Tny.MimePart, Tny.Msg {
 		[NoWrapper]
-		public virtual weak Tny.Folder get_folder ();
+		public virtual bool get_allow_external_images ();
 		[NoWrapper]
-		public virtual weak Tny.Header get_header ();
+		public virtual unowned Tny.Folder get_folder ();
 		[NoWrapper]
-		public virtual weak string get_url_string ();
+		public virtual unowned Tny.Header get_header ();
+		[NoWrapper]
+		public virtual unowned string get_url_string ();
 		[NoWrapper]
 		public virtual void rewrite_cache ();
 		[NoWrapper]
+		public virtual void set_allow_external_images (bool allow);
+		[NoWrapper]
 		public virtual void uncache_attachments ();
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-bs-msg-receive-strategy.h")]
 	public class CamelBsMsgReceiveStrategy : GLib.Object, Tny.MsgReceiveStrategy {
+		[CCode (type = "TnyMsgReceiveStrategy*", has_construct_function = false)]
 		public CamelBsMsgReceiveStrategy ();
-		public weak Tny.Stream start_receiving_part (Tny.Folder folder, Tny.CamelBsMimePart part, bool binary) throws GLib.Error;
 		[NoWrapper]
-		public virtual weak Tny.Msg perform_get_msg (Tny.Folder folder, Tny.Header header) throws GLib.Error;
+		public virtual unowned Tny.Msg perform_get_msg (Tny.Folder folder, Tny.Header header) throws GLib.Error;
+		public static void set_global_bodies_filter (Tny.CamelBsMsgReceiveStrategyBodiesFilter filter);
+		public unowned Tny.Stream start_receiving_part (Tny.Folder folder, Tny.CamelBsMimePart part, bool binary) throws GLib.Error;
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-default-connection-policy.h")]
 	public class CamelDefaultConnectionPolicy : GLib.Object, Tny.ConnectionPolicy {
+		[CCode (type = "TnyConnectionPolicy*", has_construct_function = false)]
 		public CamelDefaultConnectionPolicy ();
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-folder.h")]
 	public class CamelFolder : GLib.Object, Tny.FolderStore, Tny.Folder {
-		public weak string get_full_name ();
 		[NoWrapper]
 		public virtual void add_msg (Tny.Msg msg) throws GLib.Error;
 		[NoWrapper]
@@ -180,53 +168,56 @@ namespace Tny {
 		[NoWrapper]
 		public virtual void add_store_observer (Tny.FolderStoreObserver observer);
 		[NoWrapper]
-		public virtual weak Tny.Folder copy (Tny.FolderStore into, string new_name, bool del) throws GLib.Error;
+		public virtual unowned Tny.Folder copy (Tny.FolderStore into, string new_name, bool del) throws GLib.Error;
 		[NoWrapper]
 		public virtual void copy_async (Tny.FolderStore into, string new_name, bool del, Tny.CopyFolderCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
-		public virtual weak Tny.Folder create_folder (string name) throws GLib.Error;
+		public virtual unowned Tny.Folder create_folder (string name) throws GLib.Error;
 		[NoWrapper]
 		public virtual void create_folder_async (string name, Tny.CreateFolderCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
-		public virtual weak Tny.Msg find_msg (string url_string) throws GLib.Error;
+		public virtual unowned Tny.Msg find_msg (string url_string) throws GLib.Error;
 		[NoWrapper]
-		public virtual weak Tny.Account get_account ();
+		public virtual void find_msg_async (string url_string, Tny.GetMsgCallback callback, Tny.StatusCallback status_callback);
+		[NoWrapper]
+		public virtual unowned Tny.Account get_account ();
 		[NoWrapper]
 		public virtual uint get_all_count ();
 		[NoWrapper]
 		public virtual Tny.FolderCaps get_caps ();
 		[NoWrapper]
-		public virtual weak Tny.FolderStore get_folder_store ();
+		public virtual unowned Tny.FolderStore get_folder_store ();
 		[NoWrapper]
 		public virtual Tny.FolderType get_folder_type ();
 		[NoWrapper]
-		public virtual void get_folders (Tny.List list, Tny.FolderStoreQuery query) throws GLib.Error;
+		public virtual void get_folders (Tny.List list, Tny.FolderStoreQuery query, bool refresh) throws GLib.Error;
 		[NoWrapper]
-		public virtual void get_folders_async (Tny.List list, Tny.FolderStoreQuery query, Tny.GetFoldersCallback callback, Tny.StatusCallback status_callback);
+		public virtual void get_folders_async (Tny.List list, Tny.FolderStoreQuery query, bool refresh, Tny.GetFoldersCallback callback, Tny.StatusCallback status_callback);
+		public unowned string get_full_name ();
 		[NoWrapper]
 		public virtual void get_headers (Tny.List headers, bool refresh) throws GLib.Error;
 		[NoWrapper]
 		public virtual void get_headers_async (Tny.List headers, bool refresh, Tny.GetHeadersCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
-		public virtual weak string get_id ();
+		public virtual unowned string get_id ();
 		[NoWrapper]
 		public virtual uint get_local_size ();
 		[NoWrapper]
-		public virtual weak Tny.Msg get_msg (Tny.Header header) throws GLib.Error;
+		public virtual unowned Tny.Msg get_msg (Tny.Header header) throws GLib.Error;
 		[NoWrapper]
 		public virtual void get_msg_async (Tny.Header header, Tny.GetMsgCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
-		public virtual weak Tny.MsgReceiveStrategy get_msg_receive_strategy ();
+		public virtual unowned Tny.MsgReceiveStrategy get_msg_receive_strategy ();
 		[NoWrapper]
-		public virtual weak Tny.MsgRemoveStrategy get_msg_remove_strategy ();
+		public virtual unowned Tny.MsgRemoveStrategy get_msg_remove_strategy ();
 		[NoWrapper]
-		public virtual weak string get_name ();
+		public virtual unowned string get_name ();
 		[NoWrapper]
-		public virtual weak Tny.FolderStats get_stats ();
+		public virtual unowned Tny.FolderStats get_stats ();
 		[NoWrapper]
 		public virtual uint get_unread_count ();
 		[NoWrapper]
-		public virtual weak string get_url_string ();
+		public virtual unowned string get_url_string ();
 		[NoWrapper]
 		public virtual bool is_subscribed ();
 		[NoWrapper]
@@ -260,32 +251,40 @@ namespace Tny {
 		[NoWrapper]
 		public virtual void transfer_msgs_async (Tny.List header_list, Tny.Folder folder_dst, bool delete_originals, Tny.TransferMsgsCallback callback, Tny.StatusCallback status_callback);
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-full-msg-receive-strategy.h")]
 	public class CamelFullMsgReceiveStrategy : GLib.Object, Tny.MsgReceiveStrategy {
+		[CCode (type = "TnyMsgReceiveStrategy*", has_construct_function = false)]
 		public CamelFullMsgReceiveStrategy ();
 		[NoWrapper]
-		public virtual weak Tny.Msg perform_get_msg (Tny.Folder folder, Tny.Header header) throws GLib.Error;
+		public virtual unowned Tny.Msg perform_get_msg (Tny.Folder folder, Tny.Header header) throws GLib.Error;
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-header.h")]
 	public class CamelHeader : GLib.Object, Tny.Header {
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-html-to-text-stream.h")]
+	public class CamelHtmlToTextStream : Tny.CamelStream, Tny.Stream, Tny.Seekable {
+		[CCode (type = "TnyStream*", has_construct_function = false)]
+		public CamelHtmlToTextStream (Tny.Stream html_stream);
+	}
+	[CCode (cheader_filename = "tny-camel-imap-folder.h")]
 	public class CamelIMAPFolder : Tny.CamelFolder, Tny.FolderStore, Tny.Folder {
 	}
-	[CCode (cheader_filename = "tny.h")]
-	public class CamelIMAPStoreAccount : Tny.CamelStoreAccount, Tny.FolderStore, Tny.Account, Tny.StoreAccount {
+	[CCode (cheader_filename = "tny-camel-imap-store-account.h")]
+	public class CamelIMAPStoreAccount : Tny.CamelStoreAccount, Tny.Account, Tny.FolderStore, Tny.StoreAccount {
+		[CCode (type = "TnyStoreAccount*", has_construct_function = false)]
 		public CamelIMAPStoreAccount ();
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-mem-stream.h")]
 	public class CamelMemStream : Tny.CamelStream, Tny.Stream, Tny.Seekable {
+		[CCode (type = "TnyStream*", has_construct_function = false)]
 		public CamelMemStream ();
-		public CamelMemStream.with_buffer (string buffer, ulong len);
+		[CCode (type = "TnyStream*", has_construct_function = false)]
+		public CamelMemStream.with_buffer (string buffer, size_t len);
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-mime-part.h")]
 	public class CamelMimePart : GLib.Object, Tny.MimePart {
-		public weak Tny.CamelMimePart get_part ();
+		[CCode (type = "TnyMimePart*", has_construct_function = false)]
 		public CamelMimePart ();
-		public CamelMimePart.with_part (Tny.CamelMimePart part);
 		[NoWrapper]
 		public virtual int add_part (Tny.MimePart part);
 		[NoWrapper]
@@ -293,31 +292,32 @@ namespace Tny {
 		[NoWrapper]
 		public virtual bool content_type_is (string content_type);
 		[NoWrapper]
-		public virtual long decode_to_stream (Tny.Stream stream) throws GLib.Error;
+		public virtual ssize_t decode_to_stream (Tny.Stream stream) throws GLib.Error;
 		[NoWrapper]
 		public virtual void decode_to_stream_async (Tny.Stream stream, Tny.MimePartCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
 		public virtual void del_part (Tny.MimePart part);
 		[NoWrapper]
-		public virtual weak string get_content_id ();
+		public virtual unowned string get_content_id ();
 		[NoWrapper]
-		public virtual weak string get_content_location ();
+		public virtual unowned string get_content_location ();
 		[NoWrapper]
-		public virtual weak string get_content_type ();
+		public virtual unowned string get_content_type ();
 		[NoWrapper]
-		public virtual weak Tny.Stream get_decoded_stream ();
+		public virtual unowned Tny.Stream get_decoded_stream ();
 		[NoWrapper]
-		public virtual weak string get_description ();
+		public virtual unowned string get_description ();
 		[NoWrapper]
-		public virtual weak string get_filename ();
+		public virtual unowned string get_filename ();
 		[NoWrapper]
 		public virtual void get_header_pairs (Tny.List list);
+		public unowned Camel.MimePart get_part ();
 		[NoWrapper]
 		public virtual void get_parts (Tny.List list);
 		[NoWrapper]
-		public virtual weak Tny.Stream get_stream ();
+		public virtual unowned Tny.Stream get_stream ();
 		[NoWrapper]
-		public virtual weak string get_transfer_encoding ();
+		public virtual unowned string get_transfer_encoding ();
 		[NoWrapper]
 		public virtual bool is_attachment ();
 		[NoWrapper]
@@ -338,117 +338,166 @@ namespace Tny {
 		public virtual void set_purged ();
 		[NoWrapper]
 		public virtual void set_transfer_encoding (string transfer_encoding);
+		[CCode (type = "TnyMimePart*", has_construct_function = false)]
+		public CamelMimePart.with_part (Camel.MimePart part);
 		[NoWrapper]
-		public virtual long write_to_stream (Tny.Stream stream) throws GLib.Error;
+		public virtual ssize_t write_to_stream (Tny.Stream stream) throws GLib.Error;
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-msg.h")]
 	public class CamelMsg : Tny.CamelMimePart, Tny.MimePart, Tny.Msg {
+		[CCode (type = "TnyMsg*", has_construct_function = false)]
 		public CamelMsg ();
-		public CamelMsg.with_part (Tny.CamelMimePart part);
 		[NoWrapper]
-		public virtual weak Tny.Folder get_folder ();
+		public virtual bool get_allow_external_images ();
 		[NoWrapper]
-		public virtual weak Tny.Header get_header ();
+		public virtual unowned Tny.Folder get_folder ();
 		[NoWrapper]
-		public virtual weak string get_url_string ();
+		public virtual unowned Tny.Header get_header ();
+		[NoWrapper]
+		public virtual unowned string get_url_string ();
+		public void parse (Tny.Stream stream);
 		[NoWrapper]
 		public virtual void rewrite_cache ();
 		[NoWrapper]
+		public virtual void set_allow_external_images (bool allow);
+		[NoWrapper]
 		public virtual void uncache_attachments ();
+		[CCode (type = "TnyMsg*", has_construct_function = false)]
+		public CamelMsg.with_part (Camel.MimePart part);
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-msg-remove-strategy.h")]
 	public class CamelMsgRemoveStrategy : GLib.Object, Tny.MsgRemoveStrategy {
+		[CCode (type = "TnyMsgRemoveStrategy*", has_construct_function = false)]
 		public CamelMsgRemoveStrategy ();
 		[NoWrapper]
 		public virtual void perform_remove (Tny.Folder folder, Tny.Header header) throws GLib.Error;
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-nntp-folder.h")]
 	public class CamelNNTPFolder : Tny.CamelFolder, Tny.FolderStore, Tny.Folder {
 	}
-	[CCode (cheader_filename = "tny.h")]
-	public class CamelNNTPStoreAccount : Tny.CamelStoreAccount, Tny.FolderStore, Tny.Account, Tny.StoreAccount {
+	[CCode (cheader_filename = "tny-camel-nntp-store-account.h")]
+	public class CamelNNTPStoreAccount : Tny.CamelStoreAccount, Tny.Account, Tny.FolderStore, Tny.StoreAccount {
+		[CCode (type = "TnyStoreAccount*", has_construct_function = false)]
 		public CamelNNTPStoreAccount ();
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-pop-folder.h")]
 	public class CamelPOPFolder : Tny.CamelFolder, Tny.FolderStore, Tny.Folder {
 	}
-	[CCode (cheader_filename = "tny.h")]
-	public class CamelPOPStoreAccount : Tny.CamelStoreAccount, Tny.FolderStore, Tny.Account, Tny.StoreAccount {
+	[CCode (cheader_filename = "tny-camel-pop-store-account.h")]
+	public class CamelPOPStoreAccount : Tny.CamelStoreAccount, Tny.Account, Tny.FolderStore, Tny.StoreAccount {
+		[CCode (type = "TnyStoreAccount*", has_construct_function = false)]
 		public CamelPOPStoreAccount ();
 		public void reconnect ();
 		public void set_leave_messages_on_server (bool enabled);
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-partial-msg-receive-strategy.h")]
 	public class CamelPartialMsgReceiveStrategy : GLib.Object, Tny.MsgReceiveStrategy {
+		[CCode (type = "TnyMsgReceiveStrategy*", has_construct_function = false)]
 		public CamelPartialMsgReceiveStrategy ();
 		[NoWrapper]
-		public virtual weak Tny.Msg perform_get_msg (Tny.Folder folder, Tny.Header header) throws GLib.Error;
+		public virtual unowned Tny.Msg perform_get_msg (Tny.Folder folder, Tny.Header header) throws GLib.Error;
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-pop-remote-msg-remove-strategy.h")]
 	public class CamelPopRemoteMsgRemoveStrategy : GLib.Object, Tny.MsgRemoveStrategy {
+		[CCode (type = "TnyMsgRemoveStrategy*", has_construct_function = false)]
 		public CamelPopRemoteMsgRemoveStrategy ();
 		[NoWrapper]
 		public virtual void perform_remove (Tny.Folder folder, Tny.Header header) throws GLib.Error;
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-recover-connection-policy.h")]
 	public class CamelRecoverConnectionPolicy : GLib.Object, Tny.ConnectionPolicy {
+		[CCode (type = "TnyConnectionPolicy*", has_construct_function = false)]
 		public CamelRecoverConnectionPolicy ();
 		public void set_reconnect_delay (int milliseconds);
 		public void set_recover_active_folder (bool setting);
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-send-queue.h")]
 	public class CamelSendQueue : GLib.Object, Tny.FolderObserver, Tny.SendQueue {
-		public void flush ();
-		public weak Tny.CamelTransportAccount get_transport_account ();
+		[CCode (type = "TnySendQueue*", has_construct_function = false)]
 		public CamelSendQueue (Tny.CamelTransportAccount trans_account);
-		public void set_transport_account (Tny.CamelTransportAccount trans_account);
 		[NoWrapper]
 		public virtual void add (Tny.Msg msg) throws GLib.Error;
 		[NoWrapper]
 		public virtual void add_async (Tny.Msg msg, Tny.SendQueueAddCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
 		public virtual void cancel (Tny.SendQueueCancelAction cancel_action) throws GLib.Error;
+		public void flush ();
 		[NoWrapper]
-		public virtual weak Tny.Folder get_outbox ();
+		public virtual unowned Tny.Folder get_outbox ();
 		[NoWrapper]
-		public virtual weak Tny.Folder get_sentbox ();
+		public virtual unowned Tny.Folder get_sentbox ();
+		public unowned Tny.CamelTransportAccount get_transport_account ();
+		public void set_transport_account (Tny.CamelTransportAccount trans_account);
+		[CCode (type = "TnySendQueue*", has_construct_function = false)]
+		public CamelSendQueue.with_folders (Tny.CamelTransportAccount trans_account, Tny.Folder outbox, Tny.Folder sentbox);
 	}
-	[CCode (cheader_filename = "tny.h")]
-	public class CamelStoreAccount : Tny.CamelAccount, Tny.FolderStore, Tny.Account, Tny.StoreAccount {
+	[CCode (cheader_filename = "tny-camel-store-account.h")]
+	public class CamelStoreAccount : Tny.CamelAccount, Tny.Account, Tny.FolderStore, Tny.StoreAccount {
+		[CCode (type = "TnyStoreAccount*", has_construct_function = false)]
 		public CamelStoreAccount ();
 		[NoWrapper]
 		public virtual void add_observer (Tny.FolderStoreObserver observer);
 		[NoWrapper]
-		public virtual weak Tny.Folder create_folder (string name) throws GLib.Error;
+		public virtual unowned Tny.Folder create_folder (string name) throws GLib.Error;
 		[NoWrapper]
 		public virtual void create_folder_async (string name, Tny.CreateFolderCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
 		public virtual void delete_cache ();
-		public virtual weak Tny.Folder factor_folder (string full_name, bool was_new);
+		public virtual unowned Tny.Folder factor_folder (string full_name, bool was_new);
 		[NoWrapper]
-		public virtual weak Tny.Folder find_folder (string url_string) throws GLib.Error;
+		public virtual unowned Tny.Folder find_folder (string url_string) throws GLib.Error;
 		[NoWrapper]
-		public virtual void get_folders (Tny.List list, Tny.FolderStoreQuery query) throws GLib.Error;
+		public virtual void get_folders (Tny.List list, Tny.FolderStoreQuery query, bool refresh) throws GLib.Error;
 		[NoWrapper]
-		public virtual void get_folders_async (Tny.List list, Tny.FolderStoreQuery query, Tny.GetFoldersCallback callback, Tny.StatusCallback status_callback);
+		public virtual void get_folders_async (Tny.List list, Tny.FolderStoreQuery query, bool refresh, Tny.GetFoldersCallback callback, Tny.StatusCallback status_callback);
 		[NoWrapper]
 		public virtual void remove_folder (Tny.Folder folder) throws GLib.Error;
 		[NoWrapper]
 		public virtual void remove_observer (Tny.FolderStoreObserver observer);
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-stream.h")]
 	public class CamelStream : GLib.Object, Tny.Stream, Tny.Seekable {
-		public weak Tny.CamelStream get_stream ();
-		public CamelStream (Tny.CamelStream stream);
+		[CCode (type = "TnyStream*", has_construct_function = false)]
+		public CamelStream (Camel.Stream stream);
+		public unowned Camel.Stream get_stream ();
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "tny-camel-transport-account.h")]
 	public class CamelTransportAccount : Tny.CamelAccount, Tny.Account, Tny.TransportAccount {
+		[CCode (type = "TnyTransportAccount*", has_construct_function = false)]
 		public CamelTransportAccount ();
+		public unowned string get_from ();
 		[NoWrapper]
 		public virtual void send (Tny.Msg msg) throws GLib.Error;
+		public void set_from (string from);
 	}
-	[CCode (cheader_filename = "tny.h")]
+	[Compact]
+	[CCode (cheader_filename = "tny-session-camel.h")]
+	public class SessionCamel {
+		public weak Tny.SessionCamelPriv priv;
+		[CCode (has_construct_function = false)]
+		public SessionCamel (Tny.AccountStore account_store);
+		public void set_account_store (Tny.AccountStore account_store);
+		public void set_device (Tny.Device device);
+		public void set_initialized ();
+		public void set_ui_locker (Tny.Lockable ui_lock);
+	}
+	[Compact]
+	[CCode (cheader_filename = "libtinymail-camel-1.0.h")]
+	public class SessionCamelPriv {
+	}
+	[Compact]
+	[CCode (cheader_filename = "tny-stream-camel.h")]
+	public class StreamCamel {
+		public weak Tny.Stream stream;
+		[CCode (type = "CamelStream*", has_construct_function = false)]
+		public StreamCamel (Tny.Stream stream);
+		public void set_stream (Tny.Stream stream);
+		public ssize_t write_to_stream (Tny.Stream output);
+	}
+	[CCode (cheader_filename = "libtinymail-camel-1.0.h", has_target = false)]
+	public delegate void CamelBsMsgReceiveStrategyBodiesFilter (Tny.Msg msg, Tny.List list);
+	[CCode (cheader_filename = "libtinymail-camel-1.0.h")]
 	public delegate void CamelGetSupportedSecureAuthCallback (Tny.CamelAccount _self, bool cancelled, Tny.List auth_types, GLib.Error err);
-	[CCode (cheader_filename = "tny.h")]
+	[CCode (cheader_filename = "libtinymail-camel-1.0.h")]
 	public delegate void CamelSetOnlineCallback (Tny.CamelAccount account, bool canceled, GLib.Error err);
 }

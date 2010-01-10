@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <api version="1.0">
 	<namespace name="Tny">
+		<callback name="TnyCamelBsMsgReceiveStrategyBodiesFilter">
+			<return-type type="void"/>
+			<parameters>
+				<parameter name="msg" type="TnyMsg*"/>
+				<parameter name="list" type="TnyList*"/>
+			</parameters>
+		</callback>
 		<callback name="TnyCamelGetSupportedSecureAuthCallback">
 			<return-type type="void"/>
 			<parameters>
@@ -20,6 +27,8 @@
 				<parameter name="user_data" type="gpointer"/>
 			</parameters>
 		</callback>
+		<struct name="TnyCamelIMAPFolderClass">
+		</struct>
 		<struct name="TnySessionCamel">
 			<method name="new" symbol="tny_session_camel_new">
 				<return-type type="TnySessionCamel*"/>
@@ -366,6 +375,12 @@
 			<implements>
 				<interface name="TnyMimePart"/>
 			</implements>
+			<method name="is_fetched" symbol="tny_camel_bs_mime_part_is_fetched">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="part" type="TnyCamelBsMimePart*"/>
+				</parameters>
+			</method>
 			<vfunc name="add_part">
 				<return-type type="gint"/>
 				<parameters>
@@ -558,6 +573,12 @@
 				<interface name="TnyMimePart"/>
 				<interface name="TnyMsg"/>
 			</implements>
+			<vfunc name="get_allow_external_images">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyMsg*"/>
+				</parameters>
+			</vfunc>
 			<vfunc name="get_folder">
 				<return-type type="TnyFolder*"/>
 				<parameters>
@@ -582,6 +603,13 @@
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</vfunc>
+			<vfunc name="set_allow_external_images">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMsg*"/>
+					<parameter name="allow" type="gboolean"/>
+				</parameters>
+			</vfunc>
 			<vfunc name="uncache_attachments">
 				<return-type type="void"/>
 				<parameters>
@@ -596,6 +624,12 @@
 			<constructor name="new" symbol="tny_camel_bs_msg_receive_strategy_new">
 				<return-type type="TnyMsgReceiveStrategy*"/>
 			</constructor>
+			<method name="set_global_bodies_filter" symbol="tny_camel_bs_msg_receive_strategy_set_global_bodies_filter">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="filter" type="TnyCamelBsMsgReceiveStrategyBodiesFilter"/>
+				</parameters>
+			</method>
 			<method name="start_receiving_part" symbol="tny_camel_bs_msg_receive_strategy_start_receiving_part">
 				<return-type type="TnyStream*"/>
 				<parameters>
@@ -715,6 +749,16 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
+			<vfunc name="find_msg_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="url_string" type="gchar*"/>
+					<parameter name="callback" type="TnyGetMsgCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
 			<vfunc name="get_account">
 				<return-type type="TnyAccount*"/>
 				<parameters>
@@ -751,6 +795,7 @@
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
@@ -760,6 +805,7 @@
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
 					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="status_callback" type="TnyStatusCallback"/>
 					<parameter name="user_data" type="gpointer"/>
@@ -1004,6 +1050,18 @@
 				<interface name="TnyHeader"/>
 			</implements>
 		</object>
+		<object name="TnyCamelHtmlToTextStream" parent="TnyCamelStream" type-name="TnyCamelHtmlToTextStream" get-type="tny_camel_html_to_text_stream_get_type">
+			<implements>
+				<interface name="TnyStream"/>
+				<interface name="TnySeekable"/>
+			</implements>
+			<constructor name="new" symbol="tny_camel_html_to_text_stream_new">
+				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="html_stream" type="TnyStream*"/>
+				</parameters>
+			</constructor>
+		</object>
 		<object name="TnyCamelIMAPFolder" parent="TnyCamelFolder" type-name="TnyCamelIMAPFolder" get-type="tny_camel_imap_folder_get_type">
 			<implements>
 				<interface name="TnyFolderStore"/>
@@ -1012,8 +1070,8 @@
 		</object>
 		<object name="TnyCamelIMAPStoreAccount" parent="TnyCamelStoreAccount" type-name="TnyCamelIMAPStoreAccount" get-type="tny_camel_imap_store_account_get_type">
 			<implements>
-				<interface name="TnyFolderStore"/>
 				<interface name="TnyAccount"/>
+				<interface name="TnyFolderStore"/>
 				<interface name="TnyStoreAccount"/>
 			</implements>
 			<constructor name="new" symbol="tny_camel_imap_store_account_new">
@@ -1256,6 +1314,19 @@
 					<parameter name="part" type="CamelMimePart*"/>
 				</parameters>
 			</constructor>
+			<method name="parse" symbol="tny_camel_msg_parse">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCamelMsg*"/>
+					<parameter name="stream" type="TnyStream*"/>
+				</parameters>
+			</method>
+			<vfunc name="get_allow_external_images">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyMsg*"/>
+				</parameters>
+			</vfunc>
 			<vfunc name="get_folder">
 				<return-type type="TnyFolder*"/>
 				<parameters>
@@ -1278,6 +1349,13 @@
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="set_allow_external_images">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMsg*"/>
+					<parameter name="allow" type="gboolean"/>
 				</parameters>
 			</vfunc>
 			<vfunc name="uncache_attachments">
@@ -1312,8 +1390,8 @@
 		</object>
 		<object name="TnyCamelNNTPStoreAccount" parent="TnyCamelStoreAccount" type-name="TnyCamelNNTPStoreAccount" get-type="tny_camel_nntp_store_account_get_type">
 			<implements>
-				<interface name="TnyFolderStore"/>
 				<interface name="TnyAccount"/>
+				<interface name="TnyFolderStore"/>
 				<interface name="TnyStoreAccount"/>
 			</implements>
 			<constructor name="new" symbol="tny_camel_nntp_store_account_new">
@@ -1328,8 +1406,8 @@
 		</object>
 		<object name="TnyCamelPOPStoreAccount" parent="TnyCamelStoreAccount" type-name="TnyCamelPOPStoreAccount" get-type="tny_camel_pop_store_account_get_type">
 			<implements>
-				<interface name="TnyFolderStore"/>
 				<interface name="TnyAccount"/>
+				<interface name="TnyFolderStore"/>
 				<interface name="TnyStoreAccount"/>
 			</implements>
 			<constructor name="new" symbol="tny_camel_pop_store_account_new">
@@ -1428,6 +1506,14 @@
 					<parameter name="trans_account" type="TnyCamelTransportAccount*"/>
 				</parameters>
 			</constructor>
+			<constructor name="new_with_folders" symbol="tny_camel_send_queue_new_with_folders">
+				<return-type type="TnySendQueue*"/>
+				<parameters>
+					<parameter name="trans_account" type="TnyCamelTransportAccount*"/>
+					<parameter name="outbox" type="TnyFolder*"/>
+					<parameter name="sentbox" type="TnyFolder*"/>
+				</parameters>
+			</constructor>
 			<method name="set_transport_account" symbol="tny_camel_send_queue_set_transport_account">
 				<return-type type="void"/>
 				<parameters>
@@ -1476,8 +1562,8 @@
 		</object>
 		<object name="TnyCamelStoreAccount" parent="TnyCamelAccount" type-name="TnyCamelStoreAccount" get-type="tny_camel_store_account_get_type">
 			<implements>
-				<interface name="TnyFolderStore"/>
 				<interface name="TnyAccount"/>
+				<interface name="TnyFolderStore"/>
 				<interface name="TnyStoreAccount"/>
 			</implements>
 			<method name="factor_folder" symbol="tny_camel_store_account_factor_folder">
@@ -1544,6 +1630,7 @@
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
@@ -1553,6 +1640,7 @@
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
 					<parameter name="callback" type="TnyGetFoldersCallback"/>
 					<parameter name="status_callback" type="TnyStatusCallback"/>
 					<parameter name="user_data" type="gpointer"/>
@@ -1597,9 +1685,22 @@
 				<interface name="TnyAccount"/>
 				<interface name="TnyTransportAccount"/>
 			</implements>
+			<method name="get_from" symbol="tny_camel_transport_account_get_from">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="self" type="TnyCamelTransportAccount*"/>
+				</parameters>
+			</method>
 			<constructor name="new" symbol="tny_camel_transport_account_new">
 				<return-type type="TnyTransportAccount*"/>
 			</constructor>
+			<method name="set_from" symbol="tny_camel_transport_account_set_from">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCamelTransportAccount*"/>
+					<parameter name="from" type="gchar*"/>
+				</parameters>
+			</method>
 			<vfunc name="send">
 				<return-type type="void"/>
 				<parameters>

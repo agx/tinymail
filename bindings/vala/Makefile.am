@@ -12,5 +12,6 @@ dist_vapi_DATA = \
 	libtinymailui-1.0.vapi \
 	libtinymailui-gtk-1.0.deps \
 	libtinymailui-gtk-1.0.vapi \
+	camel-lite-1.2.vapi \
 	$(NULL)
 

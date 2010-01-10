@@ -12,6 +12,19 @@
 			<member name="TNY_GTK_ATTACH_LIST_MODEL_INSTANCE_COLUMN" value="2"/>
 			<member name="TNY_GTK_ATTACH_LIST_MODEL_N_COLUMNS" value="3"/>
 		</enum>
+		<enum name="TnyGtkFolderListStoreColumn" type-name="TnyGtkFolderListStoreColumn" get-type="tny_gtk_folder_list_store_column_get_type">
+			<member name="TNY_GTK_FOLDER_LIST_STORE_NAME_COLUMN" value="0"/>
+			<member name="TNY_GTK_FOLDER_LIST_STORE_UNREAD_COLUMN" value="1"/>
+			<member name="TNY_GTK_FOLDER_LIST_STORE_ALL_COLUMN" value="2"/>
+			<member name="TNY_GTK_FOLDER_LIST_STORE_TYPE_COLUMN" value="3"/>
+			<member name="TNY_GTK_FOLDER_LIST_STORE_INSTANCE_COLUMN" value="4"/>
+			<member name="TNY_GTK_FOLDER_LIST_STORE_N_COLUMNS" value="5"/>
+		</enum>
+		<enum name="TnyGtkFolderListStoreFlags">
+			<member name="TNY_GTK_FOLDER_LIST_STORE_FLAG_SHOW_PATH" value="1"/>
+			<member name="TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH" value="4"/>
+			<member name="TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH" value="8"/>
+		</enum>
 		<enum name="TnyGtkFolderStoreTreeModelColumn" type-name="TnyGtkFolderStoreTreeModelColumn" get-type="tny_gtk_folder_store_tree_model_column_get_type">
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_NAME_COLUMN" value="0"/>
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_UNREAD_COLUMN" value="1"/>
@@ -19,6 +32,9 @@
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_TYPE_COLUMN" value="3"/>
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_INSTANCE_COLUMN" value="4"/>
 			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_N_COLUMNS" value="5"/>
+		</enum>
+		<enum name="TnyGtkFolderStoreTreeModelFlags">
+			<member name="TNY_GTK_FOLDER_STORE_TREE_MODEL_FLAG_SHOW_PATH" value="1"/>
 		</enum>
 		<enum name="TnyGtkHeaderListModelColumn" type-name="TnyGtkHeaderListModelColumn" get-type="tny_gtk_header_list_model_column_get_type">
 			<member name="TNY_GTK_HEADER_LIST_MODEL_FROM_COLUMN" value="0"/>
@@ -36,11 +52,11 @@
 		</enum>
 		<object name="TnyGtkAccountListModel" parent="GtkListStore" type-name="TnyGtkAccountListModel" get-type="tny_gtk_account_list_model_get_type">
 			<implements>
-				<interface name="GtkBuildable"/>
 				<interface name="GtkTreeModel"/>
 				<interface name="GtkTreeDragSource"/>
 				<interface name="GtkTreeDragDest"/>
 				<interface name="GtkTreeSortable"/>
+				<interface name="GtkBuildable"/>
 				<interface name="TnyList"/>
 			</implements>
 			<constructor name="new" symbol="tny_gtk_account_list_model_new">
@@ -52,11 +68,11 @@
 		</object>
 		<object name="TnyGtkAttachListModel" parent="GtkListStore" type-name="TnyGtkAttachListModel" get-type="tny_gtk_attach_list_model_get_type">
 			<implements>
-				<interface name="GtkBuildable"/>
 				<interface name="GtkTreeModel"/>
 				<interface name="GtkTreeDragSource"/>
 				<interface name="GtkTreeDragDest"/>
 				<interface name="GtkTreeSortable"/>
+				<interface name="GtkBuildable"/>
 				<interface name="TnyList"/>
 			</implements>
 			<constructor name="new" symbol="tny_gtk_attach_list_model_new">
@@ -99,8 +115,8 @@
 		<object name="TnyGtkExpanderMimePartView" parent="GtkExpander" type-name="TnyGtkExpanderMimePartView" get-type="tny_gtk_expander_mime_part_view_get_type">
 			<implements>
 				<interface name="AtkImplementor"/>
-				<interface name="GtkBuildable"/>
 				<interface name="TnyMimePartView"/>
+				<interface name="GtkBuildable"/>
 			</implements>
 			<constructor name="new" symbol="tny_gtk_expander_mime_part_view_new">
 				<return-type type="TnyMimePartView*"/>
@@ -135,16 +151,94 @@
 				</parameters>
 			</vfunc>
 		</object>
-		<object name="TnyGtkFolderStoreTreeModel" parent="GtkTreeStore" type-name="TnyGtkFolderStoreTreeModel" get-type="tny_gtk_folder_store_tree_model_get_type">
+		<object name="TnyGtkFolderListStore" parent="GtkListStore" type-name="TnyGtkFolderListStore" get-type="tny_gtk_folder_list_store_get_type">
 			<implements>
-				<interface name="GtkBuildable"/>
+				<interface name="TnyFolderStoreObserver"/>
+				<interface name="TnyFolderObserver"/>
 				<interface name="GtkTreeModel"/>
 				<interface name="GtkTreeDragSource"/>
 				<interface name="GtkTreeDragDest"/>
 				<interface name="GtkTreeSortable"/>
+				<interface name="GtkBuildable"/>
 				<interface name="TnyList"/>
+			</implements>
+			<method name="append" symbol="tny_gtk_folder_list_store_append">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyGtkFolderListStore*"/>
+					<parameter name="item" type="TnyFolderStore*"/>
+					<parameter name="root_name" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="get_activity" symbol="tny_gtk_folder_list_store_get_activity">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyGtkFolderListStore*"/>
+				</parameters>
+			</method>
+			<method name="get_path_separator" symbol="tny_gtk_folder_list_store_get_path_separator">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="self" type="TnyGtkFolderListStore*"/>
+				</parameters>
+			</method>
+			<constructor name="new" symbol="tny_gtk_folder_list_store_new">
+				<return-type type="GtkTreeModel*"/>
+				<parameters>
+					<parameter name="query" type="TnyFolderStoreQuery*"/>
+				</parameters>
+			</constructor>
+			<constructor name="new_with_flags" symbol="tny_gtk_folder_list_store_new_with_flags">
+				<return-type type="GtkTreeModel*"/>
+				<parameters>
+					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="flags" type="TnyGtkFolderListStoreFlags"/>
+				</parameters>
+			</constructor>
+			<method name="prepend" symbol="tny_gtk_folder_list_store_prepend">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyGtkFolderListStore*"/>
+					<parameter name="item" type="TnyFolderStore*"/>
+					<parameter name="root_name" type="gchar*"/>
+				</parameters>
+			</method>
+			<method name="set_path_separator" symbol="tny_gtk_folder_list_store_set_path_separator">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyGtkFolderListStore*"/>
+					<parameter name="separator" type="gchar*"/>
+				</parameters>
+			</method>
+			<signal name="activity-changed" when="FIRST">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyGtkFolderListStore*"/>
+					<parameter name="activity" type="gboolean"/>
+				</parameters>
+			</signal>
+			<field name="first" type="GList*"/>
+			<field name="store_obs" type="GList*"/>
+			<field name="fol_obs" type="GList*"/>
+			<field name="iterator_lock" type="GMutex*"/>
+			<field name="query" type="TnyFolderStoreQuery*"/>
+			<field name="first_needs_unref" type="gboolean"/>
+			<field name="signals" type="GPtrArray*"/>
+			<field name="flags" type="TnyGtkFolderListStoreFlags"/>
+			<field name="path_separator" type="gchar*"/>
+			<field name="progress_count" type="gint"/>
+			<field name="delayed_refresh_timeout_id" type="guint"/>
+		</object>
+		<object name="TnyGtkFolderStoreTreeModel" parent="GtkTreeStore" type-name="TnyGtkFolderStoreTreeModel" get-type="tny_gtk_folder_store_tree_model_get_type">
+			<implements>
 				<interface name="TnyFolderStoreObserver"/>
 				<interface name="TnyFolderObserver"/>
+				<interface name="GtkTreeModel"/>
+				<interface name="GtkTreeDragSource"/>
+				<interface name="GtkTreeDragDest"/>
+				<interface name="GtkTreeSortable"/>
+				<interface name="GtkBuildable"/>
+				<interface name="TnyList"/>
 			</implements>
 			<method name="append" symbol="tny_gtk_folder_store_tree_model_append">
 				<return-type type="void"/>
@@ -158,6 +252,13 @@
 				<return-type type="GtkTreeModel*"/>
 				<parameters>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+				</parameters>
+			</constructor>
+			<constructor name="new_with_flags" symbol="tny_gtk_folder_store_tree_model_new_with_flags">
+				<return-type type="GtkTreeModel*"/>
+				<parameters>
+					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="flags" type="TnyGtkFolderStoreTreeModelFlags"/>
 				</parameters>
 			</constructor>
 			<method name="prepend" symbol="tny_gtk_folder_store_tree_model_prepend">
@@ -175,6 +276,7 @@
 			<field name="query" type="TnyFolderStoreQuery*"/>
 			<field name="first_needs_unref" type="gboolean"/>
 			<field name="signals" type="GPtrArray*"/>
+			<field name="flags" type="TnyGtkFolderStoreTreeModelFlags"/>
 		</object>
 		<object name="TnyGtkHeaderListModel" parent="GObject" type-name="TnyGtkHeaderListModel" get-type="tny_gtk_header_list_model_get_type">
 			<implements>
@@ -253,8 +355,8 @@
 		<object name="TnyGtkImageMimePartView" parent="GtkImage" type-name="TnyGtkImageMimePartView" get-type="tny_gtk_image_mime_part_view_get_type">
 			<implements>
 				<interface name="AtkImplementor"/>
-				<interface name="GtkBuildable"/>
 				<interface name="TnyMimePartView"/>
+				<interface name="GtkBuildable"/>
 			</implements>
 			<constructor name="new" symbol="tny_gtk_image_mime_part_view_new">
 				<return-type type="TnyMimePartView*"/>
@@ -313,8 +415,8 @@
 		<object name="TnyGtkMsgView" parent="GtkBin" type-name="TnyGtkMsgView" get-type="tny_gtk_msg_view_get_type">
 			<implements>
 				<interface name="AtkImplementor"/>
-				<interface name="GtkBuildable"/>
 				<interface name="TnyMimePartView"/>
+				<interface name="GtkBuildable"/>
 				<interface name="TnyMsgView"/>
 			</implements>
 			<method name="get_display_attachments" symbol="tny_gtk_msg_view_get_display_attachments">
@@ -457,8 +559,8 @@
 		<object name="TnyGtkMsgWindow" parent="GtkWindow" type-name="TnyGtkMsgWindow" get-type="tny_gtk_msg_window_get_type">
 			<implements>
 				<interface name="AtkImplementor"/>
-				<interface name="GtkBuildable"/>
 				<interface name="TnyMimePartView"/>
+				<interface name="GtkBuildable"/>
 				<interface name="TnyMsgView"/>
 				<interface name="TnyMsgWindow"/>
 			</implements>
@@ -667,8 +769,8 @@
 		<object name="TnyGtkTextMimePartView" parent="GtkTextView" type-name="TnyGtkTextMimePartView" get-type="tny_gtk_text_mime_part_view_get_type">
 			<implements>
 				<interface name="AtkImplementor"/>
-				<interface name="GtkBuildable"/>
 				<interface name="TnyMimePartView"/>
+				<interface name="GtkBuildable"/>
 			</implements>
 			<constructor name="new" symbol="tny_gtk_text_mime_part_view_new">
 				<return-type type="TnyMimePartView*"/>

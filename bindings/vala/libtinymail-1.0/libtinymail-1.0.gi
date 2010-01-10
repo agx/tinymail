@@ -19,6 +19,9 @@
 				<parameter name="err" type="GError*"/>
 			</parameters>
 		</function>
+		<function name="get_error_quark" symbol="tny_get_error_quark">
+			<return-type type="GQuark"/>
+		</function>
 		<function name="marshal_VOID__OBJECT_OBJECT_INT_INT" symbol="tny_marshal_VOID__OBJECT_OBJECT_INT_INT">
 			<return-type type="void"/>
 			<parameters>
@@ -77,6 +80,15 @@
 			<return-type type="void"/>
 			<parameters>
 				<parameter name="self" type="TnyFolder*"/>
+				<parameter name="cancelled" type="gboolean"/>
+				<parameter name="err" type="GError*"/>
+				<parameter name="user_data" type="gpointer"/>
+			</parameters>
+		</callback>
+		<callback name="TnyFolderStoreCallback">
+			<return-type type="void"/>
+			<parameters>
+				<parameter name="self" type="TnyFolderStore*"/>
 				<parameter name="cancelled" type="gboolean"/>
 				<parameter name="err" type="GError*"/>
 				<parameter name="user_data" type="gpointer"/>
@@ -162,6 +174,22 @@
 				<parameter name="user_data" type="gpointer"/>
 			</parameters>
 		</callback>
+		<callback name="TnyStreamCacheOpenStreamFetcher">
+			<return-type type="TnyStream*"/>
+			<parameters>
+				<parameter name="self" type="TnyStreamCache*"/>
+				<parameter name="expected_size" type="gint64*"/>
+				<parameter name="userdata" type="gpointer"/>
+			</parameters>
+		</callback>
+		<callback name="TnyStreamCacheRemoveFilter">
+			<return-type type="gboolean"/>
+			<parameters>
+				<parameter name="self" type="TnyStreamCache*"/>
+				<parameter name="id" type="gchar*"/>
+				<parameter name="userdata" type="gpointer"/>
+			</parameters>
+		</callback>
 		<callback name="TnyTransferMsgsCallback">
 			<return-type type="void"/>
 			<parameters>
@@ -238,6 +266,10 @@
 			<member name="TNY_ACCOUNT_CHANGED" value="1"/>
 			<member name="TNY_ACCOUNT_LAST_SIGNAL" value="2"/>
 		</enum>
+		<enum name="TnyAccountStoreSignal">
+			<member name="TNY_ACCOUNT_STORE_CONNECTING_STARTED" value="0"/>
+			<member name="TNY_ACCOUNT_STORE_LAST_SIGNAL" value="1"/>
+		</enum>
 		<enum name="TnyAccountType" type-name="TnyAccountType" get-type="tny_account_type_get_type">
 			<member name="TNY_ACCOUNT_TYPE_STORE" value="0"/>
 			<member name="TNY_ACCOUNT_TYPE_TRANSPORT" value="1"/>
@@ -255,9 +287,39 @@
 			<member name="TNY_CONNECTION_STATUS_RECONNECTING" value="4"/>
 			<member name="TNY_CONNECTION_STATUS_INIT" value="5"/>
 		</enum>
-		<enum name="TnyError" type-name="TnyError" get-type="tny_error_get_type">
-		</enum>
-		<enum name="TnyErrorDomain" type-name="TnyErrorDomain" get-type="tny_error_domain_get_type">
+		<enum name="TnyError">
+			<member name="TNY_NO_ERROR" value="0"/>
+			<member name="TNY_SYSTEM_ERROR_UNKNOWN" value="1"/>
+			<member name="TNY_SYSTEM_ERROR_MEMORY" value="2"/>
+			<member name="TNY_SYSTEM_ERROR_CANCEL" value="3"/>
+			<member name="TNY_IO_ERROR_WRITE" value="4"/>
+			<member name="TNY_IO_ERROR_READ" value="5"/>
+			<member name="TNY_SERVICE_ERROR_UNKNOWN" value="6"/>
+			<member name="TNY_SERVICE_ERROR_AUTHENTICATE" value="7"/>
+			<member name="TNY_SERVICE_ERROR_CONNECT" value="8"/>
+			<member name="TNY_SERVICE_ERROR_UNAVAILABLE" value="9"/>
+			<member name="TNY_SERVICE_ERROR_LOST_CONNECTION" value="10"/>
+			<member name="TNY_SERVICE_ERROR_CERTIFICATE" value="11"/>
+			<member name="TNY_SERVICE_ERROR_FOLDER_CREATE" value="12"/>
+			<member name="TNY_SERVICE_ERROR_FOLDER_REMOVE" value="13"/>
+			<member name="TNY_SERVICE_ERROR_FOLDER_RENAME" value="14"/>
+			<member name="TNY_SERVICE_ERROR_FOLDER_IS_UNKNOWN" value="15"/>
+			<member name="TNY_SERVICE_ERROR_PROTOCOL" value="16"/>
+			<member name="TNY_SERVICE_ERROR_UNSUPPORTED" value="17"/>
+			<member name="TNY_SERVICE_ERROR_NO_SUCH_MESSAGE" value="18"/>
+			<member name="TNY_SERVICE_ERROR_MESSAGE_NOT_AVAILABLE" value="19"/>
+			<member name="TNY_SERVICE_ERROR_STATE" value="20"/>
+			<member name="TNY_SERVICE_ERROR_ADD_MSG" value="21"/>
+			<member name="TNY_SERVICE_ERROR_REMOVE_MSG" value="22"/>
+			<member name="TNY_SERVICE_ERROR_GET_MSG" value="23"/>
+			<member name="TNY_SERVICE_ERROR_SYNC" value="24"/>
+			<member name="TNY_SERVICE_ERROR_REFRESH" value="25"/>
+			<member name="TNY_SERVICE_ERROR_COPY" value="26"/>
+			<member name="TNY_SERVICE_ERROR_TRANSFER" value="27"/>
+			<member name="TNY_SERVICE_ERROR_GET_FOLDERS" value="28"/>
+			<member name="TNY_SERVICE_ERROR_SEND" value="29"/>
+			<member name="TNY_MIME_ERROR_STATE" value="30"/>
+			<member name="TNY_MIME_ERROR_MALFORMED" value="31"/>
 		</enum>
 		<enum name="TnyFolderSignal" type-name="TnyFolderSignal" get-type="tny_folder_signal_get_type">
 			<member name="TNY_FOLDER_FOLDER_INSERTED" value="0"/>
@@ -342,12 +404,148 @@
 			<member name="TNY_HEADER_FLAG_LOW_PRIORITY" value="512"/>
 			<member name="TNY_HEADER_FLAG_SUSPENDED" value="2048"/>
 		</flags>
+		<object name="TnyCachedFile" parent="GObject" type-name="TnyCachedFile" get-type="tny_cached_file_get_type">
+			<method name="get_expected_size" symbol="tny_cached_file_get_expected_size">
+				<return-type type="gint64"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</method>
+			<method name="get_id" symbol="tny_cached_file_get_id">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</method>
+			<method name="get_stream" symbol="tny_cached_file_get_stream">
+				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</method>
+			<method name="get_timestamp" symbol="tny_cached_file_get_timestamp">
+				<return-type type="time_t"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</method>
+			<method name="is_active" symbol="tny_cached_file_is_active">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</method>
+			<method name="is_finished" symbol="tny_cached_file_is_finished">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</method>
+			<constructor name="new" symbol="tny_cached_file_new">
+				<return-type type="TnyCachedFile*"/>
+				<parameters>
+					<parameter name="stream_cache" type="TnyFsStreamCache*"/>
+					<parameter name="id" type="gchar*"/>
+					<parameter name="expected_size" type="gint64"/>
+					<parameter name="stream" type="TnyStream*"/>
+				</parameters>
+			</constructor>
+			<method name="remove" symbol="tny_cached_file_remove">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</method>
+			<method name="unregister_stream" symbol="tny_cached_file_unregister_stream">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+					<parameter name="stream" type="TnyCachedFileStream*"/>
+				</parameters>
+			</method>
+			<method name="wait_fetchable" symbol="tny_cached_file_wait_fetchable">
+				<return-type type="gint64"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+					<parameter name="offset" type="gint64"/>
+				</parameters>
+			</method>
+			<vfunc name="get_expected_size">
+				<return-type type="gint64"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_id">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_stream">
+				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_timestamp">
+				<return-type type="time_t"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="is_active">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="is_finished">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="remove">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="unregister_stream">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+					<parameter name="stream" type="TnyCachedFileStream*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="wait_fetchable">
+				<return-type type="gint64"/>
+				<parameters>
+					<parameter name="self" type="TnyCachedFile*"/>
+					<parameter name="offset" type="gint64"/>
+				</parameters>
+			</vfunc>
+		</object>
+		<object name="TnyCachedFileStream" parent="TnyFsStream" type-name="TnyCachedFileStream" get-type="tny_cached_file_stream_get_type">
+			<implements>
+				<interface name="TnyStream"/>
+				<interface name="TnySeekable"/>
+			</implements>
+			<constructor name="new" symbol="tny_cached_file_stream_new">
+				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="cached_file" type="TnyCachedFile*"/>
+					<parameter name="fd" type="int"/>
+				</parameters>
+			</constructor>
+		</object>
 		<object name="TnyCombinedAccount" parent="GObject" type-name="TnyCombinedAccount" get-type="tny_combined_account_get_type">
 			<implements>
-				<interface name="TnyFolderStore"/>
 				<interface name="TnyAccount"/>
-				<interface name="TnyTransportAccount"/>
 				<interface name="TnyStoreAccount"/>
+				<interface name="TnyFolderStore"/>
+				<interface name="TnyTransportAccount"/>
 			</implements>
 			<method name="get_store_account" symbol="tny_combined_account_get_store_account">
 				<return-type type="TnyStoreAccount*"/>
@@ -563,13 +761,6 @@
 					<parameter name="self" type="TnyFolderMonitor*"/>
 				</parameters>
 			</vfunc>
-			<vfunc name="update">
-				<return-type type="void"/>
-				<parameters>
-					<parameter name="self" type="TnyFolderObserver*"/>
-					<parameter name="change" type="TnyFolderChange*"/>
-				</parameters>
-			</vfunc>
 		</object>
 		<object name="TnyFolderStats" parent="GObject" type-name="TnyFolderStats" get-type="tny_folder_stats_get_type">
 			<method name="get_all_count" symbol="tny_folder_stats_get_all_count">
@@ -726,6 +917,24 @@
 				</parameters>
 			</method>
 		</object>
+		<object name="TnyFsStreamCache" parent="GObject" type-name="TnyFsStreamCache" get-type="tny_fs_stream_cache_get_type">
+			<implements>
+				<interface name="TnyStreamCache"/>
+			</implements>
+			<method name="get_path" symbol="tny_fs_stream_cache_get_path">
+				<return-type type="gchar*"/>
+				<parameters>
+					<parameter name="path" type="TnyFsStreamCache*"/>
+				</parameters>
+			</method>
+			<constructor name="new" symbol="tny_fs_stream_cache_new">
+				<return-type type="TnyStreamCache*"/>
+				<parameters>
+					<parameter name="path" type="gchar*"/>
+					<parameter name="max_size" type="guint64"/>
+				</parameters>
+			</constructor>
+		</object>
 		<object name="TnyMergeFolder" parent="GObject" type-name="TnyMergeFolder" get-type="tny_merge_folder_get_type">
 			<implements>
 				<interface name="TnyFolder"/>
@@ -779,6 +988,123 @@
 					<parameter name="ui_locker" type="TnyLockable*"/>
 				</parameters>
 			</method>
+		</object>
+		<object name="TnyMergeFolderStore" parent="GObject" type-name="TnyMergeFolderStore" get-type="tny_merge_folder_store_get_type">
+			<implements>
+				<interface name="TnyFolderStore"/>
+				<interface name="TnyFolderStoreObserver"/>
+			</implements>
+			<method name="add_store" symbol="tny_merge_folder_store_add_store">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMergeFolderStore*"/>
+					<parameter name="store" type="TnyFolderStore*"/>
+				</parameters>
+			</method>
+			<constructor name="new" symbol="tny_merge_folder_store_new">
+				<return-type type="TnyMergeFolderStore*"/>
+				<parameters>
+					<parameter name="ui_locker" type="TnyLockable*"/>
+				</parameters>
+			</constructor>
+			<method name="remove_store" symbol="tny_merge_folder_store_remove_store">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMergeFolderStore*"/>
+					<parameter name="store" type="TnyFolderStore*"/>
+				</parameters>
+			</method>
+			<vfunc name="add_store">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMergeFolderStore*"/>
+					<parameter name="store" type="TnyFolderStore*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="add_store_observer">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="observer" type="TnyFolderStoreObserver*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="create_folder">
+				<return-type type="TnyFolder*"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="name" type="gchar*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="create_folder_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="name" type="gchar*"/>
+					<parameter name="callback" type="TnyCreateFolderCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_folder_store">
+				<return-type type="TnyFolderStore*"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_folders">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="list" type="TnyList*"/>
+					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_folders_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="list" type="TnyList*"/>
+					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
+					<parameter name="callback" type="TnyGetFoldersCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="refresh_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="callback" type="TnyFolderStoreCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="remove_folder">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="folder" type="TnyFolder*"/>
+					<parameter name="err" type="GError**"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="remove_store">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMergeFolderStore*"/>
+					<parameter name="store" type="TnyFolderStore*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="remove_store_observer">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="observer" type="TnyFolderStoreObserver*"/>
+				</parameters>
+			</vfunc>
 		</object>
 		<object name="TnyNoopLockable" parent="GObject" type-name="TnyNoopLockable" get-type="tny_noop_lockable_get_type">
 			<implements>
@@ -1036,7 +1362,7 @@
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyAccount*"/>
-					<parameter name="status" type="gint"/>
+					<parameter name="status" type="TnyConnectionStatus"/>
 				</parameters>
 			</signal>
 			<vfunc name="cancel">
@@ -1392,6 +1718,12 @@
 					<parameter name="self" type="TnyDevice*"/>
 				</parameters>
 			</method>
+			<method name="is_forced" symbol="tny_device_is_forced">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyDevice*"/>
+				</parameters>
+			</method>
 			<method name="is_online" symbol="tny_device_is_online">
 				<return-type type="gboolean"/>
 				<parameters>
@@ -1419,6 +1751,12 @@
 			</vfunc>
 			<vfunc name="force_online">
 				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyDevice*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="is_forced">
+				<return-type type="gboolean"/>
 				<parameters>
 					<parameter name="self" type="TnyDevice*"/>
 				</parameters>
@@ -1493,6 +1831,16 @@
 					<parameter name="self" type="TnyFolder*"/>
 					<parameter name="url_string" type="gchar*"/>
 					<parameter name="err" type="GError**"/>
+				</parameters>
+			</method>
+			<method name="find_msg_async" symbol="tny_folder_find_msg_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="url_string" type="gchar*"/>
+					<parameter name="callback" type="TnyGetMsgCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
 				</parameters>
 			</method>
 			<method name="get_account" symbol="tny_folder_get_account">
@@ -1781,6 +2129,16 @@
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
+			<vfunc name="find_msg_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolder*"/>
+					<parameter name="url_string" type="gchar*"/>
+					<parameter name="callback" type="TnyGetMsgCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
 			<vfunc name="get_account">
 				<return-type type="TnyAccount*"/>
 				<parameters>
@@ -2061,6 +2419,7 @@
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</method>
@@ -2070,7 +2429,17 @@
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
 					<parameter name="callback" type="TnyGetFoldersCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</method>
+			<method name="refresh_async" symbol="tny_folder_store_refresh_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="callback" type="TnyFolderStoreCallback"/>
 					<parameter name="status_callback" type="TnyStatusCallback"/>
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
@@ -2121,6 +2490,7 @@
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
 					<parameter name="err" type="GError**"/>
 				</parameters>
 			</vfunc>
@@ -2130,7 +2500,17 @@
 					<parameter name="self" type="TnyFolderStore*"/>
 					<parameter name="list" type="TnyList*"/>
 					<parameter name="query" type="TnyFolderStoreQuery*"/>
+					<parameter name="refresh" type="gboolean"/>
 					<parameter name="callback" type="TnyGetFoldersCallback"/>
+					<parameter name="status_callback" type="TnyStatusCallback"/>
+					<parameter name="user_data" type="gpointer"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="refresh_async">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyFolderStore*"/>
+					<parameter name="callback" type="TnyFolderStoreCallback"/>
 					<parameter name="status_callback" type="TnyStatusCallback"/>
 					<parameter name="user_data" type="gpointer"/>
 				</parameters>
@@ -3058,6 +3438,12 @@
 				<interface name="TnyMimePart"/>
 				<interface name="GObject"/>
 			</requires>
+			<method name="get_allow_external_images" symbol="tny_msg_get_allow_external_images">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyMsg*"/>
+				</parameters>
+			</method>
 			<method name="get_folder" symbol="tny_msg_get_folder">
 				<return-type type="TnyFolder*"/>
 				<parameters>
@@ -3082,12 +3468,25 @@
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</method>
+			<method name="set_allow_external_images" symbol="tny_msg_set_allow_external_images">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMsg*"/>
+					<parameter name="allow" type="gboolean"/>
+				</parameters>
+			</method>
 			<method name="uncache_attachments" symbol="tny_msg_uncache_attachments">
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
 				</parameters>
 			</method>
+			<vfunc name="get_allow_external_images">
+				<return-type type="gboolean"/>
+				<parameters>
+					<parameter name="self" type="TnyMsg*"/>
+				</parameters>
+			</vfunc>
 			<vfunc name="get_folder">
 				<return-type type="TnyFolder*"/>
 				<parameters>
@@ -3110,6 +3509,13 @@
 				<return-type type="void"/>
 				<parameters>
 					<parameter name="self" type="TnyMsg*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="set_allow_external_images">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyMsg*"/>
+					<parameter name="allow" type="gboolean"/>
 				</parameters>
 			</vfunc>
 			<vfunc name="uncache_attachments">
@@ -3363,8 +3769,8 @@
 		</interface>
 		<interface name="TnyStoreAccount" type-name="TnyStoreAccount" get-type="tny_store_account_get_type">
 			<requires>
-				<interface name="TnyFolderStore"/>
 				<interface name="TnyAccount"/>
+				<interface name="TnyFolderStore"/>
 				<interface name="GObject"/>
 			</requires>
 			<method name="delete_cache" symbol="tny_store_account_delete_cache">
@@ -3524,6 +3930,68 @@
 				<parameters>
 					<parameter name="self" type="TnyStream*"/>
 					<parameter name="output" type="TnyStream*"/>
+				</parameters>
+			</vfunc>
+		</interface>
+		<interface name="TnyStreamCache" type-name="TnyStreamCache" get-type="tny_stream_cache_get_type">
+			<method name="get_max_size" symbol="tny_stream_cache_get_max_size">
+				<return-type type="gint64"/>
+				<parameters>
+					<parameter name="cache" type="TnyStreamCache*"/>
+				</parameters>
+			</method>
+			<method name="get_stream" symbol="tny_stream_cache_get_stream">
+				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="cache" type="TnyStreamCache*"/>
+					<parameter name="id" type="char*"/>
+					<parameter name="fetcher" type="TnyStreamCacheOpenStreamFetcher"/>
+					<parameter name="userdata" type="gpointer"/>
+				</parameters>
+			</method>
+			<method name="remove" symbol="tny_stream_cache_remove">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="cache" type="TnyStreamCache*"/>
+					<parameter name="filter" type="TnyStreamCacheRemoveFilter"/>
+					<parameter name="userdata" type="gpointer"/>
+				</parameters>
+			</method>
+			<method name="set_max_size" symbol="tny_stream_cache_set_max_size">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="cache" type="TnyStreamCache*"/>
+					<parameter name="max_size" type="gint64"/>
+				</parameters>
+			</method>
+			<vfunc name="get_max_size">
+				<return-type type="gint64"/>
+				<parameters>
+					<parameter name="self" type="TnyStreamCache*"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="get_stream">
+				<return-type type="TnyStream*"/>
+				<parameters>
+					<parameter name="self" type="TnyStreamCache*"/>
+					<parameter name="id" type="char*"/>
+					<parameter name="fetcher" type="TnyStreamCacheOpenStreamFetcher"/>
+					<parameter name="userdata" type="gpointer"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="remove">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyStreamCache*"/>
+					<parameter name="filter" type="TnyStreamCacheRemoveFilter"/>
+					<parameter name="data" type="gpointer"/>
+				</parameters>
+			</vfunc>
+			<vfunc name="set_max_size">
+				<return-type type="void"/>
+				<parameters>
+					<parameter name="self" type="TnyStreamCache*"/>
+					<parameter name="max_size" type="gint64"/>
 				</parameters>
 			</vfunc>
 		</interface>

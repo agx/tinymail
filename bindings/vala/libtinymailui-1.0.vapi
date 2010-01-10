@@ -17,22 +17,22 @@ namespace Tny {
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface MimePartSaver {
-		public abstract weak Tny.MimePartSaveStrategy get_save_strategy ();
+		public abstract unowned Tny.MimePartSaveStrategy get_save_strategy ();
 		public abstract void save (Tny.MimePart part);
 		public abstract void set_save_strategy (Tny.MimePartSaveStrategy strategy);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface MimePartView {
 		public abstract void clear ();
-		public abstract weak Tny.MimePart get_part ();
+		public abstract unowned Tny.MimePart get_part ();
 		public abstract void set_part (Tny.MimePart mime_part);
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface MsgView : Tny.MimePartView {
 		public abstract void clear ();
-		public abstract weak Tny.MimePartView create_mime_part_view_for (Tny.MimePart part);
-		public abstract weak Tny.MsgView create_new_inline_viewer ();
-		public abstract weak Tny.Msg get_msg ();
+		public abstract unowned Tny.MimePartView create_mime_part_view_for (Tny.MimePart part);
+		public abstract unowned Tny.MsgView create_new_inline_viewer ();
+		public abstract unowned Tny.Msg get_msg ();
 		public abstract void set_msg (Tny.Msg msg);
 		public abstract void set_unavailable ();
 	}
@@ -41,12 +41,12 @@ namespace Tny {
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface PlatformFactory : GLib.Object {
-		public abstract weak Tny.AccountStore new_account_store ();
-		public abstract weak Tny.Device new_device ();
-		public abstract weak Tny.MimePart new_mime_part ();
-		public abstract weak Tny.Msg new_msg ();
-		public abstract weak Tny.MsgView new_msg_view ();
-		public abstract weak Tny.PasswordGetter new_password_getter ();
+		public abstract Tny.AccountStore new_account_store ();
+		public abstract Tny.Device new_device ();
+		public abstract Tny.MimePart new_mime_part ();
+		public abstract Tny.Msg new_msg ();
+		public abstract Tny.MsgView new_msg_view ();
+		public abstract Tny.PasswordGetter new_password_getter ();
 	}
 	[CCode (cheader_filename = "tnyui.h")]
 	public interface SummaryView : GLib.Object {

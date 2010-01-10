@@ -16,7 +16,13 @@ How to regenerate Vala bindings
  * Change the current working directory to tinymail/bindings/vala
  * Generate .gi and .vapi files:
 
-for library in libtinymail-1.0 libtinymail-camel-1.0 libtinymailui-1.0 \
+for library in libtinymail-1.0
+do
+	vala-gen-introspect $library $library
+	vapigen --vapidir . --library $library $library/$library.{gi,vala}
+done
+
+for library in libtinymail-camel-1.0 libtinymailui-1.0 \
                libtinymailui-gtk-1.0 libtinymail-gnome-desktop-1.0
 do
 	vala-gen-introspect $library $library

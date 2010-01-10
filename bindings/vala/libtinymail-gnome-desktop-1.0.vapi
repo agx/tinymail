@@ -4,15 +4,17 @@
 namespace Tny {
 	[CCode (cheader_filename = "tny-gnome-platform-factory.h")]
 	public class GnomeAccountStore : GLib.Object, Tny.AccountStore {
-		public weak Tny.SessionCamel get_session ();
+		[CCode (type = "TnyAccountStore*", has_construct_function = false)]
 		public GnomeAccountStore ();
+		public unowned Tny.SessionCamel get_session ();
 	}
 	[CCode (cheader_filename = "tny-gnome-platform-factory.h")]
 	public class GnomeDevice : GLib.Object, Tny.Device {
+		[CCode (type = "TnyDevice*", has_construct_function = false)]
 		public GnomeDevice ();
 	}
 	[CCode (cheader_filename = "tny-gnome-platform-factory.h")]
 	public class GnomePlatformFactory : GLib.Object, Tny.PlatformFactory {
-		public static weak Tny.PlatformFactory get_instance ();
+		public static unowned Tny.PlatformFactory get_instance ();
 	}
 }

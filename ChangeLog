@@ -1,3 +1,7 @@
+2010-01-10  Philip Van Hoof  <philip@codeminded.be>
+
+	* Updated Vala bindings
+
 2010-01-09  Sergio Villar Senin  <svillar@igalia.com>
 
 	* camel/providers/imap/camel-imap-store.h: do not enable IDLE
