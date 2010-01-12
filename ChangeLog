@@ -1,3 +1,11 @@
+2010-01-12  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymail-camel/tny-camel-folder.c
+	(tny_camel_folder_refresh_default): added missing
+	tny_camel_folder_reason/unreason to the refresh operation. Summary
+	was sometimes freed to early when this operation was ongoing
+	causing crashes.
+
 2010-01-10  Philip Van Hoof  <philip@codeminded.be>
 	Patch by Mike Vee (mike@vee.net)
 

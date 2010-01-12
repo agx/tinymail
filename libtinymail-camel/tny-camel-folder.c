@@ -2228,6 +2228,10 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 		return;
 	}
 
+	/* We reason the folder to make sure it does not lose all the references
+	 * and uncache, causing an interlock */
+	_tny_camel_folder_reason (priv);
+
 	oldlen = priv->cached_length;
 	oldurlen = priv->unread_length;
 
@@ -2244,6 +2248,8 @@ tny_camel_folder_refresh_default (TnyFolder *self, GError **err)
 		_tny_camel_exception_to_tny_error (&ex, err);
 		camel_exception_clear (&ex);
 	}
+
+	_tny_camel_folder_unreason (priv);
 
 	g_static_rec_mutex_unlock (priv->folder_lock);
 
