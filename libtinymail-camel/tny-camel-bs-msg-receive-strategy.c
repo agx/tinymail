@@ -125,6 +125,26 @@ tny_camel_bs_msg_receive_strategy_start_receiving_part (TnyCamelBsMsgReceiveStra
 }
 
 static void
+restructure_bodystructure_part_specs (bodystruct_t *bs, const gchar *prefix, const gchar *new_prefix)
+{
+	bodystruct_t *child;
+	if (g_str_has_prefix (bs->part_spec, prefix)) {
+		gchar *new_part_spec;
+
+		new_part_spec = g_strconcat (new_prefix, bs->part_spec + strlen (prefix), NULL);
+		g_free (bs->part_spec);
+		bs->part_spec = new_part_spec;
+	}
+
+	child = bs->subparts;
+	while (child != NULL) {
+		restructure_bodystructure_part_specs (child, prefix, new_prefix);
+		child = child->next;
+	}
+
+}
+
+static void
 retrieve_subparts_headers (CamelFolder *folder, const gchar *uid, bodystruct_t *bodystructure, CamelException *ex)
 {
 	bodystruct_t *children;
@@ -137,6 +157,31 @@ retrieve_subparts_headers (CamelFolder *folder, const gchar *uid, bodystruct_t *
 
 		part_spec = g_strconcat (bodystructure->part_spec, ".HEADER", NULL);
 		gchar *mpstr = camel_folder_fetch (folder, uid, part_spec, &hdr_bin, ex);
+
+		/* Very importat. If a message/rfc822 doesn't have proper HEADER, then
+		 * server may be behaving wrongly (as gmail does sometimes). In these cases
+		 * the text part is indexed as rfc822_id.1 instead of rfc822_id.text, and
+		 * children are then indexed as rfc822_id.1.1, rfc822_id.1.2 instead of
+		 * rfc822_id.1 and rfc822_id.2 */
+
+		if (!camel_exception_is_set (ex) && mpstr) {
+			struct stat sb;
+
+			if (stat (mpstr, &sb) == 0) {
+				if (sb.st_size == 0) {
+					gchar *prefix;
+					gchar *new_prefix;
+
+					prefix = g_strdup (bodystructure->part_spec);
+					new_prefix = g_strconcat (prefix, ".1", NULL);
+					/* This is the case of NO HEADERS */
+					restructure_bodystructure_part_specs (bodystructure, prefix, new_prefix);
+					g_free (prefix);
+					g_free (new_prefix);
+				}
+			}
+		}
+
 		g_free (mpstr);
 		g_free (part_spec);
 
