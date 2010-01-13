@@ -339,25 +339,38 @@ tny_camel_bs_mime_part_get_header_pairs_default (TnyMimePart *self, TnyList *lis
 	g_free (part_uid);
  
 	if (pos_filename && !priv->parent && TNY_IS_MSG (self)) {
-		FILE *f = fopen (pos_filename, "r");
-		if (f) {
-			while (!feof (f)) {
-				gchar buffer[1024];
-				gchar *ptr;
-				memset (buffer, 0, 1024);
-				fgets (buffer, 1024, f);
-				ptr = strchr (buffer, ':');
-				if (ptr) {
-					TnyPair *pair;
-					*ptr='\0';
-					ptr++;
-					pair = tny_pair_new (buffer, ptr);
-					tny_list_append (list, (GObject *) pair);
-					g_object_unref (pair);
-                                }
-                        }
+		int fd = open (pos_filename, O_RDONLY);
+		if (fd != -1) {
+			CamelMimeParser *mp;
+			struct _camel_header_raw *headers;
+			char *buf;
+			size_t len;
+			int err;
+
+			mp = camel_mime_parser_new ();
+			camel_mime_parser_init_with_fd (mp, fd);
+
+			camel_mime_parser_step (mp, &buf, &len);
+			headers = camel_mime_parser_headers_raw (mp);
+
+			while (headers) {
+				TnyPair *pair;
+				pair = tny_pair_new (headers->name, headers->value);
+				tny_list_append (list, (GObject *) pair);
+				g_object_unref (pair);
+				headers = headers->next;
+			}
+
+			err = camel_mime_parser_errno (mp);
+			
+			if (err != 0) {
+				camel_object_unref (mp);
+				mp = NULL;
+			}
+			
+			camel_mime_parser_drop_step (mp);
                        
-			fclose (f);
+			close (fd);
 		}
 		g_free (pos_filename);
 	} else {

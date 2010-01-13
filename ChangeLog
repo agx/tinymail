@@ -1,5 +1,8 @@
 2010-01-13  Jose Dapena Paz  <jdapena@igalia.com>
 
+	* libtinymail-camel/tny-camel-bs-mime-part.c: fix headers
+	file parsing, using camel mime parser this time.
+
 	* libtinymail-camel/tny-camel-bs-msg-receive-strategy.c
 	(retrieve_subparts_headers): workaround for Gmail. If we are
 	accessing a TnyMsg, and it does not have id.HEADER part, then
