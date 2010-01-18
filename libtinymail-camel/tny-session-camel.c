@@ -103,15 +103,6 @@ get_password_idle_func (gpointer user_data)
 
 	tny_lockable_lock (self->priv->ui_lock);
 
-
-	/* TODO: fix this in camel-lite ! */
-	if (!g_ascii_strncasecmp (tny_account_get_proto (account), "pop", 3))
-		if (info->flags & CAMEL_SESSION_PASSWORD_REPROMPT)
-		{
-			TnyForgetPassFunc func = tny_account_get_forget_pass_func (account);
-			func (account);
-		}
-
 	info->retval = func (account, info->prompt, &info->cancel);
 	tny_lockable_unlock (self->priv->ui_lock);
 

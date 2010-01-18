@@ -390,43 +390,6 @@ camel_pop3_store_destroy_lists_nl (CamelPOP3Store *pop3_store)
 	}
 }
 
-static gpointer
-wait_for_login_delay (gpointer user_data)
-{
-	CamelPOP3Store *store = CAMEL_POP3_STORE (user_data);
-	gboolean killed = FALSE;
-	guint login_delay = 300;
-
-	g_static_rec_mutex_lock (store->eng_lock);
-	if (!store->engine)
-		killed = TRUE;
-	else
-		login_delay = store->engine->login_delay;
-	g_static_rec_mutex_unlock (store->eng_lock);
-
-	while (!killed) {
-
-		sleep (login_delay);
-
-
-		if (!store->is_refreshing &&
-		    (CAMEL_SERVICE (store)->status != CAMEL_SERVICE_CONNECTING)) {
-			CamelException dex = CAMEL_EXCEPTION_INITIALISER;
-			g_static_rec_mutex_lock (store->uidl_lock);
-			if (g_static_rec_mutex_trylock (store->eng_lock)) {
-				camel_pop3_store_destroy_lists_nl (store);
-				camel_service_disconnect (CAMEL_SERVICE (store), TRUE, &dex);
-				g_static_rec_mutex_unlock (store->eng_lock);
-				killed = TRUE;
-			}
-			g_static_rec_mutex_unlock (store->uidl_lock);
-		}
-	}
-
-	camel_object_unref (store);
-	return NULL;
-}
-
 static gboolean
 connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int must_tls, CamelException *ex)
 {
@@ -567,8 +530,6 @@ connect_to_server (CamelService *service, struct addrinfo *ai, int ssl_mode, int
 
 	camel_pop3_engine_reget_capabilities (store->engine);
 	store->connected = TRUE;
-
-	camel_object_ref (store);
 
 	return TRUE;
 
@@ -943,13 +904,6 @@ pop3_try_authenticate (CamelService *service, gboolean reprompt, const char *err
 	return status;
 }
 
-static void 
-camel_pop3_store_prepare (CamelStore *store)
-{
-	camel_object_ref (store);
-	g_thread_create (wait_for_login_delay, store, FALSE, NULL);
-}
-
 static gboolean
 pop3_connect (CamelService *service, CamelException *ex)
 {
@@ -974,11 +928,18 @@ pop3_connect (CamelService *service, CamelException *ex)
 
 		/* we only re-prompt if we failed to authenticate, any other error and we just abort */
 		if (status == 0 && camel_exception_get_id (ex) == CAMEL_EXCEPTION_SERVICE_CANT_AUTHENTICATE) {
-			errbuf = g_markup_printf_escaped ("%s\n\n", camel_exception_get_description (ex));
+			gchar *tmp = camel_utf8_make_valid (camel_exception_get_description (ex));
+			errbuf = g_markup_printf_escaped ("%s\n\n", tmp);
+			g_free (tmp);
+			camel_exception_clear (ex);
+
+			camel_session_forget_password (session, service, NULL, "password", ex);
+			camel_exception_clear (ex);
+
 			g_free (service->url->passwd);
 			service->url->passwd = NULL;
 			reprompt = TRUE;
-			camel_exception_clear (ex);
+
 			sleep (5); /* For example Cyrus-POPd dislikes hammering */
 		} else {
 			auth = TRUE;
@@ -1010,8 +971,6 @@ pop3_connect (CamelService *service, CamelException *ex)
 
 	store->engine->state = CAMEL_POP3_ENGINE_TRANSACTION;
 	camel_pop3_engine_reget_capabilities (store->engine);
-
-	camel_pop3_store_prepare ((CamelStore *) store);
 
 	return TRUE;
 }
@@ -1069,6 +1028,8 @@ static void
 finalize (CamelObject *object)
 {
 	CamelPOP3Store *pop3_store = CAMEL_POP3_STORE (object);
+
+	camel_service_disconnect (CAMEL_SERVICE (pop3_store), TRUE, NULL);
 
 	g_static_rec_mutex_lock (pop3_store->eng_lock);
 	if (pop3_store->engine)
