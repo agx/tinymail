@@ -1,3 +1,9 @@
+2010-01-22  Sergio Villar Senin  <svillar@igalia.com>
+
+	* camel/camel-file-utils.c (camel_file_util_decode_string): limit
+	the size of the strings when encoding/decoding them to avoid huge
+	memory allocations
+
 2010-01-18  Sergio Villar Senin  <svillar@igalia.com>
 
 	* libtinymail-camel/tny-session-camel.c (get_password_idle_func):

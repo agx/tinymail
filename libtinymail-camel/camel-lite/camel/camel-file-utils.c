@@ -347,6 +347,9 @@ camel_file_util_encode_string (FILE *out, const char *str)
 
 	lena = len = strlen (str) + 1;
 
+	if (len > 65536)
+		lena = len = 65536;
+
 	if (lena % G_MEM_ALIGN)
 		lena += G_MEM_ALIGN - (lena % G_MEM_ALIGN);
 
@@ -372,7 +375,7 @@ camel_file_util_encode_string (FILE *out, const char *str)
  *
  * Decode a normal string from the input file.
  *
- * Return value: 0 on success, -1 on error.
+ * Return value: %0 on success, %-1 on error.
  **/
 int
 camel_file_util_decode_string (FILE *in, char **str)
@@ -381,6 +384,11 @@ camel_file_util_decode_string (FILE *in, char **str)
 	register char *ret;
 
 	if (camel_file_util_decode_uint32 (in, &len) == -1) {
+		*str = NULL;
+		return -1;
+	}
+
+	if (len > 65536) {
 		*str = NULL;
 		return -1;
 	}
