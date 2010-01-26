@@ -2329,14 +2329,8 @@ imap_connect_online (CamelService *service, CamelException *ex)
 	    && camel_store_summary_count((CamelStoreSummary *)store->summary) == 0)
 	{
 		CamelStoreInfo *si;
-		char *pattern;
 
-		get_folders_sync(store, store->namespace, ex);
-		if (camel_exception_is_set(ex))
-			goto done;
-		pattern = imap_concat(store, store->namespace, "*");
-		get_folders_sync(store, pattern, ex);
-		g_free (pattern);
+		get_folders_sync(store, NULL, ex);
 		if (camel_exception_is_set(ex))
 			goto done;
 
@@ -3782,78 +3776,107 @@ get_folders_free(void *k, void *v, void *d)
 }
 
 static void
-get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException *ex)
+get_folders_sync(CamelImapStore *imap_store, const char *ppattern, CamelException *ex)
 {
 	CamelImapResponse *response;
 	CamelFolderInfo *fi, *hfi;
 	char *list;
-	int i, count, j;
+	int i, count, j, k;
 	GHashTable *present;
 	CamelStoreInfo *si;
 	int loops = 2;
+	const gchar *pattern = ppattern;
+	GList *iter;
 
 	if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
 		loops = 1;
 
 	present = g_hash_table_new(folder_hash, folder_eq);
 
-	for (j = 0; j < loops; j++) {
+	if (!pattern)
+		pattern = "";
 
-		if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
-			response = camel_imap_command (imap_store, NULL, ex,
-				"%s \"\" %G", "LIST (SUBSCRIBED)",
-				pattern);
-		else
-			response = camel_imap_command (imap_store, NULL, ex,
-				"%s \"\" %G", j==1 ? "LSUB" : "LIST",
-				pattern);
+	for (iter = imap_store->summary->namespaces; iter; iter = g_list_next (iter)) {
+		CamelImapStoreNamespace *ns = (CamelImapStoreNamespace *) iter->data;
+		for (k = 0; k < 2; k++) {
+			gchar *tmp = NULL;
 
-		if (!response)
-			goto fail;
-
-		for (i = 0; i < response->untagged->len; i++) {
-			list = response->untagged->pdata[i];
-			fi = parse_list_response_as_folder_info (imap_store, list, 
-					imap_store->dir_sep);
-
-			if (fi) {
-				if (fi->flags & CAMEL_FOLDER_NONEXISTENT) {
-					camel_folder_info_free(fi);
-					continue;
-				}
-
-				hfi = g_hash_table_lookup(present, fi->full_name);
-
-				if (hfi == NULL) {
-
-					if (j == 1) {
-						/* It's in LSUB but not in LIST? */
-						fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
-						if ((fi->flags & (CAMEL_IMAP_FOLDER_MARKED | CAMEL_IMAP_FOLDER_UNMARKED)))
-							imap_store->capabilities |= IMAP_CAPABILITY_useful_lsub;
-					}
-
-					if (j == 0) /* From the LSUB we don't add folders */
-						g_hash_table_insert(present, fi->full_name, fi);
-					else {
-						fi->flags |= CAMEL_FOLDER_NONEXISTENT;
-						fi->flags |= CAMEL_FOLDER_NOSELECT;
-						camel_folder_info_free(fi);
-					}
-				} else {
-					if (j == 1) {
-						fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
-						hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
-						hfi->flags |= fi->flags;
-					}
-					if (j == 0) {
-						hfi->unread = fi->unread;
-						hfi->total = fi->total;
-					}
-				}
+			if (!ppattern) {
+				if (!ns->full_name || !*ns->full_name) {
+					tmp = g_strdup ("*");
+					if (k == 1)
+						break;
+				} else if (k == 0)
+					tmp = g_strdup_printf ("%s%c", ns->full_name, ns->sep);
+				else
+					tmp = g_strdup_printf ("%s%c*", ns->full_name, ns->sep);
+				pattern = tmp;
 			}
+
+			for (j = 0; j < loops; j++) {
+
+				if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
+					response = camel_imap_command (imap_store, NULL, ex,
+								       "%s \"\" %G", "LIST (SUBSCRIBED)",
+								       pattern);
+				else
+					response = camel_imap_command (imap_store, NULL, ex,
+								       "%s \"\" %G", j==1 ? "LSUB" : "LIST",
+								       pattern);
+
+				if (!response)
+					goto fail;
+
+				for (i = 0; i < response->untagged->len; i++) {
+					list = response->untagged->pdata[i];
+					fi = parse_list_response_as_folder_info (imap_store, list, 
+										 imap_store->dir_sep);
+
+					if (fi) {
+						if (fi->flags & CAMEL_FOLDER_NONEXISTENT) {
+							camel_folder_info_free(fi);
+							continue;
+						}
+
+						hfi = g_hash_table_lookup(present, fi->full_name);
+
+						if (hfi == NULL) {
+
+							if (j == 1) {
+								/* It's in LSUB but not in LIST? */
+								fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
+								if ((fi->flags & (CAMEL_IMAP_FOLDER_MARKED | CAMEL_IMAP_FOLDER_UNMARKED)))
+									imap_store->capabilities |= IMAP_CAPABILITY_useful_lsub;
+							}
+
+							if (j == 0) /* From the LSUB we don't add folders */
+								g_hash_table_insert(present, fi->full_name, fi);
+							else {
+								fi->flags |= CAMEL_FOLDER_NONEXISTENT;
+								fi->flags |= CAMEL_FOLDER_NOSELECT;
+								camel_folder_info_free(fi);
+							}
+						} else {
+							if (j == 1) {
+								fi->flags |= CAMEL_FOLDER_SUBSCRIBED;
+								hfi->flags |= CAMEL_STORE_INFO_FOLDER_SUBSCRIBED;
+								hfi->flags |= fi->flags;
+							}
+							if (j == 0) {
+								hfi->unread = fi->unread;
+								hfi->total = fi->total;
+							}
+						}
+					}
+				}
+				camel_imap_response_free (imap_store, response);
+			}
+			g_free (tmp);
+
+			/* look for matching only, if ppattern was non-NULL */
+			if (ppattern)
+				break;
 		}
-		camel_imap_response_free (imap_store, response);
 	}
 
 	/* Sync summary to match */
@@ -3862,11 +3885,19 @@ get_folders_sync(CamelImapStore *imap_store, const char *pattern, CamelException
 	count = camel_store_summary_count((CamelStoreSummary *)imap_store->summary);
 
 	for (i=0;i<count;i++) {
+		const gchar *full_name;
+
 		si = camel_store_summary_index((CamelStoreSummary *)imap_store->summary, i);
 		if (si == NULL)
 			continue;
 
-		if (imap_match_pattern(imap_store->dir_sep, pattern, camel_imap_store_info_full_name(imap_store->summary, si))) {
+		full_name = camel_imap_store_info_full_name (imap_store->summary, si);
+		if (!full_name || !*full_name) {
+			camel_store_summary_info_free ((CamelStoreSummary *)imap_store->summary, si);
+			continue;
+		}
+
+		if (!ppattern || imap_match_pattern(imap_store->dir_sep, pattern, full_name)) {
 			if ((fi = g_hash_table_lookup(present, camel_store_info_path(imap_store->summary, si))) != NULL) {
 				if (((fi->flags ^ si->flags) & CAMEL_STORE_INFO_FOLDER_SUBSCRIBED))
 					si->flags = (si->flags & ~CAMEL_FOLDER_SUBSCRIBED) | (fi->flags & CAMEL_FOLDER_SUBSCRIBED);
@@ -4304,34 +4335,7 @@ get_folder_info_online (CamelStore *store, const char *top, guint32 flags, Camel
 		}
 
 	} else {
-
-		/* No NAMESPACE capability */
-
-		/* if (strlen (top) > 0) {
-			char *pattern;
-			int i;
-			char *name;
-			name = camel_imap_store_summary_full_from_path(imap_store->summary, top);
-			if (name == NULL)
-				name = camel_imap_store_summary_path_to_full(imap_store->summary, top, imap_store->dir_sep);
-			i = strlen (name);
-			pattern = g_alloca(i+5);
-			strcpy (pattern, name);
-			g_free (name);
-
-			if (imap_store->dir_sep != '\0') {
-				pattern[i] = imap_store->dir_sep;
-				pattern[i+1] = (flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?'*':'%';
-				pattern[i+2] = 0;
-				get_folders_sync(imap_store, pattern, ex);
-			} else {
-				pattern[i] = '/'; * Guess *
-				pattern[i+1] = (flags & CAMEL_STORE_FOLDER_INFO_RECURSIVE)?'*':'%';
-				pattern[i+2] = 0;
-				get_folders_sync(imap_store, pattern, ex);
-			}
-		} else */
-			get_folders_sync(imap_store, "*", ex);
+		get_folders_sync(imap_store, "*", ex);
 
 		if (camel_exception_is_set(ex))
 			goto fail;
