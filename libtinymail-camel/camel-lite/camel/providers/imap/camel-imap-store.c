@@ -3785,8 +3785,9 @@ get_folders_sync(CamelImapStore *imap_store, const char *ppattern, CamelExceptio
 	GHashTable *present;
 	CamelStoreInfo *si;
 	int loops = 2;
-	const gchar *pattern = ppattern;
+	gchar *pattern = ppattern;
 	GList *iter;
+	gboolean free_pattern = FALSE;
 
 	if (imap_store->capabilities & IMAP_CAPABILITY_LISTEXT)
 		loops = 1;
@@ -3824,8 +3825,10 @@ get_folders_sync(CamelImapStore *imap_store, const char *ppattern, CamelExceptio
 								       "%s \"\" %G", j==1 ? "LSUB" : "LIST",
 								       pattern);
 
-				if (!response)
+				if (!response) {
+					g_free (tmp);
 					goto fail;
+				}
 
 				for (i = 0; i < response->untagged->len; i++) {
 					list = response->untagged->pdata[i];
@@ -3871,7 +3874,13 @@ get_folders_sync(CamelImapStore *imap_store, const char *ppattern, CamelExceptio
 				}
 				camel_imap_response_free (imap_store, response);
 			}
-			g_free (tmp);
+
+			/* Do not free it the last time as it could be used later in imap_match_pattern */
+			if (g_list_last (iter) && !ppattern && (k == 1)) {
+				free_pattern = TRUE;
+			} else {
+				g_free (tmp);
+			}
 
 			/* look for matching only, if ppattern was non-NULL */
 			if (ppattern)
@@ -3914,10 +3923,12 @@ get_folders_sync(CamelImapStore *imap_store, const char *ppattern, CamelExceptio
 		}
 		camel_store_summary_info_free((CamelStoreSummary *)imap_store->summary, si);
 	}
+	if (free_pattern)
+		g_free (pattern);
+
 fail:
 	g_hash_table_foreach(present, get_folders_free, NULL);
 	g_hash_table_destroy(present);
-
 }
 
 
