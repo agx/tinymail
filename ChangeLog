@@ -1,3 +1,9 @@
+2010-01-27  Jürg Billeter  <j@bitron.ch>
+
+	* bindings/vala/camel-lite-1.2.vapi:
+	* bindings/vala/libtinymail-1.0/libtinymail-1.0.vala:
+	remove duplicated content
+
 2010-01-26  Sergio Villar Senin  <svillar@igalia.com>
 
 	* camel/providers/imap/camel-imap-store.c (imap_connect_online):
