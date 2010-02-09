@@ -1,3 +1,9 @@
+2010-02-09  Sergio Villar Senin  <svillar@igalia.com>
+
+	* libtinymailui-gtk/tny-gtk-folder-list-store.c
+	(recurse_folders_async_cb): do not try to refresh the whole list
+	of folders each time we recurse over every single one
+
 2010-01-27  Jürg Billeter  <j@bitron.ch>
 
 	* bindings/vala/camel-lite-1.2.vapi:

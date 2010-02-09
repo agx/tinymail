@@ -399,7 +399,7 @@ recurse_folders_async_cb (TnyFolderStore *store,
 				new_info->do_poke_status = do_poke_status;
 				tny_folder_store_get_folders_async (folder_store,
 								    folders, NULL, 
-								    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
+								    FALSE,
 								    recurse_folders_async_cb,
 								    NULL, new_info);
 				g_object_unref (folders);
