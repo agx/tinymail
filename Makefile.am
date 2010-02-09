@@ -2,7 +2,7 @@ SUBDIRS = m4
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS += libtinymail 
+SUBDIRS += libtinymail
 SUBDIRS += libtinymailui
 
 if BUILD_GIO
@@ -45,7 +45,7 @@ SUBDIRS += libtinymail-tp
 endif
 
 
-SUBDIRS += tests bindings po 
+SUBDIRS += tests bindings po
 
 #### Funny OR simulation :)
 if BUILD_TESTS
@@ -91,7 +91,8 @@ DIST_SUBDIRS = \
 	libtinymail-acap \
 	libtinymail-gnome-desktop \
 	libtinymail-tp \
-	libtinymailui-webkit
+	libtinymailui-webkit \
+	libtinymail-moblin
 
 DISTCHECK_CONFIGURE_FLAGS = --with-html-component=mozembed --enable-gtk-doc --enable-python-bindings --enable-dotnet-bindings --enable-vala-bindings --enable-tests
 

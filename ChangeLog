@@ -1,5 +1,20 @@
 2010-02-09  Sergio Villar Senin  <svillar@igalia.com>
 
+	Added first implementation of a TnyDevice that uses Moblin's
+	Connection Manager.
+
+	Now Moblin is another platform supported in tinymail.
+
+	* libtinymail-moblin/Makefile.am:
+	* libtinymail-moblin/libtinymail-moblin.pc.in:
+	* libtinymail-moblin/tny-moblin-device.c:
+	* libtinymail-moblin/tny-moblin-device.h: new files to support
+	Moblin's Connection Manager based TnyDevice
+
+	* configure.ac: Added moblin to the list of platforms
+
+	* Makefile.am (SUBDIRS): Added libtinymail-moblin
+
 	* libtinymailui-gtk/tny-gtk-folder-list-store.c
 	(recurse_folders_async_cb): do not try to refresh the whole list
 	of folders each time we recurse over every single one

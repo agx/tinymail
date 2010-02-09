@@ -121,7 +121,7 @@ esac],[enable_deprecated=$enable_deprecated])
 dnl ### Select the platform library ##
 AC_ARG_WITH(platform,
 AC_HELP_STRING([--with-platform=gnome-desktop], 
-  [Platform to compile (gnome-desktop, maemo, olpc or gpe)]),
+  [Platform to compile (gnome-desktop, maemo, moblin, olpc or gpe)]),
 [case "${with_platform}" in
   gnome-desktop) 
 	PLATFORMDIR=libtinymail-gnome-desktop
@@ -158,6 +158,17 @@ AC_HELP_STRING([--with-platform=gnome-desktop],
 	build_uigtk=true
         build_demoui=true
         PLATFORM=4
+        ;;
+  moblin)
+        PLATFORMDIR=libtinymail-moblin
+	PLATFORMSPECIFICNAME=Moblin
+        build_gtkhtml=false
+        build_mozembed=false
+        build_gnome=true
+	build_maemo=false
+	build_uigtk=true
+	build_demoui=true
+	PLATFORM=5
         ;;
   none)
 	PLATFORMDIR=
@@ -597,7 +608,7 @@ if test x$PLATFORMDIR = xlibtinymail-maemo; then
 	AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
 	AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
 fi
-			
+
 AM_CONDITIONAL(MAEMO_CONIC_DEVICE_DUMMY, test -n "$use_conic_device_dummy")
 AM_CONDITIONAL(MAEMO_CONIC_HAVE_CONIC, test "x$HAVE_CONIC" = "xyes")
 AM_CONDITIONAL(BUILD_MAEMO, test x$build_maemo = xtrue)
@@ -612,6 +623,20 @@ fi
 AC_SUBST(LIBTINYMAIL_GPE_CFLAGS)
 AC_SUBST(LIBTINYMAIL_GPE_LIBS)
 
+
+AC_SUBST(extraplatpkgs)
+AC_SUBST(extragtkpkgs)
+
+dnl ### libtinymail-moblin, a platform library implementation for the Moblin platform ##
+if test x$PLATFORMDIR = xlibtinymail-moblin; then
+ PKG_CHECK_MODULES(LIBTINYMAIL_MOBLIN, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 connman)
+ AC_DEFINE_UNQUOTED(CONNMAN_SUPPORT, 1, ["Moblin Connection Manager support."])
+else
+ LIBTINYMAIL_MOBLIN_CFLAGS=
+ LIBTINYMAIL_MOBLIN_LIBS=
+fi
+AC_SUBST(LIBTINYMAIL_MOBLIN_CFLAGS)
+AC_SUBST(LIBTINYMAIL_MOBLIN_LIBS)
 
 AC_SUBST(extraplatpkgs)
 AC_SUBST(extragtkpkgs)
@@ -721,6 +746,8 @@ libtinymail-gpe/libtinymail-gpe.pc
 libtinymail-test/Makefile
 libtinymail-acap/Makefile
 libtinymail-acap/libtinymail-acap.pc
+libtinymail-moblin/Makefile
+libtinymail-moblin/libtinymail-moblin.pc
 tests/Makefile
 tests/c-demo/Makefile
 tests/shared/Makefile
