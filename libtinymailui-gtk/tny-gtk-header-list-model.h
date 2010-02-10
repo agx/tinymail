@@ -77,6 +77,7 @@ gint tny_gtk_header_list_model_received_date_sort_func (GtkTreeModel *model, Gtk
 gint tny_gtk_header_list_model_sent_date_sort_func (GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data);
 void tny_gtk_header_list_model_set_no_duplicates (TnyGtkHeaderListModel *self, gboolean setting);
 gboolean tny_gtk_header_list_model_get_no_duplicates (TnyGtkHeaderListModel *self);
+void tny_gtk_header_list_model_set_update_in_batches (TnyGtkHeaderListModel *self, guint headers_per_batch);
 
 G_END_DECLS
 

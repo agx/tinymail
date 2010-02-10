@@ -679,9 +679,9 @@ notify_views_add (gpointer data)
 
 	already_registered = priv->registered;
 	if ( already_registered == 0)
-		mails_load_count = 100;
+		mails_load_count = (priv->headers_per_batch < 100)?priv->headers_per_batch:100;
 	else
-		mails_load_count = 3000;
+		mails_load_count = priv->headers_per_batch;
 
 	if (priv->items->len - already_registered > mails_load_count) {
 		going_tb_registered = already_registered + mails_load_count;
@@ -1201,6 +1201,7 @@ tny_gtk_header_list_model_init (TnyGtkHeaderListModel *self)
 	priv->ra_lock = g_mutex_new ();
 	priv->to_lock = g_mutex_new ();
 	priv->registered = 0;
+	priv->headers_per_batch = 3000;
 
 	return;
 }
@@ -1435,4 +1436,12 @@ tny_gtk_header_list_model_column_get_type (void)
 	static GOnce once = G_ONCE_INIT;
 	g_once (&once, tny_gtk_header_list_model_column_register_type, NULL);
 	return GPOINTER_TO_UINT (once.retval);
+}
+void
+tny_gtk_header_list_model_set_update_in_batches (TnyGtkHeaderListModel *self,
+						 guint headers_per_batch)
+{
+	TnyGtkHeaderListModelPriv *priv = TNY_GTK_HEADER_LIST_MODEL_GET_PRIVATE (self);
+
+	priv->headers_per_batch = headers_per_batch;
 }

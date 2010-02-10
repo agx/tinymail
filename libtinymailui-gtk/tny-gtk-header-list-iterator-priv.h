@@ -81,6 +81,7 @@ struct _TnyGtkHeaderListModelPriv
 	GArray *del_timeouts;
 	TnyIterator *iterator;
 	gboolean no_duplicates;
+	guint headers_per_batch;
 };
 
 G_END_DECLS
