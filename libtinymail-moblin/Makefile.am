@@ -5,11 +5,15 @@ INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
 
 lib_LTLIBRARIES = libtinymail-moblin-1.0.la
 
-libtinymail_moblin_1_0_headers = \
+libtinymail_moblin_1_0_headers = 	\
+	tny-moblin-platform-factory.h 	\
+	tny-moblin-account-store.h	\
 	tny-moblin-device.h
 
-libtinymail_moblin_1_0_la_SOURCES =  \
-	$(libtinymail_moblin_1_0_headers) \
+libtinymail_moblin_1_0_la_SOURCES =  		\
+	$(libtinymail_moblin_1_0_headers)	\
+	tny-moblin-platform-factory.c 		\
+	tny-moblin-account-store.c 		\
 	tny-moblin-device.c
 
 libtinymail_moblin_1_0_la_LIBADD = \

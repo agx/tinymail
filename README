@@ -65,9 +65,10 @@ Supported platforms & devices
 =============================
 
   o. One Laptop Per Child platform (OLPC)
-  o. Maemo platform (For example for the Nokia 770)
+  o. Maemo platform (For example for the Nokia 770, N800 & N900)
   o. GPE platform (For example for PocketPC)
   o. GNOME desktop platform
+  o. Moblin platform
 
 Information for developers who would like to tryout the demo user interface:
 ============================================================================
