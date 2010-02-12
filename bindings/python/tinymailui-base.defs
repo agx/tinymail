@@ -47,8 +47,8 @@
   (in-module "Tny")
   (c-name "TnyMsgWindow")
   (gtype-id "TNY_TYPE_MSG_WINDOW")
-  (prerequisite "TnyMsgView")
   (prerequisite "TnyMimePartView")
+  (prerequisite "TnyMsgView")
 )
 
 (define-interface PlatformFactory

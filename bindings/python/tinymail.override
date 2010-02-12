@@ -357,7 +357,7 @@ _wrap_tny_account_set_pass_func(PyGObject *self, PyObject *args)
                           &call.func, &call.data))
          return NULL;
 
-    tny_list_foreach(TNY_LIST(self->obj), (GFunc) pytny_list_foreach_marshal, &call);
+    /* Set the marshalling function as get pass here */
     Py_RETURN_NONE;
 }
 

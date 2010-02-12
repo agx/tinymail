@@ -256,6 +256,12 @@
   (return-type "GType")
 )
 
+(define-method is_fetched
+  (of-object "TnyCamelBsMimePart")
+  (c-name "tny_camel_bs_mime_part_is_fetched")
+  (return-type "gboolean")
+)
+
 
 
 ;; From tny-camel-bs-msg-receive-strategy.h
@@ -269,6 +275,14 @@
   (c-name "tny_camel_bs_msg_receive_strategy_new")
   (is-constructor-of "TnyCamelBsMsgReceiveStrategy")
   (return-type "TnyMsgReceiveStrategy*")
+)
+
+(define-function camel_bs_msg_receive_strategy_set_global_bodies_filter
+  (c-name "tny_camel_bs_msg_receive_strategy_set_global_bodies_filter")
+  (return-type "none")
+  (parameters
+    '("TnyCamelBsMsgReceiveStrategyBodiesFilter" "filter")
+  )
 )
 
 (define-method start_receiving_part
@@ -461,6 +475,15 @@
   )
 )
 
+(define-method parse
+  (of-object "TnyCamelMsg")
+  (c-name "tny_camel_msg_parse")
+  (return-type "none")
+  (parameters
+    '("TnyStream*" "stream")
+  )
+)
+
 
 
 ;; From tny-camel-nntp-folder.h
@@ -602,6 +625,16 @@
   (return-type "TnySendQueue*")
   (parameters
     '("TnyCamelTransportAccount*" "trans_account")
+  )
+)
+
+(define-function camel_send_queue_new_with_folders
+  (c-name "tny_camel_send_queue_new_with_folders")
+  (return-type "TnySendQueue*")
+  (parameters
+    '("TnyCamelTransportAccount*" "trans_account")
+    '("TnyFolder*" "outbox")
+    '("TnyFolder*" "sentbox")
   )
 )
 

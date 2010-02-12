@@ -1,4 +1,4 @@
-INCLUDES = $(PYTHON_INCLUDES) $(LIBTINYMAIL_CFLAGS) $(PYGTK_CFLAGS) \
+INCLUDES = $(PYTHON_INCLUDES) $(LIBTINYMAIL_CFLAGS) $(PYGTK_CFLAGS) $(PYGOBJ_CFLAGS) \
 	$(LIBTINYMAILUI_GTK_CFLAGS) $(TINYMAIL_PYTHON_CFLAGS) \
 	-I$(top_srcdir)/libtinymail -I$(top_srcdir)/libtinymailui \
 	-I$(top_srcdir)/libtinymailui-gtk -I$(top_srcdir)/libtinymail-camel \

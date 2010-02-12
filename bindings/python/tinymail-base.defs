@@ -218,8 +218,8 @@
   (parent "GObject")
   (c-name "TnyMergeFolder")
   (gtype-id "TNY_TYPE_MERGE_FOLDER")
-  (implements "TnyFolder")
   (implements "TnyFolderObserver")
+  (implements "TnyFolder")
 )
 
 (define-object NoopLockable
@@ -431,6 +431,19 @@
     '("normal-priority" "TNY_HEADER_FLAG_NORMAL_PRIORITY")
     '("low-priority" "TNY_HEADER_FLAG_LOW_PRIORITY")
     '("suspended" "TNY_HEADER_FLAG_SUSPENDED")
+  )
+)
+
+(define-flags HeaderSupportFlags
+  (in-module "Tny")
+  (c-name "TnyHeaderSupportFlags")
+  (gtype-id "TNY_TYPE_HEADER_SUPPORT_FLAGS")
+  (values
+    '("none" "TNY_HEADER_SUPPORT_FLAGS_NONE")
+    '("any" "TNY_HEADER_SUPPORT_FLAGS_ANY")
+    '("some" "TNY_HEADER_SUPPORT_FLAGS_SOME")
+    '("persistent_any" "TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_ANY")
+    '("persistent_some" "TNY_HEADER_SUPPORT_PERSISTENT_FLAGS_SOME")
   )
 )
 
@@ -1121,6 +1134,12 @@
   (return-type "none")
 )
 
+(define-method is_forced
+  (of-object "TnyDevice")
+  (c-name "tny_device_is_forced")
+  (return-type "gboolean")
+)
+
 (define-method reset
   (of-object "TnyDevice")
   (c-name "tny_device_reset")
@@ -1128,6 +1147,11 @@
 )
 
 (define-virtual is_online
+  (of-object "TnyDevice")
+  (return-type "gboolean")
+)
+
+(define-virtual is_forced
   (of-object "TnyDevice")
   (return-type "gboolean")
 )
@@ -1385,14 +1409,6 @@
   (of-object "TnyFolderMonitor")
   (c-name "tny_folder_monitor_start")
   (return-type "none")
-)
-
-(define-virtual update
-  (of-object "TnyFolderMonitor")
-  (return-type "none")
-  (parameters
-    '("TnyFolderChange*" "change")
-  )
 )
 
 (define-virtual poke_status
@@ -1697,6 +1713,7 @@
   (parameters
     '("TnyList*" "list")
     '("TnyFolderStoreQuery*" "query")
+    '("gboolean" "refresh")
     '("TnyGetFoldersCallback" "callback")
     '("TnyStatusCallback" "status_callback")
     '("gpointer" "user_data")
@@ -1721,6 +1738,17 @@
   )
 )
 
+(define-method refresh_async
+  (of-object "TnyFolderStore")
+  (c-name "tny_folder_store_refresh_async")
+  (return-type "none")
+  (parameters
+    '("TnyFolderStoreCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
+  )
+)
+
 (define-method get_folders
   (of-object "TnyFolderStore")
   (c-name "tny_folder_store_get_folders")
@@ -1728,6 +1756,7 @@
   (parameters
     '("TnyList*" "list")
     '("TnyFolderStoreQuery*" "query")
+    '("gboolean" "refresh")
     '("GError**" "err")
   )
 )
@@ -1777,6 +1806,7 @@
   (parameters
     '("TnyList*" "list")
     '("TnyFolderStoreQuery*" "query")
+    '("gboolean" "refresh")
     '("GError**" "err")
   )
 )
@@ -1787,6 +1817,7 @@
   (parameters
     '("TnyList*" "list")
     '("TnyFolderStoreQuery*" "query")
+    '("gboolean" "refresh")
     '("TnyGetFoldersCallback" "callback")
     '("TnyStatusCallback" "status_callback")
     '("gpointer" "user_data")
@@ -1806,6 +1837,16 @@
   (return-type "none")
   (parameters
     '("TnyFolderStoreObserver*" "observer")
+  )
+)
+
+(define-virtual refresh_async
+  (of-object "TnyFolderStore")
+  (return-type "none")
+  (parameters
+    '("TnyFolderStoreCallback" "callback")
+    '("TnyStatusCallback" "status_callback")
+    '("gpointer" "user_data")
   )
 )
 
@@ -2520,6 +2561,11 @@
   (return-type "GType")
 )
 
+(define-function header_support_flags_get_type
+  (c-name "tny_header_support_flags_get_type")
+  (return-type "GType")
+)
+
 (define-method dup_uid
   (of-object "TnyHeader")
   (c-name "tny_header_dup_uid")
@@ -2670,6 +2716,39 @@
   )
 )
 
+(define-method set_user_flag
+  (of-object "TnyHeader")
+  (c-name "tny_header_set_user_flag")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method unset_user_flag
+  (of-object "TnyHeader")
+  (c-name "tny_header_unset_user_flag")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method get_user_flag
+  (of-object "TnyHeader")
+  (c-name "tny_header_get_user_flag")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "name")
+  )
+)
+
+(define-method support_user_flags
+  (of-object "TnyHeader")
+  (c-name "tny_header_support_user_flags")
+  (return-type "TnyHeaderSupportFlags")
+)
+
 (define-method get_priority
   (of-object "TnyHeader")
   (c-name "tny_header_get_priority")
@@ -2812,6 +2891,35 @@
   (parameters
     '("TnyHeaderFlags" "mask")
   )
+)
+
+(define-virtual get_user_flag
+  (of-object "TnyHeader")
+  (return-type "gboolean")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+(define-virtual set_user_flag
+  (of-object "TnyHeader")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+(define-virtual unset_user_flag
+  (of-object "TnyHeader")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "id")
+  )
+)
+
+(define-virtual support_user_flags
+  (of-object "TnyHeader")
+  (return-type "TnyHeaderSupportFlags")
 )
 
 
@@ -3961,24 +4069,17 @@
     '("TnyHeader*" "header")
     '("TnyMsg*" "msg")
     '("GError*" "err")
-    '("gpointer" "user_data")
   )
 )
 
 (define-virtual queue_start
   (of-object "TnySendQueue")
   (return-type "none")
-  (parameters
-    '("gpointer" "user_data")
-  )
 )
 
 (define-virtual queue_stop
   (of-object "TnySendQueue")
   (return-type "none")
-  (parameters
-    '("gpointer" "user_data")
-  )
 )
 
 (define-virtual add
