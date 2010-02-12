@@ -22,6 +22,8 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include <tny-shared.h>
+#include <tny-camel-shared.h>
 
 G_BEGIN_DECLS
 

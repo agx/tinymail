@@ -1,6 +1,11 @@
 INCLUDES = -I. -I$(top_srcdir) $(EXTRA_CFLAGS) \
+	$(LIBTINYMAIL_CAMEL_CFLAGS) \
 	$(LIBTINYMAIL_MOBLIN_CFLAGS) \
 	-I$(top_srcdir)/libtinymail \
+	-I$(top_srcdir)/libtinymailui \
+	-I$(top_srcdir)/libtinymailui-gtk \
+	-I$(top_srcdir)/libtinymail-camel \
+	-I$(top_srcdir)/libtinymail-camel/camel-lite \
 	-DDBUS_API_SUBJECT_TO_CHANGE
 
 lib_LTLIBRARIES = libtinymail-moblin-1.0.la
