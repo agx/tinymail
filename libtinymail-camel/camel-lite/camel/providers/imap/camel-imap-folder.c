@@ -5584,7 +5584,7 @@ walk_the_string (char *in, GString *str)
 	return;
 }
 
-static char* 
+static char*
 imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 {
 	CamelImapFolder *imap_folder = (CamelImapFolder *) folder;
@@ -5619,7 +5619,7 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 			store = create_gmsgstore (imap_folder, &ctchecker, ex);
 
 			if (!store)
-				return NULL;
+				goto frees;
 
 
 			noop_response = camel_imap_command (store, (CamelFolder *) imap_folder, ex, "NOOP");
@@ -5627,7 +5627,7 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 				camel_imap_response_free (store, noop_response);
 			else {
 				stop_gmsgstore (imap_folder, ctchecker, FALSE);
-				return NULL;
+				goto frees;
 			}
 
 			camel_operation_start (NULL, _("Retrieving message bodystructure"));
@@ -5671,6 +5671,8 @@ imap_fetch_structure (CamelFolder *folder, const char *uid, CamelException *ex)
 			}
 		}
 	}
+ frees:
+	g_free (path);
 
 	return retval;
 }
