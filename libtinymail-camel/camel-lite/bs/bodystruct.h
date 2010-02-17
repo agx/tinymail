@@ -49,10 +49,13 @@ struct _bodystruct {
 };
 
 
-bodystruct_t* bodystruct_parse (guchar *inbuf, guint inlen, GError **err);
-void bodystruct_free (bodystruct_t *node);
+bodystruct_t* bodystruct_parse           (guchar *inbuf, guint inlen, GError **err);
 
-const gchar* mimeparam_get_value_for (mimeparam_t *mp, const gchar *key);
+void          bodystruct_free            (bodystruct_t *node);
+
+const gchar*  mimeparam_get_value_for    (mimeparam_t *mp, const gchar *key);
+
+gboolean      bodystruct_has_attachments (bodystruct_t *bodystructure);
 
 #ifdef DEBUG
 void bodystruct_dump (bodystruct_t *part);

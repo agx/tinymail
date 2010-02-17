@@ -1156,3 +1156,24 @@ envelope_parse (guchar *inbuf, guchar **end, guint inlen, GError **err)
 	return decode_envelope (end, (unsigned char *) ( *end + (inlen - lendif) ), err);
 }
 
+gboolean
+bodystruct_has_attachments (bodystruct_t *bodystructure)
+{
+	/* If it's neither a multipart nor a text message then we
+	   directly consider that it has attachments */
+	if (bodystructure->content.type &&
+	    g_ascii_strncasecmp (bodystructure->content.type, "text", 4) &&
+	    g_ascii_strncasecmp (bodystructure->content.type, "multipart", 9))
+		return TRUE;
+
+	if (bodystructure->content.type &&
+	    !g_ascii_strncasecmp (bodystructure->content.type, "multipart", 9)) {
+		bodystruct_t *subpart = bodystructure->subparts;
+		while (subpart) {
+			if (bodystruct_has_attachments (subpart))
+				return TRUE;
+			subpart = subpart->next;
+		}
+	}
+	return FALSE;
+}

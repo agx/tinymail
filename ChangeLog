@@ -1,5 +1,14 @@
 2010-02-17  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail-camel/camel-lite/bs/bodystruct.h:
+	* libtinymail-camel/camel-lite/bs/bodystruct.c (bodystruct_has_attachments):
+	added bodystruct_has_attachments call
+
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c (message_from_data):
+	added heuristic to detect attachments from BODYSTRUCTURE
+
+2010-02-17  Sergio Villar Senin  <svillar@igalia.com>
+
 	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c (imap_update_summary):
 	removed CAMEL_MESSAGE_INFO_HEADERS. Retrieve ENVELOPE and
 	BODYSTRUCTURE instead of HEADERS when retrieving folder summary

@@ -94,7 +94,6 @@
 #include "camel-imap-utils.h"
 #include "camel-imap-wrapper.h"
 
-
 #include <camel/camel-tcp-stream.h>
 #include "bs/envelope.h"
 #include "bs/bodystruct.h"
@@ -3056,13 +3055,27 @@ message_from_data (CamelFolder *folder, GData *data)
 		/**/
 		((CamelMessageInfoBase *)mi)->flags &= ~CAMEL_MESSAGE_ATTACHMENTS;
 	} else if (!camel_header_raw_find (&h, "X-MS-Has-Attach", NULL)) {
-		/* TNY TODO: This is a hack! But else we need to parse
-		 * BODYSTRUCTURE (and I'm lazy). It needs fixing though. */
+		bodystruct_t *bodystructure = NULL;
+		gchar *structure_str = NULL;
+		GError *parse_err = NULL;
 
-		if (size > 102400)
-			((CamelMessageInfoBase *)mi)->flags |= CAMEL_MESSAGE_ATTACHMENTS;
-		/* ... it does */
-
+		/* Parse bs to detect attachments */
+		structure_str = g_datalist_get_data (&data, "BODYSTRUCTURE");
+		if (structure_str) {
+			bodystructure = bodystruct_parse ((guchar *) structure_str,
+							  strlen (structure_str),
+							  &parse_err);
+			if (parse_err) {
+				g_error_free (parse_err);
+			} else {
+				if (bodystruct_has_attachments (bodystructure))
+					((CamelMessageInfoBase *)mi)->flags |= CAMEL_MESSAGE_ATTACHMENTS;
+			}
+		} else {
+			/* HACK if we don't have BODYSTRUCTURE, should never happen */
+			if (size > 102400)
+				((CamelMessageInfoBase *)mi)->flags |= CAMEL_MESSAGE_ATTACHMENTS;
+		}
 	}
 
 	camel_object_unref (CAMEL_OBJECT (msg));
