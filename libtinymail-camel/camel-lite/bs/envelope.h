@@ -21,7 +21,7 @@ struct _envelope {
 };
 
 envelope_t* envelope_new (void);
-envelope_t* envelope_parse (guchar *inbuf, guint inlen, GError **err);
+envelope_t* envelope_parse (guchar *inbuf, guchar **end, guint inlen, GError **err);
 void envelope_free (envelope_t *node);
 
 G_END_DECLS

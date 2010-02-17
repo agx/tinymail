@@ -1130,7 +1130,7 @@ bodystruct_parse (guchar *inbuf, guint inlen, GError **err)
 
 		start += 13;
 		lendif = (int) start - (int) inbuf;
-		
+
 		r = bodystruct_part_decode (&start, (unsigned char *) ( start + (inlen - lendif) ), NULL, 1, err);
 	}
 	if (!r->part_spec)
@@ -1139,19 +1139,20 @@ bodystruct_parse (guchar *inbuf, guint inlen, GError **err)
 }
 
 envelope_t*
-envelope_parse (guchar *inbuf, guint inlen, GError **err)
+envelope_parse (guchar *inbuf, guchar **end, guint inlen, GError **err)
 {
-	unsigned char *start = (unsigned char  *) strstr ((const char *) inbuf, "ENVELOPE");
 	int lendif;
 
-	if (!start)
-		return decode_envelope (&inbuf, inbuf + inlen, err);
+	*end = (guchar *) strstr ((const char *) inbuf, "ENVELOPE");
 
-	start += 8;
-	lendif = (int) start - (int) inbuf;
+	if (*end == NULL) {
+		*end = inbuf;
+		return decode_envelope (end, inbuf + inlen, err);
+	}
 
-	return decode_envelope (&start, (unsigned char *) ( start + (inlen - lendif) ), err);
+	*end += 8;
+	lendif = (int) *end - (int) inbuf;
+
+	return decode_envelope (end, (unsigned char *) ( *end + (inlen - lendif) ), err);
 }
-
-
 

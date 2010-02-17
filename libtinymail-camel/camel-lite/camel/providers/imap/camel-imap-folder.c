@@ -96,6 +96,8 @@
 
 
 #include <camel/camel-tcp-stream.h>
+#include "bs/envelope.h"
+#include "bs/bodystruct.h"
 
 #define d(x)
 
@@ -3168,21 +3170,6 @@ construct_junk_headers (char *header, char *value, struct _junk_data *jdata)
 
 #endif
 
-/* #define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT REFERENCES IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE " */
-
-#ifdef NON_TINYMAIL_FEATURES
-#define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT REFERENCES IN-REPLY-TO MESSAGE-ID MIME-VERSION CONTENT-TYPE X-PRIORITY X-MSMAIL-PRIORITY"
-#else
-#define CAMEL_MESSAGE_INFO_HEADERS "DATE FROM TO CC SUBJECT MESSAGE-ID X-PRIORITY X-MSMAIL-PRIORITY IMPORTANCE X-MS-HAS-ATTACH CONTENT-TYPE"
-#endif
-
-
-/* FIXME: this needs to be kept in sync with camel-mime-utils.c's list
-   of mailing-list headers and so might be best if this were
-   auto-generated? */
-#define MAILING_LIST_HEADERS " X-MAILING-LIST X-LOOP LIST-ID LIST-POST MAILING-LIST ORIGINATOR X-LIST SENDER RETURN-PATH X-BEENTHERE"
-
-
 static guint32
 imap_get_uids (CamelFolder *folder, CamelImapStore *store, CamelException *ex, GPtrArray *needheaders, int greater_than, int size)
 {
@@ -3262,7 +3249,6 @@ imap_update_summary (CamelFolder *folder, int exists,
    guint32 flags;
    int seq=0;
    CamelImapResponseType type;
-   const char *header_spec;
    CamelImapMessageInfo *mi;
    char *resp;
    GData *data;
@@ -3272,14 +3258,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 
    if (!store->ostream || !store->istream)
 	return;
-
-   if (store->server_level >= IMAP_LEVEL_IMAP4REV1)
-   	header_spec = "HEADER.FIELDS (" CAMEL_MESSAGE_INFO_HEADERS ")";
-   else
-   	header_spec = "0";
-
-   if( g_getenv ("TNY_IMAP_FETCH_ALL_HEADERS") )
-   	header_spec = "HEADER";
 
    nextn = 0;
    if (folder->summary)
@@ -3492,8 +3470,8 @@ imap_update_summary (CamelFolder *folder, int exists,
 		{
 			uidset = imap_uid_array_to_set (folder->summary, needheaders, uid, UID_SET_LIMIT, &uid);
 			if (!camel_imap_command_start (store, folder, ex,
-						       "UID FETCH %s (FLAGS RFC822.SIZE INTERNALDATE BODY.PEEK[%s])",
-						       uidset, header_spec))
+						       "UID FETCH %s (FLAGS RFC822.SIZE ENVELOPE BODYSTRUCTURE)",
+						       uidset))
 			{
 				if (camel_operation_cancel_check (NULL))
 					imap_folder->cancel_occurred = TRUE;
@@ -3661,7 +3639,6 @@ imap_update_summary (CamelFolder *folder, int exists,
 			}
 
 		}
-
 
 		if (camel_folder_change_info_changed (mchanges)) {
 			camel_object_trigger_event (CAMEL_OBJECT (folder), "folder_changed", mchanges);
@@ -6286,10 +6263,6 @@ errorhander:
 	return NULL;
 }
 
-
-
-
-
 static GData *
 parse_fetch_response (CamelImapFolder *imap_folder, char *response)
 {
@@ -6377,10 +6350,49 @@ parse_fetch_response (CamelImapFolder *imap_folder, char *response)
 			g_datalist_set_data (&data, "BODY_PART_LEN", GINT_TO_POINTER (body_len));
 		} else if (!g_ascii_strncasecmp (response, "BODY ", 5) ||
 			   !g_ascii_strncasecmp (response, "BODYSTRUCTURE ", 14)) {
+			gboolean is_bs = !g_ascii_strncasecmp (response, "BODYSTRUCTURE ", 14);
 			response = strchr (response, ' ') + 1;
 			start = response;
 			imap_skip_list ((const char **) &response);
-			g_datalist_set_data_full (&data, "BODY", g_strndup (start, response - start), g_free);
+			if (response && (response != start)) {
+				/* To handle IMAP Server brokenness, Returning empty body, etc. See #355640 */
+				g_datalist_set_data_full (&data, (is_bs) ? "BODYSTRUCTURE" : "BODY",
+							  g_strndup (start, response - start), g_free);
+			}
+
+			/* Save Bodystructure to disk */
+			if (is_bs) {
+				gchar *uid, *bs_data;
+				GString *bodyst;
+
+				/* Store BS in caches */
+				bodyst = g_string_new ("");
+				walk_the_string (start, bodyst);
+				bs_data = g_string_free (bodyst, FALSE);
+
+				/* Save the BS assuming that UID is
+				   always retrieved first! */
+				uid = g_datalist_get_data (&data, "UID");
+				if (uid) {
+					gchar *path;
+					FILE *file;
+					path = g_strdup_printf ("%s/%s_bodystructure", imap_folder->cache->path, uid);
+					file = fopen (path, "w");
+					g_free (path);
+
+					if (file) {
+						fputs (bs_data, file);
+						fclose (file);
+					} else {
+						d(fprintf(stderr, "%s: Write to cache failed: %s", __FUNCTION__, g_strerror (errno)));
+						/* Set exception */
+						/* gchar *mss = g_strdup_printf (_("Write to cache failed: %s"), g_strerror (errno)); */
+						/* camel_exception_set (ex, CAMEL_EXCEPTION_SYSTEM_IO_WRITE, mss); */
+						/* g_free (mss); */
+					}
+				}
+				g_free (bs_data);
+			}
 		} else if (!g_ascii_strncasecmp (response, "UID ", 4)) {
 			int len;
 
@@ -6406,6 +6418,38 @@ parse_fetch_response (CamelImapFolder *imap_folder, char *response)
 
 			if (!marker)
 				g_warning ("Unexpected MODSEQ format: %s", response);
+		} else if (!g_ascii_strncasecmp (response, "ENVELOPE ", 8)) {
+			struct _envelope *envelope;
+			GString *tmp;
+			guchar *end = NULL;
+
+			response += 8;
+
+			envelope = envelope_parse (response, &end, strlen (response), NULL);
+			if (!envelope)
+				break;
+
+			tmp = g_string_sized_new (512);
+			g_string_append_printf (tmp,
+						"Date: %s\nSubject: %s\nFrom: %s\n"
+						"Sender: %s\nReply-To: %s\nTo: %s\n"
+						"Cc: %s\nBcc: %s\nIn-Reply-To: %s\nMessage-ID: %s",
+						envelope->date,
+						envelope->subject,
+						envelope->from,
+						envelope->sender,
+						envelope->reply_to,
+						envelope->to,
+						envelope->cc,
+						envelope->bcc,
+						envelope->in_reply_to,
+						envelope->message_id);
+			body_len = tmp->len;
+			body = g_string_free (tmp, FALSE);
+			header = TRUE;
+			cache_header = FALSE;
+			envelope_free (envelope);
+			response = end;
 		} else {
 			g_warning ("Unexpected FETCH response from server: (%s", response);
 			break;

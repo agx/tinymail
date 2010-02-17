@@ -1,5 +1,18 @@
 2010-02-17  Sergio Villar Senin  <svillar@igalia.com>
 
+	* libtinymail-camel/camel-lite/camel/providers/imap/camel-imap-folder.c (imap_update_summary):
+	removed CAMEL_MESSAGE_INFO_HEADERS. Retrieve ENVELOPE and
+	BODYSTRUCTURE instead of HEADERS when retrieving folder summary
+	for IMAP folders.
+	(parse_fetch_response): added support to parse BODYSTRUCTURE and
+	ENVELOPE in responses
+
+	* libtinymail-camel/camel-lite/bs/envelope.h:
+	* libtinymail-camel/camel-lite/bs/bodystruct.c (envelope_parse):
+	envelope parsing returns now a pointer to the last parsed element
+
+2010-02-17  Sergio Villar Senin  <svillar@igalia.com>
+
 	* camel/providers/imap/camel-imap-folder.c (imap_fetch_structure):
 	fixed a memory leak
 
