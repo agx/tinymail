@@ -1,3 +1,7 @@
+2010-03-03  Jose Dapena Paz  <jdapena@igalia.com>
+
+	* Misc build fixes.
+
 2010-02-18  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* libtinymail/tny-fs-stream-cache.c

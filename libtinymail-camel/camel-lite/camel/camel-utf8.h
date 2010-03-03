@@ -39,6 +39,7 @@ char *camel_utf8_utf7(const char *ptr);
 /* convert ucs2 to/from utf8 */
 char *camel_utf8_ucs2(const char *ptr);
 char *camel_ucs2_utf8(const char *ptr);
+char *camel_utf8_make_valid (const char *text);
 
 G_END_DECLS
 

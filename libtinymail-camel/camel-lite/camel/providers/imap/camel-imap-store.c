@@ -3801,7 +3801,7 @@ get_folders_sync(CamelImapStore *imap_store, const char *ppattern, CamelExceptio
 	GHashTable *present;
 	CamelStoreInfo *si;
 	int loops = 2;
-	gchar *pattern = ppattern;
+	gchar *pattern = (gchar *) ppattern;
 	GList *iter;
 	gboolean free_pattern = FALSE;
 

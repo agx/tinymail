@@ -164,7 +164,7 @@ tny_camel_bs_msg_header_unset_user_flag (TnyHeader *self, const gchar *id)
 	return;
 }
 
-static gboolean
+static TnyHeaderSupportFlags
 tny_camel_bs_msg_header_support_user_flags (TnyHeader *self)
 {
 	return TNY_HEADER_SUPPORT_FLAGS_NONE;
