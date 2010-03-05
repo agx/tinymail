@@ -357,28 +357,28 @@ recurse_folders_async_cb (TnyFolderStore *store,
 				new_info->self = g_object_ref (self);
 				new_info->do_poke_status = do_poke_status;
 				tny_folder_store_get_folders_async (folder_store,
-								    folders, NULL, 
-								    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
+								    folders, NULL,
+								    FALSE,
 								    recurse_folders_async_cb,
 								    NULL, new_info);
 				g_object_unref (folders);
 			}
 
 			/* We're a folder, we'll request a status, since we've
-			 * set self to be a folder observers of folder, we'll 
+			 * set self to be a folder observers of folder, we'll
 			 * receive the status update. This makes it possible to
 			 * instantly get the unread and total counts, of course.
-			 * 
+			 *
 			 * Note that the initial value is read from the cache in
-			 * case the account is set offline, in TnyCamelFolder. 
-			 * In case the account is online a STAT for POP or a 
+			 * case the account is set offline, in TnyCamelFolder.
+			 * In case the account is online a STAT for POP or a
 			 * STATUS for IMAP is asked during the poke-status impl.
 			 *
 			 * This means that no priv->folder must be loaded, no
 			 * memory peak will happen, few data must be transmitted
 			 * in case we're online. Which is perfect! */
 
-			if (folder && 
+			if (folder &&
 			    (!(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_DELAYED_REFRESH)||
 			     do_poke_status))
 				tny_folder_poke_status (TNY_FOLDER (folder));
@@ -555,8 +555,8 @@ get_folders_cb (TnyFolderStore *fstore, gboolean cancelled, TnyList *list, GErro
 		new_info->self = g_object_ref (self);
 		new_info->do_poke_status = do_poke_status;
 		tny_folder_store_get_folders_async (fstore,
-						    folders, NULL, 
-						    !(self->flags & TNY_GTK_FOLDER_LIST_STORE_FLAG_NO_REFRESH),
+						    folders, NULL,
+						    FALSE,
 						    recurse_folders_async_cb,
 						    NULL, new_info);
 		g_object_unref (folders);
