@@ -1,3 +1,8 @@
+2010-03-04  Simon Schubert  <2@0x2c.org>
+
+	Use GPOINTER_TO_SIZE (once.retval) to retrieve GType values.
+	This fixes crashes on 64-bit machines.
+
 2010-03-03  Jose Dapena Paz  <jdapena@igalia.com>
 
 	* Misc build fixes.

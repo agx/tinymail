@@ -587,7 +587,7 @@ tny_camel_queue_register_type (gpointer notused)
 				       "TnyCamelQueue",
 				       &info, 0);
 
-	return GUINT_TO_POINTER (type);
+	return GSIZE_TO_POINTER (type);
 }
 
 /**
@@ -602,5 +602,5 @@ tny_camel_queue_get_type (void)
 {
 	static GOnce once = G_ONCE_INIT;
 	g_once (&once, tny_camel_queue_register_type, NULL);
-	return GPOINTER_TO_UINT (once.retval);
+	return GPOINTER_TO_SIZE (once.retval);
 }
