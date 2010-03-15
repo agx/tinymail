@@ -322,7 +322,11 @@ camel_folder_summary_unload_mmap (CamelFolderSummary *s)
 	p = _PRIVATE(s);
 
 	if (s->file)
+#if GLIB_CHECK_VERSION (2,22,0)
+		g_mapped_file_unref (s->file);
+#else
 		g_mapped_file_free (s->file);
+#endif
 	s->file = NULL;
 	s->eof = NULL;
 
@@ -816,7 +820,11 @@ printf ("Removes %s\n", ri->uid);
 	ul = FALSE;
 
 	if (s->saved_count <= 0) {
+#if GLIB_CHECK_VERSION (2,22,0)
+		g_mapped_file_unref (s->file);
+#else
 		g_mapped_file_free (s->file);
+#endif
 		s->file = NULL;
 		s->eof = NULL;
 	}

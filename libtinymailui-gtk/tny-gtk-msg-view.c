@@ -567,7 +567,11 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part, const gchar 
 
 			gtk_widget_show (GTK_WIDGET (mpview));
 
+#if GTK_CHECK_VERSION (2,20,0)
+			if (!gtk_widget_get_realized (GTK_WIDGET (mpview)))
+#else
 			if (!GTK_WIDGET_REALIZED (mpview))
+#endif
 			{
 				RealizePriv *prv = g_slice_new (RealizePriv);
 				prv->part = g_object_ref (part);
