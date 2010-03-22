@@ -567,7 +567,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part, const gchar 
 
 			gtk_widget_show (GTK_WIDGET (mpview));
 
-#if GTK_CHECK_VERSION (2,20,0)
+#if GTK_CHECK_VERSION (2,19,5)
 			if (!gtk_widget_get_realized (GTK_WIDGET (mpview)))
 #else
 			if (!GTK_WIDGET_REALIZED (mpview))
@@ -868,17 +868,21 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 static void
 widget_size_request (GtkWidget *widget, GtkRequisition *requisition)
 {
-	if (((GtkBin *) widget)->child)
-		gtk_widget_size_request (((GtkBin *) widget)->child, requisition);
+	if (gtk_bin_get_child (GTK_BIN (widget)))
+                gtk_widget_size_request (gtk_bin_get_child (GTK_BIN (widget)), requisition);
 }
 
 static void
 widget_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 {
+#if GTK_CHECK_VERSION (2,17,8)
+	gtk_widget_set_allocation (widget, allocation);
+#else
 	widget->allocation = *allocation;
+#endif
 
-	if (((GtkBin *) widget)->child)
-		gtk_widget_size_allocate (((GtkBin *) widget)->child, allocation);
+	if (gtk_bin_get_child (GTK_BIN (widget)))
+		gtk_widget_size_allocate (gtk_bin_get_child (GTK_BIN (widget)), allocation);
 }
 
 

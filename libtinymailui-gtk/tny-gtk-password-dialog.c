@@ -55,6 +55,7 @@ tny_gtk_password_dialog_get_password (TnyPasswordGetter *self, const gchar *aid,
 		GtkDialog *dialog = NULL;
 		GtkEntry *pwd_entry;
 		GtkLabel *prompt_label;
+		GtkWidget *content_area;
 
 		dialog = GTK_DIALOG (gtk_dialog_new_with_buttons (_("Password input"), NULL,
 			GTK_DIALOG_MODAL, 
@@ -74,11 +75,17 @@ tny_gtk_password_dialog_get_password (TnyPasswordGetter *self, const gchar *aid,
 		gtk_widget_show (GTK_WIDGET (pwd_entry));
 		gtk_widget_show (GTK_WIDGET (prompt_label));
 
-		gtk_box_pack_start (GTK_BOX (dialog->vbox), 
-			GTK_WIDGET (prompt_label), TRUE, TRUE, 0);
+#if GTK_CHECK_VERSION (2,14,0)
+		content_area = gtk_dialog_get_content_area (dialog);
+#else
+		content_area = dialog->vbox;
+#endif
 
-		gtk_box_pack_start (GTK_BOX (dialog->vbox), 
-			GTK_WIDGET (pwd_entry), TRUE, TRUE, 0);
+		gtk_box_pack_start (GTK_BOX (content_area),
+                        GTK_WIDGET (prompt_label), TRUE, TRUE, 0);
+
+		gtk_box_pack_start (GTK_BOX (content_area),
+                        GTK_WIDGET (pwd_entry), TRUE, TRUE, 0);
 
 		gtk_label_set_text (prompt_label, prompt);
 

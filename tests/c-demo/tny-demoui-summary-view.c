@@ -566,6 +566,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 				GtkWidget *entry1, *entry2;
 				GtkWidget *dialog;
+				GtkWidget *content_area;
 
 				folder = tny_header_get_folder (header);
 				if (folder) {
@@ -590,14 +591,20 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 						  GTK_RESPONSE_REJECT,
 						  NULL);
 
+#if GTK_CHECK_VERSION (2,14,0)
+				content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+#else
+				content_area = GTK_DIALOG(dialog)->vbox;
+#endif
+
 				entry1 = gtk_entry_new ();
 				gtk_entry_set_text (GTK_ENTRY (entry1), _("To: "));
-				gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry1);
+				gtk_container_add (GTK_CONTAINER (content_area), entry1);
 				gtk_widget_show (entry1);
 
 				entry2 = gtk_entry_new ();
 				gtk_entry_set_text (GTK_ENTRY (entry2), _("From: "));
-				gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry2);
+				gtk_container_add (GTK_CONTAINER (content_area), entry2);
 				gtk_widget_show (entry2);
 
 				if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
@@ -1238,7 +1245,11 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 			entry = gtk_entry_new ();
 			gtk_entry_set_text (GTK_ENTRY (entry), tny_folder_get_name (folder));
+#if GTK_CHECK_VERSION (2,14,0)
+			gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG(dialog))), entry);
+#else
 			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry);
+#endif
 			gtk_widget_show (entry);
 
 			result = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -1325,7 +1336,11 @@ on_delete_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 												  NULL);
 
 			label = gtk_label_new (_("Are you sure you want to delete this folder?"));
+#if GTK_CHECK_VERSION (2,14,0)
+			gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG(dialog))), label);
+#else
 			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
+#endif
 			gtk_widget_show (label);
 
 			result = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -1419,7 +1434,11 @@ on_uncache_account_activate (GtkMenuItem *mitem, gpointer user_data)
 			label = gtk_label_new (str);
 			g_free (str);
 
+#if GTK_CHECK_VERSION (2,14,0)
+			gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), label);
+#else
 			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
+#endif
 			gtk_widget_show (label);
 
 			result = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -1577,7 +1596,11 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 			entry = gtk_entry_new ();
 			gtk_entry_set_text (GTK_ENTRY (entry), _("New folder"));
+#if GTK_CHECK_VERSION (2,14,0)
+			gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), entry);
+#else
 			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry);
+#endif
 			gtk_widget_show (entry);
 
 			result = gtk_dialog_run (GTK_DIALOG (dialog));
