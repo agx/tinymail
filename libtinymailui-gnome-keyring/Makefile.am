@@ -9,10 +9,6 @@ if BUILD_GNOME
 INCLUDES += -DGNOME
 endif
 
-if BUILD_MOZEMBED
-INCLUDES += -DMOZEMBED
-endif
-
 noinst_LTLIBRARIES = libtinymailui-gnome-keyring.la
 
 libtinymailui_gnome_keyring_la_SOURCES = \

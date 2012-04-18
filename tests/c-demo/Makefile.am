@@ -12,10 +12,6 @@ if BUILD_GNOME
 INCLUDES += -DGNOME
 endif
 
-if BUILD_MOZEMBED
-INCLUDES += -DMOZEMBED -I$(top_srcdir)/libtinymailui-mozembed $(LIBTINYMAILUI_MOZEMBED_CFLAGS)
-endif
-
 bin_PROGRAMS = tny-demoui
 
 tny_demoui_SOURCES = 				\
@@ -32,9 +28,4 @@ tny_demoui_LDADD = 							        \
 	$(top_builddir)/libtinymail-camel/libtinymail-camel-$(API_VERSION).la	\
 	$(top_builddir)/$(PLATFORMDIR)/$(PLATFORMDIR)-$(API_VERSION).la
 
-
-if BUILD_MOZEMBED
-tny_demoui_LDADD +=  $(top_builddir)/libtinymailui-mozembed/libtinymailui-mozembed-$(API_VERSION).la \
-	$(LIBTINYMAILUI_MOZEMBED_LIBS)
-endif
 

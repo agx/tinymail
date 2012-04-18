@@ -75,11 +75,7 @@ tny_gtk_password_dialog_get_password (TnyPasswordGetter *self, const gchar *aid,
 		gtk_widget_show (GTK_WIDGET (pwd_entry));
 		gtk_widget_show (GTK_WIDGET (prompt_label));
 
-#if GTK_CHECK_VERSION (2,14,0)
 		content_area = gtk_dialog_get_content_area (dialog);
-#else
-		content_area = dialog->vbox;
-#endif
 
 		gtk_box_pack_start (GTK_BOX (content_area),
                         GTK_WIDGET (prompt_label), TRUE, TRUE, 0);

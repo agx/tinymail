@@ -567,11 +567,7 @@ tny_gtk_msg_view_display_part (TnyMsgView *self, TnyMimePart *part, const gchar 
 
 			gtk_widget_show (GTK_WIDGET (mpview));
 
-#if GTK_CHECK_VERSION (2,19,5)
 			if (!gtk_widget_get_realized (GTK_WIDGET (mpview)))
-#else
-			if (!GTK_WIDGET_REALIZED (mpview))
-#endif
 			{
 				RealizePriv *prv = g_slice_new (RealizePriv);
 				prv->part = g_object_ref (part);
@@ -812,7 +808,7 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 	TnyGtkMsgViewPriv *priv = TNY_GTK_MSG_VIEW_GET_PRIVATE (self);
 	GtkBox *vbox;
 
-	priv->kid = GTK_BOX (gtk_vbox_new (FALSE, 0));
+	priv->kid = GTK_BOX (gtk_box_new (GTK_ORIENTATION_VERTICAL, 0));
 	vbox = priv->kid;
 
 	priv->parented = FALSE;
@@ -832,7 +828,7 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->headerview), FALSE, FALSE, 0);
 
-	TNY_GTK_MSG_VIEW (self)->viewers = GTK_CONTAINER (gtk_vbox_new (FALSE, 0));
+	TNY_GTK_MSG_VIEW (self)->viewers = GTK_CONTAINER (gtk_box_new (GTK_ORIENTATION_VERTICAL, 0));
 	gtk_box_pack_start (GTK_BOX (vbox), 
 		GTK_WIDGET (TNY_GTK_MSG_VIEW (self)->viewers), FALSE, FALSE, 0);
 	gtk_widget_show (GTK_WIDGET (TNY_GTK_MSG_VIEW (self)->viewers));
@@ -866,20 +862,9 @@ tny_gtk_msg_view_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static void
-widget_size_request (GtkWidget *widget, GtkRequisition *requisition)
-{
-	if (gtk_bin_get_child (GTK_BIN (widget)))
-                gtk_widget_size_request (gtk_bin_get_child (GTK_BIN (widget)), requisition);
-}
-
-static void
 widget_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 {
-#if GTK_CHECK_VERSION (2,17,8)
 	gtk_widget_set_allocation (widget, allocation);
-#else
-	widget->allocation = *allocation;
-#endif
 
 	if (gtk_bin_get_child (GTK_BIN (widget)))
 		gtk_widget_size_allocate (gtk_bin_get_child (GTK_BIN (widget)), allocation);
@@ -941,7 +926,6 @@ tny_gtk_msg_view_class_init (TnyGtkMsgViewClass *class)
 	object_class = (GObjectClass*) class;
 
 	widget_class = (GtkWidgetClass *) class;
-	widget_class->size_request  = widget_size_request;
 	widget_class->size_allocate = widget_size_allocate;
 
 	object_class->finalize = tny_gtk_msg_view_finalize;

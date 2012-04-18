@@ -14,7 +14,6 @@ libtinymailui-gtk
 
 = Platform specific =
 libtinymail-gnome-desktop
-libtinymail-maemo
 libtinymail-gpe
 libtinymail-olpc
 

@@ -64,17 +64,12 @@ tny_gnome_keyring_password_getter_get_password (TnyPasswordGetter *self, const g
 						      GTK_STOCK_OK,
 						      GTK_RESPONSE_ACCEPT,
 						      NULL);
-		gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
-#if GTK_CHECK_VERSION (2,14,0)
 		content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-#else
-		content_area = GTK_DIALOG (dialog)->vbox;
-#endif
 		gtk_box_set_spacing (GTK_BOX (content_area), 12);
 		gtk_container_set_border_width (GTK_CONTAINER (dialog), 12);
 
-		in_hbox = gtk_hbox_new (FALSE, 12);
-		password_hbox = gtk_hbox_new (FALSE, 12);
+		in_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 12);
+		password_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 12);
 		sizegroup = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
 
 		in_icon = gtk_image_new_from_stock (GTK_STOCK_DIALOG_AUTHENTICATION,

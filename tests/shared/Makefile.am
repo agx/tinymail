@@ -14,10 +14,6 @@ if BUILD_GNOME
 INCLUDES += -DGNOME
 endif
 
-if BUILD_MOZEMBED
-INCLUDES += -DMOZEMBED
-endif
-
 noinst_LTLIBRARIES = libtestsshared.la
 libtestsshared_la_SOURCES = account-store.c account-store.h \
 	platfact.c platfact.h device.c device.h device-priv.h

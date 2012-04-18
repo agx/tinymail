@@ -3264,7 +3264,7 @@ imap_update_summary (CamelFolder *folder, int exists,
    CamelImapResponseType type;
    CamelImapMessageInfo *mi;
    char *resp;
-   GData *data;
+   GData *data = NULL;
    gboolean more = TRUE, oosync = FALSE, oldrescval = imap_folder->need_rescan;
    unsigned int nextn, cnt=0, tcnt=0, ucnt=0, ineed = 0, allhdrs = 0;
    gboolean do_the_save = TRUE;

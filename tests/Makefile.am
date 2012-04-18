@@ -1,11 +1,7 @@
-SUBDIRS = python-demo
+SUBDIRS =
 
 if BUILD_DEMOUI
 SUBDIRS += c-demo
-
-if BUILD_VALA_BINDINGS
-SUBDIRS += vala-demo
-endif
 endif
 
 #### Funny OR simulation :)

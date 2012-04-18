@@ -9,9 +9,9 @@ INCLUDES =								\
 	-DE_DATA_SERVER_UIDIR=\""$(uidir)"\"				\
 	$(E_DATA_SERVER_CFLAGS)
 
-noinst_LTLIBRARIES = libedataserver-1.2.la
+noinst_LTLIBRARIES = libedataserver-2.0.la
 
-libedataserver_1_2_la_SOURCES =		\
+libedataserver_2_0_la_SOURCES =		\
 	e-trie.c			\
 	e-iconv.c			\
 	e-memory.c			\

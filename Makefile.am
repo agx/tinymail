@@ -21,10 +21,6 @@ if BUILD_UIGTK
 SUBDIRS += libtinymailui-gtk 
 endif
 
-if BUILD_MOZEMBED
-SUBDIRS += libtinymailui-mozembed 
-endif
-
 if BUILD_WEBKIT
 SUBDIRS += libtinymailui-webkit
 endif
@@ -45,7 +41,7 @@ SUBDIRS += libtinymail-tp
 endif
 
 
-SUBDIRS += tests bindings po
+SUBDIRS += tests po
 
 #### Funny OR simulation :)
 if BUILD_TESTS
@@ -81,8 +77,7 @@ DIST_SUBDIRS = \
 	libtinymail-camel \
 	docs \
 	libtinymail-test tests \
-	bindings po \
-	libtinymail-maemo \
+	po \
 	libtinymail-olpc \
 	libtinymail-gpe m4 \
 	libtinymailui-mozembed \

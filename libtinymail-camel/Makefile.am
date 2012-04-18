@@ -9,9 +9,9 @@ if BUILD_IMAPP
 INCLUDES += -DIMAP_PART_FETCH
 endif
 
-lib_LTLIBRARIES = libtinymail-camel-1.0.la 
+lib_LTLIBRARIES = libtinymail-camel-2.0.la 
 
-libtinymail_camel_1_0_headers =	\
+libtinymail_camel_2_0_headers =	\
 	tny-camel-mime-part.h \
 	tny-camel-pop-remote-msg-remove-strategy.h \
 	tny-camel-msg-remove-strategy.h \
@@ -63,9 +63,9 @@ libtinymail_camel_priv_headers = \
 	tny-camel-bs-mime-part-priv.h \
 	tny-camel-bs-msg-header-priv.h
 
-libtinymail_camel_1_0_la_SOURCES = \
+libtinymail_camel_2_0_la_SOURCES = \
 	$(libtinymail_camel_priv_headers) \
-	$(libtinymail_camel_1_0_headers) \
+	$(libtinymail_camel_2_0_headers) \
 	tny-camel-msg.c \
 	tny-camel-header.c \
 	tny-camel-msg-header-priv.h \
@@ -100,15 +100,15 @@ libtinymail_camel_1_0_la_SOURCES = \
 	tny-camel-default-connection-policy.c \
 	tny-camel-recover-connection-policy.c
 
-libtinymail_camel_1_0_la_LIBADD = \
+libtinymail_camel_2_0_la_LIBADD = \
 	$(LIBTINYMAIL_CAMEL_LIBS) \
-	$(top_builddir)/libtinymail-camel/camel-lite/camel/libcamel-lite-1.2.la \
+	$(top_builddir)/libtinymail-camel/camel-lite/camel/libcamel-lite-2.0.la \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la
 
-libtinymail_camel_1_0_la_LDFLAGS = -export-dynamic -version-info \
+libtinymail_camel_2_0_la_LDFLAGS = -export-dynamic -version-info \
 	$(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
-libtinymail_camel_1_0includedir = $(includedir)/libtinymail-camel-$(API_VERSION)
-libtinymail_camel_1_0include_HEADERS = $(libtinymail_camel_1_0_headers)
+libtinymail_camel_2_0includedir = $(includedir)/libtinymail-camel-$(API_VERSION)
+libtinymail_camel_2_0include_HEADERS = $(libtinymail_camel_2_0_headers)
 
 libtinymail-camel-$(API_VERSION).pc: libtinymail-camel.pc
 	cp $< $@

@@ -28,8 +28,8 @@ libcamel_liteincludedir = $(includedir)/camel-lite/camel
 libcamel_lite_providerincludedir = $(includedir)/camel-lite/camel
 camel_litelibexecdir = $(libexecdir)
 
-# noinst_LTLIBRARIES = libcamel-lite-1.2.la
-lib_LTLIBRARIES = libcamel-lite-1.2.la
+# noinst_LTLIBRARIES = libcamel-lite-2.0.la
+lib_LTLIBRARIES = libcamel-lite-2.0.la
 
 INCLUDES = -I.. -I$(srcdir)/.. \
 	-I$(top_srcdir)/intl \
@@ -143,7 +143,7 @@ providerinclude_headers =		\
 	camel-vee-summary.h			\
 	camel-vtrash-folder.h
 
-libcamel_lite_1_2_la_SOURCES = 			\
+libcamel_lite_2_0_la_SOURCES = 			\
 	$(provider_sources)			\
 	broken-date-parser.c			\
 	camel-address.c				\
@@ -211,9 +211,9 @@ libcamel_lite_1_2_la_SOURCES = 			\
 	$(LIBCAMEL_PLATFORM_DEP_SOURCES)
 
 if HAVE_CST
-libcamel_lite_1_2_la_SOURCES +=	camel-certdb-cst.c
+libcamel_lite_2_0_la_SOURCES +=	camel-certdb-cst.c
 else
-libcamel_lite_1_2_la_SOURCES +=	camel-certdb.c
+libcamel_lite_2_0_la_SOURCES +=	camel-certdb.c
 endif
 
 
@@ -289,9 +289,9 @@ libcamel_liteinclude_HEADERS =			\
 	camel-lock-helper.h			\
 	camel.h
 
-# libcamel_lite_1_2_la_LDFLAGS = -version-info $(LIBCAMEL_CURRENT):$(LIBCAMEL_REVISION):$(LIBCAMEL_AGE) $(NO_UNDEFINED)
+# libcamel_lite_2_0_la_LDFLAGS = -version-info $(LIBCAMEL_CURRENT):$(LIBCAMEL_REVISION):$(LIBCAMEL_AGE) $(NO_UNDEFINED)
 
-libcamel_lite_1_2_la_LIBADD =				\
+libcamel_lite_2_0_la_LIBADD =				\
 	$(top_builddir)/libedataserver/libedataserver-${API_VERSION}.la \
 	$(top_builddir)/summary/libsummary.la				\
 	$(CAMEL_LIBS)							\

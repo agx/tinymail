@@ -272,7 +272,7 @@ tny_account_store_get_cache_dir (TnyAccountStore *self)
  *
  * There are multiple samples of #TnyAccountStore implementations in
  * libtinymail-gnome-desktop, libtinymail-olpc, libtinymail-gpe, 
- * libtinymail-maemo and tests/shared/account-store.c which is being used by
+ * and tests/shared/account-store.c which is being used by
  * the unit tests and the normal tests.
  *
  * The get_pass and forget_pass functionality of the example below is usually

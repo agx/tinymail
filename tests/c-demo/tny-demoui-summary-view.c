@@ -36,11 +36,6 @@
 #include <tny-gnome-account-store.h>
 #endif
 
-#if PLATFORM==2
-#include <tny-maemo-platform-factory.h>
-#include <tny-maemo-account-store.h>
-#endif
-
 #if PLATFORM==3
 #include <tny-gpe-platform-factory.h>
 #include <tny-gpe-account-store.h>
@@ -544,7 +539,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 	TnyDemouiSummaryViewPriv *priv = TNY_DEMOUI_SUMMARY_VIEW_GET_PRIVATE (self);
 
 
-	if (event->keyval == GDK_Home && priv->send_queue)
+	if (event->keyval == GDK_KEY_Home && priv->send_queue)
 	{
 		GtkTreeSelection *selection = gtk_tree_view_get_selection (header_view);
 		GtkTreeModel *model;
@@ -591,11 +586,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 						  GTK_RESPONSE_REJECT,
 						  NULL);
 
-#if GTK_CHECK_VERSION (2,14,0)
 				content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-#else
-				content_area = GTK_DIALOG(dialog)->vbox;
-#endif
 
 				entry1 = gtk_entry_new ();
 				gtk_entry_set_text (GTK_ENTRY (entry1), _("To: "));
@@ -628,7 +619,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 		}
 	}
 
-	if (event->keyval == GDK_Delete)
+	if (event->keyval == GDK_KEY_Delete)
 	{
 		GtkTreeSelection *selection = gtk_tree_view_get_selection (header_view);
 		GtkTreeModel *model, *mymodel;
@@ -681,7 +672,7 @@ on_header_view_key_press_event (GtkTreeView *header_view, GdkEventKey *event, gp
 
 
 
-	if (event->keyval == GDK_End)
+	if (event->keyval == GDK_KEY_End)
 	{
 		GtkTreeSelection *selection = gtk_tree_view_get_selection (header_view);
 		GtkTreeModel *model;
@@ -1085,10 +1076,6 @@ on_header_view_tree_row_activated (GtkTreeView *treeview, GtkTreePath *path,
 			platfact = tny_gnome_platform_factory_get_instance ();    
 #endif
 
-#if PLATFORM==2
-			platfact = tny_maemo_platform_factory_get_instance ();    
-#endif
-
 #if PLATFORM==3
 			platfact = tny_gpe_platform_factory_get_instance ();
 #endif
@@ -1245,11 +1232,7 @@ on_rename_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 			entry = gtk_entry_new ();
 			gtk_entry_set_text (GTK_ENTRY (entry), tny_folder_get_name (folder));
-#if GTK_CHECK_VERSION (2,14,0)
 			gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG(dialog))), entry);
-#else
-			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry);
-#endif
 			gtk_widget_show (entry);
 
 			result = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -1336,11 +1319,7 @@ on_delete_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 												  NULL);
 
 			label = gtk_label_new (_("Are you sure you want to delete this folder?"));
-#if GTK_CHECK_VERSION (2,14,0)
 			gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG(dialog))), label);
-#else
-			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
-#endif
 			gtk_widget_show (label);
 
 			result = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -1434,11 +1413,7 @@ on_uncache_account_activate (GtkMenuItem *mitem, gpointer user_data)
 			label = gtk_label_new (str);
 			g_free (str);
 
-#if GTK_CHECK_VERSION (2,14,0)
 			gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), label);
-#else
-			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
-#endif
 			gtk_widget_show (label);
 
 			result = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -1596,11 +1571,7 @@ on_create_folder_activate (GtkMenuItem *mitem, gpointer user_data)
 
 			entry = gtk_entry_new ();
 			gtk_entry_set_text (GTK_ENTRY (entry), _("New folder"));
-#if GTK_CHECK_VERSION (2,14,0)
 			gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), entry);
-#else
-			gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), entry);
-#endif
 			gtk_widget_show (entry);
 
 			result = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -1934,10 +1905,6 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	platfact = tny_gnome_platform_factory_get_instance ();
 #endif
 
-#if PLATFORM==2
-	platfact = tny_maemo_platform_factory_get_instance ();
-#endif
-
 #if PLATFORM==3
 	platfact = tny_gpe_platform_factory_get_instance ();
 #endif
@@ -1947,10 +1914,9 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 #endif
 
 
-	hpaned1 = gtk_hpaned_new ();
+	hpaned1 = gtk_paned_new (GTK_ORIENTATION_HORIZONTAL);
 	gtk_widget_show (hpaned1);
 	priv->status = GTK_WIDGET (gtk_statusbar_new ());
-	gtk_statusbar_set_has_resize_grip (GTK_STATUSBAR (priv->status), FALSE);
 	priv->progress = gtk_progress_bar_new ();
 	priv->status_id = gtk_statusbar_get_context_id (GTK_STATUSBAR (priv->status), "default");
 
@@ -1972,7 +1938,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (hpaned1), TRUE, TRUE, 0);
 	gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (priv->status), FALSE, TRUE, 0);
 
-	vpaned1 = gtk_vpaned_new ();
+	vpaned1 = gtk_paned_new (GTK_ORIENTATION_VERTICAL);
 	gtk_widget_show (vpaned1);
 
 	priv->msg_view = tny_platform_factory_new_msg_view (platfact);
@@ -1999,7 +1965,7 @@ tny_demoui_summary_view_instance_init (GTypeInstance *instance, gpointer g_class
 	gtk_cell_layout_set_attributes((GtkCellLayout *)priv->account_view, renderer, "text", 0, NULL);
 
 	mailbox_sw = gtk_scrolled_window_new (NULL, NULL);
-	vpbox = GTK_BOX (gtk_vbox_new (FALSE, 0));
+	vpbox = GTK_BOX (gtk_box_new (GTK_ORIENTATION_VERTICAL, 0));
 	gtk_box_pack_start (GTK_BOX (vpbox), GTK_WIDGET (priv->account_view), FALSE, FALSE, 0);    
 	gtk_box_pack_start (GTK_BOX (vpbox), mailbox_sw, TRUE, TRUE, 0);
 	gtk_widget_show (GTK_WIDGET (vpbox));    

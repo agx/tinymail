@@ -1,6 +1,6 @@
 INCLUDES = $(LIBTINYMAIL_CFLAGS) -I. -I$(top_srcdir) $(EXTRA_CFLAGS)
 
-lib_LTLIBRARIES = libtinymail-1.0.la
+lib_LTLIBRARIES = libtinymail-2.0.la
 
 tny-signals-marshal.h: tny-signals-marshal.list
 	glib-genmarshal --header --prefix=$(subst -,_,tny)_marshal $< > tny-signals-marshal.h
@@ -13,7 +13,7 @@ CLEANFILES=tny-signals-marshal.c tny-signals-marshal.h
 
 private_headers = tny-common-priv.h observer-mixin-priv.h
 
-libtinymail_1_0_headers = \
+libtinymail_2_0_headers = \
 	tny-signals-marshal.h \
 	tny-shared.h tny.h \
 	tny-error.h \
@@ -57,7 +57,7 @@ libtinymail_1_0_headers = \
 	tny-connection-policy.h \
 	tny-merge-folder-store.h
 
-libtinymail_1_0_la_SOURCES = \
+libtinymail_2_0_la_SOURCES = \
 	$(libtinymail_1_0_headers) \
 	tny-expunged-header.c \
 	tny-signals-marshal.c \
@@ -109,10 +109,10 @@ libtinymail_1_0_la_SOURCES = \
 	observer-mixin.c \
 	$(private_headers)
 
-libtinymail_1_0_la_LIBADD = $(LIBTINYMAIL_LIBS)
-libtinymail_1_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
-libtinymail_1_0_includedir = $(includedir)/libtinymail-$(API_VERSION)
-libtinymail_1_0_include_HEADERS = $(libtinymail_1_0_headers)
+libtinymail_2_0_la_LIBADD = $(LIBTINYMAIL_LIBS)
+libtinymail_2_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
+libtinymail_2_0_includedir = $(includedir)/libtinymail-$(API_VERSION)
+libtinymail_2_0_include_HEADERS = $(libtinymail_2_0_headers)
 
 libtinymail-$(API_VERSION).pc: libtinymail.pc
 	cp $< $@

@@ -12,10 +12,6 @@ if BUILD_GNOME
 INCLUDES += -DGNOME
 endif
 
-if BUILD_MOZEMBED
-INCLUDES += -DMOZEMBED
-endif
-
 bin_PROGRAMS = memory-test
 
 memory_test_SOURCES = memory-test.c 

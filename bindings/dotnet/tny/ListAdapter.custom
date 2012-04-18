@@ -1,6 +1,0 @@
-
-		public System.Collections.IEnumerator GetEnumerator()
-		{
-			return (System.Collections.IEnumerator) this.CreateIterator ();
-		}
-

@@ -28,10 +28,6 @@
 #include <tny-gnome-platform-factory.h>
 #endif
 
-#if PLATFORM==2
-#include <tny-maemo-platform-factory.h>
-#endif
-
 #if PLATFORM==3
 #include <tny-gpe-platform-factory.h>
 #endif
@@ -57,17 +53,9 @@ main (int argc, char **argv)
 	GtkWidget *view = NULL, *window = NULL;
 	TnyPlatformFactory *platfact;
 	GOptionContext *context;
-	static gint plug = 0;
 	TnyAccountStore *account_store;
 
-	static GOptionEntry entries[] = {
-		{ "plug", 'p', 0, G_OPTION_ARG_INT, &plug,
-			"Socket ID of an XEmbed socket to plug into", NULL },
-		{ NULL }
-	};
-
 	context = g_option_context_new (" - libtinymail demo application");
-	g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
 	g_option_context_add_group (context, gtk_get_option_group (TRUE));
 	g_option_context_parse (context, &argc, &argv, NULL);
 
@@ -85,10 +73,6 @@ main (int argc, char **argv)
 	platfact = tny_gnome_platform_factory_get_instance ();
 #endif
     
-#if PLATFORM==2
-	platfact = tny_maemo_platform_factory_get_instance ();    
-#endif
-
 #if PLATFORM==3
 	platfact = tny_gpe_platform_factory_get_instance ();    
 #endif
@@ -99,13 +83,8 @@ main (int argc, char **argv)
 
 	view = GTK_WIDGET (tny_demoui_summary_view_new ());
 
-	if (plug > 0) {
-		g_message ("Plugging into socket %d", plug);
-		window = gtk_plug_new (plug);
-	} else {
-		window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-		gtk_window_set_title (GTK_WINDOW (window), "Demo ui");
-	}
+	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_title (GTK_WINDOW (window), "Demo ui");
 
 	gtk_container_add (GTK_CONTAINER (window), view);
 	

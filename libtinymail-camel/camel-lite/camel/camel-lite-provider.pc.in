@@ -6,7 +6,7 @@ includedir=@includedir@
 camel_lite_providerdir=@camel_lite_providerdir@
 
 Name: camel-lite-provider
-Requires: camel-lite-1.2
+Requires: camel-lite-2.0
 Description: A light mail access library
 Version: 1.2
 Libs: -L${libdir} -lcamel-lite-1.2

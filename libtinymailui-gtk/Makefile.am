@@ -7,9 +7,9 @@ if BUILD_GNOME
 INCLUDES += -I$(top_srcdir)/libtinymail-gio -DGNOME
 endif
 
-lib_LTLIBRARIES = libtinymailui-gtk-1.0.la
+lib_LTLIBRARIES = libtinymailui-gtk-2.0.la
 
-libtinymailui_gtk_1_0_headers = \
+libtinymailui_gtk_2_0_headers = \
 	tny-gtk-mime-part-save-strategy.h \
 	tny-gtk-msg-view.h \
 	tny-gtk-lockable.h \
@@ -28,8 +28,8 @@ libtinymailui_gtk_1_0_headers = \
 	tny-gtk-password-dialog.h \
 	tny-gtk-expander-mime-part-view.h
 
-libtinymailui_gtk_1_0_la_SOURCES = \
-	$(libtinymailui_gtk_1_0_headers) \
+libtinymailui_gtk_2_0_la_SOURCES = \
+	$(libtinymailui_gtk_2_0_headers) \
 	tny-gtk-mime-part-save-strategy.c \
 	tny-gtk-msg-view.c \
 	tny-gtk-lockable.c \
@@ -59,20 +59,20 @@ libtinymailui_gtk_1_0_la_SOURCES = \
 	tny-gtk-password-dialog.c \
 	tny-gtk-expander-mime-part-view.c
 
-libtinymailui_gtk_1_0_la_LIBADD = \
+libtinymailui_gtk_2_0_la_LIBADD = \
 	$(LIBTINYMAILUI_GTK_LIBS) \
 	$(top_builddir)/libtinymail/libtinymail-$(API_VERSION).la \
 	$(top_builddir)/libtinymailui/libtinymailui-$(API_VERSION).la
 
-libtinymailui_gtk_1_0_la_LDFLAGS = -export-dynamic \
+libtinymailui_gtk_2_0_la_LDFLAGS = -export-dynamic \
 	-version-info $(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
 
 if BUILD_GNOME
-libtinymailui_gtk_1_0_la_LIBADD += $(top_builddir)/libtinymail-gio/libtinymail-gio-$(API_VERSION).la
+libtinymailui_gtk_2_0_la_LIBADD += $(top_builddir)/libtinymail-gio/libtinymail-gio-$(API_VERSION).la
 endif
 
 libtinymailuigtkincludedir = $(includedir)/libtinymailui-gtk-$(API_VERSION)
-libtinymailuigtkinclude_HEADERS = $(libtinymailui_gtk_1_0_headers)
+libtinymailuigtkinclude_HEADERS = $(libtinymailui_gtk_2_0_headers)
 
 libtinymailui-gtk-$(API_VERSION).pc: libtinymailui-gtk.pc
 	cp $< $@

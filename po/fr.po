@@ -18,7 +18,6 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n>1;\n"
 
 #: ../libtinymail-gpe/tny-gpe-password-dialog.c:93
-#: ../libtinymail-maemo/tny-maemo-password-dialog.c:93
 #: ../libtinymail-gnome-desktop/tny-gnome-password-dialog.c:94
 #: ../libtinymail-olpc/tny-olpc-password-dialog.c:93
 msgid "Password input"

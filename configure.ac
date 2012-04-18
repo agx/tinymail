@@ -1,4 +1,4 @@
-m4_define([tny_major_version], [1])
+m4_define([tny_major_version], [2])
 m4_define([tny_minor_version], [0])
 m4_define([tny_micro_version], [0])
 m4_define([tny_version],
@@ -6,7 +6,7 @@ m4_define([tny_version],
 m4_define([tny_interface_age], [0])
 m4_define([tny_binary_age],
           [m4_eval(100 * tny_minor_version + tny_micro_version)])
-m4_define([tny_api_version], [1.0])
+m4_define([tny_api_version], [2.0])
 m4_define([lt_current], [m4_eval(100 * tny_minor_version + tny_micro_version - tny_interface_age)])
 m4_define([lt_revision], [tny_interface_age])
 m4_define([lt_age], [m4_eval(tny_binary_age - tny_interface_age)])
@@ -69,14 +69,12 @@ build_acap=false
 build_gnome=true
 build_uigtk=true
 build_demoui=true
-build_mozembed=false
 build_webkit=false
 build_gtkhtml=false
 build_doxygen=false
 build_tests=false
 build_unittests=false
 build_tp=false
-have_conic=false
 debug=false
 enable_deprecated=true
 PLATFORMDIR=libtinymail-gnome-desktop
@@ -121,26 +119,16 @@ esac],[enable_deprecated=$enable_deprecated])
 dnl ### Select the platform library ##
 AC_ARG_WITH(platform,
 AC_HELP_STRING([--with-platform=gnome-desktop], 
-  [Platform to compile (gnome-desktop, maemo, moblin, olpc or gpe)]),
+  [Platform to compile (gnome-desktop, moblin, olpc or gpe)]),
 [case "${with_platform}" in
   gnome-desktop) 
 	PLATFORMDIR=libtinymail-gnome-desktop
 	PLATFORMSPECIFICNAME=Gnome 
 	build_uigtk=true
 	build_demoui=true
+	build_gtkhtml=true
 	PLATFORM=1
 	;;
-  maemo)
-        PLATFORMDIR=libtinymail-maemo
-	PLATFORMSPECIFICNAME=Maemo
-        build_gtkhtml=false
-        build_mozembed=false
-        build_gnome=false
-	build_maemo=true
-	build_uigtk=true
-	build_demoui=true
-	PLATFORM=2
-        ;;
   gpe) 
 	PLATFORMDIR=libtinymail-gpe
 	PLATFORMSPECIFICNAME=Gpe 
@@ -152,7 +140,6 @@ AC_HELP_STRING([--with-platform=gnome-desktop],
         PLATFORMDIR=libtinymail-olpc
 	PLATFORMSPECIFICNAME=Olpc
         build_gtkhtml=false
-        build_mozembed=false
         build_gnome=false
         with_html_component=none
 	build_uigtk=true
@@ -163,9 +150,7 @@ AC_HELP_STRING([--with-platform=gnome-desktop],
         PLATFORMDIR=libtinymail-moblin
 	PLATFORMSPECIFICNAME=Moblin
         build_gtkhtml=false
-        build_mozembed=false
         build_gnome=true
-	build_maemo=false
 	build_uigtk=true
 	build_demoui=true
 	PLATFORM=5
@@ -200,38 +185,27 @@ AM_CONDITIONAL([HAVE_PLATFORM], [test x$have_platform = xyes])
 dnl ### Select the html component ##
 AC_ARG_WITH(html-component,
 AC_HELP_STRING([--with-html-component],
-  [Set which html component to use (mozembed, gtkhtml, webkit, none)]),
+  [Set which html component to use (gtkhtml, webkit, none)]),
 [case "$with_html_component" in
   webkit)
 	build_gtkhtml=false
-	build_mozembed=false
 	build_webkit=true
-  ;;
-  mozembed) 
-	build_webkit=false
-	build_mozembed=true
-	build_gtkhtml=false
-	build_demoui=true
   ;;
   gtkhtml)
 	build_webkit=false
-	build_mozembed=false
 	build_gtkhtml=true
 	build_demoui=true
   ;;
   none)
 	with_html_component=none
-	build_mozembed=false 
 	build_gtkhtml=false
 	build_webkit=false
   ;;
   *) AC_MSG_ERROR(bad value ${with_html_component} for --with-html-component) ;;
-esac], [build_mozembed=false
-	build_webkit=false 
+esac], [build_webkit=false 
 	build_gtkhtml=false
 	with_html_component=none])
 
-AM_CONDITIONAL(BUILD_MOZEMBED, test x$build_mozembed = xtrue)
 AM_CONDITIONAL(BUILD_GTKHTML, test x$build_gtkhtml = xtrue)
 AM_CONDITIONAL(BUILD_WEBKIT, test x$build_webkit = xtrue)
 
@@ -399,11 +373,11 @@ dnl ### gtk-doc
 GTK_DOC_CHECK([1.0])
 
 dnl ### libtinymail, the abstraction library ##
-PKG_CHECK_MODULES(LIBTINYMAIL, glib-2.0 >= 2.8 gobject-2.0)
+PKG_CHECK_MODULES(LIBTINYMAIL, glib-2.0 >= 2.32 gobject-2.0)
 dnl ### libtinymailui, the ui abstraction library ##
-PKG_CHECK_MODULES(LIBTINYMAILUI, glib-2.0 >= 2.8 gobject-2.0)
+PKG_CHECK_MODULES(LIBTINYMAILUI, glib-2.0 >= 2.32 gobject-2.0)
 dnl ### libtinymail-camel, a camel implementation of libtinymail ##
-PKG_CHECK_MODULES(LIBTINYMAIL_CAMEL, glib-2.0 >= 2.8 gobject-2.0)
+PKG_CHECK_MODULES(LIBTINYMAIL_CAMEL, glib-2.0 >= 2.32 gobject-2.0)
 
 if test x$debug == xtrue; then
 	EXTRA_CFLAGS="-DDEBUG -DDBC -g -ggdb -O0"
@@ -505,7 +479,7 @@ fi
 
 dnl ### libtinymailui-gtk, a gtk+ implementation of libtinymail-ui ##
 if test x$build_uigtk = xtrue; then
-  PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 $extragtkpkgs gtk+-2.0)
+  PKG_CHECK_MODULES(LIBTINYMAILUI_GTK, glib-2.0 >= 2.8 gobject-2.0 $extragtkpkgs gtk+-3.0)
 else
   LIBTINYMAILUI_GTK_CFLAGS=
   LIBTINYMAILUI_GTK_LIBS=
@@ -513,38 +487,11 @@ fi
 AC_SUBST(LIBTINYMAILUI_GTK_CFLAGS)
 AC_SUBST(LIBTINYMAILUI_GTK_LIBS)
 
-dnl ### libtinymailui-mozembed, a library that wraps the gtkmozembed widget ##
-if test x$build_mozembed = xtrue; then
-
-  AC_TNY_MOZ_CHECK
-
-  if test x$mozilla_xpcom = xno; then
-   AC_MSG_ERROR("You need Mozilla's XPCOM")
-  fi
-
-  if test x$mozilla_gtkmozembed = xno; then
-   AC_MSG_ERROR("You need Mozilla's GtkMozEmbed")
-  fi
-
-  extraplatpkgs="$mozilla_xpcom $mozilla_gtkmozembed"
-  extratnypkgs="$extratnypkgs $extraplatpkgs"
-  PKG_CHECK_MODULES(LIBTINYMAILUI_MOZEMBED, $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
-  MOZILLA_HOME="$mozilla_home"
-  AC_DEFINE_UNQUOTED(MOZILLA_HOME,"$mozilla_home",["The path of the mozilla engine"])
-else
-  LIBTINYMAILUI_MOZEMBED_CFLAGS=
-  LIBTINYMAILUI_MOZEMBED_LIBS=
-  MOZILLA_HOME=
-  AM_CONDITIONAL([HAVE_MOZILLA_1_8],[test "0" = "1"])
-  AM_CONDITIONAL([HAVE_MOZILLA_1_9],[test "0" = "1"])
-fi
-AC_SUBST([MOZILLA_HOME])
-
 dnl ### libtinymailui-gtkhtml, a library that wraps the GtkHtml widget ##
 if test x$build_gtkhtml = xtrue; then
   extraplatpkgs="libgtkhtml-3.8"
   extratnypkgs="$extratnypkgs $extraplatpkgs"
-  PKG_CHECK_MODULES(LIBTINYMAILUI_GTKHTML, $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs)
+  PKG_CHECK_MODULES(LIBTINYMAILUI_GTKHTML, $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-3.0 $extragtkpkgs)
 else
   LIBTINYMAILUI_GTKHTML_CFLAGS=
   LIBTINYMAILUI_GTKHTML_LIBS=
@@ -564,7 +511,7 @@ AC_DEFINE_UNQUOTED(NM_SUPPORT, 1, ["NetworkManager support."])
 fi
 
 if test x$PLATFORMDIR = xlibtinymail-gnome-desktop; then
-  PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, gconf-2.0 $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extragtkpkgs $extranmpkgs)
+  PKG_CHECK_MODULES(LIBTINYMAIL_GNOME_DESKTOP, gconf-2.0 $extraplatpkgs glib-2.0 >= 2.8 gobject-2.0 gtk+-3.0 $extragtkpkgs $extranmpkgs)
 else
   LIBTINYMAIL_GNOME_DESKTOP_CFLAGS=
   LIBTINYMAIL_GNOME_DESKTOP_LIBS=
@@ -575,7 +522,7 @@ AC_SUBST(LIBTINYMAIL_GNOME_DESKTOP_LIBS)
 
 dnl ### libtinymail-olpc, a platform library implementation for the One Laptop Per Child device ##
 if test x$PLATFORMDIR = xlibtinymail-olpc; then
- PKG_CHECK_MODULES(LIBTINYMAIL_OLPC, glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0)
+ PKG_CHECK_MODULES(LIBTINYMAIL_OLPC, glib-2.0 >= 2.8 gobject-2.0 gtk+-3.0)
 else
  LIBTINYMAIL_OLPC_CFLAGS=
  LIBTINYMAIL_OLPC_LIBS=
@@ -588,36 +535,9 @@ AC_DEFUN([ARMEL_TARGET],
 	[if sb-conf cu | grep -i 'armel' >/dev/null 2>&1; then
 	    armel_target=yes])
 
-dnl ### libtinymail-maemo, a platform library implementation for the maemo platform ##
-if test x$PLATFORMDIR = xlibtinymail-maemo; then
-	PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
-	if $PKG_CONFIG --exists conic; then
-		PKG_CHECK_MODULES(LIBTINYMAIL_MAEMO_CONIC,conic,HAVE_CONIC=yes,HAVE_CONIC=no)
-		AC_MSG_RESULT(conic)
-		AC_SUBST(LIBYINYMAIL_MAEMO_CONIC_CFLAGS)
-		AC_SUBST(LIBTINYMAIL_MAEMO_CONIC_LIBS)
-		dnl HACK: unless we are building for arm, make the device a 'dummy' assuming it is always online
-		dnl this is because scratcbhox-Conic does not support ethernet, and will therefore never consider
-		dnl itself 'online'
- 		if test -z "`sb-conf show -c | grep arm`"; then
-			use_conic_device_dummy=1
- 			AC_DEFINE_UNQUOTED(MAEMO_CONIC_DUMMY,1,["Whether to hack the TnyMaemoConicDevice to somewhat work in sbox"])
- 		fi
-	else
-		AC_DEFINE_UNQUOTED(LIBTINYMAIL_MAEMO_WITHOUT_CONIC,1,["whether the dummy libconic should be built"])
-	fi
-
-	AC_SUBST(LIBTINYMAIL_MAEMO_CFLAGS)
-	AC_SUBST(LIBTINYMAIL_MAEMO_LIBS)
-fi
-
-AM_CONDITIONAL(MAEMO_CONIC_DEVICE_DUMMY, test -n "$use_conic_device_dummy")
-AM_CONDITIONAL(MAEMO_CONIC_HAVE_CONIC, test "x$HAVE_CONIC" = "xyes")
-AM_CONDITIONAL(BUILD_MAEMO, test x$build_maemo = xtrue)
-
 dnl ### libtinymail-gpe, a platform library implementation for the GPE platform ##
 if test x$PLATFORMDIR = xlibtinymail-gpe; then
- PKG_CHECK_MODULES(LIBTINYMAIL_GPE, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0)
+ PKG_CHECK_MODULES(LIBTINYMAIL_GPE, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-3.0)
 else
  LIBTINYMAIL_GPE_CFLAGS=
  LIBTINYMAIL_GPE_LIBS=
@@ -631,7 +551,7 @@ AC_SUBST(extragtkpkgs)
 
 dnl ### libtinymail-moblin, a platform library implementation for the Moblin platform ##
 if test x$PLATFORMDIR = xlibtinymail-moblin; then
- PKG_CHECK_MODULES(LIBTINYMAIL_MOBLIN, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-2.0 connman)
+ PKG_CHECK_MODULES(LIBTINYMAIL_MOBLIN, glib-2.0 >= 2.8 gobject-2.0 gconf-2.0 gtk+-3.0 connman)
  AC_DEFINE_UNQUOTED(CONNMAN_SUPPORT, 1, ["Moblin Connection Manager support."])
 else
  LIBTINYMAIL_MOBLIN_CFLAGS=
@@ -650,31 +570,13 @@ fi
 
 dnl ### tinymail, the demo-ui ##
 if test x$build_demoui = xtrue; then
-  PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.8 gobject-2.0 gtk+-2.0 $extratnypkgs)
+  PKG_CHECK_MODULES(TINYMAIL, glib-2.0 >= 2.32 gobject-2.0 gtk+-3.0 $extratnypkgs)
 else
   TINYMAIL_CFLAGS=
   TINYMAIL_LIBS=
 fi
 AC_SUBST(TINYMAIL_CFLAGS)
 AC_SUBST(TINYMAIL_LIBS)
-
-dnl ### tinymail-python, the python language bindings ##
-if test x$build_pytinymail = xtrue; then
-  AC_TNY_PYTHON_BINDING_CHECK
-  PKG_CHECK_MODULES(PYGOBJ, [pygobject-2.0 >= 2.0.0])
-else
-  PYGOBJ_CFLAGS=
-  PYGOBJ_LIBS=
-  TINYMAIL_PYTHON_CFLAGS=
-  TINYMAIL_PYTHON_LIBS=
-fi
-AC_SUBST(PYGTK_CODEGENDIR)
-AC_SUBST(TINYMAIL_PYTHON_CFLAGS)
-AC_SUBST(TINYMAIL_PYTHON_LIBS)
-AC_SUBST(PYGTK_CFLAGS)
-AC_SUBST(PYGTK_LIBS)
-AC_SUBST(PYGOBJ_LIBS)
-AC_SUBST(PYGOBJ_CFLAGS)
 
 BINDIR=$prefix/bin
 AC_SUBST(BINDIR)
@@ -693,34 +595,6 @@ docs/devel/doxygen/libtinymail
 docs/devel/doxygen/libtinymail-camel
 docs/devel/doxygen/libtinymailui
 docs/devel/doxygen/libtinymailui-gtk
-bindings/Makefile
-bindings/python/Makefile
-bindings/python/gendefs/Makefile
-bindings/python/tinymail.pth
-bindings/vala/Makefile
-bindings/dotnet/Makefile
-bindings/dotnet/AssemblyInfo.cs
-bindings/dotnet/tny/libtinymail-sharp.dll.config
-bindings/dotnet/tny/libtinymail-sharp.pc
-bindings/dotnet/tny/libtinymail-sources.xml
-bindings/dotnet/tny/Makefile
-bindings/dotnet/ui/libtinymailui-sharp.dll.config
-bindings/dotnet/ui/libtinymailui-sharp.pc
-bindings/dotnet/ui/libtinymailui-sources.xml
-bindings/dotnet/ui/Makefile
-bindings/dotnet/ui-gtk/libtinymailui-gtk-sharp.dll.config
-bindings/dotnet/ui-gtk/libtinymailui-gtk-sharp.pc
-bindings/dotnet/ui-gtk/libtinymailui-gtk-sources.xml
-bindings/dotnet/ui-gtk/Makefile
-bindings/dotnet/camel/libtinymail-camel-sharp.dll.config
-bindings/dotnet/camel/libtinymail-camel-sharp.pc
-bindings/dotnet/camel/libtinymail-camel-sources.xml
-bindings/dotnet/camel/Makefile
-bindings/dotnet/platform/libtinymail-platform-sharp.dll.config
-bindings/dotnet/platform/libtinymail-platform-sharp.pc
-bindings/dotnet/platform/libtinymail-platform-sources.xml
-bindings/dotnet/platform/libtinymail-platform.metadata
-bindings/dotnet/platform/Makefile
 libtinymail/Makefile
 libtinymail/libtinymail.pc
 libtinymail-camel/Makefile
@@ -735,19 +609,13 @@ libtinymailui-webkit/Makefile
 libtinymailui-webkit/libtinymailui-webkit.pc
 libtinymailui-gtkhtml/Makefile
 libtinymailui-gtkhtml/libtinymailui-gtkhtml.pc
-libtinymailui-mozembed/Makefile
-libtinymailui-mozembed/libtinymailui-mozembed.pc
 libtinymailui-gnome-keyring/Makefile
-libtinymail-gnomevfs/Makefile
-libtinymail-gnomevfs/libtinymail-gnomevfs.pc
 libtinymail-gio/Makefile
 libtinymail-gio/libtinymail-gio.pc
 libtinymail-gnome-desktop/Makefile
 libtinymail-gnome-desktop/libtinymail-gnome-desktop.pc
 libtinymail-olpc/Makefile
 libtinymail-olpc/libtinymail-olpc.pc
-libtinymail-maemo/Makefile
-libtinymail-maemo/libtinymail-maemo.pc
 libtinymail-gpe/Makefile
 libtinymail-gpe/libtinymail-gpe.pc
 libtinymail-test/Makefile
@@ -758,11 +626,8 @@ libtinymail-moblin/libtinymail-moblin.pc
 tests/Makefile
 tests/c-demo/Makefile
 tests/shared/Makefile
-tests/python-demo/Makefile
 tests/memory/Makefile
 tests/functional/Makefile
-tests/vala-demo/Makefile
-tests/dotnet-demo/build.sh
 m4/Makefile
 ])
 

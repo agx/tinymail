@@ -11,10 +11,6 @@ if BUILD_GNOME
 INCLUDES += -DGNOME
 endif
 
-if BUILD_MOZEMBED
-INCLUDES += -DMOZEMBED
-endif
-
 bin_PROGRAMS = folder-lister folder-lister-async msg-transfer msg-sender anything folder-transfer account-refresh folder-remove
 
 anything_SOURCES = anything.c

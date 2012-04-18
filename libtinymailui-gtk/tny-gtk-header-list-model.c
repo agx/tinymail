@@ -613,8 +613,6 @@ notify_views_add_destroy (gpointer data)
 	return;
 }
 
-#if GTK_CHECK_VERSION (2,16,0)
-
 static inline GtkTreePath *
 gtk_tree_path_new_internal (gint index)
 {
@@ -628,33 +626,6 @@ gtk_tree_path_free_internal (GtkTreePath *path_in)
 	gtk_tree_path_free (path_in);
 }
 
-#else
-
-typedef struct 
-{
-  gint depth;
-  gint *indices;
-}GtkTreePathInternal;
-
-static inline GtkTreePath *
-gtk_tree_path_new_internal (gint index)
-{
-  GtkTreePathInternal *retval = g_slice_new (GtkTreePathInternal);
-  retval->depth = 1;
-  retval->indices = g_slice_alloc (sizeof(gint));
-  retval->indices[0] = index;
-  return (GtkTreePath *) retval;
-}
-
-static inline void
-gtk_tree_path_free_internal (GtkTreePath *path_in)
-{
-  GtkTreePathInternal *path = (GtkTreePathInternal *) path_in;
-  g_slice_free1 (sizeof(gint), path->indices);
-  g_slice_free (GtkTreePathInternal, path);
-}
-
-#endif
 
 static gboolean
 notify_views_add (gpointer data)

@@ -57,7 +57,7 @@ noinst_HEADERS =				\
 libcamellocal_la_LDFLAGS = -avoid-version -module $(NO_UNDEFINED)
 
 libcamellocal_la_LIBADD = \
-	$(top_builddir)/camel/libcamel-lite-1.2.la				\
+	$(top_builddir)/camel/libcamel-lite-2.0.la				\
 	$(CAMEL_LIBS)
 
 EXTRA_DIST = libcamellocal.urls

@@ -1,7 +1,0 @@
-Tny cheader_filename="tnyui.h"
-tny_platform_factory_new_account_store transfer_ownership="1"
-tny_platform_factory_new_device transfer_ownership="1"
-tny_platform_factory_new_msg_view transfer_ownership="1"
-tny_platform_factory_new_msg transfer_ownership="1"
-tny_platform_factory_new_mime_part transfer_ownership="1"
-tny_platform_factory_new_password_getter transfer_ownership="1"

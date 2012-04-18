@@ -274,10 +274,6 @@ tests/shared/platfact.c
 tests/shared/device.c
 tests/shared/account-store.c
 tests/memory/memory-test.c
-libtinymail-maemo/tny-maemo-device.c
-libtinymail-maemo/tny-maemo-platform-factory.c
-libtinymail-maemo/tny-maemo-account-store.c
-libtinymail-maemo/tny-maemo-conic-device.c
 libtinymailui-mozembed/tny-moz-embed-stream.c
 libtinymailui-mozembed/tny-moz-embed-msg-view.c
 libtinymailui-mozembed/tny-moz-embed-html-mime-part-view.c

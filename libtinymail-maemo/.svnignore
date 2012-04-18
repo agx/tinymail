@@ -1,6 +1,0 @@
-Makefile.in
-libtinymail-maemo-1.0.pc
-.libs
-.deps
-libtinymail-maemo.pc
-Makefile

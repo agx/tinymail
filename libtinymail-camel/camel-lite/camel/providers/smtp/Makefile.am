@@ -21,7 +21,7 @@ noinst_HEADERS =			\
 libcamelsmtp_la_LDFLAGS = -avoid-version -module $(NO_UNDEFINED)
 
 libcamelsmtp_la_LIBADD = \
-	$(top_builddir)/camel/libcamel-lite-1.2.la				\
+	$(top_builddir)/camel/libcamel-lite-2.0.la				\
 	$(CAMEL_LIBS)
 
 EXTRA_DIST = libcamelsmtp.urls
