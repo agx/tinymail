@@ -84,7 +84,7 @@ account_finalized (TnyCamelQueue *queue, GObject *finalized_account)
 }
 
 /**
- * _tny_camel_queue_new
+ * _tny_camel_queue_new:
  * @account: the account
  *
  * Internal, non-public API documentation of Tinymail
@@ -295,7 +295,7 @@ tny_camel_queue_thread_main_func (gpointer user_data)
 
 
 /**
- * _tny_camel_queue_remove_items
+ * _tny_camel_queue_remove_items:
  * @queue: the queue
  * @flags: flags
  *
@@ -334,7 +334,7 @@ _tny_camel_queue_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFlags flag
 }
 
 /**
- * _tny_camel_queue_cancel_remove_items
+ * _tny_camel_queue_cancel_remove_items:
  * @queue: the queue
  * @flags: flags
  *
@@ -379,7 +379,7 @@ _tny_camel_queue_cancel_remove_items (TnyCamelQueue *queue, TnyCamelQueueItemFla
 }
 
 /**
- * _tny_camel_queue_launch_wflags
+ * _tny_camel_queue_launch_wflags:
  * @queue: the queue
  * @func: the work function
  * @callback: the callback for when finished
@@ -471,7 +471,7 @@ _tny_camel_queue_launch_wflags (TnyCamelQueue *queue, GThreadFunc func, GSourceF
 }
 
 /**
- * _tny_camel_queue_launch
+ * _tny_camel_queue_launch:
  * @queue: the queue
  * @func: the work function
  * @callback: the callback for when finished

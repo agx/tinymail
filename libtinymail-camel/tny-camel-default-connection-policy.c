@@ -86,7 +86,7 @@ tny_camel_default_connection_policy_class_init (TnyCamelDefaultConnectionPolicyC
  * 
  * A connection policy that does nothing special
  *
- * Return value: A new #TnyConnectionPolicy instance 
+ * Return value: (transfer full): A new #TnyConnectionPolicy instance 
  **/
 TnyConnectionPolicy*
 tny_camel_default_connection_policy_new (void)

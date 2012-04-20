@@ -172,7 +172,7 @@ tny_camel_recover_connection_policy_class_init (TnyCamelRecoverConnectionPolicyC
  * A connection policy that tries to camel_recover the connection and the currently
  * selected folder.
  *
- * Return value: A new #TnyConnectionPolicy instance 
+ * Return value: (transfer full): A new #TnyConnectionPolicy instance 
  **/
 TnyConnectionPolicy*
 tny_camel_recover_connection_policy_new (void)

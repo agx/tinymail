@@ -812,7 +812,7 @@ tny_camel_store_account_instance_init (GTypeInstance *instance, gpointer g_class
 
 static void notify_factory_del (TnyCamelStoreAccount *self, GObject *folder);
 
-/**
+/*
  * Removes the weak reference the account has for every managed
  * folder. It can also remove the folder from the list, we don't do it
  * always in order to allow the use of this function from
@@ -1376,7 +1376,7 @@ tny_camel_store_account_get_folders (TnyFolderStore *self, TnyList *list, TnyFol
  * instance was not available, a new one will be created and remembered for in 
  * case a new request happens.
  * 
- * Return value: A #TnyCamelTransportAccount instance or NULL
+ * Return value: (transfer full): A #TnyCamelTransportAccount instance or NULL
  **/
 TnyFolder *
 tny_camel_store_account_factor_folder (TnyCamelStoreAccount *self, const gchar *full_name, gboolean *was_new)

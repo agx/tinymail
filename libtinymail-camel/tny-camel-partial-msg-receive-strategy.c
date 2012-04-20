@@ -152,7 +152,7 @@ tny_camel_partial_msg_receive_strategy_instance_init (GTypeInstance *instance, g
  * 
  * A message receiver that fetches partial messages (only the body)
  *
- * Return value: A new #TnyMsgReceiveStrategy instance implemented for Camel
+ * Return value: (transfer full): A new #TnyMsgReceiveStrategy instance implemented for Camel
  **/
 TnyMsgReceiveStrategy* 
 tny_camel_partial_msg_receive_strategy_new (void)

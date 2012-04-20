@@ -11,6 +11,31 @@ endif
 
 lib_LTLIBRARIES = libtinymail-camel-2.0.la 
 
+BUILT_SOURCES = \
+	tny-camel-type-builtins.h \
+	tny-camel-type-builtins.c
+
+CLEANFILES= \
+	$(BUILT_SOURCES) \
+	stamp-tny-camel-type-builtins.h \
+	stamp-tny-camel-type-builtins.c
+
+tny-camel-type-builtins.h: stamp-tny-camel-type-builtins.h
+	@true
+stamp-tny-camel-type-builtins.h: tny-camel-type-builtins.h.template $(libtinymail_camel_2_0_headers)
+	$(AM_V_GEN)$(GLIB_MKENUMS) --template $< $(filter-out $<,$^) > xgen-etbh \
+	&& (cmp -s xgen-etbh tny-camel-type-builtins.h || cp xgen-etbh tny-camel-type-builtins.h ) \
+	&& rm -f xgen-etbh \
+	&& echo timestamp > $(@F)
+
+tny-camel-type-builtins.c: stamp-tny-camel-type-builtins.c
+	@true
+stamp-tny-camel-type-builtins.c: tny-camel-type-builtins.c.template $(libtinymail_camel_2_0_headers)
+	$(AM_V_GEN)$(GLIB_MKENUMS) --template $< $(filter-out $<,$^) > xgen-etbc \
+	&& (cmp -s xgen-etbc tny-camel-type-builtins.c || cp xgen-etbc tny-camel-type-builtins.c ) \
+	&& rm -f xgen-etbc \
+	&& echo timestamp > $(@F)
+
 libtinymail_camel_2_0_headers =	\
 	tny-camel-mime-part.h \
 	tny-camel-pop-remote-msg-remove-strategy.h \
@@ -29,13 +54,12 @@ libtinymail_camel_2_0_headers =	\
 	tny-camel-nntp-store-account.h \
 	tny-camel-pop-store-account.h \
 	tny-camel-transport-account.h \
+	tny-session-camel.h \
 	tny-camel-stream.h \
-	tny-stream-camel.h \
 	tny-camel-html-to-text-stream.h \
 	tny-camel-shared.h \
 	tny-camel-send-queue.h \
 	tny-camel-mem-stream.h \
-	tny-session-camel.h \
 	tny-camel-bs-msg.h \
 	tny-camel-bs-mime-part.h \
 	tny-camel-bs-msg-receive-strategy.h \
@@ -48,6 +72,7 @@ libtinymail_camel_priv_headers = \
 	tny-camel-nntp-folder-priv.h \
 	tny-camel-imap-folder-priv.h \
 	tny-session-camel-priv.h \
+	tny-stream-camel.h \
 	tny-camel-common.c \
 	tny-camel-common-priv.h \
 	tny-camel-account-priv.h \
@@ -109,6 +134,39 @@ libtinymail_camel_2_0_la_LDFLAGS = -export-dynamic -version-info \
 	$(LT_VERSION_INFO) $(LIBTOOL_EXPORT_OPTIONS)
 libtinymail_camel_2_0includedir = $(includedir)/libtinymail-camel-$(API_VERSION)
 libtinymail_camel_2_0include_HEADERS = $(libtinymail_camel_2_0_headers)
+
+if ENABLE_INTROSPECTION
+
+TinymailCamel-$(API_VERSION).gir: libtinymail-camel-2.0.la Makefile $(libtinymail_camel_2_0_headers) $(filter %.c,$(libtinymail_camel_2_0_la_SOURCES))
+	$(AM_V_GEN) PKG_CONFIG_PATH=$(top_builddir):$$PKG_CONFIG_PATH \
+	$(G_IR_SCANNER) -v --warn-all --namespace TinymailCamel \
+	--strip-prefix=TnyCamel \
+	--nsversion=$(API_VERSION) \
+	--include=GLib-2.0 \
+	--include=GObject-2.0 \
+	--include=Tinymail-2.0 \
+	--library=tinymail-camel-2.0 \
+	--libtool="$(LIBTOOL)" \
+	--output $@ \
+	-I$(top_srcdir) \
+	-I$(top_srcdir)/libtinymail \
+	-I$(top_srcdir)/libtinymail-camel/camel-lite \
+	-I$(top_builddir) \
+	$(filter %.h,$^) \
+	$(filter %.c,$^)
+
+girdir = $(GIRDIR)
+gir_DATA = TinymailCamel-$(API_VERSION).gir
+
+typelibsdir = $(GIRTYPELIBDIR)
+typelibs_DATA = TinymailCamel-$(API_VERSION).typelib
+
+%.typelib: %.gir
+	$(AM_V_GEN) LD_LIBRARY_PATH=$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}. $(G_IR_COMPILER) \
+	--includedir=$(srcdir) \
+	$(G_IR_COMPILER_OPTS) \
+	$< -o $@
+endif #ENABLE_INSTROSPECTION
 
 libtinymail-camel-$(API_VERSION).pc: libtinymail-camel.pc
 	cp $< $@

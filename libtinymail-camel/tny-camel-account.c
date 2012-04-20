@@ -1676,7 +1676,7 @@ done:
  * tny_camel_account_set_online:
  * @self: a #TnyCamelAccount object
  * @online: whether or not the account is online
- * @callback: a callback when the account went online
+ * @callback: (scope async): a callback when the account went online
  * @user_data: user data for the callback
  *
  * Set the connectivity status of an account. Setting this to FALSE means that 
@@ -1985,8 +1985,8 @@ tny_camel_account_get_supported_secure_authentication_async_thread (
 /**
  * tny_camel_account_get_supported_secure_authentication:
  * @self: a #TnyCamelAccount object.
- * @callback: A function to be called when the operation is complete.
- * @status_callback: A function to be called one or more times while the operation is in progress.
+ * @callback: (scope async): A function to be called when the operation is complete.
+ * @status_callback: (scope call): A function to be called one or more times while the operation is in progress.
  * @user_data: Data to be passed to the callback and status callback.
  * 
  * Query the server for the list of supported secure authentication mechanisms.
@@ -2215,7 +2215,7 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 		/* create interface signals here. */
 
 /**
- * TnyCamelAccount::set-online-happened
+ * TnyCamelAccount::set-online-happened:
  * @self: the object on which the signal is emitted
  * @online: whether it was online
  * @user_data: user data set when the signal handler was connected.

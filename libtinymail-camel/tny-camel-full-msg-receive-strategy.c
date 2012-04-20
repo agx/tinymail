@@ -134,7 +134,7 @@ tny_msg_receive_strategy_init (TnyMsgReceiveStrategyIface *klass)
  * 
  * A message receiver that fetches full messages
  *
- * Return value: A new #TnyMsgReceiveStrategy instance implemented for Camel
+ * Return value: (transfer full): A new #TnyMsgReceiveStrategy instance implemented for Camel
  **/
 TnyMsgReceiveStrategy* 
 tny_camel_full_msg_receive_strategy_new (void)

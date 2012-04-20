@@ -356,7 +356,7 @@ tny_camel_msg_finalize (GObject *object)
  * The #TnyCamelMsg implementation is actually a proxy for #CamelMimeMessage (and
  * a few other Camel types)
  *
- * Return value: A new #TnyMsg instance implemented for Camel
+ * Return value: (transfer full): A new #TnyMsg instance implemented for Camel
  **/
 TnyMsg*
 tny_camel_msg_new (void)
@@ -379,7 +379,7 @@ tny_camel_msg_new (void)
  *
  * The #TnyMsg implementation is actually a proxy for #CamelMimePart.
  *
- * Return value: A new #TnyMsg instance implemented for Camel
+ * Return value: (transfer full): A new #TnyMsg instance implemented for Camel
  **/
 TnyMsg*
 tny_camel_msg_new_with_part (CamelMimePart *part)

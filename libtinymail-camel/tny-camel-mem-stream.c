@@ -50,7 +50,7 @@ tny_camel_mem_stream_new (void)
  *
  * Create a new in-memory stream
  *
- * returns: (caller-owns): a new #TnyStream instance
+ * returns: (transfer full): a new #TnyStream instance
  * since: 1.0
  * audience: application-developer
  **/

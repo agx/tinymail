@@ -1057,7 +1057,7 @@ _tny_session_camel_reg_queue (TnySessionCamel *self, TnyCamelSendQueue *queue)
  *
  * A #CamelSession for tinymail
  *
- * Return value: The #TnySessionCamel singleton instance
+ * Return value: (transfer full): The #TnySessionCamel singleton instance
  **/
 TnySessionCamel*
 tny_session_camel_new (TnyAccountStore *account_store)

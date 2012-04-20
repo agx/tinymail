@@ -1042,7 +1042,7 @@ _tny_camel_mime_part_set_part (TnyCamelMimePart *self, CamelMimePart *part)
  * 
  * Get the #CamelMimePart instance that is being proxied by @self.
  *
- * Return value: The #CamelMimePart instance
+ * Return value: (transfer full): The #CamelMimePart instance
  **/
 CamelMimePart*
 tny_camel_mime_part_get_part (TnyCamelMimePart *self)
@@ -1310,7 +1310,7 @@ tny_camel_mime_part_finalize (GObject *object)
  * 
  * Create a new MIME part instance
  * 
- * Return value: A new #TnyMimePart instance implemented for Camel
+ * Returns: (transfer full): A new #TnyMimePart instance implemented for Camel
  **/
 TnyMimePart*
 tny_camel_mime_part_new (void)
@@ -1331,7 +1331,7 @@ tny_camel_mime_part_new (void)
  * 
  * Create a new MIME part instance that is a proxy for a #CamelMimePart one
  *
- * Return value: A new #TnyMimePart instance implemented for Camel
+ * Return value: (trasnfer full): A new #TnyMimePart instance implemented for Camel
  **/
 TnyMimePart*
 tny_camel_mime_part_new_with_part (CamelMimePart *part)

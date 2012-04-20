@@ -272,7 +272,7 @@ tny_camel_transport_account_send_default (TnyTransportAccount *self, TnyMsg *msg
  * 
  * Get the from of @self. Returned value must not be freed.
  * 
- * returns: (null-ok): a read-only string
+ * returns: (transfer none): a read-only string
  **/
 const gchar *
 tny_camel_transport_account_get_from (TnyCamelTransportAccount *self)
@@ -284,7 +284,7 @@ tny_camel_transport_account_get_from (TnyCamelTransportAccount *self)
 /**
  * tny_camel_transport_account_set_from:
  * @self: a #TnyCamelTransportAccount
- * @from: (null-ok): a string or NULL
+ * @from: (allow-none): a string or NULL
  * 
  * Set the from of @self.
  **/
@@ -302,7 +302,7 @@ tny_camel_transport_account_set_from (TnyCamelTransportAccount *self, const gcha
  * 
  * Create a new #TnyTransportAccount instance implemented for Camel
  * 
- * returns: (caller-owns): A new #TnyTransportAccount instance implemented for Camel
+ * returns: (transfer full): A new #TnyTransportAccount instance implemented for Camel
  **/
 TnyTransportAccount*
 tny_camel_transport_account_new (void)

@@ -123,7 +123,7 @@ tny_camel_pop_remote_msg_remove_strategy_perform_remove_default (TnyMsgRemoveStr
  * for other E-mail service types, like IMAP). Using this strategy you can easily
  * change this behaviour.
  *
- * Return value: a new #TnyPopRemoteMsgRemoveStrategy instance implemented for a #TnyCamelFolder
+ * Returns: (transfer full): a new #TnyPopRemoteMsgRemoveStrategy instance implemented for a #TnyCamelFolder
  **/
 TnyMsgRemoveStrategy*
 tny_camel_pop_remote_msg_remove_strategy_new (void)
