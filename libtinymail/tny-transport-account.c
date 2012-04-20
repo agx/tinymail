@@ -35,7 +35,7 @@
  * tny_transport_account_send:
  * @self: a #TnyTransportAccount
  * @msg: a #TnyMsg
- * @err: (null-ok): a #GError or NULL
+ * @err: (allow-none): a #GError or NULL
  *
  * Send @msg. Note that @msg must be a correct #TnyMsg instance with a correct
  * #TnyHeader, which will be used as the envelope while sending.

@@ -42,12 +42,12 @@
  * @self: A #TnyMsgReceiveStrategy
  * @folder: a #TnyFolder from which the message will be received
  * @header: a #TnyHeader of the message that must be received
- * @err: (null-ok): A #GError or NULL
+ * @err: (allow-none): A #GError or NULL
  *
  * Performs the receiving of a message from @folder. If not NULL, the returned
  * value must be unreferenced after use.
  *
- * returns: (null-ok) (caller-owns): the received message or NULL
+ * returns: (transfer full): the received message or NULL
  * since: 1.0
  * audience: application-developer
  **/

@@ -248,7 +248,7 @@ tny_folder_store_change_reset (TnyFolderStoreChange *self)
  *
  * Creates a changeset for @folderstore
  *
- * returns: (caller-owns): a new #TnyFolderStoreChange instance
+ * returns: (transfer full): a new #TnyFolderStoreChange instance
  * since: 1.0
  * audience: application-developer
  **/
@@ -270,7 +270,7 @@ tny_folder_store_change_new (TnyFolderStore *folderstore)
  * Get the folderstore of @self. The return value of this method must be 
  * unreferenced after use
  *
- * returns: (caller-owns): the #TnyFolderStore related to this changeset
+ * returns: (transfer full): the #TnyFolderStore related to this changeset
  * since: 1.0
  * audience: application-developer
  **/

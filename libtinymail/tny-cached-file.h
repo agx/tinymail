@@ -66,7 +66,7 @@ struct _TnyCachedFileClass
 };
 
 GType  tny_cached_file_get_type (void);
-TnyCachedFile* tny_cached_file_new (TnyFsStreamCache *stream_cache, const gchar *id, gint64 expected_size, TnyStream *stream);
+TnyCachedFile* tny_cached_file_new (TnyFsStreamCache *stream_cache, const gchar *id, gint64 expected_size, TnyStream *input_stream);
 
 gint64 tny_cached_file_get_expected_size (TnyCachedFile *self);
 const gchar *tny_cached_file_get_id (TnyCachedFile *self);

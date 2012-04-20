@@ -118,7 +118,7 @@ tny_folder_monitor_remove_list_default (TnyFolderMonitor *self, TnyList *list)
 }
 
 /**
- * tny_folder_monitor_poke_status
+ * tny_folder_monitor_poke_status:
  * @self: a #TnyFolderMonitor
  *
  * Invoke the poke method on the folder instance being monitored.
@@ -342,7 +342,7 @@ tny_folder_monitor_start_default (TnyFolderMonitor *self)
  *
  * Creates a folder monitor for @folder
  *
- * returns: (caller-owns): a new #TnyFolderMonitor instance
+ * returns: (transfer full): a new #TnyFolderMonitor instance
  * since: 1.0
  * audience: application-developer
  **/

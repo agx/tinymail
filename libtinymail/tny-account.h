@@ -100,8 +100,6 @@ struct _TnyAccountIface
 	TnyAccountType (*get_account_type) (TnyAccount *self);
 	void (*cancel) (TnyAccount *self);
 	gboolean (*matches_url_string) (TnyAccount *self, const gchar *url_string);
-	void (*start_operation) (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data);
-	void (*stop_operation) (TnyAccount *self, gboolean *cancelled);
 	gboolean (*is_ready) (TnyAccount *self);
 	TnyConnectionPolicy* (*get_connection_policy) (TnyAccount *self);
 	void (*set_connection_policy) (TnyAccount *self, TnyConnectionPolicy *policy);
@@ -140,8 +138,6 @@ void tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forge
 TnyForgetPassFunc tny_account_get_forget_pass_func (TnyAccount *self);
 void tny_account_cancel (TnyAccount *self);
 gboolean tny_account_matches_url_string (TnyAccount *self, const gchar *url_string);
-void tny_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data);
-void tny_account_stop_operation (TnyAccount *self, gboolean *cancelled);
 gboolean tny_account_is_ready (TnyAccount *self);
 TnyConnectionPolicy* tny_account_get_connection_policy (TnyAccount *self);
 void tny_account_set_connection_policy (TnyAccount *self, TnyConnectionPolicy *policy);

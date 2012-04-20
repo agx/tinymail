@@ -338,26 +338,6 @@ tny_combined_account_remove_observer (TnyFolderStore *self, TnyFolderStoreObserv
 	tny_folder_store_remove_observer (TNY_FOLDER_STORE (priv->store_account), observer);
 }
 
-static void 
-tny_combined_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
-{
-	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
-
-	tny_account_start_operation (TNY_ACCOUNT (priv->store_account), domain, code, status_callback, status_user_data);
-
-	return;
-}
-
-static void 
-tny_combined_account_stop_operation (TnyAccount *self, gboolean *canceled)
-{
-	TnyCombinedAccountPriv *priv = TNY_COMBINED_ACCOUNT_GET_PRIVATE (self);
-
-	tny_account_stop_operation (TNY_ACCOUNT (priv->store_account), canceled);
-
-	return;
-}
-
 static gboolean 
 tny_combined_account_is_ready (TnyAccount *self)
 {
@@ -396,7 +376,7 @@ on_subscription_changed_signal (TnyStoreAccount *sa, TnyFolder *folder, gpointer
  * either setting or getting members of the #TnyAccount type. You must get the
  * actual instances to read these properties.
  *
- * returns: (caller-owns): A new account instance that decorates both @ta and @sa
+ * returns: (transfer full): A new account instance that decorates both @ta and @sa
  *
  * since: 1.0
  * complexity: high
@@ -425,7 +405,7 @@ tny_combined_account_new (TnyTransportAccount *ta, TnyStoreAccount *sa)
  * Get the transport account that is being decorated by @self. You must unreference
  * the returned value if not needed anymore.
  *
- * returns: (caller-owns): the transport account in @self
+ * returns: (transfer full): the transport account in @self
  * since: 1.0
  * complexity: low
  * audience: application-developer
@@ -445,7 +425,7 @@ tny_combined_account_get_transport_account (TnyCombinedAccount *self)
  * Get the store account that is being decorated by @self. You must unreference
  * the returned value if not needed anymore.
  *
- * returns: (caller-owns): the store account in @self
+ * returns: (transfer full): the store account in @self
  * since: 1.0
  * complexity: low
  * audience: application-developer
@@ -533,8 +513,6 @@ tny_account_init (TnyAccountIface *klass)
 	klass->get_account_type= tny_combined_account_get_account_type;
 	klass->cancel= tny_combined_account_cancel;
 	klass->matches_url_string= tny_combined_account_matches_url_string;
-	klass->start_operation= tny_combined_account_start_operation;
-	klass->stop_operation= tny_combined_account_stop_operation;
 	klass->is_ready= tny_combined_account_is_ready;
 }
 

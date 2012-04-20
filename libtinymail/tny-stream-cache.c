@@ -32,16 +32,15 @@
  * tny_stream_cache_get_stream:
  * @self: a #TnyStreamCache
  * @id: a stringthe unique id used to identify the stream
- * @fetcher: a #TnyStreamCacheOpenStreamFetcher, function to obtain a
+ * @fetcher: (scope call): a #TnyStreamCacheOpenStreamFetcher, function to obtain a
  *  TnyStream for fetching the file in case it's not in cache.
- * @destroy_userdata: a #GDestroyNotify, that frees @userdata once we used it
  * @userdata a #gpointer
  * 
  * Obtain a #TnyStream with the file referred with @id from cache. If it's
  * not in cache, it sets up a stream resource to fetch the file from internet
  * and store in cache while sending information to the user.
  *
- * Returns: a #TnyStream
+ * Returns: (transfer full): a #TnyStream
  * since: 1.0
  * audience: application-developer
  */
@@ -106,7 +105,7 @@ tny_stream_cache_get_max_size (TnyStreamCache *self)
 /**
  * tny_stream_cache_remove:
  * @self: a #TnyStreamCache
- * @filter: a #TnyStreamCacheRemoveFilter
+ * @filter: (scope call): a #TnyStreamCacheRemoveFilter
  * @userdata: a #gpointer
  * 
  * Removes all the cached files matching filter.

@@ -86,8 +86,6 @@ struct _TnyCamelAccountClass
 	void (*try_connect) (TnyAccount *self, GError **err);
 	void (*cancel) (TnyAccount *self);
 	gboolean (*matches_url_string) (TnyAccount *self, const gchar *url_string);
-	void (*start_operation) (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data);
-	void (*stop_operation) (TnyAccount *self, gboolean *canceled);
 
 	void (*add_option) (TnyCamelAccount *self, TnyPair *option);
 	void (*clear_options) (TnyCamelAccount *self);

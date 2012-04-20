@@ -47,10 +47,11 @@ guint tny_account_signals [TNY_ACCOUNT_LAST_SIGNAL];
  * Get the connection policy for @self. You must unreference the returned 
  * value when you are finished with used it.
  *
- * returns: (caller-owns): connection policy
  * since: 1.0
  * audience: application-developer, platform-developer
- **/
+ *
+ * Returns: (transfer full): connection policy
+ */
 TnyConnectionPolicy* 
 tny_account_get_connection_policy (TnyAccount *self)
 {
@@ -127,62 +128,6 @@ tny_account_is_ready (TnyAccount *self)
 #endif
 
 	return retval;
-}
-
-/**
- * tny_account_start_operation:
- * @self: a #TnyAccount
- * @domain: the domain of the #TnyStatus that will happen in @status_callback
- * @code: the code of the #TnyStatus that will happen in @status_callback
- * @status_callback: (null-ok): status callback handler or NULL
- * @status_user_data: (null-ok): the user-data to give to the @status_callback or NULL
- *
- * Starts an operation. This only works for methods that don't end with _async.
- *
- * since: 1.0
- * audience: application-developer
- **/
-void 
-tny_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
-{
-#ifdef DBC /* require */
-	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->start_operation!= NULL);
-#endif
-
-	TNY_ACCOUNT_GET_IFACE (self)->start_operation(self, domain, code, status_callback, status_user_data);
-
-#ifdef DBC /* ensure*/
-#endif
-
-	return;
-}
-
-/**
- * tny_account_stop_operation:
- * @self: a #TnyAccount
- * @cancelled: (out): NULL or byref whether the operation got canceled
- *
- * Stop the current operation. This only works for methods that don't end 
- * with _async.
- *
- * since: 1.0
- * audience: application-developer
- **/
-void 
-tny_account_stop_operation (TnyAccount *self, gboolean *cancelled)
-{
-#ifdef DBC /* require */
-	g_assert (TNY_IS_ACCOUNT (self));
-	g_assert (TNY_ACCOUNT_GET_IFACE (self)->stop_operation!= NULL);
-#endif
-
-	TNY_ACCOUNT_GET_IFACE (self)->stop_operation(self, cancelled);
-
-#ifdef DBC /* ensure*/
-#endif
-
-	return;
 }
 
 /**
@@ -476,7 +421,7 @@ tny_account_set_id (TnyAccount *self, const gchar *id)
 /**
  * tny_account_set_forget_pass_func:
  * @self: a #TnyAccount
- * @forget_pass_func: a pointer to the function
+ * @forget_pass_func: (scope call): a pointer to the function
  *
  * Set the function that will be called in case the password was wrong and 
  * therefore can, for example, be forgotten by a password store.
@@ -533,7 +478,7 @@ tny_account_set_forget_pass_func (TnyAccount *self, TnyForgetPassFunc forget_pas
 }
 
 /**
- * tny_account_get_forget_pass_func:
+ * tny_account_get_forget_pass_func: (skip):
  * @self: a #TnyAccount
  * 
  * Get a pointer to the forget-password function for @self.
@@ -729,7 +674,7 @@ tny_account_set_port (TnyAccount *self, guint port)
 /**
  * tny_account_set_pass_func:
  * @self: a #TnyAccount
- * @get_pass_func: a pointer to the function
+ * @get_pass_func: (scope call): a pointer to the function
  * 
  * Set the function that will be called when the password is needed. The
  * function should return the password for a specific account. The password 
@@ -834,7 +779,7 @@ tny_account_get_proto (TnyAccount *self)
  * imap://user@hostname. Note that it doesn't necessarily contain the password 
  * of the account.
  *
- * Returns: (null-ok) (caller-owns): the url-string or NULL.
+ * Returns: (transfer full): the url-string or NULL.
  * since: 1.0
  * audience: application-developer
  **/
@@ -1008,7 +953,7 @@ tny_account_get_port (TnyAccount *self)
 	return retval;
 }
 /**
- * tny_account_get_pass_func:
+ * tny_account_get_pass_func: (skip):
  * @self: a #TnyAccount
  * 
  * Get a pointer to the get-password function
@@ -1045,10 +990,10 @@ tny_account_base_init (gpointer g_class)
 		/* create interface signals here. */
 
 /**
- * TnyAccount::connection-status-changed
+ * TnyAccount::connection-status-changed:
  * @self: the object on which the signal is emitted
  * @status: the #TnyConnectionStatus
- * @user_data: (null-ok): user data set when the signal handler was connected.
+ * @user_data: (allow-none): user data set when the signal handler was connected.
  *
  * Emitted when the connection status of an account changes.
  *
@@ -1067,9 +1012,9 @@ tny_account_base_init (gpointer g_class)
 
 
 /**
- * TnyAccount::changed
+ * TnyAccount::changed:
  * @self: the object on which the signal is emitted
- * @user_data: (null-ok): user data set when the signal handler was connected.
+ * @user_data: (allow-none): user data set when the signal handler was connected.
  *
  * Emitted when one of the account's properties changes.
  *

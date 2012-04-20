@@ -44,7 +44,7 @@ static GObjectClass *item_parent_class;
  *
  * Create a new #TnyFolderStoreQuery instance
  * 
- * returns: (caller-owns): a new #TnyFolderStoreQuery instance
+ * returns: (transfer full): a new #TnyFolderStoreQuery instance
  * since: 1.0
  * audience: application-developer
  **/
@@ -202,7 +202,7 @@ get_regerror (int errcode, regex_t *compiled)
 /**
  * tny_folder_store_query_add_item:
  * @query: a #TnyFolderStoreQuery
- * @pattern: (null-ok): a regular expression or NULL
+ * @pattern: (transfer full): a regular expression or NULL
  * @options: a #TnyFolderStoreQueryOption enum
  *
  * Add a query-item to @query.
@@ -312,7 +312,7 @@ tny_folder_store_query_add_item (TnyFolderStoreQuery *query, const gchar *patter
  * Get a list of query items in @query. The return value must be unreferenced
  * after use.
  *
- * returns: (caller-owns): a list of query items
+ * returns: (transfer full): a list of query items
  * since: 1.0
  * audience: tinymail-developer
  **/
@@ -347,7 +347,7 @@ tny_folder_store_query_item_get_options (TnyFolderStoreQueryItem *item)
  * Get the compiled regular expression of @item. You must not free the returned
  * value.
  *
- * returns: (null-ok): the compiled regular expression of a query item
+ * returns: (transfer none): the compiled regular expression of a query item
  * since: 1.0
  * audience: tinymail-developer
  **/
@@ -365,7 +365,7 @@ tny_folder_store_query_item_get_regex (TnyFolderStoreQueryItem *item)
  * Get the regular expression's pattern of @item. You must not free the returned
  * value.
  *
- * returns: (null-ok): the pattern of the regular expression of a query item
+ * returns: (transfer none): the pattern of the regular expression of a query item
  * since: 1.0
  * audience: tinymail-developer
  **/

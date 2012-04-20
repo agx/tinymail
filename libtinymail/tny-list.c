@@ -54,7 +54,7 @@ tny_list_get_length (TnyList *self)
 /**
  * tny_list_prepend:
  * @self: A #TnyList
- * @item: (type-parameter G): the item to prepend
+ * @item: the item to prepend
  *
  * Prepends an item to a list. You can only prepend items that inherit from the
  * GObject base item. That's because Tinymail's list infrastructure does 
@@ -98,7 +98,7 @@ tny_list_prepend (TnyList *self, GObject* item)
 /**
  * tny_list_append:
  * @self: A #TnyList
- * @item: (type-parameter G): the item to prepend
+ * @item: the item to prepend
  *
  * Appends an item to a list. You can only prepend items that inherit from the
  * GObject base item. That's because Tinymail's list infrastructure does 
@@ -142,7 +142,7 @@ tny_list_append (TnyList *self, GObject* item)
 /**
  * tny_list_remove:
  * @self: A #TnyList
- * @item: (type-parameter G): the item to remove
+ * @item: the item to remove
  *
  * Removes an item from a list.  Removing a item invalidates all existing
  * iterators and puts them in an unspecified state. You'll need to recreate
@@ -210,7 +210,7 @@ tny_list_remove (TnyList *self, GObject* item)
 /**
  * tny_list_remove_matches:
  * @self: A #TnyList
- * @matcher: a #TnyListMatcher to match @match_data against items
+ * @matcher: (scope call): a #TnyListMatcher to match @match_data against items
  * @match_data: data used by the comparer to remove items
  *
  * Removes items from a list.  Removing items invalidates all existing
@@ -314,7 +314,7 @@ tny_list_remove_matches (TnyList *self, TnyListMatcher matcher, gpointer match_d
  * it creates a new instance of an iterator. The returned iterator object should
  * (therefore) be unreferenced after use.
  * 
- * returns: (caller-owns) (type-parameter G): A new iterator for the list
+ * returns: (transfer full): A new iterator for the list
  * since: 1.0
  * audience: application-developer, type-implementer
  **/
@@ -340,7 +340,7 @@ tny_list_create_iterator (TnyList *self)
 /**
  * tny_list_foreach:
  * @self: A #TnyList
- * @func: the function to call with each element's data.
+ * @func: (scope call): the function to call with each element's data.
  * @user_data: user data to pass to the function.
  *
  * Calls @func for each element in a #TnyList. It will use an internal iteration
@@ -400,7 +400,7 @@ tny_list_foreach (TnyList *self, GFunc func, gpointer user_data)
  * setting their reference count to for example two. Which means that the 
  * returned value must be unreferenced after use.
  *
- * returns: (caller-owns) (type-parameter G): A copy of this list
+ * returns: (transfer full): A copy of this list
  * since: 1.0
  * audience: application-developer, type-implementer
  **/

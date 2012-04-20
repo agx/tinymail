@@ -143,9 +143,9 @@ typedef void (*TnyFolderStoreCallback) (TnyFolderStore *self, gboolean cancelled
  * TnyGetMsgCallback:
  * @folder: a #TnyFolder that caused the callback
  * @cancelled: if the operation got cancelled
- * @msg: (null-ok): a #TnyMsg with the fetched message or NULL
- * @err: (null-ok): if an error occurred
- * @user_data: (null-ok):  user data that was passed to the callbacks
+ * @msg: (allow-none): a #TnyMsg with the fetched message or NULL
+ * @err: (allow-none): if an error occurred
+ * @user_data: (allow-none):  user data that was passed to the callbacks
  *
  * A folder callback for when a message fetch was requested. If allocated, you
  * must cleanup @user_data at the end of your implementation of the callback. All 
@@ -163,8 +163,8 @@ typedef void (*TnyGetMsgCallback) (TnyFolder *folder, gboolean cancelled, TnyMsg
  * TnyTransferMsgsCallback:
  * @folder: a #TnyFolder that caused the callback
  * @cancelled: if the operation got cancelled
- * @err: (null-ok): if an error occurred
- * @user_data: (null-ok):  user data that was passed to the callbacks
+ * @err: (allow-none): if an error occurred
+ * @user_data: (allow-none):  user data that was passed to the callbacks
  *
  * A folder callback for when a transfer of messages was requested. If allocated,
  * you must cleanup @user_data at the end of your implementation of the callback.

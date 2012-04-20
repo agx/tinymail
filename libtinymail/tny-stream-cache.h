@@ -49,16 +49,16 @@ struct _TnyStreamCacheIface
 					  TnyStreamCacheOpenStreamFetcher fetcher, gpointer userdata);
 	gint64           (*get_max_size) (TnyStreamCache *self);
 	void             (*set_max_size) (TnyStreamCache *self, gint64 max_size);
-	void             (*remove)       (TnyStreamCache *self, TnyStreamCacheRemoveFilter filter, gpointer data);
+	void             (*remove)       (TnyStreamCache *self, TnyStreamCacheRemoveFilter filter, gpointer userdata);
 };
 
 GType      tny_stream_cache_get_type (void);
 
-TnyStream* tny_stream_cache_get_stream (TnyStreamCache *cache, const char *id,
+TnyStream* tny_stream_cache_get_stream (TnyStreamCache *self, const char *id,
 					TnyStreamCacheOpenStreamFetcher fetcher, gpointer userdata);
-void       tny_stream_cache_remove (TnyStreamCache *cache, TnyStreamCacheRemoveFilter filter, gpointer userdata);
-void       tny_stream_cache_set_max_size (TnyStreamCache *cache, gint64 max_size);
-gint64    tny_stream_cache_get_max_size (TnyStreamCache *cache);
+void       tny_stream_cache_remove (TnyStreamCache *self, TnyStreamCacheRemoveFilter filter, gpointer userdata);
+void       tny_stream_cache_set_max_size (TnyStreamCache *self, gint64 max_size);
+gint64    tny_stream_cache_get_max_size (TnyStreamCache *self);
 
 G_END_DECLS
 

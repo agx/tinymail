@@ -58,10 +58,8 @@ AM_PROG_CC_STDC
 AC_HEADER_STDC
 AC_PROG_LIBTOOL
 
-AC_PATH_PROG(VALAC, valac, valac)
-AC_SUBST(VALAC)
-
-AM_PATH_PYTHON
+AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
+AC_PATH_PROG([GLIB_MKENUMS],[glib-mkenums])
 
 dnl ### default values (will get overwritten)
 build_nm=false
@@ -263,6 +261,38 @@ AC_HELP_STRING([--enable-acap],
 esac],[build_acap=$build_acap])
 AM_CONDITIONAL(BUILD_ACAP, test x$build_acap = xtrue)
 
+dnl ### Enable building introspection ##
+AC_ARG_ENABLE([introspection],
+        AS_HELP_STRING([--enable-introspection],
+		       [Enable GObject introspection]),
+       	[enable_introspection=$enableval],
+	[enable_introspection=yes])
+AC_MSG_RESULT([$enable_introspection])
+
+G_IR_SCANNER=
+G_IR_COMPILER=
+G_IR_GENERATE=
+GIRDIR=
+GIRTYPELIBDIR=
+
+if test "$enable_introspection" = "yes"; then
+  GOBJECT_INTROSPECTION_REQUIRED=0.6
+  PKG_CHECK_MODULES([GOBJECT_INTROSPECTION],[gobject-introspection-1.0 >= $GOBJECT_INTROSPECTION_REQUIRED])
+
+  G_IR_SCANNER="$($PKG_CONFIG --variable=g_ir_scanner gobject-introspection-1.0)"
+  G_IR_COMPILER="$($PKG_CONFIG --variable=g_ir_compiler gobject-introspection-1.0)"
+  G_IR_GENERATE="$($PKG_CONFIG --variable=g_ir_generate gobject-introspection-1.0)"
+  GIRDIR="$($PKG_CONFIG --variable=girdir gobject-introspection-1.0)"
+  GIRTYPELIBDIR="$($PKG_CONFIG --variable=typelibdir gobject-introspection-1.0)"
+fi
+
+AC_SUBST([G_IR_SCANNER])
+AC_SUBST([G_IR_COMPILER])
+AC_SUBST([G_IR_GENERATE])
+AC_SUBST([GIRDIR])
+AC_SUBST([GIRTYPELIBDIR])
+
+AM_CONDITIONAL([ENABLE_INTROSPECTION],[test "$enable_introspection" = "yes"])
 
 dnl ### Enable building the unit tests ##
 AC_ARG_ENABLE(unit-tests,

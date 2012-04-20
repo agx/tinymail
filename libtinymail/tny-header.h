@@ -105,9 +105,9 @@ struct _TnyHeaderIface
 	TnyHeaderFlags (*get_flags) (TnyHeader *self);
 	void (*set_flag) (TnyHeader *self, TnyHeaderFlags mask);
 	void (*unset_flag) (TnyHeader *self, TnyHeaderFlags mask);
-	gboolean (*get_user_flag) (TnyHeader *self, const gchar *id);
-	void (*set_user_flag) (TnyHeader *self, const gchar *id);
-	void (*unset_user_flag) (TnyHeader *self, const gchar *id);
+	gboolean (*get_user_flag) (TnyHeader *self, const gchar *name);
+	void (*set_user_flag) (TnyHeader *self, const gchar *name);
+	void (*unset_user_flag) (TnyHeader *self, const gchar *name);
 	TnyHeaderSupportFlags (*support_user_flags) (TnyHeader *self);
 };
 

@@ -39,7 +39,7 @@ guint tny_send_queue_signals [TNY_SEND_QUEUE_LAST_SIGNAL];
  * tny_send_queue_cancel:
  * @self: a #TnySendQueue
  * @cancel_action: a #TnySendQueueCancelAction, it could remove messages or just mark them as suspended
- * @err: (null-ok): a #GError or NULL
+ * @err: (allow-none): a #GError or NULL
  *
  * Cancels the current operation
  *
@@ -65,7 +65,7 @@ tny_send_queue_cancel (TnySendQueue *self, TnySendQueueCancelAction cancel_actio
  * Get the folder which contains the messages that have been sent. The 
  * returned value must be unreferenced after use
  *
- * returns: (caller-owns): a #TnyFolder instance
+ * returns: (transfer full): a #TnyFolder instance
  * since: 1.0
  * audience: application-developer
  **/
@@ -101,7 +101,7 @@ tny_send_queue_get_sentbox (TnySendQueue *self)
  * and a #TnySendQueue implementation not having to implement #TnyFolderObserver
  * too (which makes it possible to act on changes happening to the outbox).
  *
- * returns: (caller-owns): a #TnyFolder instance
+ * returns: (transfer full): a #TnyFolder instance
  * since: 1.0
  * audience: application-developer
  **/
@@ -128,7 +128,7 @@ tny_send_queue_get_outbox (TnySendQueue *self)
  * tny_send_queue_add:
  * @self: A #TnySendQueue
  * @msg: a #TnyMsg
- * @err: (null-ok): a #GError or NULL
+ * @err: (allow-none): a #GError or NULL
  *
  * Add a message to the send queue, usually adding it to the outbox too.
  *
@@ -154,9 +154,9 @@ tny_send_queue_add (TnySendQueue *self, TnyMsg *msg, GError **err)
  * tny_send_queue_add_async:
  * @self: A #TnySendQueue
  * @msg: a #TnyMsg
- * @callback: (null-ok): a #TnySendQueueAddCallback or NULL
- * @status_callback: (null-ok): a #TnyStatusCallback or NULL
- * @user_data: (null-ok): user data that will be passed to the callbacks
+ * @callback: (allow-none) (scope async): a #TnySendQueueAddCallback or NULL
+ * @status_callback: (allow-none) (scope async): a #TnyStatusCallback or NULL
+ * @user_data: (allow-none): user data that will be passed to the callbacks
  *
  * Add a message to the send queue, usually adding it to the outbox
  * too. The caller will be notified in the callback function when the
@@ -187,7 +187,7 @@ tny_send_queue_base_init (gpointer g_class)
 
 	if (!initialized) {
 /**
- * TnySendQueue::msg-sending
+ * TnySendQueue::msg-sending:
  * @self: the object on which the signal is emitted
  * @arg1: The message that is being sent
  * @arg2: The current nth number of the message that is being sent
@@ -208,10 +208,10 @@ tny_send_queue_base_init (gpointer g_class)
 		
 
 /**
- * TnySendQueue::msg-sent
+ * TnySendQueue::msg-sent:
  * @self: the object on which the signal is emitted
  * @arg1: The message that got sent
- * @arg4: (null-ok): user data
+ * @arg4: (allow-none): user data
  *
  * Emitted when a message got sent
  **/
@@ -225,12 +225,12 @@ tny_send_queue_base_init (gpointer g_class)
 				      G_TYPE_NONE, 4, TNY_TYPE_HEADER, TNY_TYPE_MSG, G_TYPE_UINT, G_TYPE_UINT);
 		
 /**
- * TnySendQueue::error-happened
+ * TnySendQueue::error-happened:
  * @self: the object on which the signal is emitted
- * @arg1: (null-ok): The header of the message that was supposed to be sent or NULL
- * @arg2: (null-ok): The message that was supposed to be sent or NULL
+ * @arg1: (allow-none): The header of the message that was supposed to be sent or NULL
+ * @arg2: (allow-none): The message that was supposed to be sent or NULL
  * @arg3: a GError containing the error that happened
- * @arg4: (null-ok): user data
+ * @arg4: (allow-none): user data
  *
  * Emitted when a message didn't get sent because of an error
  **/
@@ -244,7 +244,7 @@ tny_send_queue_base_init (gpointer g_class)
 				      G_TYPE_NONE, 3, TNY_TYPE_HEADER, TNY_TYPE_MSG, G_TYPE_POINTER);
 
 /**
- * TnySendQueue::queue-start
+ * TnySendQueue::queue-start:
  * @self: a #TnySendQueue, the object on which the signal is emitted
  *
  * Emitted when the queue starts to process messages
@@ -259,7 +259,7 @@ tny_send_queue_base_init (gpointer g_class)
 				      G_TYPE_NONE, 0);
 
 /**
- * TnySendQueue::queue-stop
+ * TnySendQueue::queue-stop:
  * @self: a #TnySendQueue, the object on which the signal is emitted
  *
  * Emitted when the queue stops to process messages

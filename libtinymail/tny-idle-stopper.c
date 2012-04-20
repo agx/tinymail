@@ -72,12 +72,10 @@ struct _TnyIdleStopper
  * You must call tny_idle_stopper_stop() on one of these instances,
  * and call tny_idle_stopper_destroy() on all instances.
  *
- * Return value: A new TnyIdleStopper instance. Release this with
+ * Return value: (transfer full) A new TnyIdleStopper instance. Release this with
  * tny_idle_stopper_destroy().
  *
  * This is INTERNAL API
- * 
- * Return value: a new #TnyIdleStopper instance
  **/
 TnyIdleStopper*
 tny_idle_stopper_new (void)

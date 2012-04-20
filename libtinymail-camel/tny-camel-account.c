@@ -814,19 +814,6 @@ _tny_camel_account_stop_camel_operation (TnyCamelAccount *self)
 	return;
 }
 
-static void 
-tny_camel_account_start_operation (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
-{
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->start_operation(self, domain, code, status_callback, status_user_data);
-}
-
-static void
-tny_camel_account_stop_operation (TnyAccount *self, gboolean *canceled)
-{
-	TNY_CAMEL_ACCOUNT_GET_CLASS (self)->stop_operation(self, canceled);
-}
-
-
 
 
 static void
@@ -851,63 +838,6 @@ refresh_status (struct _CamelOperation *op, const char *what, int sofar, int oft
 	}
 
 	return;
-}
-
-static void 
-tny_camel_account_start_operation_default (TnyAccount *self, TnyStatusDomain domain, TnyStatusCode code, TnyStatusCallback status_callback, gpointer status_user_data)
-{
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-
-	if (!priv->csyncop)
-	{
-		RefreshStatusInfo *info = g_slice_new (RefreshStatusInfo);
-
-		info->self = TNY_ACCOUNT (g_object_ref (self));
-		info->domain = domain;
-		info->code = code;
-		info->status_callback = status_callback;
-		info->depth = g_main_depth ();
-		info->user_data = status_user_data;
-		info->stopper = tny_idle_stopper_new();
-
-		priv->csyncop = info;
-
-		_tny_camel_account_start_camel_operation_n (TNY_CAMEL_ACCOUNT (self), 
-				refresh_status, info, "Starting operation", FALSE);
-
-	} else
-		g_critical ("Another synchronous operation is already in "
-				"progress. This indicates an error in the "
-				"software.");
-
-	return;
-}
-
-static void
-tny_camel_account_stop_operation_default (TnyAccount *self, gboolean *canceled)
-{
-	TnyCamelAccountPriv *priv = TNY_CAMEL_ACCOUNT_GET_PRIVATE (self);
-
-	if (priv->csyncop)
-	{
-		RefreshStatusInfo *info = priv->csyncop;
-
-		tny_idle_stopper_stop (info->stopper);
-		tny_idle_stopper_destroy (info->stopper);
-		info->stopper = NULL;
-		g_object_unref (info->self);
-		g_slice_free (RefreshStatusInfo, info);
-		priv->csyncop = NULL;
-
-		if (canceled)
-			*canceled = camel_operation_cancel_check (priv->cancel);
-
-		_tny_camel_account_stop_camel_operation (TNY_CAMEL_ACCOUNT (self));
-	} else
-		g_critical ("No synchronous operation was in "
-				"progress while trying to stop one "
-				"This indicates an error in the software.");
-
 }
 
 
@@ -2264,8 +2194,6 @@ tny_account_init (gpointer g, gpointer iface_data)
 	klass->get_account_type= tny_camel_account_get_account_type;
 	klass->cancel= tny_camel_account_cancel;
 	klass->matches_url_string= tny_camel_account_matches_url_string;
-	klass->start_operation= tny_camel_account_start_operation;
-	klass->stop_operation=  tny_camel_account_stop_operation;
 	klass->is_ready= tny_camel_account_is_ready;
 	klass->set_connection_policy= tny_camel_account_set_connection_policy;
 	klass->get_connection_policy= tny_camel_account_get_connection_policy;
@@ -2328,8 +2256,6 @@ tny_camel_account_class_init (TnyCamelAccountClass *class)
 	class->get_account_type= tny_camel_account_get_account_type_default;
 	class->cancel= tny_camel_account_cancel_default;
 	class->matches_url_string= tny_camel_account_matches_url_string_default;
-	class->start_operation= tny_camel_account_start_operation_default;
-	class->stop_operation=  tny_camel_account_stop_operation_default;
 
 	class->add_option= tny_camel_account_add_option_default;
 	class->clear_options= tny_camel_account_clear_options_default;

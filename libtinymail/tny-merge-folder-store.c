@@ -487,7 +487,7 @@ tny_merge_folder_store_remove_store_default (TnyMergeFolderStore *self, TnyFolde
  * instantly sets the ui locker. For Gtk+ you should use a #TnyGtkLockable here.
  * #ui_locker maybe NULL if your toolkit is unthreaded.
  *
- * returns: (caller-owns): a new #TnyMergeFolderStore instance
+ * returns: (transfer full): a new #TnyMergeFolderStore instance
  * since: 1.0
  * audience: application-developer
  **/

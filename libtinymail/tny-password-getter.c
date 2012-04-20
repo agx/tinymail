@@ -37,7 +37,7 @@
  * tny_password_getter_get_password:
  * @self: a #TnyPasswordGetter
  * @aid: a unique string identifying the requested password
- * @prompt: (null-ok): A human-readable password question
+ * @prompt: (allow-none): A human-readable password question
  * @cancel: (out): by reference whether or not the user cancelled
  * 
  * Get the password of @self identified by @aid. If you set the by reference
@@ -49,7 +49,7 @@
  * a unique string. Possible values of this string are "acap.server.com" or the
  * result of a tny_account_get_id(), or a combination of things.
  *
- * returns: (null-ok) (caller-owns): the password
+ * returns: (transfer none): the password
  * since: 1.0
  * audience: application-developer, type-implementer, platform-developer
  **/

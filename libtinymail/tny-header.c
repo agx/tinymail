@@ -39,7 +39,7 @@
 /**
  * tny_header_set_replyto:
  * @self: a #TnyHeader
- * @to: (null-ok): the reply-to header or NULL
+ * @to: (allow-none): the reply-to header or NULL
  * 
  * Set the reply-to header
  *
@@ -68,7 +68,7 @@ tny_header_set_replyto (TnyHeader *self, const gchar *to)
  * 
  * Get the reply-to header
  * 
- * returns: (null-ok) (caller-owns): reply-to header or NULL
+ * returns: (transfer full): reply-to header or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -86,7 +86,7 @@ tny_header_dup_replyto (TnyHeader *self)
 /**
  * tny_header_set_bcc:
  * @self: a #TnyHeader
- * @bcc: (null-ok): the BCC header in a comma separated list or NULL
+ * @bcc: (allow-none): the BCC header in a comma separated list or NULL
  * 
  * Set the BCC header. Look at the To header for more information
  * about formatting.
@@ -113,7 +113,7 @@ tny_header_set_bcc (TnyHeader *self, const gchar *bcc)
 /**
  * tny_header_set_cc:
  * @self: a #TnyHeader
- * @cc: (null-ok): the CC header in a comma separated list or NULL
+ * @cc: (allow-none): the CC header in a comma separated list or NULL
  * 
  * Set the CC header. Look at the To header for more information
  * about formatting.
@@ -140,7 +140,7 @@ tny_header_set_cc (TnyHeader *self, const gchar *cc)
 /**
  * tny_header_set_from:
  * @self: a #TnyHeader
- * @from: (null-ok): the from header or NULL
+ * @from: (allow-none): the from header or NULL
  * 
  * Set the from header
  *
@@ -166,7 +166,7 @@ tny_header_set_from (TnyHeader *self, const gchar *from)
 /**
  * tny_header_set_subject:
  * @self: a #TnyHeader
- * @subject: (null-ok): the subject header or NULL
+ * @subject: (allow-none): the subject header or NULL
  * 
  * Set the subject header
  *
@@ -192,7 +192,7 @@ tny_header_set_subject (TnyHeader *self, const gchar *subject)
 /**
  * tny_header_set_to:
  * @self: a #TnyHeader
- * @to: (null-ok): the To header in a comma separated list or NULL
+ * @to: (allow-none): the To header in a comma separated list or NULL
  * 
  * Set the To header.
  *
@@ -226,7 +226,7 @@ tny_header_set_to (TnyHeader *self, const gchar *to)
  * 
  * Get the CC header. If not NULL, the returned value must be freed.
  * 
- * returns: (null-ok) (caller-owns): CC header as a alloc'd string or NULL
+ * returns: (transfer full): CC header as a alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -247,7 +247,7 @@ tny_header_dup_cc (TnyHeader *self)
  * 
  * Get the BCC header. If not NULL, the returned value must be freed.
  * 
- * returns: (null-ok) (caller-owns): BCC header as an alloc'd string or NULL
+ * returns: (transfer full): BCC header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -313,7 +313,7 @@ tny_header_get_date_sent (TnyHeader *self)
  * corresponds to the UID in IMAP and the UIDL in POP if UIDL is supported or 
  * the UID if not. If not NULL, the returned value must be freed.
  * 
- * returns: (null-ok) (caller-owns): unique follow-up uid as an alloc'd string or NULL
+ * returns: (transfer full): unique follow-up uid as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -336,7 +336,7 @@ tny_header_dup_uid (TnyHeader *self)
  * message-id corresponds to the message-id header in the MIME message.
  * If not NULL, the returned value must be freed.
  * 
- * returns: (null-ok) (caller-owns): message-id header as an alloc'd string or NULL
+ * returns: (transfer full): message-id header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -382,7 +382,7 @@ tny_header_get_message_size (TnyHeader *self)
  * 
  * Get the from header. If not NULL, the returned value must be freed.
  * 
- * returns: (null-ok) (caller-owns): from header as an alloc'd string or NULL
+ * returns: (transfer full): from header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -403,7 +403,7 @@ tny_header_dup_from (TnyHeader *self)
  * 
  * Get the subject header. If not NULL, the returned value must be freed.
  * 
- * returns: (null-ok) (caller-owns): subject header as an alloc'd string or NULL
+ * returns: (transfer full): subject header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -425,7 +425,7 @@ tny_header_dup_subject (TnyHeader *self)
  * 
  * Get the to header. If not NULL, the returned value must be freed.
  * 
- * returns: (null-ok) (caller-owns): to header as an alloc'd string or NULL
+ * returns: (transfer full): to header as an alloc'd string or NULL
  * since: 1.0
  * audience: application-developer
  **/
@@ -448,7 +448,7 @@ tny_header_dup_to (TnyHeader *self)
  * return NULL in case the folder isn't know. The returned value, if not NULL,
  * must be unreferenced after use.
  * 
- * returns: (null-ok) (caller-owns): The folder of the message header or NULL
+ * returns: (transfer full): The folder of the message header or NULL
  * since: 1.0
  * audience: application-developer
  **/

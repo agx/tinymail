@@ -303,7 +303,7 @@ fill_from_cache (TnyFsStreamCache *self)
  * Creates a stream cache that stores cached streams as files in a filesystem
  * folder specified by @path.
  *
- * returns: (caller-owns): a new #TnyStream instance
+ * returns: (transfer full): a new #TnyStream instance
  * since: 1.0
  * audience: application-developer
  **/

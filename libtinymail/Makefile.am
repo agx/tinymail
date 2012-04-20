@@ -3,13 +3,39 @@ INCLUDES = $(LIBTINYMAIL_CFLAGS) -I. -I$(top_srcdir) $(EXTRA_CFLAGS)
 lib_LTLIBRARIES = libtinymail-2.0.la
 
 tny-signals-marshal.h: tny-signals-marshal.list
-	glib-genmarshal --header --prefix=$(subst -,_,tny)_marshal $< > tny-signals-marshal.h
+	$(AM_V_GEN)$(GLIB_GENMARSHAL) --header --prefix=$(subst -,_,tny)_marshal $< > tny-signals-marshal.h
 
 tny-signals-marshal.c: tny-signals-marshal.list tny-signals-marshal.h
-	glib-genmarshal --body --prefix=$(subst -,_,tny)_marshal $< > tny-signals-marshal.c
+	$(AM_V_GEN)$(GLIB_GENMARSHAL) --body --prefix=$(subst -,_,tny)_marshal $< > tny-signals-marshal.c
 	sed -i "1i#include \"tny-signals-marshal.h\"" tny-signals-marshal.c
 
-CLEANFILES=tny-signals-marshal.c tny-signals-marshal.h
+BUILT_SOURCES = \
+	tny-signals-marshal.h \
+	tny-signals-marshal.c \
+	tny-type-builtins.h \
+	tny-type-builtins.c
+
+CLEANFILES= \
+	$(BUILT_SOURCES) \
+	stamp-tny-type-builtins.h \
+	stamp-tny-type-builtins.c
+
+tny-type-builtins.h: stamp-tny-type-builtins.h
+	@true
+stamp-tny-type-builtins.h: tny-type-builtins.h.template $(libtinymail_2_0_headers)
+	$(AM_V_GEN)$(GLIB_MKENUMS) --template $< $(filter-out $<,$^) > xgen-etbh \
+	&& (cmp -s xgen-etbh tny-type-builtins.h || cp xgen-etbh tny-type-builtins.h ) \
+	&& rm -f xgen-etbh \
+	&& echo timestamp > $(@F)
+
+tny-type-builtins.c: stamp-tny-type-builtins.c
+	@true
+stamp-tny-type-builtins.c: tny-type-builtins.c.template $(libtinymail_2_0_headers)
+	$(AM_V_GEN)$(GLIB_MKENUMS) --template $< $(filter-out $<,$^) > xgen-etbc \
+	&& (cmp -s xgen-etbc tny-type-builtins.c || cp xgen-etbc tny-type-builtins.c ) \
+	&& rm -f xgen-etbc \
+	&& echo timestamp > $(@F)
+
 
 private_headers = tny-common-priv.h observer-mixin-priv.h
 
@@ -114,11 +140,45 @@ libtinymail_2_0_la_LDFLAGS = -export-dynamic -version-info $(LT_VERSION_INFO) $(
 libtinymail_2_0_includedir = $(includedir)/libtinymail-$(API_VERSION)
 libtinymail_2_0_include_HEADERS = $(libtinymail_2_0_headers)
 
+if ENABLE_INTROSPECTION
+
+Tinymail-$(API_VERSION).gir: libtinymail-2.0.la Makefile $(libtinymail_2_0_headers) $(filter %.c,$(libtinymail_2_0_la_SOURCES))
+	$(AM_V_GEN) PKG_CONFIG_PATH=$(top_builddir):$$PKG_CONFIG_PATH \
+	$(G_IR_SCANNER) -v --warn-all --namespace Tinymail \
+	--strip-prefix=Tny \
+	--nsversion=$(API_VERSION) \
+	--include=GLib-2.0 \
+	--include=GObject-2.0 \
+	--library=tinymail-2.0 \
+	--libtool="$(LIBTOOL)" \
+	--output $@ \
+	-I$(top_srcdir) \
+	-I$(top_builddir) \
+	$(filter %.h,$^) \
+	$(filter %.c,$^)
+
+girdir = $(GIRDIR)
+gir_DATA = Tinymail-$(API_VERSION).gir
+
+typelibsdir = $(GIRTYPELIBDIR)
+typelibs_DATA = Tinymail-$(API_VERSION).typelib
+
+%.typelib: %.gir
+	$(AM_V_GEN) LD_LIBRARY_PATH=$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}. $(G_IR_COMPILER) \
+	--includedir=$(srcdir) \
+	$(G_IR_COMPILER_OPTS) \
+	$< -o $@
+endif #ENABLE_INSTROSPECTION
+
+
 libtinymail-$(API_VERSION).pc: libtinymail.pc
 	cp $< $@
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libtinymail-$(API_VERSION).pc
-EXTRA_DIST = $(pkgconfig_DATA:-$(API_VERSION).pc=.pc.in) tny-signals-marshal.list
+EXTRA_DIST = $(pkgconfig_DATA:-$(API_VERSION).pc=.pc.in) \
+	tny-type-builtins.c.template \
+	tny-type-builtins.h.template \
+	tny-signals-marshal.list
 
 DISTCLEANFILES = $(pkgconfig_DATA)

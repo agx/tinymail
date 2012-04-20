@@ -111,7 +111,7 @@ tny_cached_file_stream_close (TnyStream *self)
  * @cached_file: a #TnyCachedFile
  * @fd: The file descriptor to write to or read from
  *
- * returns: (caller-owns): a new #TnyStream instance
+ * returns: (transfer full): a new #TnyStream instance
  * since: 1.0
  * audience: tinymail-developer
  **/

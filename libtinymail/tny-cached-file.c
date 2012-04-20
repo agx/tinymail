@@ -210,6 +210,14 @@ get_new_fd_of_stream (TnyCachedFile *self, gboolean creation, gboolean temp)
 	return new_fd;
 }
 
+/**
+ * tny_cached_file_get_stream:
+ * @self: a #TnyCachedFile
+ *
+ * Obtains the stream for the cached file.
+ *
+ * Returns: (transfer full): a #TnyCachedFile
+ */
 TnyStream *
 tny_cached_file_get_stream (TnyCachedFile *self)
 {
@@ -385,8 +393,8 @@ async_fetch_stream (gpointer userdata)
  * tny_cached_file_new:
  * @stream_cache: the cache the file will be added to
  * @id: the stream unique-id
- * @fetcher: a #TnyStreamCacheOpenStreamFetcher
- * @userdata: a #gpointer
+ * @expected_size: expected size of the file
+ * @input_stream: a #TnyStream
  *
  * Creates a cached file information object. This object maintains the stream
  * that fetches the file @id into @stream_cache, and gives valid TnySeekable
@@ -395,7 +403,7 @@ async_fetch_stream (gpointer userdata)
  * If @fetcher and @userdata are %NULL, then it assumes the file is already in 
  * @stream_cache
  *
- * returns: (caller-owns): a new #TnyCachedFile instance
+ * returns: (transfer full): a new #TnyCachedFile instance
  * since: 1.0
  * audience: application-developer
  **/

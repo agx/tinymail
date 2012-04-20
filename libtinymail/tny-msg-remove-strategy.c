@@ -36,7 +36,7 @@
  * @self: a #TnyMsgRemoveStrategy 
  * @folder: a #TnyFolder from which the message will be removed
  * @header: a #TnyHeader of the message that must be removed
- * @err: (null-ok): a #GError or NULL
+ * @err: (allow-none): a #GError or NULL
  *
  * Performs the removal of a message from @folder.
  *

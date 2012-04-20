@@ -208,7 +208,7 @@ tny_simple_list_init (TnySimpleList *self)
  * 
  * Create a general purpose #TnyList instance
  *
- * returns: (caller-owns): A general purpose #TnyList instance
+ * returns: (transfer full): A general purpose #TnyList instance
  **/
 TnyList*
 tny_simple_list_new (void)

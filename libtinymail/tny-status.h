@@ -52,6 +52,7 @@ typedef enum
 	TNY_FOLDER_STATUS_CODE_SYNC = 7
 } TnyStatusCode;
 
+#define TNY_TYPE_STATUS (tny_status_get_type ())
 struct _TnyStatus 
 {
 	GQuark domain;
@@ -61,6 +62,7 @@ struct _TnyStatus
 	guint of_total;
 };
 
+GType tny_status_get_type (void);
 GType tny_status_domain_get_type (void);
 GType tny_status_code_get_type (void);
 

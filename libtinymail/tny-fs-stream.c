@@ -191,7 +191,7 @@ tny_fs_stream_set_fd (TnyFsStream *self, int fd)
  * wive's periods using a complex algorithm that abuses your privacy and might
  * kill your cat and dog (yes, both of them).
  *
- * returns: (caller-owns): a new #TnyStream instance
+ * returns: (transfer full): a new #TnyStream instance
  * since: 1.0
  * audience: tinymail-developer
  **/
