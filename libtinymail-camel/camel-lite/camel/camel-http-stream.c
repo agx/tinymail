@@ -168,7 +168,7 @@ camel_http_stream_new (CamelHttpMethod method, CamelService *service, CamelURL *
 	return (CamelStream *)stream;
 }
 
-#define SSL_FLAGS (CAMEL_TCP_STREAM_SSL_ENABLE_SSL2 | CAMEL_TCP_STREAM_SSL_ENABLE_SSL3)
+#define SSL_FLAGS (CAMEL_TCP_STREAM_SSL_ENABLE_SSL2 | CAMEL_TCP_STREAM_SSL_ENABLE_SSL3 | CAMEL_TCP_STREAM_SSL_ENABLE_TLS)
 
 static CamelStream *
 http_connect (CamelHttpStream *http, CamelURL *url)
