@@ -144,7 +144,7 @@ TinymailCamel-$(API_VERSION).gir: libtinymail-camel-2.0.la Makefile $(libtinymai
 	--nsversion=$(API_VERSION) \
 	--include=GLib-2.0 \
 	--include=GObject-2.0 \
-	--include=Tinymail-2.0 \
+	--include-uninstalled=$(top_builddir)/libtinymail/Tinymail-2.0.gir \
 	--library=tinymail-camel-2.0 \
 	--libtool="$(LIBTOOL)" \
 	--output $@ \
@@ -164,6 +164,7 @@ typelibs_DATA = TinymailCamel-$(API_VERSION).typelib
 %.typelib: %.gir
 	$(AM_V_GEN) LD_LIBRARY_PATH=$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}. $(G_IR_COMPILER) \
 	--includedir=$(srcdir) \
+	--includedir=$(top_builddir)/libtinymail/ \
 	$(G_IR_COMPILER_OPTS) \
 	$< -o $@
 endif #ENABLE_INSTROSPECTION
